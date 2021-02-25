@@ -9,13 +9,13 @@ using System.Collections;
 
 namespace MECCG_Deck_Builder
 {
-    internal class CardImages
+    internal class Cards
     {
         private readonly SortedDictionary<string, string> card = new SortedDictionary<string, string>();
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
 
 
-        internal CardImages()
+        internal Cards()
         {
             LoadImages();
             ReadMETW_TTSfile();

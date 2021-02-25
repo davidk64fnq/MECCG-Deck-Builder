@@ -8,344 +8,125 @@ namespace MECCG_Deck_Builder
 
     internal partial class Form1 : Form
     {
-        private List<string[]> cardList = new List<string[]>();
+        // There is a master listbox of all cards in selected sets on the left, from which
+        // cards can be copied to the tabs on the right. On the right are five tabs each with 
+        // a listbox for pool/resource/hazard/sideboard/site, cards can be copied/moved between 
+        // tabs and deleted from a tab. Each listbox has an associated list with the card set
+        // and id. "meccgCards" is where all information about each card is stored.
+
+        private List<string[]> masterList = new List<string[]>();
         private List<string[]> poolList = new List<string[]>();
         private List<string[]> resourceList = new List<string[]>();
         private List<string[]> hazardList = new List<string[]>();
         private List<string[]> sideboardList = new List<string[]>();
         private List<string[]> siteList = new List<string[]>();
         private readonly List<string> setList = new List<string>();
-        private readonly CardImages meccgImages = new CardImages();
+        private readonly Cards meccgCards = new Cards();
+
         internal Form1()
         {
             InitializeComponent();
 
-            ((ToolStripMenuItem)ToolStripMenuItemTW).Checked = true;
+            ((ToolStripMenuItem)ToolStripMenuTW).Checked = true;
 
         }
-        private void UpdateCardList(string setName)
+
+        private void ListBoxMasterList_MouseDown(object sender, MouseEventArgs e)
         {
-            // Maintain list of user selected sets
-            if (setList.Contains(setName))
+            // Only use the right mouse button.
+            if (e.Button == MouseButtons.Right)
             {
-                setList.Remove(setName);
-            }
-            else
-            {
-                setList.Add(setName);
-            }
-
-            // Store current card selected before resetting card list
-            string curCardname = $"{ListBoxCardList.SelectedItem}";
-            string curCardSet = "";
-            if (ListBoxCardList.SelectedIndex >= 0)
-            {
-                curCardSet = cardList[ListBoxCardList.SelectedIndex][(int)CardListField.set];
-            }
-            
-            int curSelection = ListBoxCardList.SelectedIndex;
-
-            // Retrieve and set new list of cards
-            ListBoxCardList.Items.Clear();
-            cardList = meccgImages.GetCardList(setList);
-            foreach (var card in cardList)
-            {
-                ListBoxCardList.Items.Add(card[(int)CardListField.name]);
-            }
-
-            // Find new location of selected card if it's still in list
-            int locatedIndex = -1;
-            int index = -1;
-            foreach (var card in cardList)
-            {
-                index++;
-                if (Equals(card[(int)CardListField.name], curCardname) && Equals(card[(int)CardListField.set] == curCardSet))
-                {
-                    locatedIndex = index;
-                    break;
-                }
-            } 
-
-            // Set currently selected card
-            var curListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
-            if (locatedIndex >= 0)
-            {
-                // Restore previously selected card in cardList (which could be from another set)
-                ListBoxCardList.SelectedIndex = locatedIndex;
-            }
-            else if (curSelection >= 0 && curListbox.Items.Count > 0)
-            {
-                // Select first card on active tab
-                curListbox.SelectedIndex = 0;
-            }
-            else if (curListbox.Items.Count == 0)
-            {
-                // Select first card in cardList
-                ListBoxCardList.SelectedIndex = 0;
-            }
-        }
-
-        private void ListBoxCardList_MouseDown(object sender, MouseEventArgs e)
-        {
-            ListBoxCardList_SelectedIndexChanged(sender, e);
-
-            if (e.Button == MouseButtons.Left && e.Clicks == 1)
-            {
-                int index = ListBoxCardList.IndexFromPoint(e.X, e.Y);
-                if (index == ListBox.NoMatches)
+                // Find the item under the mouse.
+                int index = ListBoxMasterList.IndexFromPoint(e.Location);
+                if (index < 0)
                 {
                     return;
                 }
-                string cardToMove = ListBoxCardList.Items[index].ToString();
-                DoDragDrop(cardToMove, DragDropEffects.Copy);
+                ListBoxMasterList.SelectedIndex = index;
+                ListBox_SelectedIndexChanged(sender, e);
+
+                // Drag the item.
+                string cardText = ListBoxMasterList.SelectedItem.ToString();
+                ListBoxMasterList.DoDragDrop(cardText, DragDropEffects.Copy);
+            }
+            return;
+        }
+
+        private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ListBox currentListBox = GetCurrentListBox(((ListBox)sender).Parent.Name);
+            if (currentListBox != null && currentListBox.SelectedIndex >= 0)
+            {
+                int currentIndex = currentListBox.SelectedIndex;
+
+                // Deselect other listboxes
+                if (currentListBox.Name != ListBoxMasterList.Name)
+                    ListBoxMasterList.ClearSelected();
+                if (currentListBox.Name != ListBoxPool.Name)
+                    ListBoxPool.ClearSelected();
+                if (currentListBox.Name != ListBoxResources.Name)
+                    ListBoxResources.ClearSelected();
+                if (currentListBox.Name != ListBoxHazards.Name)
+                    ListBoxHazards.ClearSelected();
+                if (currentListBox.Name != ListBoxSideboard.Name)
+                    ListBoxSideboard.ClearSelected();
+                if (currentListBox.Name != ListBoxSites.Name)
+                    ListBoxSites.ClearSelected();
+
+                // Display card image from correct set
+                List<string[]> currentList = GetCardListRef(currentListBox);
+                PictureBoxCardImage.Image = Image.FromFile($"{currentList[currentIndex][(int)CardListField.set]}\\{currentListBox.SelectedItem}.png");
             }
         }
 
-        private void ListBoxPool_DragOver(object sender, DragEventArgs e)
+        private void ListBoxTab_DragOver(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Copy;
         }
 
-        private void ListBoxResources_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effect = DragDropEffects.Copy;
-        }
-
-        private void ListBoxHazards_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effect = DragDropEffects.Copy;
-        }
-
-        private void ListBoxSideboard_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effect = DragDropEffects.Copy;
-        }
-
-        private void ListBoxSites_DragOver(object sender, DragEventArgs e)
-        {
-            e.Effect = DragDropEffects.Copy;
-        }
-
-        private void ListBoxPool_DragDrop(object sender, DragEventArgs e)
+        private void ListBoxTab_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.StringFormat))
             {
                 string str = (string)e.Data.GetData(DataFormats.StringFormat);
-
-                ListBoxPool.Items.Add(str);
-                poolList.Add(cardList[ListBoxCardList.SelectedIndex]);
-                poolList.Sort(CompareCardsByName);
+                ListBox currentTabListBox = GetCurrentTabListBox(TabControlDeck.SelectedIndex);
+                currentTabListBox.Items.Add(str);
+                List<string[]> currentTabList = GetCardListRef(currentTabListBox);
+                currentTabList.Add(masterList[ListBoxMasterList.SelectedIndex]);
+                currentTabList.Sort(CompareCardsByName);
             }
         }
 
-        private void ListBoxResources_DragDrop(object sender, DragEventArgs e)
+        private ListBox GetCurrentTabListBox(int currentTabIndex)
         {
-            if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            switch (currentTabIndex)
             {
-                string str = (string)e.Data.GetData(DataFormats.StringFormat);
-
-                ListBoxResources.Items.Add(str);
-                resourceList.Add(cardList[ListBoxCardList.SelectedIndex]);
-                resourceList.Sort(CompareCardsByName);
+                case (int)DeckTab.pool:
+                    return ListBoxPool;
+                case (int)DeckTab.resources:
+                    return ListBoxResources;
+                case (int)DeckTab.hazards:
+                    return ListBoxHazards;
+                case (int)DeckTab.sideboard:
+                    return ListBoxSideboard;
+                case (int)DeckTab.sites:
+                    return ListBoxSites;
+                default:
+                    break;
             }
+            return null;
         }
 
-        private void ListBoxHazards_DragDrop(object sender, DragEventArgs e)
+        private List<string[]> GetCardListRef(ListBox listbox)
         {
-            if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            if (listbox == null)
             {
-                string str = (string)e.Data.GetData(DataFormats.StringFormat);
-
-                ListBoxHazards.Items.Add(str);
-                hazardList.Add(cardList[ListBoxCardList.SelectedIndex]);
-                hazardList.Sort(CompareCardsByName);
+                return null;
             }
-        }
-
-        private void ListBoxSideboard_DragDrop(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            switch (listbox.Name)
             {
-                string str = (string)e.Data.GetData(DataFormats.StringFormat);
-
-                ListBoxSideboard.Items.Add(str);
-                sideboardList.Add(cardList[ListBoxCardList.SelectedIndex]);
-                sideboardList.Sort(CompareCardsByName);
-            }
-        }
-
-        private void ListBoxSites_DragDrop(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.StringFormat))
-            {
-                string str = (string)e.Data.GetData(DataFormats.StringFormat);
-
-                ListBoxSites.Items.Add(str);
-                siteList.Add(cardList[ListBoxCardList.SelectedIndex]);
-                siteList.Sort(CompareCardsByName);
-            }
-        }
-
-        private int CompareCardsByName(string[] x, string[] y)
-        {
-            return x[(int)CardListField.name].CompareTo(y[(int)CardListField.name]);
-        }
-
-        private void ListBoxCardList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ListBoxCardList.SelectedIndex >= 0)
-            {
-                // Deselect other listboxes
-                ListBoxPool.ClearSelected();
-                ListBoxResources.ClearSelected();
-                ListBoxHazards.ClearSelected();
-                ListBoxSideboard.ClearSelected();
-                ListBoxSites.ClearSelected();
-
-                // Display card image from correct set
-                PictureBoxCardImage.Image = Image.FromFile($"{cardList[ListBoxCardList.SelectedIndex][(int)CardListField.set]}\\{ListBoxCardList.SelectedItem}.png");
-            }
-        }
-
-        private void ListBoxPool_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ListBoxPool.SelectedIndex >= 0)
-            {
-                // Deselect other listboxes
-                ListBoxCardList.ClearSelected();
-                ListBoxResources.ClearSelected();
-                ListBoxHazards.ClearSelected();
-                ListBoxSideboard.ClearSelected();
-                ListBoxSites.ClearSelected();
-
-                // Display card image from correct set
-                PictureBoxCardImage.Image = Image.FromFile($"{poolList[ListBoxPool.SelectedIndex][(int)CardListField.set]}\\{ListBoxPool.SelectedItem}.png");
-            }
-        }
-
-        private void ListBoxResources_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ListBoxResources.SelectedIndex >= 0)
-            {
-                // Deselect other listboxes
-                ListBoxCardList.ClearSelected();
-                ListBoxPool.ClearSelected();
-                ListBoxHazards.ClearSelected();
-                ListBoxSideboard.ClearSelected();
-                ListBoxSites.ClearSelected();
-
-                // Display card image from correct set
-                PictureBoxCardImage.Image = Image.FromFile($"{resourceList[ListBoxResources.SelectedIndex][(int)CardListField.set]}\\{ListBoxResources.SelectedItem}.png");
-            }
-        }
-
-        private void ListBoxHazards_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ListBoxHazards.SelectedIndex >= 0)
-            {
-                // Deselect other listboxes
-                ListBoxCardList.ClearSelected();
-                ListBoxPool.ClearSelected();
-                ListBoxResources.ClearSelected();
-                ListBoxSideboard.ClearSelected();
-                ListBoxSites.ClearSelected();
-
-                // Display card image from correct set
-                PictureBoxCardImage.Image = Image.FromFile($"{hazardList[ListBoxHazards.SelectedIndex][(int)CardListField.set]}\\{ListBoxHazards.SelectedItem}.png");
-            }
-        }
-
-        private void ListBoxSideboard_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ListBoxSideboard.SelectedIndex >= 0)
-            {
-                // Deselect other listboxes
-                ListBoxCardList.ClearSelected();
-                ListBoxPool.ClearSelected();
-                ListBoxResources.ClearSelected();
-                ListBoxHazards.ClearSelected();
-                ListBoxSites.ClearSelected();
-
-                // Display card image from correct set
-                PictureBoxCardImage.Image = Image.FromFile($"{sideboardList[ListBoxSideboard.SelectedIndex][(int)CardListField.set]}\\{ListBoxSideboard.SelectedItem}.png");
-            }
-        }
-
-        private void ListBoxSites_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (ListBoxSites.SelectedIndex >= 0)
-            {
-                // Deselect other listboxes
-                ListBoxCardList.ClearSelected();
-                ListBoxPool.ClearSelected();
-                ListBoxResources.ClearSelected();
-                ListBoxHazards.ClearSelected();
-                ListBoxSideboard.ClearSelected();
-
-                // Display card image from correct set
-                PictureBoxCardImage.Image = Image.FromFile($"{siteList[ListBoxSites.SelectedIndex][(int)CardListField.set]}\\{ListBoxSites.SelectedItem}.png");
-            }
-        }
-
-        private void ToolStripMenuItemTW_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.METW);
-        }
-
-        private void ToolStripMenuItemTD_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.METD);
-        }
-
-        private void ToolStripMenuItemDM_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.MEDM);
-        }
-
-        private void ToolStripMenuItemLE_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.MELE);
-        }
-
-        private void ToolStripMenuItemAS_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.MEAS);
-        }
-
-        private void ToolStripMenuItemWH_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.MEWH);
-        }
-
-        private void ToolStripMenuItemBA_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateCardList(Constants.MEBA);
-        }
-
-        private void ListBoxCardList_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            ListBox sourceListbox = ListBoxCardList;
-            ListBox destListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
-            List<string[]> sourceList = cardList;
-            List<string[]> destList = GetDestCardlist(destListbox);
-            int index = ListBoxCardList.IndexFromPoint(e.X, e.Y);
-            AddCardToListBox(sourceListbox, destListbox, sourceList, destList, index);
-        }
-
-        private void ListBoxTab_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            ListBox sourceListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
-            ListBox destListbox = sourceListbox;
-            List<string[]> sourceList = GetDestCardlist(destListbox);
-            List<string[]> destList = sourceList;
-            int index = sourceListbox.IndexFromPoint(e.X, e.Y);
-            AddCardToListBox(sourceListbox, destListbox, sourceList, destList, index);
-        }
-
-        private List<string[]> GetDestCardlist(ListBox destListbox)
-        {
-            switch (destListbox.Name)
-            {
+                case "ListBoxCardList":
+                    return masterList;
                 case "ListBoxPool":
                     return poolList;
                 case "ListBoxResources":
@@ -359,10 +140,121 @@ namespace MECCG_Deck_Builder
                 default:
                     break;
             }
-            return cardList;
+            return masterList;
         }
 
-        private void AddCardToListBox(ListBox sourceListbox, ListBox destListbox, List<string[]> sourceList, List<string[]> destList, int index)
+        private int CompareCardsByName(string[] x, string[] y)
+        {
+            return x[(int)CardListField.name].CompareTo(y[(int)CardListField.name]);
+        }
+
+        private ListBox GetCurrentListBox(string senderParent)
+        {
+            if (senderParent == Constants.senderMaster)
+            {
+                return ListBoxMasterList;
+            }
+            else if (senderParent == Constants.senderPool)
+            {
+                return ListBoxPool;
+            }
+            else if (senderParent == Constants.senderResource)
+            {
+                return ListBoxResources;
+            }
+            else if (senderParent == Constants.senderHazard)
+            {
+                return ListBoxHazards;
+            }
+            else if (senderParent == Constants.senderSideboard)
+            {
+                return ListBoxSideboard;
+            }
+            else if (senderParent == Constants.senderSite)
+            {
+                return ListBoxSites;
+            }
+            return null;
+        }
+
+        private void ToolStripMenuSet_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateMasterList(((ToolStripMenuItem)sender).Tag.ToString());
+        }
+
+        private void UpdateMasterList(string setName)
+        {
+            // Update list of user selected sets
+            if (setList.Contains(setName))
+            {
+                setList.Remove(setName);
+            }
+            else
+            {
+                setList.Add(setName);
+            }
+
+            // Store current card selected before resetting master list
+            string curCardId = "";
+            if (ListBoxMasterList.SelectedIndex >= 0)
+            {
+                curCardId = masterList[ListBoxMasterList.SelectedIndex][(int)CardListField.id];
+            }
+
+            // Retrieve and set new list of cards
+            ListBoxMasterList.Items.Clear();
+            masterList = meccgCards.GetCardList(setList);
+            foreach (var card in masterList)
+            {
+                ListBoxMasterList.Items.Add(card[(int)CardListField.name]);
+            }
+
+            // Set currently selected card
+            SetCardFocusAfterSetChange(curCardId);
+        }
+
+        private void SetCardFocusAfterSetChange(string curCardId)
+        {
+            // Find new location of selected card if it's still in master list
+            int index = 0;
+            foreach (var card in masterList)
+            {
+                if (card[(int)CardListField.id] == curCardId)
+                {
+                    ListBoxMasterList.SelectedIndex = index;
+                    return;
+                }
+                index++;
+            }
+
+            // Default choice
+            if (ListBoxMasterList.Items.Count > 0)
+            {
+                ListBoxMasterList.SelectedIndex = 0;
+            }
+        }
+
+        private void ListBoxCardList_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ListBox sourceListbox = ListBoxMasterList;
+            ListBox destListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
+            List<string[]> sourceList = masterList;
+            List<string[]> destList = GetCardListRef(destListbox);
+            int index = ListBoxMasterList.IndexFromPoint(e.X, e.Y);
+            AddCard(sourceListbox, destListbox, sourceList, destList, index);
+        }
+
+        private void ListBoxTab_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            ListBox sourceListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
+            ListBox destListbox = sourceListbox;
+            List<string[]> sourceList = GetCardListRef(destListbox);
+            List<string[]> destList = sourceList;
+            int index = sourceListbox.IndexFromPoint(e.X, e.Y);
+            AddCard(sourceListbox, destListbox, sourceList, destList, index);
+        }
+
+        private void AddCard(ListBox sourceListbox, ListBox destListbox, List<string[]> sourceList, List<string[]> destList, int index)
         {
             if (index == ListBox.NoMatches)
             {
@@ -371,47 +263,6 @@ namespace MECCG_Deck_Builder
             destListbox.Items.Add(sourceListbox.Items[index]);
             destList.Add(sourceList[index]);
             destList.Sort(CompareCardsByName);
-        }
-
-        private void ListBoxTab_MouseDown(object sender, MouseEventArgs e)
-        {
-            ListBox curListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
-
-            if (e.Button == MouseButtons.Right && e.Clicks == 1)
-            {
-                int index = curListbox.IndexFromPoint(e.X, e.Y);
-                if (index == ListBox.NoMatches)
-                {
-                    return;
-                }
-                curListbox.Items.Remove(curListbox.Items[index]);
-                switch (curListbox.Name)
-                {
-                    case "ListBoxPool":
-                        poolList.Remove(poolList[index]);
-                        poolList.Sort(CompareCardsByName);
-                        break;
-                    case "ListBoxResources":
-                        resourceList.Remove(resourceList[index]);
-                        resourceList.Sort(CompareCardsByName);
-                        break;
-                    case "ListBoxHazards":
-                        hazardList.Remove(hazardList[index]);
-                        hazardList.Sort(CompareCardsByName);
-                        break;
-                    case "ListBoxSideboard":
-                        sideboardList.Remove(sideboardList[index]);
-                        sideboardList.Sort(CompareCardsByName);
-                        break;
-                    case "ListBoxSites":
-                        siteList.Remove(siteList[index]);
-                        siteList.Sort(CompareCardsByName);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
         }
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -426,11 +277,11 @@ namespace MECCG_Deck_Builder
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
             {
                 string savePrefix = saveFileDialog.FileName.Substring(0, saveFileDialog.FileName.IndexOf("."));
-                meccgImages.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix);
-                meccgImages.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix);
-                meccgImages.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix);
-                meccgImages.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
-                meccgImages.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix);
+                meccgCards.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix);
+                meccgCards.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix);
+                meccgCards.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix);
+                meccgCards.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
+                meccgCards.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix);
             }
         }
 
@@ -456,77 +307,155 @@ namespace MECCG_Deck_Builder
                 for (int index = 0; index < openFileDialog.FileNames.Length; index++)
                 {
                     string curFileName = openFileDialog.FileNames[index];
-                    string openPrefix = openFileDialog.FileNames[index].Substring(0, openFileDialog.FileName.IndexOf("_"));
                     string openSuffix = curFileName[curFileName.IndexOf("_")..];
-                    switch (openSuffix)
+
+                    ListBox currentListBox = GetOpenFileListBox(openSuffix);
+                    List<string[]> currentList = GetCardListRef(currentListBox);
+                    currentList = meccgCards.OpenMETW_TTSfile(curFileName);
+                    currentListBox.Items.Clear();
+                    foreach (var card in currentList)
                     {
-                        case Constants.poolFileSuffix:
-                            poolList = meccgImages.OpenMETW_TTSfile(openPrefix + Constants.poolFileSuffix);
-                            ListBoxPool.Items.Clear();
-                            foreach (var card in poolList)
-                            {
-                                ListBoxPool.Items.Add(card[(int)CardListField.name]);
-                            }
-                            break;
-                        case Constants.resourceFileSuffix:
-                            resourceList = meccgImages.OpenMETW_TTSfile(openPrefix + Constants.resourceFileSuffix);
-                            ListBoxResources.Items.Clear();
-                            foreach (var card in resourceList)
-                            {
-                                ListBoxResources.Items.Add(card[(int)CardListField.name]);
-                            }
-                            break;
-                        case Constants.hazardFileSuffix:
-                            hazardList = meccgImages.OpenMETW_TTSfile(openPrefix + Constants.hazardFileSuffix);
-                            ListBoxHazards.Items.Clear();
-                            foreach (var card in hazardList)
-                            {
-                                ListBoxHazards.Items.Add(card[(int)CardListField.name]);
-                            }
-                            break;
-                        case Constants.sideboardFileSuffix:
-                            sideboardList = meccgImages.OpenMETW_TTSfile(openPrefix + Constants.sideboardFileSuffix);
-                            ListBoxSideboard.Items.Clear();
-                            foreach (var card in sideboardList)
-                            {
-                                ListBoxSideboard.Items.Add(card[(int)CardListField.name]);
-                            }
-                            break;
-                        case Constants.siteFileSuffix:
-                            siteList = meccgImages.OpenMETW_TTSfile(openPrefix + Constants.siteFileSuffix);
-                            ListBoxSites.Items.Clear();
-                            foreach (var card in siteList)
-                            {
-                                ListBoxSites.Items.Add(card[(int)CardListField.name]);
-                            }
-                            break;
-                        default:
-                            break;
+                        currentListBox.Items.Add(card[(int)CardListField.name]);
                     }
                 }
             }
         }
 
-        private void ToolStripMenuItemPool_Click(object sender, EventArgs e)
+        private ListBox GetOpenFileListBox(string fileSuffix)
         {
-            ListBox sourceListbox = ListBoxCardList;
-            ListBox destListbox = ListBoxPool;
-            List<string[]> sourceList = cardList;
-            List<string[]> destList = poolList;
-            int index = ListBoxCardList.SelectedIndex;
-            AddCardToListBox(sourceListbox, destListbox, sourceList, destList, index);
-            TabControlDeck.SelectTab(0);
+            if (fileSuffix == Constants.poolFileSuffix)
+            {
+                return ListBoxPool;
+            }
+            else if (fileSuffix == Constants.resourceFileSuffix)
+            {
+                return ListBoxResources;
+            }
+            else if (fileSuffix == Constants.hazardFileSuffix)
+            {
+                return ListBoxHazards;
+            }
+            else if (fileSuffix == Constants.sideboardFileSuffix)
+            {
+                return ListBoxSideboard;
+            }
+            else if (fileSuffix == Constants.siteFileSuffix)
+            {
+                return ListBoxSites;
+            }
+            return null;
         }
 
-        private void ToolStripMenuItemResource_Click(object sender, EventArgs e)
+        private ListBox GetListBoxRef(object sender)
         {
-            ListBox sourceListbox = ListBoxCardList;
-            ListBox destListbox = ListBoxResources;
-            List<string[]> sourceList = cardList;
-            List<string[]> destList = resourceList;
-            int index = ListBoxCardList.SelectedIndex;
-            AddCardToListBox(sourceListbox, destListbox, sourceList, destList, index);
-            TabControlDeck.SelectTab(1);
+            if (((ToolStripMenuItem)sender).Name.Contains(Constants.Pool))
+            {
+                return ListBoxPool;
+            }
+            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Resource))
+            {
+                return ListBoxResources;
+            }
+            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Hazard))
+            {
+                return ListBoxHazards;
+            }
+            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Sideboard))
+            {
+                return ListBoxSideboard;
+            }
+            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Site))
+            {
+                return ListBoxSites;
+            }
+            return null;
+        }
+
+        private string GetOperation(object sender)
+        {
+            string operation;
+            if (((ToolStripMenuItem)sender).Name.Contains(Constants.Copy))
+            {
+                operation = Constants.Copy;
+            }
+            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Move))
+            {
+                operation = Constants.Move;
+            }
+            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Delete))
+            {
+                operation = Constants.Delete;
+            }
+            else
+            {
+                operation = "";
+            }
+            return operation;
+        }
+
+        private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
+        {
+            listBox.Items.Remove(listBox.Items[index]);
+            cardList.Remove(cardList[index]);
+            cardList.Sort(CompareCardsByName);
+        }
+
+        private void ToolStripMenuTab_Click(object sender, EventArgs e)
+        {
+            if (ListBoxMasterList.SelectedIndex >= 0)
+            {
+                return;
+            }
+            ListBox sourceListbox = GetCurrentListBox();
+            if (sourceListbox != null)
+            {
+                List<string[]> sourceList = GetCardListRef(sourceListbox);
+                int index = sourceListbox.SelectedIndex;
+                if (GetOperation(sender) == Constants.Delete)
+                {
+                    RemoveCard(sourceListbox, sourceList, index);
+                    return;
+                }
+                ListBox destListbox = GetListBoxRef(sender);
+                List<string[]> destList = GetCardListRef(destListbox);
+                if (index >= 0)
+                {
+                    AddCard(sourceListbox, destListbox, sourceList, destList, index);
+                    if (GetOperation(sender) == Constants.Move)
+                    {
+                        RemoveCard(sourceListbox, sourceList, index);
+                    }
+                }
+            }
+        }
+
+        private ListBox GetCurrentListBox()
+        {
+            if (ListBoxMasterList.SelectedIndex >= 0)
+            {
+                return ListBoxMasterList;
+            }
+            else if (ListBoxPool.SelectedIndex >= 0)
+            {
+                return ListBoxPool;
+            }
+            else if (ListBoxResources.SelectedIndex >= 0)
+            {
+                return ListBoxResources;
+            }
+            else if (ListBoxHazards.SelectedIndex >= 0)
+            {
+                return ListBoxHazards;
+            }
+            else if (ListBoxSideboard.SelectedIndex >= 0)
+            {
+                return ListBoxSideboard;
+            }
+            else if (ListBoxSites.SelectedIndex >= 0)
+            {
+                return ListBoxSites;
+            }
+            return null;
         }
     }
 }

@@ -7,6 +7,15 @@ namespace MECCG_Deck_Builder
         set,
         id
     }
+
+    internal enum DeckTab
+    {
+        pool,
+        resources,
+        hazards,
+        sideboard,
+        sites
+    }
     static class Constants
     {
         public const string METW = "metw";
@@ -23,6 +32,21 @@ namespace MECCG_Deck_Builder
         public const string sideboardFileSuffix = "_sideboard.json";
         public const string siteFileSuffix = "_site.json";
 
+        public const string Move = "Move";
+        public const string Copy = "Copy";
+        public const string Delete = "Delete";
+        public const string Pool = "Pool";
+        public const string Resource = "Resource";
+        public const string Hazard = "Hazard";
+        public const string Sideboard = "Sideboard";
+        public const string Site = "Site";
+
+        public const string senderMaster = "Form1";
+        public const string senderPool = "TabPagePool";
+        public const string senderResource = "TabPageResources";
+        public const string senderHazard = "TabPageHazards";
+        public const string senderSideboard = "TabPageSideboard";
+        public const string senderSite = "TabPageSites";
     }
 
 }
