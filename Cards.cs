@@ -163,10 +163,8 @@ namespace MECCG_Deck_Builder
             File.WriteAllText(filePathOutput, outputText);
         }
 
-        internal List<string[]> OpenMETW_TTSfile(string filePathName)
+        internal void OpenMETW_TTSfile(string filePathName, List<string[]> cardList)
         {
-            List<string[]> cardList = new List<string[]>();
-
             using StreamReader r = new StreamReader(filePathName);
             string json = r.ReadToEnd();
             var Items = JsonConvert.DeserializeObject<Root>(json);
@@ -182,8 +180,6 @@ namespace MECCG_Deck_Builder
                 cardList.Add(cardItems);
             }
             cardList.Sort(CompareCardsByName);
-
-            return cardList;
         }
 
         private void ReadMETW_TTSfile()

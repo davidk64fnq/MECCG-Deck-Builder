@@ -31,7 +31,7 @@ namespace MECCG_Deck_Builder
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.ListBoxMasterList = new System.Windows.Forms.ListBox();
+            this.ListBoxMaster = new System.Windows.Forms.ListBox();
             this.ContextMenuStripTabs = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ToolStripMenuItemCopyCard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
@@ -107,17 +107,17 @@ namespace MECCG_Deck_Builder
             this.MenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // ListBoxMasterList
+            // ListBoxMaster
             // 
-            this.ListBoxMasterList.FormattingEnabled = true;
-            this.ListBoxMasterList.ItemHeight = 15;
-            this.ListBoxMasterList.Location = new System.Drawing.Point(12, 37);
-            this.ListBoxMasterList.Name = "ListBoxMasterList";
-            this.ListBoxMasterList.Size = new System.Drawing.Size(190, 529);
-            this.ListBoxMasterList.TabIndex = 0;
-            this.ListBoxMasterList.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
-            this.ListBoxMasterList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxCardList_MouseDoubleClick);
-            this.ListBoxMasterList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxMasterList_MouseDown);
+            this.ListBoxMaster.FormattingEnabled = true;
+            this.ListBoxMaster.ItemHeight = 15;
+            this.ListBoxMaster.Location = new System.Drawing.Point(12, 37);
+            this.ListBoxMaster.Name = "ListBoxMaster";
+            this.ListBoxMaster.Size = new System.Drawing.Size(190, 529);
+            this.ListBoxMaster.TabIndex = 0;
+            this.ListBoxMaster.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
+            this.ListBoxMaster.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxCardList_MouseDoubleClick);
+            this.ListBoxMaster.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxMasterList_MouseDown);
             // 
             // ContextMenuStripTabs
             // 
@@ -125,9 +125,9 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuItemCopyCard,
             this.ToolStripMenuItemMoveCard,
             this.ToolStripMenuItemDeleteCard});
-            this.ContextMenuStripTabs.Name = "contextMenuStrip1";
+            this.ContextMenuStripTabs.Name = "ContextMenuStripTabs";
             this.ContextMenuStripTabs.Size = new System.Drawing.Size(108, 70);
-            this.ContextMenuStripTabs.Text = "Context Tab";
+            this.ContextMenuStripTabs.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStripTabs_Opening);
             // 
             // ToolStripMenuItemCopyCard
             // 
@@ -145,7 +145,6 @@ namespace MECCG_Deck_Builder
             // 
             this.ToolStripMenuCopyToPool.Name = "ToolStripMenuCopyToPool";
             this.ToolStripMenuCopyToPool.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuCopyToPool.Tag = "";
             this.ToolStripMenuCopyToPool.Text = "Pool";
             this.ToolStripMenuCopyToPool.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
@@ -713,7 +712,7 @@ namespace MECCG_Deck_Builder
             this.ClientSize = new System.Drawing.Size(838, 579);
             this.Controls.Add(this.TabControlDeck);
             this.Controls.Add(this.PictureBoxCardImage);
-            this.Controls.Add(this.ListBoxMasterList);
+            this.Controls.Add(this.ListBoxMaster);
             this.Controls.Add(this.MenuStrip1);
             this.MainMenuStrip = this.MenuStrip1;
             this.Name = "Form1";
@@ -735,7 +734,7 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        private System.Windows.Forms.ListBox ListBoxMasterList;
+        private System.Windows.Forms.ListBox ListBoxMaster;
         private System.Windows.Forms.PictureBox PictureBoxCardImage;
         private System.Windows.Forms.ListBox ListBoxResources;
         private System.Windows.Forms.ListBox ListBoxHazards;

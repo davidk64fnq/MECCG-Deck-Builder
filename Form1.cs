@@ -8,20 +8,21 @@ namespace MECCG_Deck_Builder
 
     internal partial class Form1 : Form
     {
-        // There is a master listbox of all cards in selected sets on the left, from which
+        // There is a master listbox of all cards in selected sets on the left from which
         // cards can be copied to the tabs on the right. On the right are five tabs each with 
         // a listbox for pool/resource/hazard/sideboard/site, cards can be copied/moved between 
         // tabs and deleted from a tab. Each listbox has an associated list with the card set
         // and id. "meccgCards" is where all information about each card is stored.
 
         private List<string[]> masterList = new List<string[]>();
-        private List<string[]> poolList = new List<string[]>();
-        private List<string[]> resourceList = new List<string[]>();
-        private List<string[]> hazardList = new List<string[]>();
-        private List<string[]> sideboardList = new List<string[]>();
-        private List<string[]> siteList = new List<string[]>();
+        private readonly List<string[]> poolList = new List<string[]>();
+        private readonly List<string[]> resourceList = new List<string[]>();
+        private readonly List<string[]> hazardList = new List<string[]>();
+        private readonly List<string[]> sideboardList = new List<string[]>();
+        private readonly List<string[]> siteList = new List<string[]>();
         private readonly List<string> setList = new List<string>();
         private readonly Cards meccgCards = new Cards();
+        private ListBox callingListbox;
 
         internal Form1()
         {
@@ -31,52 +32,29 @@ namespace MECCG_Deck_Builder
 
         }
 
+        // User can drag cards from master list to current tab on right with right mouse click hold
+        #region DRAG_DROP
+
+
         private void ListBoxMasterList_MouseDown(object sender, MouseEventArgs e)
         {
             // Only use the right mouse button.
             if (e.Button == MouseButtons.Right)
             {
                 // Find the item under the mouse.
-                int index = ListBoxMasterList.IndexFromPoint(e.Location);
+                int index = ListBoxMaster.IndexFromPoint(e.Location);
                 if (index < 0)
                 {
                     return;
                 }
-                ListBoxMasterList.SelectedIndex = index;
+                ListBoxMaster.SelectedIndex = index;
                 ListBox_SelectedIndexChanged(sender, e);
 
                 // Drag the item.
-                string cardText = ListBoxMasterList.SelectedItem.ToString();
-                ListBoxMasterList.DoDragDrop(cardText, DragDropEffects.Copy);
+                string cardText = ListBoxMaster.SelectedItem.ToString();
+                ListBoxMaster.DoDragDrop(cardText, DragDropEffects.Copy);
             }
             return;
-        }
-
-        private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ListBox currentListBox = GetCurrentListBox(((ListBox)sender).Parent.Name);
-            if (currentListBox != null && currentListBox.SelectedIndex >= 0)
-            {
-                int currentIndex = currentListBox.SelectedIndex;
-
-                // Deselect other listboxes
-                if (currentListBox.Name != ListBoxMasterList.Name)
-                    ListBoxMasterList.ClearSelected();
-                if (currentListBox.Name != ListBoxPool.Name)
-                    ListBoxPool.ClearSelected();
-                if (currentListBox.Name != ListBoxResources.Name)
-                    ListBoxResources.ClearSelected();
-                if (currentListBox.Name != ListBoxHazards.Name)
-                    ListBoxHazards.ClearSelected();
-                if (currentListBox.Name != ListBoxSideboard.Name)
-                    ListBoxSideboard.ClearSelected();
-                if (currentListBox.Name != ListBoxSites.Name)
-                    ListBoxSites.ClearSelected();
-
-                // Display card image from correct set
-                List<string[]> currentList = GetCardListRef(currentListBox);
-                PictureBoxCardImage.Image = Image.FromFile($"{currentList[currentIndex][(int)CardListField.set]}\\{currentListBox.SelectedItem}.png");
-            }
         }
 
         private void ListBoxTab_DragOver(object sender, DragEventArgs e)
@@ -89,93 +67,49 @@ namespace MECCG_Deck_Builder
             if (e.Data.GetDataPresent(DataFormats.StringFormat))
             {
                 string str = (string)e.Data.GetData(DataFormats.StringFormat);
-                ListBox currentTabListBox = GetCurrentTabListBox(TabControlDeck.SelectedIndex);
+                ListBox currentTabListBox = GetListBox(((ListBox)sender).Parent.Name);
                 currentTabListBox.Items.Add(str);
-                List<string[]> currentTabList = GetCardListRef(currentTabListBox);
-                currentTabList.Add(masterList[ListBoxMasterList.SelectedIndex]);
+                List<string[]> currentTabList = GetList(currentTabListBox);
+                currentTabList.Add(masterList[ListBoxMaster.SelectedIndex]);
                 currentTabList.Sort(CompareCardsByName);
             }
         }
 
-        private ListBox GetCurrentTabListBox(int currentTabIndex)
+        #endregion
+
+        // Display image of selected card
+        #region SELECTED_INDEX
+        private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (currentTabIndex)
+            ListBox currentListBox = GetListBox(((ListBox)sender).Parent.Name);
+            if (currentListBox != null && currentListBox.SelectedIndex >= 0)
             {
-                case (int)DeckTab.pool:
-                    return ListBoxPool;
-                case (int)DeckTab.resources:
-                    return ListBoxResources;
-                case (int)DeckTab.hazards:
-                    return ListBoxHazards;
-                case (int)DeckTab.sideboard:
-                    return ListBoxSideboard;
-                case (int)DeckTab.sites:
-                    return ListBoxSites;
-                default:
-                    break;
+                int currentIndex = currentListBox.SelectedIndex;
+
+                // Deselect other listboxes
+                if (currentListBox.Name != ListBoxMaster.Name)
+                    ListBoxMaster.ClearSelected();
+                if (currentListBox.Name != ListBoxPool.Name)
+                    ListBoxPool.ClearSelected();
+                if (currentListBox.Name != ListBoxResources.Name)
+                    ListBoxResources.ClearSelected();
+                if (currentListBox.Name != ListBoxHazards.Name)
+                    ListBoxHazards.ClearSelected();
+                if (currentListBox.Name != ListBoxSideboard.Name)
+                    ListBoxSideboard.ClearSelected();
+                if (currentListBox.Name != ListBoxSites.Name)
+                    ListBoxSites.ClearSelected();
+
+                // Display card image from correct set
+                List<string[]> currentList = GetList(currentListBox);
+                PictureBoxCardImage.Image = Image.FromFile($"{currentList[currentIndex][(int)CardListField.set]}\\{currentListBox.SelectedItem}.png");
             }
-            return null;
         }
 
-        private List<string[]> GetCardListRef(ListBox listbox)
-        {
-            if (listbox == null)
-            {
-                return null;
-            }
-            switch (listbox.Name)
-            {
-                case "ListBoxCardList":
-                    return masterList;
-                case "ListBoxPool":
-                    return poolList;
-                case "ListBoxResources":
-                    return resourceList;
-                case "ListBoxHazards":
-                    return hazardList;
-                case "ListBoxSideboard":
-                    return sideboardList;
-                case "ListBoxSites":
-                    return siteList;
-                default:
-                    break;
-            }
-            return masterList;
-        }
+        #endregion
 
-        private int CompareCardsByName(string[] x, string[] y)
-        {
-            return x[(int)CardListField.name].CompareTo(y[(int)CardListField.name]);
-        }
-
-        private ListBox GetCurrentListBox(string senderParent)
-        {
-            if (senderParent == Constants.senderMaster)
-            {
-                return ListBoxMasterList;
-            }
-            else if (senderParent == Constants.senderPool)
-            {
-                return ListBoxPool;
-            }
-            else if (senderParent == Constants.senderResource)
-            {
-                return ListBoxResources;
-            }
-            else if (senderParent == Constants.senderHazard)
-            {
-                return ListBoxHazards;
-            }
-            else if (senderParent == Constants.senderSideboard)
-            {
-                return ListBoxSideboard;
-            }
-            else if (senderParent == Constants.senderSite)
-            {
-                return ListBoxSites;
-            }
-            return null;
-        }
+        // User can choose which sets to include in the master list on left from "Set" menu
+        #region SET_MANAGEMENT
 
         private void ToolStripMenuSet_CheckedChanged(object sender, EventArgs e)
         {
@@ -196,17 +130,17 @@ namespace MECCG_Deck_Builder
 
             // Store current card selected before resetting master list
             string curCardId = "";
-            if (ListBoxMasterList.SelectedIndex >= 0)
+            if (ListBoxMaster.SelectedIndex >= 0)
             {
-                curCardId = masterList[ListBoxMasterList.SelectedIndex][(int)CardListField.id];
+                curCardId = masterList[ListBoxMaster.SelectedIndex][(int)CardListField.id];
             }
 
             // Retrieve and set new list of cards
-            ListBoxMasterList.Items.Clear();
+            ListBoxMaster.Items.Clear();
             masterList = meccgCards.GetCardList(setList);
             foreach (var card in masterList)
             {
-                ListBoxMasterList.Items.Add(card[(int)CardListField.name]);
+                ListBoxMaster.Items.Add(card[(int)CardListField.name]);
             }
 
             // Set currently selected card
@@ -221,26 +155,32 @@ namespace MECCG_Deck_Builder
             {
                 if (card[(int)CardListField.id] == curCardId)
                 {
-                    ListBoxMasterList.SelectedIndex = index;
+                    ListBoxMaster.SelectedIndex = index;
                     return;
                 }
                 index++;
             }
 
             // Default choice
-            if (ListBoxMasterList.Items.Count > 0)
+            if (ListBoxMaster.Items.Count > 0)
             {
-                ListBoxMasterList.SelectedIndex = 0;
+                ListBoxMaster.SelectedIndex = 0;
             }
         }
 
+        #endregion
+
+        // Double click on card in master list copies it to current tab on right, double click
+        // on card in current tab on right duplicates it in that tab
+        #region DOUBLE_CLICK
+
         private void ListBoxCardList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            ListBox sourceListbox = ListBoxMasterList;
+            ListBox sourceListbox = ListBoxMaster;
             ListBox destListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
             List<string[]> sourceList = masterList;
-            List<string[]> destList = GetCardListRef(destListbox);
-            int index = ListBoxMasterList.IndexFromPoint(e.X, e.Y);
+            List<string[]> destList = GetList(destListbox);
+            int index = ListBoxMaster.IndexFromPoint(e.X, e.Y);
             AddCard(sourceListbox, destListbox, sourceList, destList, index);
         }
 
@@ -248,11 +188,16 @@ namespace MECCG_Deck_Builder
         {
             ListBox sourceListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
             ListBox destListbox = sourceListbox;
-            List<string[]> sourceList = GetCardListRef(destListbox);
+            List<string[]> sourceList = GetList(destListbox);
             List<string[]> destList = sourceList;
             int index = sourceListbox.IndexFromPoint(e.X, e.Y);
             AddCard(sourceListbox, destListbox, sourceList, destList, index);
         }
+
+        #endregion
+
+        // Add/Remove a card from a tab listbox and associated list, compare cards in list for sorting
+        #region CARD_OPS
 
         private void AddCard(ListBox sourceListbox, ListBox destListbox, List<string[]> sourceList, List<string[]> destList, int index)
         {
@@ -264,6 +209,22 @@ namespace MECCG_Deck_Builder
             destList.Add(sourceList[index]);
             destList.Sort(CompareCardsByName);
         }
+        private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
+        {
+            listBox.Items.Remove(listBox.Items[index]);
+            cardList.Remove(cardList[index]);
+            cardList.Sort(CompareCardsByName);
+        }
+
+        private int CompareCardsByName(string[] x, string[] y)
+        {
+            return x[(int)CardListField.name].CompareTo(y[(int)CardListField.name]);
+        }
+
+        #endregion
+
+        // Save and read from file a deck in TTS format
+        #region OPEN_CLOSE
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -309,9 +270,9 @@ namespace MECCG_Deck_Builder
                     string curFileName = openFileDialog.FileNames[index];
                     string openSuffix = curFileName[curFileName.IndexOf("_")..];
 
-                    ListBox currentListBox = GetOpenFileListBox(openSuffix);
-                    List<string[]> currentList = GetCardListRef(currentListBox);
-                    currentList = meccgCards.OpenMETW_TTSfile(curFileName);
+                    ListBox currentListBox = GetListBox(openSuffix);
+                    List<string[]> currentList = GetList(currentListBox);
+                    meccgCards.OpenMETW_TTSfile(curFileName, currentList);
                     currentListBox.Items.Clear();
                     foreach (var card in currentList)
                     {
@@ -321,50 +282,100 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        private ListBox GetOpenFileListBox(string fileSuffix)
+        #endregion
+
+        // Right click on current tab with a card selected brings up context menu allowing three operations:
+        // 1. Copy card to same or other tab
+        // 2. Move card to another tab
+        // 3. Delete card from current tab
+        #region CONTEXT_MENU
+
+        private void ToolStripMenuTab_Click(object sender, EventArgs e)
         {
-            if (fileSuffix == Constants.poolFileSuffix)
+            ListBox sourceListbox = callingListbox;
+            List<string[]> sourceList = GetList(sourceListbox);
+            int index = sourceListbox.SelectedIndex;
+            if (GetOperation(sender) == Constants.Delete)
             {
-                return ListBoxPool;
+                RemoveCard(sourceListbox, sourceList, index);
+                return;
             }
-            else if (fileSuffix == Constants.resourceFileSuffix)
+            ListBox destListbox = GetListBox(((ToolStripMenuItem)sender).Name);
+            List<string[]> destList = GetList(destListbox);
+            AddCard(sourceListbox, destListbox, sourceList, destList, index);
+            if (GetOperation(sender) == Constants.Move)
             {
-                return ListBoxResources;
+                RemoveCard(sourceListbox, sourceList, index);
             }
-            else if (fileSuffix == Constants.hazardFileSuffix)
-            {
-                return ListBoxHazards;
-            }
-            else if (fileSuffix == Constants.sideboardFileSuffix)
-            {
-                return ListBoxSideboard;
-            }
-            else if (fileSuffix == Constants.siteFileSuffix)
-            {
-                return ListBoxSites;
-            }
-            return null;
         }
 
-        private ListBox GetListBoxRef(object sender)
+        private void ContextMenuStripTabs_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (((ToolStripMenuItem)sender).Name.Contains(Constants.Pool))
+            if (((ListBox)((ContextMenuStrip)sender).SourceControl).SelectedIndex == ListBox.NoMatches)
+            {
+                e.Cancel = true;
+            }
+            else
+            {
+                callingListbox = (ListBox)((ContextMenuStrip)sender).SourceControl;
+            }
+        }
+
+        #endregion
+
+        // Utility methods for determing correct listbox, list or operation
+        #region LOOKUPS
+
+        private List<string[]> GetList(ListBox listbox)
+        {
+            if (listbox == null)
+            {
+                return null;
+            }
+            switch (listbox.Name)
+            {
+                case "ListBoxCardList":
+                    return masterList;
+                case "ListBoxPool":
+                    return poolList;
+                case "ListBoxResources":
+                    return resourceList;
+                case "ListBoxHazards":
+                    return hazardList;
+                case "ListBoxSideboard":
+                    return sideboardList;
+                case "ListBoxSites":
+                    return siteList;
+                default:
+                    break;
+            }
+            return masterList;
+        }
+
+        private ListBox GetListBox(string stringToSearch)
+        {
+            StringComparison comp = StringComparison.OrdinalIgnoreCase;
+            if (stringToSearch.Contains(Constants.Form, comp))
+            {
+                return ListBoxMaster;
+            }
+            else if (stringToSearch.Contains(Constants.Pool, comp))
             {
                 return ListBoxPool;
             }
-            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Resource))
+            else if (stringToSearch.Contains(Constants.Resource, comp))
             {
                 return ListBoxResources;
             }
-            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Hazard))
+            else if (stringToSearch.Contains(Constants.Hazard, comp))
             {
                 return ListBoxHazards;
             }
-            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Sideboard))
+            else if (stringToSearch.Contains(Constants.Sideboard, comp))
             {
                 return ListBoxSideboard;
             }
-            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Site))
+            else if (stringToSearch.Contains(Constants.Site, comp))
             {
                 return ListBoxSites;
             }
@@ -392,70 +403,6 @@ namespace MECCG_Deck_Builder
             }
             return operation;
         }
-
-        private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
-        {
-            listBox.Items.Remove(listBox.Items[index]);
-            cardList.Remove(cardList[index]);
-            cardList.Sort(CompareCardsByName);
-        }
-
-        private void ToolStripMenuTab_Click(object sender, EventArgs e)
-        {
-            if (ListBoxMasterList.SelectedIndex >= 0)
-            {
-                return;
-            }
-            ListBox sourceListbox = GetCurrentListBox();
-            if (sourceListbox != null)
-            {
-                List<string[]> sourceList = GetCardListRef(sourceListbox);
-                int index = sourceListbox.SelectedIndex;
-                if (GetOperation(sender) == Constants.Delete)
-                {
-                    RemoveCard(sourceListbox, sourceList, index);
-                    return;
-                }
-                ListBox destListbox = GetListBoxRef(sender);
-                List<string[]> destList = GetCardListRef(destListbox);
-                if (index >= 0)
-                {
-                    AddCard(sourceListbox, destListbox, sourceList, destList, index);
-                    if (GetOperation(sender) == Constants.Move)
-                    {
-                        RemoveCard(sourceListbox, sourceList, index);
-                    }
-                }
-            }
-        }
-
-        private ListBox GetCurrentListBox()
-        {
-            if (ListBoxMasterList.SelectedIndex >= 0)
-            {
-                return ListBoxMasterList;
-            }
-            else if (ListBoxPool.SelectedIndex >= 0)
-            {
-                return ListBoxPool;
-            }
-            else if (ListBoxResources.SelectedIndex >= 0)
-            {
-                return ListBoxResources;
-            }
-            else if (ListBoxHazards.SelectedIndex >= 0)
-            {
-                return ListBoxHazards;
-            }
-            else if (ListBoxSideboard.SelectedIndex >= 0)
-            {
-                return ListBoxSideboard;
-            }
-            else if (ListBoxSites.SelectedIndex >= 0)
-            {
-                return ListBoxSites;
-            }
-            return null;
-        }
+        #endregion
     }
 }
