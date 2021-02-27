@@ -13,7 +13,7 @@ namespace MECCG_Deck_Builder
     {
         private readonly SortedDictionary<string, string> card = new SortedDictionary<string, string>();
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
-
+        private Root TTSitems;
 
         internal Cards()
         {
@@ -41,7 +41,6 @@ namespace MECCG_Deck_Builder
         private void LoadImages()
         {
             string[] sets = { "metw", "metd", "medm", "mele", "meas", "mewh", "meba" };
-            ArrayList indices = new ArrayList();
 
             int index = 0;
             foreach (string set in sets)
@@ -62,15 +61,15 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        internal List<string[]> GetCardList(List<string> checkedItems)
+        internal List<string[]> GetCardList(List<string> selectedSets)
         {
             List<string[]> cardList = new List<string[]>();
 
-            foreach (string itemChecked in checkedItems)
+            foreach (string set in selectedSets)
             {
                 foreach (var card in cards)
                 {
-                    if (card["set"] == itemChecked)
+                    if (card["set"] == set)
                     {
                         string[] cardItems = new string[3];
                         cardItems[(int)CardListField.name] = $"{card["cardname"]}";
@@ -90,10 +89,74 @@ namespace MECCG_Deck_Builder
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }
 
+        internal void SaveMETW_TTSfileNew(List<string[]> cardList, string filePathOutput)
+        {
+            int cardIndex;
+
+            // Make a copy of TTSitems object called saveTTSitems as starting point then modify
+            // before serialising to output file
+            string copyTTSitems = JsonConvert.SerializeObject(TTSitems);
+            Root saveTTSitems = JsonConvert.DeserializeObject<Root>(copyTTSitems); 
+
+            // Update DeckIDs list
+            saveTTSitems.ObjectStates[0].DeckIDs.Clear();
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
+                saveTTSitems.ObjectStates[0].DeckIDs.Add(Convert.ToInt32(cards[cardIndex]["TTScardID"]));
+            }
+
+            // Update ContainedObject list
+            string temp = JsonConvert.SerializeObject(TTSitems.ObjectStates[0].ContainedObjects[0]);
+            saveTTSitems.ObjectStates[0].ContainedObjects.Clear();
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                ContainedObject containedObject = JsonConvert.DeserializeObject<ContainedObject>(temp);
+                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
+                containedObject.Nickname = cards[cardIndex]["TTSnickname"];
+                containedObject.Description = cards[cardIndex]["TTSdescription"];
+                containedObject.CardID = Convert.ToInt32(cards[cardIndex]["TTScardID"]);
+                SetTTScustomDeck(containedObject, cards[cardIndex]["TTScustomDeck"]);
+                containedObject.GUID = cards[cardIndex]["TTSguid"];
+                saveTTSitems.ObjectStates[0].ContainedObjects.Add(containedObject);
+            }
+
+            // Serialize
+            string indentedJsonString = JsonConvert.SerializeObject(saveTTSitems, Formatting.Indented);
+            File.WriteAllText(filePathOutput, indentedJsonString);
+        }
+
+        internal void SetTTScustomDeck(ContainedObject containedObject, string deckID)
+        {
+            CustomDeck deckInstance = TTSitems.ObjectStates[0].CustomDeck;
+            foreach (PropertyInfo deckProperty in typeof(CustomDeck).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                object deckValue = deckProperty.GetValue(deckInstance);
+                if (deckProperty.Name == deckID)
+                {
+                    CustomDeck cardInstance = containedObject.CustomDeck;
+                    foreach (PropertyInfo cardProperty in typeof(CustomDeck).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                    {
+                        if (cardProperty.Name == deckID)
+                        {
+                            containedObject.CustomDeck = new CustomDeck();
+                            cardProperty.SetValue(containedObject.CustomDeck, deckValue);
+                            return;
+                        }
+                    }
+
+                }
+            }
+        }
+
         internal void SaveMETW_TTSfile(List<string[]> cardList, string filePathOutput)
         {
             string filePathHeader = @"DeckOutputHeader.txt";
             string outputText = File.ReadAllText(filePathHeader);
+            int cardIndex;
+
+            SaveMETW_TTSfileNew(cardList, filePathOutput);
+            return;
 
             foreach (var card in cardList)
             {
@@ -110,7 +173,8 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-                int count = 0;
+            /*
+            int count = 0;
             foreach (var card in cardList)
             {
                 int index = Convert.ToInt32(card[(int)CardListField.id]);
@@ -121,6 +185,15 @@ namespace MECCG_Deck_Builder
                 }
                 outputText += Environment.NewLine;
             }
+            */
+
+            for (int index = 0; index < cardList.Count - 2; index++)
+            {
+                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
+                outputText += "        " + cards[cardIndex]["TTScardID"] + "," + Environment.NewLine;
+            }
+            cardIndex = Convert.ToInt32(cardList[^1][(int)CardListField.id]);
+            outputText += "        " + cards[cardIndex]["TTScardID"] + Environment.NewLine;
 
             string filePathCustomDeck = @"DeckOutputCustomDeck.txt";
             outputText += File.ReadAllText(filePathCustomDeck);
@@ -133,7 +206,7 @@ namespace MECCG_Deck_Builder
             string cardSideways = File.ReadAllText(filePathCardSideways);
             string filePathCardWidth = @"DeckOutputCardWidth.txt";
             string cardWidth = File.ReadAllText(filePathCardWidth);
-            count = 0;
+            int count = 0;
             foreach (var card in cardList)
             {
                 int index = Convert.ToInt32(card[(int)CardListField.id]);
@@ -186,7 +259,7 @@ namespace MECCG_Deck_Builder
         {
             using StreamReader r = new StreamReader("METW.json");
             string json = r.ReadToEnd();
-            var Items = JsonConvert.DeserializeObject<Root>(json);
+            TTSitems = JsonConvert.DeserializeObject<Root>(json);
 
             foreach (var card in cards)
             {
@@ -196,7 +269,7 @@ namespace MECCG_Deck_Builder
                     int minDistance = 100;
                     int minIndex = 0;
                     int index = 0;
-                    foreach (var item in Items.ObjectStates[0].ContainedObjects)
+                    foreach (var item in TTSitems.ObjectStates[0].ContainedObjects)
                     {
                         int levenshteinDistance = lev.DistanceFrom(item.Nickname);
                         if (levenshteinDistance < minDistance)
@@ -207,11 +280,11 @@ namespace MECCG_Deck_Builder
                         index++;
                     }
 
-                    card.Add("TTScardID", $"{Items.ObjectStates[0].ContainedObjects[minIndex].CardID}");
-                    card.Add("TTScustomDeck", GetProperties(Items.ObjectStates[0].ContainedObjects[minIndex].CustomDeck));
-                    card.Add("TTSdescription", $"{Items.ObjectStates[0].ContainedObjects[minIndex].Description}");
-                    card.Add("TTSguid", $"{Items.ObjectStates[0].ContainedObjects[minIndex].GUID}");
-                    card.Add("TTSnickname", $"{Items.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
+                    card.Add("TTScardID", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].CardID}");
+                    card.Add("TTScustomDeck", GetProperties(TTSitems.ObjectStates[0].ContainedObjects[minIndex].CustomDeck));
+                    card.Add("TTSdescription", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Description}");
+                    card.Add("TTSguid", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].GUID}");
+                    card.Add("TTSnickname", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
 
                 }
             }
