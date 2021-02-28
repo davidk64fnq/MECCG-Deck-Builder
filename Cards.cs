@@ -89,7 +89,7 @@ namespace MECCG_Deck_Builder
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }
 
-        internal void SaveMETW_TTSfileNew(List<string[]> cardList, string filePathOutput)
+        internal void SaveMETW_TTSfile(List<string[]> cardList, string filePathOutput)
         {
             int cardIndex;
 
@@ -106,6 +106,11 @@ namespace MECCG_Deck_Builder
                 saveTTSitems.ObjectStates[0].DeckIDs.Add(Convert.ToInt32(cards[cardIndex]["TTScardID"]));
             }
 
+            // Update deck transform values
+            saveTTSitems.ObjectStates[0].Transform.RotX = 0;
+            saveTTSitems.ObjectStates[0].Transform.RotY = 180;
+            saveTTSitems.ObjectStates[0].Transform.RotZ = 180;
+
             // Update ContainedObject list
             string temp = JsonConvert.SerializeObject(TTSitems.ObjectStates[0].ContainedObjects[0]);
             saveTTSitems.ObjectStates[0].ContainedObjects.Clear();
@@ -113,6 +118,9 @@ namespace MECCG_Deck_Builder
             {
                 ContainedObject containedObject = JsonConvert.DeserializeObject<ContainedObject>(temp);
                 cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
+                containedObject.Transform.RotX = 0;
+                containedObject.Transform.RotY = 180;
+                containedObject.Transform.RotZ = 180;
                 containedObject.Nickname = cards[cardIndex]["TTSnickname"];
                 containedObject.Description = cards[cardIndex]["TTSdescription"];
                 containedObject.CardID = Convert.ToInt32(cards[cardIndex]["TTScardID"]);
@@ -122,7 +130,12 @@ namespace MECCG_Deck_Builder
             }
 
             // Serialize
-            string indentedJsonString = JsonConvert.SerializeObject(saveTTSitems, Formatting.Indented);
+            JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            string indentedJsonString = JsonConvert.SerializeObject(saveTTSitems, Formatting.Indented, jsonSettings);
+            indentedJsonString = indentedJsonString.Replace("\"CD", "\"");
             File.WriteAllText(filePathOutput, indentedJsonString);
         }
 
@@ -147,93 +160,6 @@ namespace MECCG_Deck_Builder
 
                 }
             }
-        }
-
-        internal void SaveMETW_TTSfile(List<string[]> cardList, string filePathOutput)
-        {
-            string filePathHeader = @"DeckOutputHeader.txt";
-            string outputText = File.ReadAllText(filePathHeader);
-            int cardIndex;
-
-            SaveMETW_TTSfileNew(cardList, filePathOutput);
-            return;
-
-            foreach (var card in cardList)
-            {
-                if (card[(int)CardListField.set] != Constants.METW)
-                {
-                    Form1 form1 = new Form1();
-                    MessageBox.Show(
-                        "Deck contains at least one non Middle Earth The Wizards card. Unable to save in Tabletop Simulator format.",
-                        form1.Text,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
-                    return;
-                }
-            }
-
-            /*
-            int count = 0;
-            foreach (var card in cardList)
-            {
-                int index = Convert.ToInt32(card[(int)CardListField.id]);
-                outputText += "        " + cards[index]["TTScardID"];
-                if (++count < cards.Count)
-                {
-                    outputText += ",";
-                }
-                outputText += Environment.NewLine;
-            }
-            */
-
-            for (int index = 0; index < cardList.Count - 2; index++)
-            {
-                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
-                outputText += "        " + cards[cardIndex]["TTScardID"] + "," + Environment.NewLine;
-            }
-            cardIndex = Convert.ToInt32(cardList[^1][(int)CardListField.id]);
-            outputText += "        " + cards[cardIndex]["TTScardID"] + Environment.NewLine;
-
-            string filePathCustomDeck = @"DeckOutputCustomDeck.txt";
-            outputText += File.ReadAllText(filePathCustomDeck);
-
-            string filePathCardTransform = @"DeckOutputCardTransform.txt";
-            string cardTransform = File.ReadAllText(filePathCardTransform);
-            string filePathCardColor = @"DeckOutputCardColor.txt";
-            string cardColor = File.ReadAllText(filePathCardColor);
-            string filePathCardSideways = @"DeckOutputCardSideways.txt";
-            string cardSideways = File.ReadAllText(filePathCardSideways);
-            string filePathCardWidth = @"DeckOutputCardWidth.txt";
-            string cardWidth = File.ReadAllText(filePathCardWidth);
-            int count = 0;
-            foreach (var card in cardList)
-            {
-                int index = Convert.ToInt32(card[(int)CardListField.id]);
-                outputText += cardTransform;
-                outputText += "          \"Nickname\": \"" + cards[index]["TTSnickname"].Replace("\"", "\\\"") + "\"," + Environment.NewLine;
-                outputText += "          \"Description\": \"" + cards[index]["TTSdescription"].Replace("\"", "\\\"") + "\"," + Environment.NewLine;
-                outputText += cardColor;
-                outputText += "          \"CardID\": " + cards[index]["TTScardID"] + "," + Environment.NewLine;
-                outputText += cardSideways;
-                outputText += "            \"" + cards[index]["TTScustomDeck"][(2)..] + "\": {" + Environment.NewLine;
-                string filePathCardDeck = $"DeckOutputCardDeck{cards[index]["TTScustomDeck"][(2)..]}.txt";
-                string cardDeck = File.ReadAllText(filePathCardDeck);
-                outputText += cardDeck;
-                outputText += cardWidth;
-                outputText += "          \"GUID\": \"" + cards[index]["TTSguid"] + "\"" + Environment.NewLine;
-                outputText += "        }";
-                if (++count < cards.Count)
-                {
-                    outputText += ",";
-                }
-                outputText += Environment.NewLine;
-            }
-
-            string filePathFooter = @"DeckOutputFooter.txt";
-            outputText += File.ReadAllText(filePathFooter);
-
-            File.WriteAllText(filePathOutput, outputText);
         }
 
         internal void OpenMETW_TTSfile(string filePathName, List<string[]> cardList)
