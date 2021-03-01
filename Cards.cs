@@ -207,7 +207,7 @@ namespace MECCG_Deck_Builder
                     }
 
                     card.Add("TTScardID", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].CardID}");
-                    card.Add("TTScustomDeck", GetProperties(TTSitems.ObjectStates[0].ContainedObjects[minIndex].CustomDeck));
+                    card.Add("TTScustomDeck", GetTTScustomDeck(TTSitems.ObjectStates[0].ContainedObjects[minIndex].CustomDeck));
                     card.Add("TTSdescription", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Description}");
                     card.Add("TTSguid", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].GUID}");
                     card.Add("TTSnickname", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
@@ -216,23 +216,17 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        private string GetProperties<T>(T instance)
+        internal string GetTTScustomDeck(CustomDeck cardInstance)
         {
-            return GetProperties(typeof(T), instance);
-        }
-
-        private string GetProperties(Type classType, object instance)
-        {
-            foreach (PropertyInfo property in classType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            foreach (PropertyInfo cardProperty in typeof(CustomDeck).GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                object value = property.GetValue(instance);
+                object value = cardProperty.GetValue(cardInstance);
                 if (value != null)
                 {
-                    int idx = value.ToString().LastIndexOf('.');
-                    return value.ToString()[(idx + 1)..];
+                    return cardProperty.Name;
                 }
             }
-            return "";
+            return "No custom deck found";
         }
     }
 }

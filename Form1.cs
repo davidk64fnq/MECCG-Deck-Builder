@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO;
+using System.Text;
 
 namespace MECCG_Deck_Builder
 {
@@ -23,23 +25,24 @@ namespace MECCG_Deck_Builder
         private readonly List<string> setList = new List<string>();
         private readonly Cards meccgCards = new Cards();
         private ListBox callingListbox;
+        private string currentDeckTitle = "New Deck";
 
         internal Form1()
         {
             InitializeComponent();
-
             ((ToolStripMenuItem)ToolStripMenuTW).Checked = true;
+            UpdateFormTitle();
 
         }
 
-        // User can drag cards from master list to current tab on right with right mouse click hold
-        #region DRAG_DROP
+        // User can drag cards from master list to current tab on right with left mouse click hold
+        // and use context menu with right click to copy selected card to a tab on the right
+        #region MASTER_SINGLE_CLICK
 
 
         private void ListBoxMasterList_MouseDown(object sender, MouseEventArgs e)
         {
-            // Only use the right mouse button.
-            if (e.Button == MouseButtons.Right)
+            if (e.Button == MouseButtons.Left)
             {
                 // Find the item under the mouse.
                 int index = ListBoxMaster.IndexFromPoint(e.Location);
@@ -54,7 +57,21 @@ namespace MECCG_Deck_Builder
                 string cardText = ListBoxMaster.SelectedItem.ToString();
                 ListBoxMaster.DoDragDrop(cardText, DragDropEffects.Copy);
             }
+            if (e.Clicks == 2)
+            {
+                ListBoxCardList_MouseDoubleClick(sender, e);
+            }
             return;
+        }
+        private void ToolStripMenuMaster_Click(object sender, EventArgs e)
+        {
+            ListBox sourceListbox = ListBoxMaster;
+            List<string[]> sourceList = masterList;
+            int index = sourceListbox.SelectedIndex;
+            ListBox destListbox = GetListBox(((ToolStripMenuItem)sender).Name);
+            List<string[]> destList = GetList(destListbox);
+            AddCard(sourceListbox, destListbox, sourceList, destList, index);
+            TabControlDeck.SelectTab(GetTabIndex(destListbox));
         }
 
         private void ListBoxTab_DragOver(object sender, DragEventArgs e)
@@ -196,7 +213,7 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        // Add/Remove a card from a tab listbox and associated list, compare cards in list for sorting
+        // Add/Remove a card from a tab listbox and associated list, compare cards in lists for sorting
         #region CARD_OPS
 
         private void AddCard(ListBox sourceListbox, ListBox destListbox, List<string[]> sourceList, List<string[]> destList, int index)
@@ -208,12 +225,31 @@ namespace MECCG_Deck_Builder
             destListbox.Items.Add(sourceListbox.Items[index]);
             destList.Add(sourceList[index]);
             destList.Sort(CompareCardsByName);
+            UpdateFormTitle();
         }
         private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
         {
             listBox.Items.Remove(listBox.Items[index]);
             cardList.Remove(cardList[index]);
             cardList.Sort(CompareCardsByName);
+            UpdateFormTitle();
+        }
+
+        private void UpdateFormTitle()
+        {
+            string newFormTitle;
+
+            newFormTitle = "MECCG Deck Builder - \"" + currentDeckTitle + "\" ("; 
+            for (int tabIndex = 0; tabIndex < TabControlDeck.TabCount; tabIndex++)
+            {
+                newFormTitle += $"{((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Items.Count}";
+                if (tabIndex != TabControlDeck.TabCount - 1)
+                {
+                    newFormTitle += "/";
+                }
+            }
+            newFormTitle += ")";
+            Text = newFormTitle;
         }
 
         private int CompareCardsByName(string[] x, string[] y)
@@ -248,6 +284,10 @@ namespace MECCG_Deck_Builder
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string curPath = "";
+            string curFilename = "";
+            string curSuffix = "";
+
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Title = this.Text,
@@ -267,19 +307,55 @@ namespace MECCG_Deck_Builder
             {
                 for (int index = 0; index < openFileDialog.FileNames.Length; index++)
                 {
-                    string curFileName = openFileDialog.FileNames[index];
-                    string openSuffix = curFileName[curFileName.IndexOf("_")..];
-
-                    ListBox currentListBox = GetListBox(openSuffix);
-                    List<string[]> currentList = GetList(currentListBox);
-                    meccgCards.OpenMETW_TTSfile(curFileName, currentList);
-                    currentListBox.Items.Clear();
-                    foreach (var card in currentList)
+                    curPath = openFileDialog.FileNames[index];
+                    curFilename = Path.GetFileName(curPath);
+                    if (curFilename.LastIndexOf("_") >= 1)
                     {
-                        currentListBox.Items.Add(card[(int)CardListField.name]);
+                        curSuffix = curFilename[curFilename.LastIndexOf("_")..^0];
                     }
+                    if (SuffixValid(curSuffix))
+                    {
+                        ListBox currentListBox = GetListBox(curSuffix);
+                        List<string[]> currentList = GetList(currentListBox);
+                        meccgCards.OpenMETW_TTSfile(curPath, currentList);
+                        currentListBox.Items.Clear();
+                        foreach (var card in currentList)
+                        {
+                            currentListBox.Items.Add(card[(int)CardListField.name]);
+                        }
+                        currentDeckTitle = curFilename[0..(curFilename.LastIndexOf("_") - 1)];
+                    }
+                    else
+                    {
+                        string message = $"Unable to open \"{curFilename}\"\n\nExpecting filename to end in one of:\n";
+                        message += $"\t\"{Constants.poolFileSuffix}\", \n\t\"{Constants.resourceFileSuffix}\", \n\t\"{Constants.hazardFileSuffix}\",\n";
+                        message += $"\t\"{Constants.sideboardFileSuffix}\", \n\t\"{Constants.siteFileSuffix}\"";
+                        MessageBox.Show(message, "Open File Error");
+                    }
+
                 }
+                UpdateFormTitle(); // To last valid filename opened
             }
+        }
+
+        private Boolean SuffixValid(string curSuffix)
+        {
+            switch (curSuffix)
+            {
+                case Constants.poolFileSuffix:
+                    return true;
+                case Constants.resourceFileSuffix:
+                    return true;
+                case Constants.hazardFileSuffix:
+                    return true;
+                case Constants.sideboardFileSuffix:
+                    return true;
+                case Constants.siteFileSuffix:
+                    return true;
+                default:
+                    break;
+            }
+            return false;
         }
 
         #endregion
@@ -288,7 +364,7 @@ namespace MECCG_Deck_Builder
         // 1. Copy card to same or other tab
         // 2. Move card to another tab
         // 3. Delete card from current tab
-        #region CONTEXT_MENU
+        #region TABS_CONTEXT_MENU
 
         private void ToolStripMenuTab_Click(object sender, EventArgs e)
         {
@@ -323,7 +399,7 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        // Utility methods for determing correct listbox, list or operation
+        // Utility methods for determining correct listbox, list, tab or operation
         #region LOOKUPS
 
         private List<string[]> GetList(ListBox listbox)
@@ -403,6 +479,19 @@ namespace MECCG_Deck_Builder
             }
             return operation;
         }
+
+        private int GetTabIndex(ListBox listbox)
+        {
+            for (int tabIndex = 0; tabIndex < TabControlDeck.TabCount; tabIndex++)
+            {
+                if (TabControlDeck.Controls[tabIndex].Controls[0].Name == listbox.Name)
+                {
+                    return tabIndex;
+                }
+            }
+            return -1;
+        }
+
         #endregion
     }
 }

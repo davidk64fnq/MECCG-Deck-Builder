@@ -32,20 +32,27 @@ namespace MECCG_Deck_Builder
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.ListBoxMaster = new System.Windows.Forms.ListBox();
+            this.ContextMenuStripMaster = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ToolStripMenuMasterCopyCard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterCopyToResource = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterCopyToHazard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterCopyToSideboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterCopyToSite = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStripTabs = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.ToolStripMenuItemCopyCard = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuCopyToResource = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuCopyToHazard = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuCopyToSideboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuCopyToSite = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuItemMoveCard = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuMoveToPool = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuMoveToResource = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuMoveToHazard = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuMoveToSideboard = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuMoveToSite = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuItemDeleteCard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCopyCard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCopyToResource = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCopyToHazard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCopyToSideboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCopyToSite = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabMoveCard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabMoveToPool = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabMoveToResource = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabMoveToHazard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabMoveToSideboard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabMoveToSite = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabDeleteCard = new System.Windows.Forms.ToolStripMenuItem();
             this.PictureBoxCardImage = new System.Windows.Forms.PictureBox();
             this.ListBoxPool = new System.Windows.Forms.ListBox();
             this.ListBoxResources = new System.Windows.Forms.ListBox();
@@ -96,6 +103,7 @@ namespace MECCG_Deck_Builder
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ContextMenuStripMaster.SuspendLayout();
             this.ContextMenuStripTabs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBoxCardImage)).BeginInit();
             this.TabControlDeck.SuspendLayout();
@@ -109,6 +117,7 @@ namespace MECCG_Deck_Builder
             // 
             // ListBoxMaster
             // 
+            this.ListBoxMaster.ContextMenuStrip = this.ContextMenuStripMaster;
             this.ListBoxMaster.FormattingEnabled = true;
             this.ListBoxMaster.ItemHeight = 15;
             this.ListBoxMaster.Location = new System.Drawing.Point(12, 37);
@@ -119,116 +128,170 @@ namespace MECCG_Deck_Builder
             this.ListBoxMaster.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxCardList_MouseDoubleClick);
             this.ListBoxMaster.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxMasterList_MouseDown);
             // 
+            // ContextMenuStripMaster
+            // 
+            this.ContextMenuStripMaster.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuMasterCopyCard});
+            this.ContextMenuStripMaster.Name = "ContextMenuStripMaster";
+            this.ContextMenuStripMaster.Size = new System.Drawing.Size(103, 26);
+            // 
+            // ToolStripMenuMasterCopyCard
+            // 
+            this.ToolStripMenuMasterCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuMasterCopyToPool,
+            this.ToolStripMenuMasterCopyToResource,
+            this.ToolStripMenuMasterCopyToHazard,
+            this.ToolStripMenuMasterCopyToSideboard,
+            this.ToolStripMenuMasterCopyToSite});
+            this.ToolStripMenuMasterCopyCard.Name = "ToolStripMenuMasterCopyCard";
+            this.ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(102, 22);
+            this.ToolStripMenuMasterCopyCard.Text = "Copy";
+            // 
+            // ToolStripMenuMasterCopyToPool
+            // 
+            this.ToolStripMenuMasterCopyToPool.Name = "ToolStripMenuMasterCopyToPool";
+            this.ToolStripMenuMasterCopyToPool.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuMasterCopyToPool.Text = "Pool";
+            this.ToolStripMenuMasterCopyToPool.Click += new System.EventHandler(this.ToolStripMenuMaster_Click);
+            // 
+            // ToolStripMenuMasterCopyToResource
+            // 
+            this.ToolStripMenuMasterCopyToResource.Name = "ToolStripMenuMasterCopyToResource";
+            this.ToolStripMenuMasterCopyToResource.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuMasterCopyToResource.Text = "Resources";
+            this.ToolStripMenuMasterCopyToResource.Click += new System.EventHandler(this.ToolStripMenuMaster_Click);
+            // 
+            // ToolStripMenuMasterCopyToHazard
+            // 
+            this.ToolStripMenuMasterCopyToHazard.Name = "ToolStripMenuMasterCopyToHazard";
+            this.ToolStripMenuMasterCopyToHazard.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuMasterCopyToHazard.Text = "Hazards";
+            this.ToolStripMenuMasterCopyToHazard.Click += new System.EventHandler(this.ToolStripMenuMaster_Click);
+            // 
+            // ToolStripMenuMasterCopyToSideboard
+            // 
+            this.ToolStripMenuMasterCopyToSideboard.Name = "ToolStripMenuMasterCopyToSideboard";
+            this.ToolStripMenuMasterCopyToSideboard.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuMasterCopyToSideboard.Text = "Sideboard";
+            this.ToolStripMenuMasterCopyToSideboard.Click += new System.EventHandler(this.ToolStripMenuMaster_Click);
+            // 
+            // ToolStripMenuMasterCopyToSite
+            // 
+            this.ToolStripMenuMasterCopyToSite.Name = "ToolStripMenuMasterCopyToSite";
+            this.ToolStripMenuMasterCopyToSite.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuMasterCopyToSite.Text = "Sites";
+            this.ToolStripMenuMasterCopyToSite.Click += new System.EventHandler(this.ToolStripMenuMaster_Click);
+            // 
             // ContextMenuStripTabs
             // 
             this.ContextMenuStripTabs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMenuItemCopyCard,
-            this.ToolStripMenuItemMoveCard,
-            this.ToolStripMenuItemDeleteCard});
+            this.ToolStripMenuTabCopyCard,
+            this.ToolStripMenuTabMoveCard,
+            this.ToolStripMenuTabDeleteCard});
             this.ContextMenuStripTabs.Name = "ContextMenuStripTabs";
             this.ContextMenuStripTabs.Size = new System.Drawing.Size(108, 70);
             this.ContextMenuStripTabs.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStripTabs_Opening);
             // 
-            // ToolStripMenuItemCopyCard
+            // ToolStripMenuTabCopyCard
             // 
-            this.ToolStripMenuItemCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMenuCopyToPool,
-            this.ToolStripMenuCopyToResource,
-            this.ToolStripMenuCopyToHazard,
-            this.ToolStripMenuCopyToSideboard,
-            this.ToolStripMenuCopyToSite});
-            this.ToolStripMenuItemCopyCard.Name = "ToolStripMenuItemCopyCard";
-            this.ToolStripMenuItemCopyCard.Size = new System.Drawing.Size(107, 22);
-            this.ToolStripMenuItemCopyCard.Text = "Copy";
+            this.ToolStripMenuTabCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuTabCopyToPool,
+            this.ToolStripMenuTabCopyToResource,
+            this.ToolStripMenuTabCopyToHazard,
+            this.ToolStripMenuTabCopyToSideboard,
+            this.ToolStripMenuTabCopyToSite});
+            this.ToolStripMenuTabCopyCard.Name = "ToolStripMenuTabCopyCard";
+            this.ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(107, 22);
+            this.ToolStripMenuTabCopyCard.Text = "Copy";
             // 
-            // ToolStripMenuCopyToPool
+            // ToolStripMenuTabCopyToPool
             // 
-            this.ToolStripMenuCopyToPool.Name = "ToolStripMenuCopyToPool";
-            this.ToolStripMenuCopyToPool.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuCopyToPool.Text = "Pool";
-            this.ToolStripMenuCopyToPool.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabCopyToPool.Name = "ToolStripMenuTabCopyToPool";
+            this.ToolStripMenuTabCopyToPool.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabCopyToPool.Text = "Pool";
+            this.ToolStripMenuTabCopyToPool.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuCopyToResource
+            // ToolStripMenuTabCopyToResource
             // 
-            this.ToolStripMenuCopyToResource.Name = "ToolStripMenuCopyToResource";
-            this.ToolStripMenuCopyToResource.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuCopyToResource.Text = "Resources";
-            this.ToolStripMenuCopyToResource.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabCopyToResource.Name = "ToolStripMenuTabCopyToResource";
+            this.ToolStripMenuTabCopyToResource.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabCopyToResource.Text = "Resources";
+            this.ToolStripMenuTabCopyToResource.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuCopyToHazard
+            // ToolStripMenuTabCopyToHazard
             // 
-            this.ToolStripMenuCopyToHazard.Name = "ToolStripMenuCopyToHazard";
-            this.ToolStripMenuCopyToHazard.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuCopyToHazard.Text = "Hazards";
-            this.ToolStripMenuCopyToHazard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabCopyToHazard.Name = "ToolStripMenuTabCopyToHazard";
+            this.ToolStripMenuTabCopyToHazard.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabCopyToHazard.Text = "Hazards";
+            this.ToolStripMenuTabCopyToHazard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuCopyToSideboard
+            // ToolStripMenuTabCopyToSideboard
             // 
-            this.ToolStripMenuCopyToSideboard.Name = "ToolStripMenuCopyToSideboard";
-            this.ToolStripMenuCopyToSideboard.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuCopyToSideboard.Text = "Sideboard";
-            this.ToolStripMenuCopyToSideboard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabCopyToSideboard.Name = "ToolStripMenuTabCopyToSideboard";
+            this.ToolStripMenuTabCopyToSideboard.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabCopyToSideboard.Text = "Sideboard";
+            this.ToolStripMenuTabCopyToSideboard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuCopyToSite
+            // ToolStripMenuTabCopyToSite
             // 
-            this.ToolStripMenuCopyToSite.Name = "ToolStripMenuCopyToSite";
-            this.ToolStripMenuCopyToSite.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuCopyToSite.Text = "Sites";
-            this.ToolStripMenuCopyToSite.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabCopyToSite.Name = "ToolStripMenuTabCopyToSite";
+            this.ToolStripMenuTabCopyToSite.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabCopyToSite.Text = "Sites";
+            this.ToolStripMenuTabCopyToSite.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuItemMoveCard
+            // ToolStripMenuTabMoveCard
             // 
-            this.ToolStripMenuItemMoveCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMenuMoveToPool,
-            this.ToolStripMenuMoveToResource,
-            this.ToolStripMenuMoveToHazard,
-            this.ToolStripMenuMoveToSideboard,
-            this.ToolStripMenuMoveToSite});
-            this.ToolStripMenuItemMoveCard.Name = "ToolStripMenuItemMoveCard";
-            this.ToolStripMenuItemMoveCard.Size = new System.Drawing.Size(107, 22);
-            this.ToolStripMenuItemMoveCard.Text = "Move";
+            this.ToolStripMenuTabMoveCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuTabMoveToPool,
+            this.ToolStripMenuTabMoveToResource,
+            this.ToolStripMenuTabMoveToHazard,
+            this.ToolStripMenuTabMoveToSideboard,
+            this.ToolStripMenuTabMoveToSite});
+            this.ToolStripMenuTabMoveCard.Name = "ToolStripMenuTabMoveCard";
+            this.ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(107, 22);
+            this.ToolStripMenuTabMoveCard.Text = "Move";
             // 
-            // ToolStripMenuMoveToPool
+            // ToolStripMenuTabMoveToPool
             // 
-            this.ToolStripMenuMoveToPool.Name = "ToolStripMenuMoveToPool";
-            this.ToolStripMenuMoveToPool.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuMoveToPool.Text = "Pool";
-            this.ToolStripMenuMoveToPool.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabMoveToPool.Name = "ToolStripMenuTabMoveToPool";
+            this.ToolStripMenuTabMoveToPool.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabMoveToPool.Text = "Pool";
+            this.ToolStripMenuTabMoveToPool.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuMoveToResource
+            // ToolStripMenuTabMoveToResource
             // 
-            this.ToolStripMenuMoveToResource.Name = "ToolStripMenuMoveToResource";
-            this.ToolStripMenuMoveToResource.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuMoveToResource.Text = "Resources";
-            this.ToolStripMenuMoveToResource.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabMoveToResource.Name = "ToolStripMenuTabMoveToResource";
+            this.ToolStripMenuTabMoveToResource.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabMoveToResource.Text = "Resources";
+            this.ToolStripMenuTabMoveToResource.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuMoveToHazard
+            // ToolStripMenuTabMoveToHazard
             // 
-            this.ToolStripMenuMoveToHazard.Name = "ToolStripMenuMoveToHazard";
-            this.ToolStripMenuMoveToHazard.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuMoveToHazard.Text = "Hazards";
-            this.ToolStripMenuMoveToHazard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabMoveToHazard.Name = "ToolStripMenuTabMoveToHazard";
+            this.ToolStripMenuTabMoveToHazard.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabMoveToHazard.Text = "Hazards";
+            this.ToolStripMenuTabMoveToHazard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuMoveToSideboard
+            // ToolStripMenuTabMoveToSideboard
             // 
-            this.ToolStripMenuMoveToSideboard.Name = "ToolStripMenuMoveToSideboard";
-            this.ToolStripMenuMoveToSideboard.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuMoveToSideboard.Text = "Sideboard";
-            this.ToolStripMenuMoveToSideboard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabMoveToSideboard.Name = "ToolStripMenuTabMoveToSideboard";
+            this.ToolStripMenuTabMoveToSideboard.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabMoveToSideboard.Text = "Sideboard";
+            this.ToolStripMenuTabMoveToSideboard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuMoveToSite
+            // ToolStripMenuTabMoveToSite
             // 
-            this.ToolStripMenuMoveToSite.Name = "ToolStripMenuMoveToSite";
-            this.ToolStripMenuMoveToSite.Size = new System.Drawing.Size(127, 22);
-            this.ToolStripMenuMoveToSite.Text = "Sites";
-            this.ToolStripMenuMoveToSite.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabMoveToSite.Name = "ToolStripMenuTabMoveToSite";
+            this.ToolStripMenuTabMoveToSite.Size = new System.Drawing.Size(127, 22);
+            this.ToolStripMenuTabMoveToSite.Text = "Sites";
+            this.ToolStripMenuTabMoveToSite.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
-            // ToolStripMenuItemDeleteCard
+            // ToolStripMenuTabDeleteCard
             // 
-            this.ToolStripMenuItemDeleteCard.Name = "ToolStripMenuItemDeleteCard";
-            this.ToolStripMenuItemDeleteCard.Size = new System.Drawing.Size(107, 22);
-            this.ToolStripMenuItemDeleteCard.Text = "Delete";
-            this.ToolStripMenuItemDeleteCard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            this.ToolStripMenuTabDeleteCard.Name = "ToolStripMenuTabDeleteCard";
+            this.ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(107, 22);
+            this.ToolStripMenuTabDeleteCard.Text = "Delete";
+            this.ToolStripMenuTabDeleteCard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
             // 
             // PictureBoxCardImage
             // 
@@ -717,6 +780,7 @@ namespace MECCG_Deck_Builder
             this.MainMenuStrip = this.MenuStrip1;
             this.Name = "Form1";
             this.Text = "MECCG Deck Builder";
+            this.ContextMenuStripMaster.ResumeLayout(false);
             this.ContextMenuStripTabs.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.PictureBoxCardImage)).EndInit();
             this.TabControlDeck.ResumeLayout(false);
@@ -778,19 +842,7 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip ContextMenuStripTabs;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemCopyCard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuCopyToPool;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuCopyToResource;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuCopyToHazard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuCopyToSideboard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuCopyToSite;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemMoveCard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemDeleteCard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMoveToPool;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMoveToResource;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMoveToHazard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMoveToSideboard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMoveToSite;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyCard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTW;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTD;
@@ -799,6 +851,25 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuAS;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuWH;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuBA;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToPool;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToResource;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToHazard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToSideboard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToSite;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveCard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToPool;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToResource;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToHazard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToSideboard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToSite;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabDeleteCard;
+        private System.Windows.Forms.ContextMenuStrip ContextMenuStripMaster;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyCard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToPool;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToResource;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToHazard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSideboard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
     }
 }
 
