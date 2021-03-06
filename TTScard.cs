@@ -248,7 +248,7 @@ namespace MECCG_Deck_Builder
         public string GUID { get; set; }
     }
 
-    public class Root
+    public class TTScard
     {
         public string SaveName { get; set; }
         public string GameMode { get; set; }

@@ -8,9 +8,17 @@ namespace MECCG_Deck_Builder
         id
     }
 
+    internal enum SaveType
+    {
+        TTS = 1,
+        Cardnum,
+        Text
+    }
+
     static class Constants
     {
         public const string METW = "metw";
+        public const string AppTitle = "MECCG Deck Builder";
 
         public const string poolFileSuffix = "_pool.json";
         public const string resourceFileSuffix = "_resource.json";

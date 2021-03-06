@@ -13,12 +13,14 @@ namespace MECCG_Deck_Builder
     {
         private readonly SortedDictionary<string, string> card = new SortedDictionary<string, string>();
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
-        private Root TTSitems;
+        private TTScard TTSitems;
+        private List<CardnumCard> CardnumItems;
 
         internal Cards()
         {
             LoadImages();
-            ReadMETW_TTSfile();
+            SetMETW_TTSdata();
+            SetCardnumData();
         }
         private string GetCardValue(int cardIndex, string cardKey)
         {
@@ -89,14 +91,47 @@ namespace MECCG_Deck_Builder
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }
 
+        internal void Save_TextFile(List<string[]> cardList, string filePathOutput)
+        {
+            string textOutput = "";
+
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                textOutput += cardList[index][(int)CardListField.name] + Environment.NewLine;
+            }
+            File.WriteAllText(filePathOutput, textOutput);
+        }
+
+        internal void Save_CardnumFile(List<string[]> cardList, string filePathOutput)
+        {
+            int cardIndex;
+            string cardnumOutput = "";
+
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
+                cardnumOutput += $"{cards[cardIndex]["cardnumFullCode"]}{Environment.NewLine}";
+            }
+            File.WriteAllText(filePathOutput, cardnumOutput);
+        }
+
         internal void SaveMETW_TTSfile(List<string[]> cardList, string filePathOutput)
         {
             int cardIndex;
 
+            // Check that the list only contains METW cards
+            if (!METWonly(cardList))
+            {
+                string message = $"Unable to save \"{Path.GetFileName(filePathOutput)}\" in TTS format. ";
+                message += $"Application only supports the saving of Middle Earth the Wizards cards at present";
+                MessageBox.Show(message, Constants.AppTitle);
+                return;
+            }
+
             // Make a copy of TTSitems object called saveTTSitems as starting point then modify
             // before serialising to output file
             string copyTTSitems = JsonConvert.SerializeObject(TTSitems);
-            Root saveTTSitems = JsonConvert.DeserializeObject<Root>(copyTTSitems); 
+            TTScard saveTTSitems = JsonConvert.DeserializeObject<TTScard>(copyTTSitems); 
 
             // Update DeckIDs list
             saveTTSitems.ObjectStates[0].DeckIDs.Clear();
@@ -139,6 +174,16 @@ namespace MECCG_Deck_Builder
             File.WriteAllText(filePathOutput, indentedJsonString);
         }
 
+        internal Boolean METWonly(List<string[]> cardList)
+        {
+            for (int index = 0; index < cardList.Count; index++)
+            {
+                if (cardList[index][(int)CardListField.set] != Constants.METW)
+                    return false;
+            }
+            return true;
+        }
+
         internal void SetTTScustomDeck(ContainedObject containedObject, string deckID)
         {
             CustomDeck deckInstance = TTSitems.ObjectStates[0].CustomDeck;
@@ -166,7 +211,7 @@ namespace MECCG_Deck_Builder
         {
             using StreamReader r = new StreamReader(filePathName);
             string json = r.ReadToEnd();
-            var Items = JsonConvert.DeserializeObject<Root>(json);
+            var Items = JsonConvert.DeserializeObject<TTScard>(json);
 
             for (int index = 0; index < Items.ObjectStates[0].ContainedObjects.Count; index++)
             {
@@ -181,11 +226,11 @@ namespace MECCG_Deck_Builder
             cardList.Sort(CompareCardsByName);
         }
 
-        private void ReadMETW_TTSfile()
+        private void SetMETW_TTSdata()
         {
-            using StreamReader r = new StreamReader("METW.json");
+            using StreamReader r = new StreamReader("METW_TTS.json");
             string json = r.ReadToEnd();
-            TTSitems = JsonConvert.DeserializeObject<Root>(json);
+            TTSitems = JsonConvert.DeserializeObject<TTScard>(json);
 
             foreach (var card in cards)
             {
@@ -213,6 +258,37 @@ namespace MECCG_Deck_Builder
                     card.Add("TTSnickname", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
 
                 }
+            }
+        }
+
+        private void SetCardnumData()
+        {
+            using StreamReader r = new StreamReader("Cardnum.json");
+            string json = r.ReadToEnd();
+            CardnumItems = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
+
+            foreach (var card in cards)
+            {
+                    Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein($"{card["cardname"]}");
+                    int minDistance = 100;
+                    int minIndex = 0;
+                    int index = 0;
+                    foreach (var item in CardnumItems)
+                    {
+                        int levenshteinDistance = lev.DistanceFrom(item.NameEN);
+                        if (levenshteinDistance < minDistance)
+                        {
+                            minDistance = levenshteinDistance;
+                            minIndex = index;
+                        }
+                        else if ((levenshteinDistance == minDistance) && (card["set"] == item.Set.ToLower()))
+                        {
+                            minDistance = levenshteinDistance;
+                            minIndex = index;
+                        }
+                        index++;
+                    }
+                    card.Add("cardnumFullCode", $"{CardnumItems[minIndex].FullCode}");
             }
         }
 

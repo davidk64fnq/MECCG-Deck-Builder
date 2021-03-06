@@ -213,7 +213,8 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        // Add/Remove a card from a tab listbox and associated list, compare cards in lists for sorting
+        // Add/Remove a card from a tab listbox and associated list, compare cards in lists for sorting,
+        // update application window title
         #region CARD_OPS
 
         private void AddCard(ListBox sourceListbox, ListBox destListbox, List<string[]> sourceList, List<string[]> destList, int index)
@@ -266,19 +267,39 @@ namespace MECCG_Deck_Builder
         {
             using SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Filter = "Tabletop Simulator (*.json)|*.json",
+                Title = Constants.AppTitle,
+                Filter = "Tabletop Simulator (*.json)|*.json|Cardnum (*.cnum)|*.cnum|Text (*.txt)|*.txt",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
             {
-                string savePrefix = saveFileDialog.FileName.Substring(0, saveFileDialog.FileName.IndexOf("."));
-                meccgCards.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix);
-                meccgCards.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix);
-                meccgCards.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix);
-                meccgCards.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
-                meccgCards.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix);
+                string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
+                {
+                    meccgCards.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix);
+                    meccgCards.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix);
+                    meccgCards.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix);
+                    meccgCards.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
+                    meccgCards.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix);
+                }
+                else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
+                {
+                    meccgCards.Save_CardnumFile(poolList, savePrefix + Constants.poolFileSuffix);
+                    meccgCards.Save_CardnumFile(resourceList, savePrefix + Constants.resourceFileSuffix);
+                    meccgCards.Save_CardnumFile(hazardList, savePrefix + Constants.hazardFileSuffix);
+                    meccgCards.Save_CardnumFile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
+                    meccgCards.Save_CardnumFile(siteList, savePrefix + Constants.siteFileSuffix);
+                }
+                else
+                {
+                    meccgCards.Save_TextFile(poolList, savePrefix + Constants.poolFileSuffix);
+                    meccgCards.Save_TextFile(resourceList, savePrefix + Constants.resourceFileSuffix);
+                    meccgCards.Save_TextFile(hazardList, savePrefix + Constants.hazardFileSuffix);
+                    meccgCards.Save_TextFile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
+                    meccgCards.Save_TextFile(siteList, savePrefix + Constants.siteFileSuffix);
+                }
             }
         }
 
@@ -290,11 +311,8 @@ namespace MECCG_Deck_Builder
 
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = this.Text,
-
-                CheckFileExists = true,
+                Title = Constants.AppTitle,
                 CheckPathExists = true,
-
                 DefaultExt = "json",
                 Filter = "Tabletop Simulator (*.json)|*.json",
                 FilterIndex = 1,
@@ -323,39 +341,19 @@ namespace MECCG_Deck_Builder
                         {
                             currentListBox.Items.Add(card[(int)CardListField.name]);
                         }
-                        currentDeckTitle = curFilename[0..(curFilename.LastIndexOf("_") - 1)];
+                        currentDeckTitle = curFilename[0..curFilename.LastIndexOf("_")];
                     }
                     else
                     {
                         string message = $"Unable to open \"{curFilename}\"\n\nExpecting filename to end in one of:\n";
                         message += $"\t\"{Constants.poolFileSuffix}\", \n\t\"{Constants.resourceFileSuffix}\", \n\t\"{Constants.hazardFileSuffix}\",\n";
                         message += $"\t\"{Constants.sideboardFileSuffix}\", \n\t\"{Constants.siteFileSuffix}\"";
-                        MessageBox.Show(message, "Open File Error");
+                        MessageBox.Show(message, Constants.AppTitle);
                     }
 
                 }
                 UpdateFormTitle(); // To last valid filename opened
             }
-        }
-
-        private Boolean SuffixValid(string curSuffix)
-        {
-            switch (curSuffix)
-            {
-                case Constants.poolFileSuffix:
-                    return true;
-                case Constants.resourceFileSuffix:
-                    return true;
-                case Constants.hazardFileSuffix:
-                    return true;
-                case Constants.sideboardFileSuffix:
-                    return true;
-                case Constants.siteFileSuffix:
-                    return true;
-                default:
-                    break;
-            }
-            return false;
         }
 
         #endregion
@@ -399,7 +397,8 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        // Utility methods for determining correct listbox, list, tab or operation
+        // Utility methods for determining correct listbox, list, tab or operation. Validate filename
+        // suffix when opening file
         #region LOOKUPS
 
         private List<string[]> GetList(ListBox listbox)
@@ -490,6 +489,26 @@ namespace MECCG_Deck_Builder
                 }
             }
             return -1;
+        }
+
+        private Boolean SuffixValid(string curSuffix)
+        {
+            switch (curSuffix)
+            {
+                case Constants.poolFileSuffix:
+                    return true;
+                case Constants.resourceFileSuffix:
+                    return true;
+                case Constants.hazardFileSuffix:
+                    return true;
+                case Constants.sideboardFileSuffix:
+                    return true;
+                case Constants.siteFileSuffix:
+                    return true;
+                default:
+                    break;
+            }
+            return false;
         }
 
         #endregion
