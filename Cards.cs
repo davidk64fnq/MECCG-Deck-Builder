@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Reflection;
-using System.Collections;
 
 namespace MECCG_Deck_Builder
 {
@@ -15,9 +14,12 @@ namespace MECCG_Deck_Builder
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
         private TTScard TTSitems;
         private List<CardnumCard> CardnumItems;
+        private readonly Utilities utilities = new Utilities();
 
         internal Cards()
         {
+            utilities.StripDCcardnumData();
+
             LoadImages();
             SetMETW_TTSdata();
             SetCardnumData();
@@ -54,10 +56,22 @@ namespace MECCG_Deck_Builder
                 {
                     SortedDictionary<string, string> card = new SortedDictionary<string, string>
                     {
-                        { "cardname", $"{file[(set.Length + 1)..^4]}" },
+                        { "imageName", $"{file[(set.Length + 1)..^4]}" },
                         { "set", $"{set}" },
                         { "id", $"{index++}" }
                     };
+                    // Four image files in Against the Shadow are minion versions and identified by ".1" in filename
+                    // to distinguish from hero versions of same name in same set
+                    if (card["imageName"].Contains(".1"))
+                    {
+                        card.Add("cardname", card["imageName"][0..^2]);
+                        card.Add("cardnumAlignment", "Minion");
+                    }
+                    else
+                    {
+                        card.Add("cardname", card["imageName"]);
+                        card.Add("cardnumAlignment", "Hero"); // Will be corrected when cardnum data imported
+                    }
                     cards.Add(card);
                 }
             }
@@ -73,8 +87,9 @@ namespace MECCG_Deck_Builder
                 {
                     if (card["set"] == set)
                     {
-                        string[] cardItems = new string[3];
+                        string[] cardItems = new string[4];
                         cardItems[(int)CardListField.name] = $"{card["cardname"]}";
+                        cardItems[(int)CardListField.image] = $"{card["imageName"]}";
                         cardItems[(int)CardListField.set] = $"{card["set"]}";
                         cardItems[(int)CardListField.id] = $"{card["id"]}";
                         cardList.Add(cardItems);
@@ -110,7 +125,7 @@ namespace MECCG_Deck_Builder
             for (int index = 0; index < cardList.Count; index++)
             {
                 cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
-                cardnumOutput += $"{cards[cardIndex]["cardnumFullCode"]}{Environment.NewLine}";
+                cardnumOutput += $"1 {cards[cardIndex]["cardnumFullCode"]}{Environment.NewLine}";
             }
             File.WriteAllText(filePathOutput, cardnumOutput);
         }
@@ -217,8 +232,9 @@ namespace MECCG_Deck_Builder
             {
                 int TTScardID = Items.ObjectStates[0].ContainedObjects[index].CardID;
                 int cardIndex = GetCardIndex("TTScardID", TTScardID.ToString());
-                string[] cardItems = new string[3];
+                string[] cardItems = new string[4];
                 cardItems[(int)CardListField.name] = $"{cards[cardIndex]["cardname"]}";
+                cardItems[(int)CardListField.image] = $"{cards[cardIndex]["imageName"]}";
                 cardItems[(int)CardListField.set] = $"{cards[cardIndex]["set"]}";
                 cardItems[(int)CardListField.id] = $"{cards[cardIndex]["id"]}";
                 cardList.Add(cardItems);
@@ -260,7 +276,6 @@ namespace MECCG_Deck_Builder
                 }
             }
         }
-
         private void SetCardnumData()
         {
             using StreamReader r = new StreamReader("Cardnum.json");
@@ -269,26 +284,27 @@ namespace MECCG_Deck_Builder
 
             foreach (var card in cards)
             {
-                    Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein($"{card["cardname"]}");
-                    int minDistance = 100;
-                    int minIndex = 0;
-                    int index = 0;
-                    foreach (var item in CardnumItems)
+                Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein($"{card["cardname"]}");
+                int minDistance = 100;
+                int minIndex = 0;
+                int index = 0;
+                foreach (var item in CardnumItems)
+                {
+                    int levenshteinDistance = lev.DistanceFrom(item.NameEN);
+                    if (levenshteinDistance < minDistance)
                     {
-                        int levenshteinDistance = lev.DistanceFrom(item.NameEN);
-                        if (levenshteinDistance < minDistance)
-                        {
-                            minDistance = levenshteinDistance;
-                            minIndex = index;
-                        }
-                        else if ((levenshteinDistance == minDistance) && (card["set"] == item.Set.ToLower()))
-                        {
-                            minDistance = levenshteinDistance;
-                            minIndex = index;
-                        }
-                        index++;
+                        minDistance = levenshteinDistance;
+                        minIndex = index;
                     }
-                    card.Add("cardnumFullCode", $"{CardnumItems[minIndex].FullCode}");
+                    else if ((levenshteinDistance == minDistance) && (card["set"] == item.Set.ToLower()) && (card["cardnumAlignment"] == item.Alignment))
+                    {
+                        minDistance = levenshteinDistance;
+                        minIndex = index;
+                    }
+                    index++;
+                }
+
+                card.Add("cardnumFullCode", $"{CardnumItems[minIndex].FullCode}");
             }
         }
 

@@ -32,7 +32,6 @@ namespace MECCG_Deck_Builder
             InitializeComponent();
             ((ToolStripMenuItem)ToolStripMenuTW).Checked = true;
             UpdateFormTitle();
-
         }
 
         // User can drag cards from master list to current tab on right with left mouse click hold
@@ -119,7 +118,7 @@ namespace MECCG_Deck_Builder
 
                 // Display card image from correct set
                 List<string[]> currentList = GetList(currentListBox);
-                PictureBoxCardImage.Image = Image.FromFile($"{currentList[currentIndex][(int)CardListField.set]}\\{currentListBox.SelectedItem}.png");
+                PictureBoxCardImage.Image = Image.FromFile($"{currentList[currentIndex][(int)CardListField.set]}\\{currentList[currentIndex][(int)CardListField.image]}.png");
             }
         }
 
@@ -278,27 +277,27 @@ namespace MECCG_Deck_Builder
                 string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
                 if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
                 {
-                    meccgCards.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix);
-                    meccgCards.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix);
-                    meccgCards.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix);
-                    meccgCards.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
-                    meccgCards.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix);
+                    meccgCards.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
+                    meccgCards.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix + ".json");
+                    meccgCards.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix + ".json");
+                    meccgCards.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
+                    meccgCards.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
                 }
                 else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
                 {
-                    meccgCards.Save_CardnumFile(poolList, savePrefix + Constants.poolFileSuffix);
-                    meccgCards.Save_CardnumFile(resourceList, savePrefix + Constants.resourceFileSuffix);
-                    meccgCards.Save_CardnumFile(hazardList, savePrefix + Constants.hazardFileSuffix);
-                    meccgCards.Save_CardnumFile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
-                    meccgCards.Save_CardnumFile(siteList, savePrefix + Constants.siteFileSuffix);
+                    meccgCards.Save_CardnumFile(poolList, savePrefix + Constants.poolFileSuffix + ".cnum");
+                    meccgCards.Save_CardnumFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".cnum");
+                    meccgCards.Save_CardnumFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".cnum");
+                    meccgCards.Save_CardnumFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".cnum");
+                    meccgCards.Save_CardnumFile(siteList, savePrefix + Constants.siteFileSuffix + ".cnum");
                 }
                 else
                 {
-                    meccgCards.Save_TextFile(poolList, savePrefix + Constants.poolFileSuffix);
-                    meccgCards.Save_TextFile(resourceList, savePrefix + Constants.resourceFileSuffix);
-                    meccgCards.Save_TextFile(hazardList, savePrefix + Constants.hazardFileSuffix);
-                    meccgCards.Save_TextFile(sideboardList, savePrefix + Constants.sideboardFileSuffix);
-                    meccgCards.Save_TextFile(siteList, savePrefix + Constants.siteFileSuffix);
+                    meccgCards.Save_TextFile(poolList, savePrefix + Constants.poolFileSuffix + ".txt");
+                    meccgCards.Save_TextFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".txt");
+                    meccgCards.Save_TextFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".txt");
+                    meccgCards.Save_TextFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".txt");
+                    meccgCards.Save_TextFile(siteList, savePrefix + Constants.siteFileSuffix + ".txt");
                 }
             }
         }

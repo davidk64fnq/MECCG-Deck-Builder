@@ -4,6 +4,7 @@ namespace MECCG_Deck_Builder
     internal enum CardListField
     {
         name,
+        image,
         set,
         id
     }
@@ -20,11 +21,11 @@ namespace MECCG_Deck_Builder
         public const string METW = "metw";
         public const string AppTitle = "MECCG Deck Builder";
 
-        public const string poolFileSuffix = "_pool.json";
-        public const string resourceFileSuffix = "_resource.json";
-        public const string hazardFileSuffix = "_hazard.json";
-        public const string sideboardFileSuffix = "_sideboard.json";
-        public const string siteFileSuffix = "_site.json";
+        public const string poolFileSuffix = "_pool";
+        public const string resourceFileSuffix = "_resource";
+        public const string hazardFileSuffix = "_hazard";
+        public const string sideboardFileSuffix = "_sideboard";
+        public const string siteFileSuffix = "_site";
 
         public const string Move = "Move";
         public const string Copy = "Copy";
