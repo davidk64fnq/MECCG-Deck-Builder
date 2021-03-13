@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace MECCG_Deck_Builder
 {
@@ -30,7 +32,7 @@ namespace MECCG_Deck_Builder
         internal Form1()
         {
             InitializeComponent();
-            ((ToolStripMenuItem)ToolStripMenuTW).Checked = true;
+            ToolStripMenuTW.Checked = true;
             UpdateFormTitle();
         }
 
@@ -262,7 +264,7 @@ namespace MECCG_Deck_Builder
         // Save and read from file a deck in TTS format
         #region OPEN_CLOSE
 
-        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -277,32 +279,93 @@ namespace MECCG_Deck_Builder
                 string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
                 if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
                 {
-                    meccgCards.SaveMETW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
-                    meccgCards.SaveMETW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix + ".json");
-                    meccgCards.SaveMETW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix + ".json");
-                    meccgCards.SaveMETW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
-                    meccgCards.SaveMETW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
+                    meccgCards.Export_METW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
+                    meccgCards.Export_METW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix + ".json");
+                    meccgCards.Export_METW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix + ".json");
+                    meccgCards.Export_METW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
+                    meccgCards.Export_METW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
                 }
                 else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
                 {
-                    meccgCards.Save_CardnumFile(poolList, savePrefix + Constants.poolFileSuffix + ".cnum");
-                    meccgCards.Save_CardnumFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".cnum");
-                    meccgCards.Save_CardnumFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".cnum");
-                    meccgCards.Save_CardnumFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".cnum");
-                    meccgCards.Save_CardnumFile(siteList, savePrefix + Constants.siteFileSuffix + ".cnum");
+                    meccgCards.Export_CardnumFile(poolList, savePrefix + Constants.poolFileSuffix + ".cnum");
+                    meccgCards.Export_CardnumFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".cnum");
+                    meccgCards.Export_CardnumFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".cnum");
+                    meccgCards.Export_CardnumFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".cnum");
+                    meccgCards.Export_CardnumFile(siteList, savePrefix + Constants.siteFileSuffix + ".cnum");
                 }
                 else
                 {
-                    meccgCards.Save_TextFile(poolList, savePrefix + Constants.poolFileSuffix + ".txt");
-                    meccgCards.Save_TextFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".txt");
-                    meccgCards.Save_TextFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".txt");
-                    meccgCards.Save_TextFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".txt");
-                    meccgCards.Save_TextFile(siteList, savePrefix + Constants.siteFileSuffix + ".txt");
+                    meccgCards.Export_TextFile(poolList, savePrefix + Constants.poolFileSuffix + ".txt");
+                    meccgCards.Export_TextFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".txt");
+                    meccgCards.Export_TextFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".txt");
+                    meccgCards.Export_TextFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".txt");
+                    meccgCards.Export_TextFile(siteList, savePrefix + Constants.siteFileSuffix + ".txt");
                 }
             }
         }
 
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = Constants.AppTitle,
+                CheckPathExists = true,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Deck (*.json)|*.json",
+                FilterIndex = 1,
+                RestoreDirectory = false,
+                AutoUpgradeEnabled = true
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                OpenClose OpenCloseItems = new OpenClose
+                {
+                    CurrentDeckTitle = currentDeckTitle,
+                    setList = setList
+                };
+                string indentedJsonString = JsonConvert.SerializeObject(OpenCloseItems, Formatting.Indented);
+                File.WriteAllText(saveFileDialog.FileName, indentedJsonString);
+            }
+
+        }
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = Constants.AppTitle,
+                CheckPathExists = true,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Deck (*.json)|*.json",
+                FilterIndex = 1,
+                RestoreDirectory = false,
+                Multiselect = true,
+                AutoUpgradeEnabled = true
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                using StreamReader r = new StreamReader(openFileDialog.FileName);
+                string json = r.ReadToEnd();
+                var OpenCloseItems = JsonConvert.DeserializeObject<OpenClose>(json);
+                currentDeckTitle = OpenCloseItems.CurrentDeckTitle;
+                UpdateFormTitle();
+                foreach (ToolStripMenuItem item in ToolStripMenuSet.DropDownItems)
+                {
+                    if (item.Checked == true)
+                    {
+                        item.Checked = false;
+                    }
+                    if (OpenCloseItems.setList.Contains(item.Tag))
+                    {
+                        item.Checked = true;
+                    }
+                }
+            }
+
+        }
+
+        private void XOpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string curPath = "";
             string curFilename = "";
@@ -511,5 +574,6 @@ namespace MECCG_Deck_Builder
         }
 
         #endregion
+
     }
 }

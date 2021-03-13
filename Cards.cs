@@ -106,7 +106,7 @@ namespace MECCG_Deck_Builder
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }
 
-        internal void Save_TextFile(List<string[]> cardList, string filePathOutput)
+        internal void Export_TextFile(List<string[]> cardList, string filePathOutput)
         {
             string textOutput = "";
 
@@ -117,7 +117,7 @@ namespace MECCG_Deck_Builder
             File.WriteAllText(filePathOutput, textOutput);
         }
 
-        internal void Save_CardnumFile(List<string[]> cardList, string filePathOutput)
+        internal void Export_CardnumFile(List<string[]> cardList, string filePathOutput)
         {
             int cardIndex;
             string cardnumOutput = "";
@@ -130,7 +130,7 @@ namespace MECCG_Deck_Builder
             File.WriteAllText(filePathOutput, cardnumOutput);
         }
 
-        internal void SaveMETW_TTSfile(List<string[]> cardList, string filePathOutput)
+        internal void Export_METW_TTSfile(List<string[]> cardList, string filePathOutput)
         {
             int cardIndex;
 
