@@ -28,6 +28,7 @@ namespace MECCG_Deck_Builder
         private readonly Cards meccgCards = new Cards();
         private ListBox callingListbox;
         private string currentDeckTitle = "New Deck";
+        private readonly CardImageCache cardImageCache = new CardImageCache();
 
         internal Form1()
         {
@@ -120,7 +121,9 @@ namespace MECCG_Deck_Builder
 
                 // Display card image from correct set
                 List<string[]> currentList = GetList(currentListBox);
-                PictureBoxCardImage.Image = Image.FromFile($"{currentList[currentIndex][(int)CardListField.set]}\\{currentList[currentIndex][(int)CardListField.image]}.png");
+                string setFolder = currentList[currentIndex][(int)CardListField.set];
+                string imageName = currentList[currentIndex][(int)CardListField.image];
+                PictureBoxCardImage.Image = cardImageCache.GetOrCreate($"https://cardnum.net/img/cards/{setFolder}/{imageName}", setFolder, imageName);
             }
         }
 
@@ -233,6 +236,7 @@ namespace MECCG_Deck_Builder
         {
             listBox.Items.Remove(listBox.Items[index]);
             cardList.Remove(cardList[index]);
+            listBox.SelectedIndex = 0;
             cardList.Sort(CompareCardsByName);
             UpdateFormTitle();
         }

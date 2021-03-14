@@ -5,24 +5,23 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Reflection;
+using System.Net;
 
 namespace MECCG_Deck_Builder
 {
     internal class Cards
     {
-        private readonly SortedDictionary<string, string> card = new SortedDictionary<string, string>();
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
+        private readonly List<Dictionary<string, string>> sets = new List<Dictionary<string, string>>();
         private TTScard TTSitems;
         private List<CardnumCard> CardnumItems;
-        private readonly Utilities utilities = new Utilities();
+        private List<CardnumSet> CardnumSets;
 
         internal Cards()
         {
-            utilities.StripDCcardnumData();
-
-            LoadImages();
-            SetMETW_TTSdata();
-            SetCardnumData();
+            ImportCardnumData();
+            ImportCardnumSetInfo();
+            ImportMETW_TTSdata();
         }
         private string GetCardValue(int cardIndex, string cardKey)
         {
@@ -40,41 +39,6 @@ namespace MECCG_Deck_Builder
                 index++;
             }
             return -1;
-        }
-
-        private void LoadImages()
-        {
-            string[] sets = { "metw", "metd", "medm", "mele", "meas", "mewh", "meba" };
-
-            int index = 0;
-            foreach (string set in sets)
-            {
-                var imageFiles = from file in Directory.EnumerateFiles(set)
-                                 select file;
-
-                foreach (var file in imageFiles)
-                {
-                    SortedDictionary<string, string> card = new SortedDictionary<string, string>
-                    {
-                        { "imageName", $"{file[(set.Length + 1)..^4]}" },
-                        { "set", $"{set}" },
-                        { "id", $"{index++}" }
-                    };
-                    // Four image files in Against the Shadow are minion versions and identified by ".1" in filename
-                    // to distinguish from hero versions of same name in same set
-                    if (card["imageName"].Contains(".1"))
-                    {
-                        card.Add("cardname", card["imageName"][0..^2]);
-                        card.Add("cardnumAlignment", "Minion");
-                    }
-                    else
-                    {
-                        card.Add("cardname", card["imageName"]);
-                        card.Add("cardnumAlignment", "Hero"); // Will be corrected when cardnum data imported
-                    }
-                    cards.Add(card);
-                }
-            }
         }
 
         internal List<string[]> GetCardList(List<string> selectedSets)
@@ -125,7 +89,7 @@ namespace MECCG_Deck_Builder
             for (int index = 0; index < cardList.Count; index++)
             {
                 cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
-                cardnumOutput += $"1 {cards[cardIndex]["cardnumFullCode"]}{Environment.NewLine}";
+                cardnumOutput += $"1 {cards[cardIndex]["fullCode"]}{Environment.NewLine}";
             }
             File.WriteAllText(filePathOutput, cardnumOutput);
         }
@@ -242,7 +206,7 @@ namespace MECCG_Deck_Builder
             cardList.Sort(CompareCardsByName);
         }
 
-        private void SetMETW_TTSdata()
+        private void ImportMETW_TTSdata()
         {
             using StreamReader r = new StreamReader("METW_TTS.json");
             string json = r.ReadToEnd();
@@ -276,36 +240,67 @@ namespace MECCG_Deck_Builder
                 }
             }
         }
-        private void SetCardnumData()
+        private void ImportCardnumData()
         {
             using StreamReader r = new StreamReader("Cardnum.json");
             string json = r.ReadToEnd();
             CardnumItems = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
 
-            foreach (var card in cards)
+            int index = 0;
+            foreach (var item in CardnumItems)
             {
-                Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein($"{card["cardname"]}");
-                int minDistance = 100;
-                int minIndex = 0;
-                int index = 0;
-                foreach (var item in CardnumItems)
+                if (item.Dreamcard != false || item.Released != false)
                 {
-                    int levenshteinDistance = lev.DistanceFrom(item.NameEN);
-                    if (levenshteinDistance < minDistance)
+                    SortedDictionary<string, string> card = new SortedDictionary<string, string>
                     {
-                        minDistance = levenshteinDistance;
-                        minIndex = index;
-                    }
-                    else if ((levenshteinDistance == minDistance) && (card["set"] == item.Set.ToLower()) && (card["cardnumAlignment"] == item.Alignment))
-                    {
-                        minDistance = levenshteinDistance;
-                        minIndex = index;
-                    }
-                    index++;
+                        { "id", $"{index++}" },
+                        { "set", $"{item.Set}" },
+                        { "fullCode", $"{item.FullCode}" },
+                        { "cardname", $"{item.NameEN}" },
+                        { "alignment", $"{item.Alignment}" },
+                        { "imageName", $"{item.ImageName}" }
+                    };
+                    cards.Add(card);
                 }
-
-                card.Add("cardnumFullCode", $"{CardnumItems[minIndex].FullCode}");
             }
+        }
+
+        private void ImportCardnumSetInfo()
+        {
+            string json = GetWebContent("https://github.com/rezwits/cardnum/blob/master/fdata/sets-dc.json");
+            if (json != null)
+            {
+                CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+
+                int index = 0;
+                foreach (var item in CardnumSets)
+                {
+                    Dictionary<string, string> set = new Dictionary<string, string>
+                    {
+                        { "id", $"{index++}" },
+                        { "code", $"{item.Code}" },
+                        { "format", $"{item.Format}" },
+                        { "name", $"{item.Name}" },
+                        { "position", $"{item.Position}" },
+                        { "dreamcards", $"{item.Dreamcards}" },
+                        { "released", $"{item.Released}" }
+                    };
+                    sets.Add(set);
+                }
+            }
+        }
+
+        public string GetWebContent(string url)
+        {
+            Uri uri = new Uri(url);
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+            request.Method = WebRequestMethods.Http.Get;
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
+            string output = reader.ReadToEnd();
+            response.Close();
+
+            return output;
         }
 
         internal string GetTTScustomDeck(CustomDeck cardInstance)

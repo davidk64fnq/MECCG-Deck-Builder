@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace MECCG_Deck_Builder
-{// Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+{
     public class CardnumCard
     {
         public string Set { get; set; }
