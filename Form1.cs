@@ -33,12 +33,28 @@ namespace MECCG_Deck_Builder
         internal Form1()
         {
             InitializeComponent();
-            ToolStripMenuTW.Checked = true;
+            CreateSetMenu();
             UpdateFormTitle();
         }
 
-        // User can drag cards from master list to current tab on right with left mouse click hold
-        // and use context menu with right click to copy selected card to a tab on the right
+        private void CreateSetMenu()
+        {
+            for (int index = 0; index < meccgCards.GetSetCount(); index++)
+            {
+                ToolStripMenuItem MenuSetItem = new ToolStripMenuItem(meccgCards.GetSetValue(index, "name"))
+                {
+                    Tag = meccgCards.GetSetValue(index, "code"),
+                    CheckOnClick = true,
+                };
+                MenuSetItem.CheckedChanged += new EventHandler(ToolStripMenuSet_CheckedChanged);
+                if (index == 0)
+                {
+                    MenuSetItem.Checked = true;
+                }
+                ToolStripMenuSet.DropDownItems.Add(MenuSetItem);
+            }
+        }
+
         #region MASTER_SINGLE_CLICK
 
 
@@ -236,7 +252,10 @@ namespace MECCG_Deck_Builder
         {
             listBox.Items.Remove(listBox.Items[index]);
             cardList.Remove(cardList[index]);
-            listBox.SelectedIndex = 0;
+            if (listBox.Items.Count > 0)
+            {
+                listBox.SelectedIndex = 0;
+            }
             cardList.Sort(CompareCardsByName);
             UpdateFormTitle();
         }

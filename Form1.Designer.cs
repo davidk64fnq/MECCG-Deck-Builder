@@ -91,13 +91,6 @@ namespace MECCG_Deck_Builder
             this.customizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuTW = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuTD = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuDM = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuLE = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuAS = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuWH = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuBA = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.indexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -661,80 +654,9 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuSet
             // 
-            this.ToolStripMenuSet.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMenuTW,
-            this.ToolStripMenuTD,
-            this.ToolStripMenuDM,
-            this.ToolStripMenuLE,
-            this.ToolStripMenuAS,
-            this.ToolStripMenuWH,
-            this.ToolStripMenuBA});
             this.ToolStripMenuSet.Name = "ToolStripMenuSet";
             this.ToolStripMenuSet.Size = new System.Drawing.Size(35, 20);
             this.ToolStripMenuSet.Text = "&Set";
-            // 
-            // ToolStripMenuTW
-            // 
-            this.ToolStripMenuTW.CheckOnClick = true;
-            this.ToolStripMenuTW.Name = "ToolStripMenuTW";
-            this.ToolStripMenuTW.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuTW.Tag = "metw";
-            this.ToolStripMenuTW.Text = "The Wizards";
-            this.ToolStripMenuTW.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
-            // 
-            // ToolStripMenuTD
-            // 
-            this.ToolStripMenuTD.CheckOnClick = true;
-            this.ToolStripMenuTD.Name = "ToolStripMenuTD";
-            this.ToolStripMenuTD.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuTD.Tag = "metd";
-            this.ToolStripMenuTD.Text = "The Dragons";
-            this.ToolStripMenuTD.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
-            // 
-            // ToolStripMenuDM
-            // 
-            this.ToolStripMenuDM.CheckOnClick = true;
-            this.ToolStripMenuDM.Name = "ToolStripMenuDM";
-            this.ToolStripMenuDM.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuDM.Tag = "medm";
-            this.ToolStripMenuDM.Text = "Dark Dominions";
-            this.ToolStripMenuDM.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
-            // 
-            // ToolStripMenuLE
-            // 
-            this.ToolStripMenuLE.CheckOnClick = true;
-            this.ToolStripMenuLE.Name = "ToolStripMenuLE";
-            this.ToolStripMenuLE.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuLE.Tag = "mele";
-            this.ToolStripMenuLE.Text = "The Lidless Eye";
-            this.ToolStripMenuLE.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
-            // 
-            // ToolStripMenuAS
-            // 
-            this.ToolStripMenuAS.CheckOnClick = true;
-            this.ToolStripMenuAS.Name = "ToolStripMenuAS";
-            this.ToolStripMenuAS.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuAS.Tag = "meas";
-            this.ToolStripMenuAS.Text = "Against The Shadow";
-            this.ToolStripMenuAS.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
-            // 
-            // ToolStripMenuWH
-            // 
-            this.ToolStripMenuWH.CheckOnClick = true;
-            this.ToolStripMenuWH.Name = "ToolStripMenuWH";
-            this.ToolStripMenuWH.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuWH.Tag = "mewh";
-            this.ToolStripMenuWH.Text = "The White Hand";
-            this.ToolStripMenuWH.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
-            // 
-            // ToolStripMenuBA
-            // 
-            this.ToolStripMenuBA.CheckOnClick = true;
-            this.ToolStripMenuBA.Name = "ToolStripMenuBA";
-            this.ToolStripMenuBA.Size = new System.Drawing.Size(181, 22);
-            this.ToolStripMenuBA.Tag = "meba";
-            this.ToolStripMenuBA.Text = "The Balrog";
-            this.ToolStripMenuBA.CheckedChanged += new System.EventHandler(this.ToolStripMenuSet_CheckedChanged);
             // 
             // helpToolStripMenuItem
             // 
@@ -853,13 +775,6 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ContextMenuStrip ContextMenuStripTabs;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyCard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTW;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTD;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuDM;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuLE;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuAS;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuWH;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuBA;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToPool;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToResource;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToHazard;

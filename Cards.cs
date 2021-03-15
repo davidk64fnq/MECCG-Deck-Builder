@@ -27,6 +27,14 @@ namespace MECCG_Deck_Builder
         {
             return $"{cards[cardIndex][cardKey]}";
         }
+        internal int GetSetCount()
+        {
+            return CardnumSets.Count;
+        }
+        internal string GetSetValue(int setIndex, string setKey)
+        {
+            return $"{sets[setIndex][setKey]}";
+        }
         private int GetCardIndex(string cardKey, string cardValue)
         {
             int index = 0;
@@ -267,40 +275,25 @@ namespace MECCG_Deck_Builder
 
         private void ImportCardnumSetInfo()
         {
-            string json = GetWebContent("https://github.com/rezwits/cardnum/blob/master/fdata/sets-dc.json");
-            if (json != null)
+            using StreamReader r = new StreamReader("CardnumSets.json");
+            string json = r.ReadToEnd();
+            CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+
+            int index = 0;
+            foreach (var item in CardnumSets)
             {
-                CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
-
-                int index = 0;
-                foreach (var item in CardnumSets)
+                Dictionary<string, string> set = new Dictionary<string, string>
                 {
-                    Dictionary<string, string> set = new Dictionary<string, string>
-                    {
-                        { "id", $"{index++}" },
-                        { "code", $"{item.Code}" },
-                        { "format", $"{item.Format}" },
-                        { "name", $"{item.Name}" },
-                        { "position", $"{item.Position}" },
-                        { "dreamcards", $"{item.Dreamcards}" },
-                        { "released", $"{item.Released}" }
-                    };
-                    sets.Add(set);
-                }
+                    { "id", $"{index++}" },
+                    { "code", $"{item.Code}" },
+                    { "format", $"{item.Format}" },
+                    { "name", $"{item.Name}" },
+                    { "position", $"{item.Position}" },
+                    { "dreamcards", $"{item.Dreamcards}" },
+                    { "released", $"{item.Released}" }
+                };
+                sets.Add(set);
             }
-        }
-
-        public string GetWebContent(string url)
-        {
-            Uri uri = new Uri(url);
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
-            request.Method = WebRequestMethods.Http.Get;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader reader = new StreamReader(response.GetResponseStream());
-            string output = reader.ReadToEnd();
-            response.Close();
-
-            return output;
         }
 
         internal string GetTTScustomDeck(CustomDeck cardInstance)
