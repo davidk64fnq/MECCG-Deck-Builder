@@ -287,6 +287,23 @@ namespace MECCG_Deck_Builder
         // Save and read from file a deck in TTS format
         #region OPEN_CLOSE
 
+        private void NewToolStripMenu_Click(object sender, EventArgs e)
+        {
+            var selectedOption = MessageBox.Show("Do you want to save the current deck?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (selectedOption == DialogResult.No)
+            {
+                currentDeckTitle = "New Deck";
+                for (int index = 0; index < Constants.noTabs; index++)
+                {
+                    ListBox currentListBox = GetListBox(Constants.TabList[index]);
+                    currentListBox.Items.Clear();
+                    List<string[]> currentList = GetList(currentListBox);
+                    currentList.Clear();
+                }
+                UpdateFormTitle();
+            }
+        }
+
         private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -342,16 +359,23 @@ namespace MECCG_Deck_Builder
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
+                currentDeckTitle = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
                 OpenClose OpenCloseItems = new OpenClose
                 {
                     CurrentDeckTitle = currentDeckTitle,
                     setList = setList
                 };
+                OpenCloseItems.poolList = poolList;
+                OpenCloseItems.resourceList = resourceList;
+                OpenCloseItems.hazardList = hazardList;
+                OpenCloseItems.sideboardList = sideboardList;
+                OpenCloseItems.siteList = siteList;
                 string indentedJsonString = JsonConvert.SerializeObject(OpenCloseItems, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, indentedJsonString);
+                UpdateFormTitle();
             }
-
         }
+
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -370,9 +394,8 @@ namespace MECCG_Deck_Builder
             {
                 using StreamReader r = new StreamReader(openFileDialog.FileName);
                 string json = r.ReadToEnd();
-                var OpenCloseItems = JsonConvert.DeserializeObject<OpenClose>(json);
+                OpenClose OpenCloseItems = JsonConvert.DeserializeObject<OpenClose>(json);
                 currentDeckTitle = OpenCloseItems.CurrentDeckTitle;
-                UpdateFormTitle();
                 foreach (ToolStripMenuItem item in ToolStripMenuSet.DropDownItems)
                 {
                     if (item.Checked == true)
@@ -384,60 +407,20 @@ namespace MECCG_Deck_Builder
                         item.Checked = true;
                     }
                 }
-            }
-
-        }
-
-        private void XOpenToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            string curPath = "";
-            string curFilename = "";
-            string curSuffix = "";
-
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Title = Constants.AppTitle,
-                CheckPathExists = true,
-                DefaultExt = "json",
-                Filter = "Tabletop Simulator (*.json)|*.json",
-                FilterIndex = 1,
-                RestoreDirectory = false,
-                Multiselect = true,
-                AutoUpgradeEnabled = true
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                for (int index = 0; index < openFileDialog.FileNames.Length; index++)
+                for (int index = 0; index < Constants.noTabs; index++)
                 {
-                    curPath = openFileDialog.FileNames[index];
-                    curFilename = Path.GetFileName(curPath);
-                    if (curFilename.LastIndexOf("_") >= 1)
+                    ListBox currentListBox = GetListBox(Constants.TabList[index]);
+                    List<string[]> savedList = GetList(OpenCloseItems, currentListBox);
+                    List<string[]> currentList = GetList(currentListBox);
+                    currentListBox.Items.Clear();
+                    currentList.Clear();
+                    foreach (var card in savedList)
                     {
-                        curSuffix = curFilename[curFilename.LastIndexOf("_")..^0];
+                        currentListBox.Items.Add(card[(int)CardListField.name]);
+                        currentList.Add(card);
                     }
-                    if (SuffixValid(curSuffix))
-                    {
-                        ListBox currentListBox = GetListBox(curSuffix);
-                        List<string[]> currentList = GetList(currentListBox);
-                        meccgCards.OpenMETW_TTSfile(curPath, currentList);
-                        currentListBox.Items.Clear();
-                        foreach (var card in currentList)
-                        {
-                            currentListBox.Items.Add(card[(int)CardListField.name]);
-                        }
-                        currentDeckTitle = curFilename[0..curFilename.LastIndexOf("_")];
-                    }
-                    else
-                    {
-                        string message = $"Unable to open \"{curFilename}\"\n\nExpecting filename to end in one of:\n";
-                        message += $"\t\"{Constants.poolFileSuffix}\", \n\t\"{Constants.resourceFileSuffix}\", \n\t\"{Constants.hazardFileSuffix}\",\n";
-                        message += $"\t\"{Constants.sideboardFileSuffix}\", \n\t\"{Constants.siteFileSuffix}\"";
-                        MessageBox.Show(message, Constants.AppTitle);
-                    }
-
                 }
-                UpdateFormTitle(); // To last valid filename opened
+                UpdateFormTitle();
             }
         }
 
@@ -511,6 +494,29 @@ namespace MECCG_Deck_Builder
             }
             return masterList;
         }
+        private List<string[]> GetList(OpenClose OpenCloseItems, ListBox listbox)
+        {
+            if (listbox == null)
+            {
+                return null;
+            }
+            switch (listbox.Name)
+            {
+                case "ListBoxPool":
+                    return OpenCloseItems.poolList;
+                case "ListBoxResources":
+                    return OpenCloseItems.resourceList;
+                case "ListBoxHazards":
+                    return OpenCloseItems.hazardList;
+                case "ListBoxSideboard":
+                    return OpenCloseItems.sideboardList;
+                case "ListBoxSites":
+                    return OpenCloseItems.siteList;
+                default:
+                    break;
+            }
+            return null;
+        }
 
         private ListBox GetListBox(string stringToSearch)
         {
@@ -574,26 +580,6 @@ namespace MECCG_Deck_Builder
                 }
             }
             return -1;
-        }
-
-        private Boolean SuffixValid(string curSuffix)
-        {
-            switch (curSuffix)
-            {
-                case Constants.poolFileSuffix:
-                    return true;
-                case Constants.resourceFileSuffix:
-                    return true;
-                case Constants.hazardFileSuffix:
-                    return true;
-                case Constants.sideboardFileSuffix:
-                    return true;
-                case Constants.siteFileSuffix:
-                    return true;
-                default:
-                    break;
-            }
-            return false;
         }
 
         #endregion

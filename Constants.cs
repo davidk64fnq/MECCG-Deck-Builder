@@ -18,6 +18,14 @@ namespace MECCG_Deck_Builder
 
     static class Constants
     {
+
+        public static readonly string[] TabList = {
+            "Pool",
+            "Resources",
+            "Hazards",
+            "Sideboard",
+            "Sites"
+        };
         public const string METW = "metw";
         public const string AppTitle = "MECCG Deck Builder";
 
@@ -36,6 +44,8 @@ namespace MECCG_Deck_Builder
         public const string Hazard = "Hazard";
         public const string Sideboard = "Sideboard";
         public const string Site = "Site";
+
+        public const int noTabs = 5;
     }
 
 }

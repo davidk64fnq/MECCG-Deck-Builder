@@ -1,11 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Reflection;
+using System.Net.Http.Headers;
+using System.Net.Http;
 using System.Net;
+using Octokit;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace MECCG_Deck_Builder
 {
@@ -22,10 +26,6 @@ namespace MECCG_Deck_Builder
             ImportCardnumData();
             ImportCardnumSetInfo();
             ImportMETW_TTSdata();
-        }
-        private string GetCardValue(int cardIndex, string cardKey)
-        {
-            return $"{cards[cardIndex][cardKey]}";
         }
         internal int GetSetCount()
         {

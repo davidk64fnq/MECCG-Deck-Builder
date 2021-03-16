@@ -67,7 +67,7 @@ namespace MECCG_Deck_Builder
             this.TabPageSites = new System.Windows.Forms.TabPage();
             this.MenuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuNew = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.ExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -464,7 +464,7 @@ namespace MECCG_Deck_Builder
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.newToolStripMenuItem,
+            this.ToolStripMenuNew,
             this.OpenToolStripMenuItem,
             this.toolStripSeparator,
             this.ExportToolStripMenuItem,
@@ -479,14 +479,15 @@ namespace MECCG_Deck_Builder
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
-            // newToolStripMenuItem
+            // ToolStripMenuNew
             // 
-            this.newToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("newToolStripMenuItem.Image")));
-            this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-            this.newToolStripMenuItem.Text = "&New";
+            this.ToolStripMenuNew.Image = ((System.Drawing.Image)(resources.GetObject("ToolStripMenuNew.Image")));
+            this.ToolStripMenuNew.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.ToolStripMenuNew.Name = "ToolStripMenuNew";
+            this.ToolStripMenuNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.ToolStripMenuNew.Size = new System.Drawing.Size(148, 22);
+            this.ToolStripMenuNew.Text = "&New";
+            this.ToolStripMenuNew.Click += new System.EventHandler(this.NewToolStripMenu_Click);
             // 
             // OpenToolStripMenuItem
             // 
@@ -744,7 +745,7 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.MenuStrip MenuStrip1;
         private System.Windows.Forms.ListBox ListBoxPool;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuNew;
         private System.Windows.Forms.ToolStripMenuItem OpenToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
         private System.Windows.Forms.ToolStripMenuItem ExportToolStripMenuItem;
