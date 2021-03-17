@@ -25,7 +25,7 @@ namespace MECCG_Deck_Builder
         {
             ImportCardnumData();
             ImportCardnumSetInfo();
-            ImportMETW_TTSdata();
+            ImportTTSdata();
         }
         internal int GetSetCount()
         {
@@ -214,38 +214,34 @@ namespace MECCG_Deck_Builder
             cardList.Sort(CompareCardsByName);
         }
 
-        private void ImportMETW_TTSdata()
+        private void ImportTTSdata()
         {
-            using StreamReader r = new StreamReader("METW_TTS.json");
+            using StreamReader r = new StreamReader("TTSReleasedCards1670.json");
             string json = r.ReadToEnd();
             TTSitems = JsonConvert.DeserializeObject<TTScard>(json);
 
             foreach (var card in cards)
             {
-                if (card["set"] == Constants.METW)
+                Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein($"{card["cardname"]}");
+                int minDistance = 100;
+                int minIndex = 0;
+                int index = 0;
+                foreach (var item in TTSitems.ObjectStates[0].ContainedObjects)
                 {
-                    Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein($"{card["cardname"]}");
-                    int minDistance = 100;
-                    int minIndex = 0;
-                    int index = 0;
-                    foreach (var item in TTSitems.ObjectStates[0].ContainedObjects)
+                    int levenshteinDistance = lev.DistanceFrom(item.Nickname);
+                    if (levenshteinDistance < minDistance)
                     {
-                        int levenshteinDistance = lev.DistanceFrom(item.Nickname);
-                        if (levenshteinDistance < minDistance)
-                        {
-                            minDistance = levenshteinDistance;
-                            minIndex = index;
-                        }
-                        index++;
+                        minDistance = levenshteinDistance;
+                        minIndex = index;
                     }
-
-                    card.Add("TTScardID", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].CardID}");
-                    card.Add("TTScustomDeck", GetTTScustomDeck(TTSitems.ObjectStates[0].ContainedObjects[minIndex].CustomDeck));
-                    card.Add("TTSdescription", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Description}");
-                    card.Add("TTSguid", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].GUID}");
-                    card.Add("TTSnickname", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
-
+                    index++;
                 }
+
+                card.Add("TTScardID", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].CardID}");
+            //    card.Add("TTScustomDeck", GetTTScustomDeck(TTSitems.ObjectStates[0].ContainedObjects[minIndex].CustomDeck));
+                card.Add("TTSdescription", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Description}");
+                card.Add("TTSguid", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].GUID}");
+                card.Add("TTSnickname", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
             }
         }
         private void ImportCardnumData()
@@ -275,9 +271,27 @@ namespace MECCG_Deck_Builder
 
         private void ImportCardnumSetInfo()
         {
-            using StreamReader r = new StreamReader("CardnumSets.json");
-            string json = r.ReadToEnd();
-            CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+            string json;
+            try
+            {
+                WebClient wc = new WebClient();
+                json = wc.DownloadString("https://github.com/rezwitsX/cardnum/blob/master/fdata/sets-dc.json?raw=true");
+                CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    using StreamReader r = new StreamReader("CardnumSets.json");
+                    json = r.ReadToEnd();
+                    CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumSetInfo)), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception)
+                {
+
+                }
+            }
 
             int index = 0;
             foreach (var item in CardnumSets)
