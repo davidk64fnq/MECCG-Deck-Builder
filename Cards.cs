@@ -4,12 +4,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Reflection;
-using System.Net.Http.Headers;
-using System.Net.Http;
 using System.Net;
-using Octokit;
-using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 
 namespace MECCG_Deck_Builder
 {
@@ -18,18 +13,18 @@ namespace MECCG_Deck_Builder
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
         private readonly List<Dictionary<string, string>> sets = new List<Dictionary<string, string>>();
         private TTScard TTSitems;
-        private List<CardnumCard> CardnumItems;
+        private List<CardnumCard> CardnumCards;
         private List<CardnumSet> CardnumSets;
 
         internal Cards()
         {
-            ImportCardnumData();
+            ImportCardnumCardInfo();
             ImportCardnumSetInfo();
             ImportTTSdata();
         }
         internal int GetSetCount()
         {
-            return CardnumSets.Count;
+            return sets.Count;
         }
         internal string GetSetValue(int setIndex, string setKey)
         {
@@ -244,28 +239,55 @@ namespace MECCG_Deck_Builder
                 card.Add("TTSnickname", $"{TTSitems.ObjectStates[0].ContainedObjects[minIndex].Nickname}");
             }
         }
-        private void ImportCardnumData()
-        {
-            using StreamReader r = new StreamReader("Cardnum.json");
-            string json = r.ReadToEnd();
-            CardnumItems = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
 
-            int index = 0;
-            foreach (var item in CardnumItems)
+        private void ImportCardnumCardInfo()
+        {
+            string json;
+            try
             {
-                if (item.Dreamcard != false || item.Released != false)
+                WebClient wc = new WebClient();
+                json = wc.DownloadString(Constants.CardnumCardsURL);
+                CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    using StreamReader r = new StreamReader(Constants.CardnumCardsFile);
+                    json = r.ReadToEnd();
+                    CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
+                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception)
                 {
                     SortedDictionary<string, string> card = new SortedDictionary<string, string>
                     {
-                        { "id", $"{index++}" },
-                        { "set", $"{item.Set}" },
-                        { "fullCode", $"{item.FullCode}" },
-                        { "cardname", $"{item.NameEN}" },
-                        { "alignment", $"{item.Alignment}" },
-                        { "imageName", $"{item.ImageName}" }
+                        { "id", "0" },
+                        { "set", "METW" },
+                        { "fullCode", "Adrazar (TW)" },
+                        { "cardname", "Adrazar" },
+                        { "alignment", "Hero" },
+                        { "imageName", "metw_adrazar.jpg" }
                     };
                     cards.Add(card);
+                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
+            }
+
+            int index = 0;
+            foreach (var item in CardnumCards)
+            {
+                SortedDictionary<string, string> card = new SortedDictionary<string, string>
+                {
+                    { "id", $"{index++}" },
+                    { "set", $"{item.Set}" },
+                    { "fullCode", $"{item.FullCode}" },
+                    { "cardname", $"{item.NameEN}" },
+                    { "alignment", $"{item.Alignment}" },
+                    { "imageName", $"{item.ImageName}" }
+                };
+                cards.Add(card);
             }
         }
 
@@ -275,21 +297,33 @@ namespace MECCG_Deck_Builder
             try
             {
                 WebClient wc = new WebClient();
-                json = wc.DownloadString("https://github.com/rezwitsX/cardnum/blob/master/fdata/sets-dc.json?raw=true");
+                json = wc.DownloadString(Constants.CardnumSetsURL);
                 CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
             }
             catch (Exception)
             {
                 try
                 {
-                    using StreamReader r = new StreamReader("CardnumSets.json");
+                    using StreamReader r = new StreamReader(Constants.CardnumSetsFile);
                     json = r.ReadToEnd();
                     CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
-                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumSetInfo)), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception)
                 {
-
+                    Dictionary<string, string> set = new Dictionary<string, string>
+                    {
+                        { "id", "0" },
+                        { "code", "METW" },
+                        { "format", "General" },
+                        { "name", "The Wizards" },
+                        { "position", "1" },
+                        { "dreamcards", "false" },
+                        { "released", "true" }
+                    };
+                    sets.Add(set);
+                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
             }
 

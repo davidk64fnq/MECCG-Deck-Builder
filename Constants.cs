@@ -28,6 +28,10 @@ namespace MECCG_Deck_Builder
         };
         public const string METW = "metw";
         public const string AppTitle = "MECCG Deck Builder";
+        public const string CardnumCardsFile = "cards-dc.json";
+        public const string CardnumCardsURL = "https://github.com/rezwits/cardnum/blob/master/fdata/cards-dc.json?raw=true";
+        public const string CardnumSetsFile = "sets-dc.json";
+        public const string CardnumSetsURL = "https://github.com/rezwits/cardnum/blob/master/fdata/sets-dc.json?raw=true";
 
         public const string poolFileSuffix = "_pool";
         public const string resourceFileSuffix = "_resource";
