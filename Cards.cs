@@ -20,7 +20,8 @@ namespace MECCG_Deck_Builder
         {
             ImportCardnumCardInfo();
             ImportCardnumSetInfo();
-            ImportTTSdata();
+            SetTTSimageMontagePos();
+        //    ImportTTSdata();
         }
         internal int GetSetCount()
         {
@@ -73,27 +74,44 @@ namespace MECCG_Deck_Builder
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }
 
-        internal void Export_TextFile(List<string[]> cardList, string filePathOutput)
+        private static int CompareCardsByImageName(SortedDictionary<string, string> x, SortedDictionary<string, string> y)
+        {
+            return $"{x["imageName"]}".CompareTo($"{y["imageName"]}");
+        }
+
+        internal void Export_TextFile(List<List<string[]>> deckTabLists, string filePathOutput)
         {
             string textOutput = "";
 
-            for (int index = 0; index < cardList.Count; index++)
+            for (int tabIndex = 0; tabIndex < deckTabLists.Count; tabIndex++) 
             {
-                textOutput += cardList[index][(int)CardListField.name] + Environment.NewLine;
+                textOutput += Constants.TabList[tabIndex] + Environment.NewLine + Environment.NewLine;
+                for (int index = 0; index < deckTabLists[tabIndex].Count; index++)
+                {
+                    textOutput += deckTabLists[tabIndex][index][(int)CardListField.name] + Environment.NewLine;
+                }
+                textOutput += Environment.NewLine;
             }
+
             File.WriteAllText(filePathOutput, textOutput);
         }
 
-        internal void Export_CardnumFile(List<string[]> cardList, string filePathOutput)
+        internal void Export_CardnumFile(List<List<string[]>> deckTabLists, string filePathOutput)
         {
             int cardIndex;
             string cardnumOutput = "";
 
-            for (int index = 0; index < cardList.Count; index++)
+            for (int tabIndex = 0; tabIndex < deckTabLists.Count; tabIndex++)
             {
-                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
-                cardnumOutput += $"1 {cards[cardIndex]["fullCode"]}{Environment.NewLine}";
+                cardnumOutput += Constants.TabList[tabIndex] + Environment.NewLine + Environment.NewLine;
+                for (int index = 0; index < deckTabLists[tabIndex].Count; index++)
+                {
+                    cardIndex = Convert.ToInt32(deckTabLists[tabIndex][index][(int)CardListField.id]);
+                    cardnumOutput += $"1 {cards[cardIndex]["fullCode"]}{Environment.NewLine}";
+                }
+                cardnumOutput += Environment.NewLine;
             }
+
             File.WriteAllText(filePathOutput, cardnumOutput);
         }
 
@@ -248,6 +266,15 @@ namespace MECCG_Deck_Builder
                 WebClient wc = new WebClient();
                 json = wc.DownloadString(Constants.CardnumCardsURL);
                 CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
+                try
+                {
+                    using StreamWriter w = new StreamWriter(Constants.CardnumCardsFile);
+                    w.Write(json);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "3"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             catch (Exception)
             {
@@ -256,7 +283,7 @@ namespace MECCG_Deck_Builder
                     using StreamReader r = new StreamReader(Constants.CardnumCardsFile);
                     json = r.ReadToEnd();
                     CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
-                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception)
                 {
@@ -270,7 +297,7 @@ namespace MECCG_Deck_Builder
                         { "imageName", "metw_adrazar.jpg" }
                     };
                     cards.Add(card);
-                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
@@ -278,16 +305,40 @@ namespace MECCG_Deck_Builder
             int index = 0;
             foreach (var item in CardnumCards)
             {
-                SortedDictionary<string, string> card = new SortedDictionary<string, string>
+                if (item.Dreamcard == true || item.Released == true)
                 {
-                    { "id", $"{index++}" },
-                    { "set", $"{item.Set}" },
-                    { "fullCode", $"{item.FullCode}" },
-                    { "cardname", $"{item.NameEN}" },
-                    { "alignment", $"{item.Alignment}" },
-                    { "imageName", $"{item.ImageName}" }
-                };
-                cards.Add(card);
+                    SortedDictionary<string, string> card = new SortedDictionary<string, string>
+                    {
+                        { "id", $"{index++}" },
+                        { "set", $"{item.Set}" },
+                        { "fullCode", $"{item.FullCode}" },
+                        { "cardname", $"{item.NameEN}" },
+                        { "alignment", $"{item.Alignment}" },
+                        { "imageName", $"{item.ImageName}" }
+                    };
+                    cards.Add(card);
+                }
+            }
+        }
+
+        private void SetTTSimageMontagePos()
+        {
+            for (int setIndex = 0; setIndex < sets.Count; setIndex++)
+            {
+                List<SortedDictionary<string, string>> cardList = new List<SortedDictionary<string, string>>();
+                for (int cardIndex = 0; cardIndex < cards.Count; cardIndex++)
+                {
+                    if (cards[cardIndex]["set"] == sets[setIndex]["code"])
+                    {
+                        cardList.Add(cards[cardIndex]);
+                    }
+                }
+                cardList.Sort(CompareCardsByImageName);
+                for (int cardIndex = 0; cardIndex < cardList.Count; cardIndex++)
+                {
+                    string cardsIndex = cardList[cardIndex]["id"];
+                    cards[Convert.ToInt32(cardsIndex)].Add("TTScardID", $"{cardIndex}");
+                }
             }
         }
 
@@ -299,6 +350,15 @@ namespace MECCG_Deck_Builder
                 WebClient wc = new WebClient();
                 json = wc.DownloadString(Constants.CardnumSetsURL);
                 CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+                try
+                {
+                    using StreamWriter w = new StreamWriter(Constants.CardnumSetsFile);
+                    w.Write(json);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "3"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             catch (Exception)
             {
@@ -307,7 +367,7 @@ namespace MECCG_Deck_Builder
                     using StreamReader r = new StreamReader(Constants.CardnumSetsFile);
                     json = r.ReadToEnd();
                     CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
-                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception)
                 {
@@ -322,7 +382,7 @@ namespace MECCG_Deck_Builder
                         { "released", "true" }
                     };
                     sets.Add(set);
-                    MessageBox.Show(Errors.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }

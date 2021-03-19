@@ -12,7 +12,7 @@ namespace MECCG_Deck_Builder
             SizeLimit = 10000
         });
 
-        public Bitmap GetOrCreate(string key, string setFolder, string imageName)
+        internal Bitmap GetOrCreate(string key, string setFolder, string imageName)
         {
             if (!Cache.TryGetValue(key, out Bitmap cacheEntry))// Look for cache key.
             {

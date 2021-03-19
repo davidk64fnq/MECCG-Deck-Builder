@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MECCG_Deck_Builder
 {
-    static class Errors
+    static class Messages
     {
         internal static string GetMsgBoxText(string searchString)
         {
@@ -20,6 +20,10 @@ namespace MECCG_Deck_Builder
                         $"Unable to retrieve card information from local copy:{Environment.NewLine}{Environment.NewLine}" +
                         $"\"{Constants.CardnumCardsFile}\"{Environment.NewLine}{Environment.NewLine}" +
                         $"Using Middle Earth The Wizards \"Adrazar\" card information only.";
+                case "ImportCardnumCardInfo3":
+                    return $"ImportCardnumCardInfo: Unable to store card information in local copy:{Environment.NewLine}{Environment.NewLine}" +
+                        $"\"{Constants.CardnumCardsFile}\"{Environment.NewLine}{Environment.NewLine}" +
+                        $"Perhaps a permissions issue in \"{Environment.CurrentDirectory}\"";
                 case "ImportCardnumSetInfo1":
                     return $"ImportCardnumSetInfo: Unable to retrieve set information from Cardnum site using this URL:{Environment.NewLine}{Environment.NewLine}" +
                         $"\"{Constants.CardnumSetsURL}\"{Environment.NewLine}{Environment.NewLine}" +
@@ -30,6 +34,10 @@ namespace MECCG_Deck_Builder
                         $"Unable to retrieve set information from local copy:{Environment.NewLine}{Environment.NewLine}" +
                         $"\"{Constants.CardnumSetsFile}\"{Environment.NewLine}{Environment.NewLine}" +
                         $"Using Middle Earth The Wizards set information only.";
+                case "ImportCardnumSetInfo3":
+                    return $"ImportCardnumCardInfo: Unable to store set information in local copy:{Environment.NewLine}{Environment.NewLine}" +
+                        $"\"{Constants.CardnumSetsFile}\"{Environment.NewLine}{Environment.NewLine}" +
+                        $"Perhaps a permissions issue in \"{Environment.CurrentDirectory}\"";
                 default:
                     break;
             }

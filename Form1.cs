@@ -317,6 +317,14 @@ namespace MECCG_Deck_Builder
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
             {
                 string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                List<List<string[]>> deckTabLists = new List<List<string[]>>
+                {
+                    poolList,
+                    resourceList,
+                    hazardList,
+                    sideboardList,
+                    siteList
+                };
                 if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
                 {
                     meccgCards.Export_METW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
@@ -327,19 +335,11 @@ namespace MECCG_Deck_Builder
                 }
                 else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
                 {
-                    meccgCards.Export_CardnumFile(poolList, savePrefix + Constants.poolFileSuffix + ".cnum");
-                    meccgCards.Export_CardnumFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".cnum");
-                    meccgCards.Export_CardnumFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".cnum");
-                    meccgCards.Export_CardnumFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".cnum");
-                    meccgCards.Export_CardnumFile(siteList, savePrefix + Constants.siteFileSuffix + ".cnum");
+                    meccgCards.Export_CardnumFile(deckTabLists, savePrefix + ".cnum");
                 }
                 else
                 {
-                    meccgCards.Export_TextFile(poolList, savePrefix + Constants.poolFileSuffix + ".txt");
-                    meccgCards.Export_TextFile(resourceList, savePrefix + Constants.resourceFileSuffix + ".txt");
-                    meccgCards.Export_TextFile(hazardList, savePrefix + Constants.hazardFileSuffix + ".txt");
-                    meccgCards.Export_TextFile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".txt");
-                    meccgCards.Export_TextFile(siteList, savePrefix + Constants.siteFileSuffix + ".txt");
+                    meccgCards.Export_TextFile(deckTabLists, savePrefix + ".txt");
                 }
             }
         }
@@ -584,5 +584,23 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
+        private void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
+        {
+            for (int cardIndex = 0; cardIndex < masterList.Count; cardIndex++)
+            {
+                string imageName = masterList[cardIndex][(int)CardListField.image];
+                string setFolder = masterList[cardIndex][(int)CardListField.set];
+                Bitmap cardImage;
+                cardImage = cardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
+                if (cardImage != null)
+                {
+                    if (!Directory.Exists(setFolder))
+                    {
+                        Directory.CreateDirectory(setFolder);
+                    }
+                    cardImage.Save($"{Path.Combine(setFolder, imageName)}");
+                }
+            }
+        }
     }
 }

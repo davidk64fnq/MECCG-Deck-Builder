@@ -87,9 +87,8 @@ namespace MECCG_Deck_Builder
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.customizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -452,7 +451,7 @@ namespace MECCG_Deck_Builder
             this.MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
-            this.toolsToolStripMenuItem,
+            this.ToolStripMenuTools,
             this.ToolStripMenuSet,
             this.helpToolStripMenuItem});
             this.MenuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -632,26 +631,20 @@ namespace MECCG_Deck_Builder
             this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
             this.selectAllToolStripMenuItem.Text = "Select &All";
             // 
-            // toolsToolStripMenuItem
+            // ToolStripMenuTools
             // 
-            this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.customizeToolStripMenuItem,
-            this.optionsToolStripMenuItem});
-            this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
-            this.toolsToolStripMenuItem.Text = "&Tools";
+            this.ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuToolsGetImages});
+            this.ToolStripMenuTools.Name = "ToolStripMenuTools";
+            this.ToolStripMenuTools.Size = new System.Drawing.Size(46, 20);
+            this.ToolStripMenuTools.Text = "&Tools";
             // 
-            // customizeToolStripMenuItem
+            // ToolStripMenuToolsGetImages
             // 
-            this.customizeToolStripMenuItem.Name = "customizeToolStripMenuItem";
-            this.customizeToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.customizeToolStripMenuItem.Text = "&Customize";
-            // 
-            // optionsToolStripMenuItem
-            // 
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.optionsToolStripMenuItem.Text = "&Options";
+            this.ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
+            this.ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(169, 22);
+            this.ToolStripMenuToolsGetImages.Text = "Download Images";
+            this.ToolStripMenuToolsGetImages.Click += new System.EventHandler(this.ToolStripMenuToolsGetImages_Click);
             // 
             // ToolStripMenuSet
             // 
@@ -764,9 +757,7 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem customizeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTools;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
@@ -796,6 +787,7 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSideboard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
     }
 }
 
