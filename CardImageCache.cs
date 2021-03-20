@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Drawing;
 using System.IO;
 using Microsoft.Extensions.Caching.Memory;
@@ -48,14 +49,20 @@ namespace MECCG_Deck_Builder
 
         internal Bitmap CreateItem(string key)
         {
-            System.Net.WebRequest request =
-            System.Net.WebRequest.Create(key);
-            System.Net.WebResponse response = request.GetResponse();
-            System.IO.Stream responseStream = response.GetResponseStream();
-            if (responseStream != null)
+            try
             {
-                Bitmap card = new Bitmap(responseStream);
-                return card;
+                System.Net.WebRequest request = System.Net.WebRequest.Create(key);
+                System.Net.WebResponse response = request.GetResponse();
+                Stream responseStream = response.GetResponseStream();
+                if (responseStream != null)
+                {
+                    Bitmap card = new Bitmap(responseStream);
+                    return card;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
             }
             return null;
         }

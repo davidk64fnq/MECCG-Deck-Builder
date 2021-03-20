@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MECCG Deck Builder": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

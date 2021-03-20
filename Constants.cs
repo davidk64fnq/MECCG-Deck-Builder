@@ -48,8 +48,6 @@ namespace MECCG_Deck_Builder
         public const string Hazard = "Hazard";
         public const string Sideboard = "Sideboard";
         public const string Site = "Site";
-
-        public const int noTabs = 5;
     }
 
 }

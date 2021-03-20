@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
-using System.Text;
 using Newtonsoft.Json;
 using System.Linq;
 
@@ -293,7 +292,7 @@ namespace MECCG_Deck_Builder
             if (selectedOption == DialogResult.No)
             {
                 currentDeckTitle = "New Deck";
-                for (int index = 0; index < Constants.noTabs; index++)
+                for (int index = 0; index < Constants.TabList.Count(); index++)
                 {
                     ListBox currentListBox = GetListBox(Constants.TabList[index]);
                     currentListBox.Items.Clear();
@@ -327,11 +326,11 @@ namespace MECCG_Deck_Builder
                 };
                 if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
                 {
-                    meccgCards.Export_METW_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
-                    meccgCards.Export_METW_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix + ".json");
-                    meccgCards.Export_METW_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix + ".json");
-                    meccgCards.Export_METW_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
-                    meccgCards.Export_METW_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
+                    meccgCards.Export_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
+                    meccgCards.Export_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix + ".json");
+                    meccgCards.Export_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix + ".json");
+                    meccgCards.Export_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
+                    meccgCards.Export_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
                 }
                 else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
                 {
@@ -407,7 +406,7 @@ namespace MECCG_Deck_Builder
                         item.Checked = true;
                     }
                 }
-                for (int index = 0; index < Constants.noTabs; index++)
+                for (int index = 0; index < Constants.TabList.Count(); index++)
                 {
                     ListBox currentListBox = GetListBox(Constants.TabList[index]);
                     List<string[]> savedList = GetList(OpenCloseItems, currentListBox);
