@@ -238,6 +238,10 @@ namespace MECCG_Deck_Builder
                         { "text", $"{item.Text}" },
                         { "imageName", $"{item.ImageName}" }
                     };
+                    if (item.Ice_errata == true)
+                    {
+                        card["imageName"] = "ice-" + item.ImageName;
+                    }
                     cards.Add(card);
                 }
             }
