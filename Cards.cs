@@ -19,14 +19,17 @@ namespace MECCG_Deck_Builder
             ImportCardnumCardInfo();
             ImportCardnumSetInfo();
         }
+
         internal int GetSetCount()
         {
             return sets.Count;
         }
+
         internal string GetSetValue(int setIndex, string setKey)
         {
             return $"{sets[setIndex][setKey]}";
         }
+
         private int GetCardIndex(string cardKey, string cardValue)
         {
             int index = 0;
@@ -163,7 +166,14 @@ namespace MECCG_Deck_Builder
                 cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
                 jsonOutput += "\t\t\t\t{\n";
                 jsonOutput += "\t\t\t\t\t\"Name\": \"Card\",\n";
-                jsonOutput += $"\t\t\t\t\t\"Nickname\": \"{cards[cardIndex]["cardname"]}\",\n";
+                jsonOutput += "\t\t\t\t\t\"Transform\": {\n";
+                jsonOutput += "\t\t\t\t\t\t\"RotY\": 180.0,\n";
+                jsonOutput += "\t\t\t\t\t\t\"RotZ\": 180.0,\n";
+                jsonOutput += "\t\t\t\t\t\t\"ScaleX\": 1.0,\n";
+                jsonOutput += "\t\t\t\t\t\t\"ScaleY\": 1.0,\n";
+                jsonOutput += "\t\t\t\t\t\t\"ScaleZ\": 1.0\n";
+                jsonOutput += "\t\t\t\t\t},\n";
+                jsonOutput += $"\t\t\t\t\t\"Nickname\": \"{cards[cardIndex]["cardname"].Replace("\"", "\\\"")}\",\n";
                 jsonOutput += $"\t\t\t\t\t\"CardID\": \"{(index + 1) * 100}\"\n";
                 jsonOutput += "\t\t\t\t}";
                 if (index != cardList.Count - 1)
@@ -172,7 +182,7 @@ namespace MECCG_Deck_Builder
                 }
                 jsonOutput += "\n";
             }
-            jsonOutput += "\t\t\t]\n";
+            jsonOutput += "\t\t\t],\n";
             jsonOutput += "\t\t}\n";
             jsonOutput += "\t]\n";
             jsonOutput += "}\n";
