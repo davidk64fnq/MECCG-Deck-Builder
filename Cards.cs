@@ -117,19 +117,15 @@ namespace MECCG_Deck_Builder
         internal void Export_TTSfile(List<string[]> cardList, string filePathOutput)
         {
             int cardIndex;
+            int noTabs;
 
             string jsonOutput = "";
             jsonOutput += "{\n";
             jsonOutput += "\t\"ObjectStates\": [\n";
             jsonOutput += "\t\t{\n";
             jsonOutput += "\t\t\t\"Name\": \"Deck\",\n";
-            jsonOutput += "\t\t\t\"Transform\": {\n";
-            jsonOutput += "\t\t\t\t\"RotY\": 180.0,\n";
-            jsonOutput += "\t\t\t\t\"RotZ\": 180.0,\n";
-            jsonOutput += "\t\t\t\t\"ScaleX\": 1.0,\n";
-            jsonOutput += "\t\t\t\t\"ScaleY\": 1.0,\n";
-            jsonOutput += "\t\t\t\t\"ScaleZ\": 1.0\n";
-            jsonOutput += "\t\t\t},\n";
+            noTabs = 3;
+            jsonOutput += SetTTStransform(noTabs);
             jsonOutput += "\t\t\t\"DeckIDs\": [\n";
             for (int index = 0; index < cardList.Count; index++)
             {
@@ -144,15 +140,8 @@ namespace MECCG_Deck_Builder
             jsonOutput += "\t\t\t\"CustomDeck\": {\n";
             for (int index = 0; index < cardList.Count; index++)
             {
-                cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
-                string setFolder = cards[cardIndex]["set"];
-                string imageName = cards[cardIndex]["imageName"];
-                jsonOutput += $"\t\t\t\t\"{index + 1}\": {{\n";
-                jsonOutput += $"\t\t\t\t\t\"FaceURL\": \"https://cardnum.net/img/cards/{setFolder}/{imageName}\",\n";
-                jsonOutput += "\t\t\t\t\t\"BackURL\": \"https://i.imgur.com/gUPyTI4.jpg\",\n";
-                jsonOutput += "\t\t\t\t\t\"NumWidth\": 1,\n";
-                jsonOutput += "\t\t\t\t\t\"NumHeight\": 1\n";
-                jsonOutput += "\t\t\t\t}";
+                noTabs = 4;
+                jsonOutput += SetTTScustomDeck(cardList, index, noTabs);
                 if (index != cardList.Count - 1)
                 {
                     jsonOutput += ",";
@@ -166,13 +155,12 @@ namespace MECCG_Deck_Builder
                 cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
                 jsonOutput += "\t\t\t\t{\n";
                 jsonOutput += "\t\t\t\t\t\"Name\": \"Card\",\n";
-                jsonOutput += "\t\t\t\t\t\"Transform\": {\n";
-                jsonOutput += "\t\t\t\t\t\t\"RotY\": 180.0,\n";
-                jsonOutput += "\t\t\t\t\t\t\"RotZ\": 180.0,\n";
-                jsonOutput += "\t\t\t\t\t\t\"ScaleX\": 1.0,\n";
-                jsonOutput += "\t\t\t\t\t\t\"ScaleY\": 1.0,\n";
-                jsonOutput += "\t\t\t\t\t\t\"ScaleZ\": 1.0\n";
-                jsonOutput += "\t\t\t\t\t},\n";
+                noTabs = 5;
+                jsonOutput += SetTTStransform(noTabs);
+                jsonOutput += "\t\t\t\t\t\"CustomDeck\": {\n";
+                noTabs = 6;
+                jsonOutput += SetTTScustomDeck(cardList, index, noTabs);
+                jsonOutput += "\n\t\t\t\t\t},\n";
                 jsonOutput += $"\t\t\t\t\t\"Nickname\": \"{cards[cardIndex]["cardname"].Replace("\"", "\\\"")}\",\n";
                 jsonOutput += $"\t\t\t\t\t\"CardID\": \"{(index + 1) * 100}\"\n";
                 jsonOutput += "\t\t\t\t}";
@@ -187,6 +175,45 @@ namespace MECCG_Deck_Builder
             jsonOutput += "\t]\n";
             jsonOutput += "}\n";
             File.WriteAllText(filePathOutput, jsonOutput);
+        }
+
+        private string SetTTStransform(int noTabs)
+        {
+            string transform;
+            string tabString = "";
+            for (int tabNo = 0; tabNo < noTabs; tabNo++)
+            {
+                tabString += "\t";
+            }
+            transform = $"{tabString}\"Transform\": {{\n";
+            transform += $"{tabString}\t\"RotY\": 180.0,\n";
+            transform += $"{tabString}\t\"RotZ\": 180.0,\n";
+            transform += $"{tabString}\t\"ScaleX\": 1.0,\n";
+            transform += $"{tabString}\t\"ScaleY\": 1.0,\n";
+            transform += $"{tabString}\t\"ScaleZ\": 1.0\n";
+            transform += $"{tabString}}},\n";
+            return transform;
+        }
+
+        private string SetTTScustomDeck(List<string[]> cardList, int index, int noTabs)
+        {
+            string customDeck;
+            int cardIndex = Convert.ToInt32(cardList[index][(int)CardListField.id]);
+            string setFolder = cards[cardIndex]["set"];
+            string imageName = cards[cardIndex]["imageName"];
+            string tabString = "";
+            for (int tabNo = 0; tabNo < noTabs; tabNo++)
+            {
+                tabString += "\t";
+            }
+            customDeck = $"{tabString}\"{index + 1}\": {{\n";
+            customDeck += $"{tabString}\t\"FaceURL\": \"https://cardnum.net/img/cards/{setFolder}/{imageName}\",\n";
+            customDeck += $"{tabString}\t\"BackURL\": \"https://i.imgur.com/gUPyTI4.jpg\",\n";
+            customDeck += $"{tabString}\t\"BackIsHidden\": \"true\",\n";
+            customDeck += $"{tabString}\t\"NumWidth\": 1,\n";
+            customDeck += $"{tabString}\t\"NumHeight\": 1\n";
+            customDeck += $"{tabString}}}";
+            return customDeck;
         }
 
         private void ImportCardnumCardInfo()
