@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Net;
+using System.Linq;
 
 namespace MECCG_Deck_Builder
 {
@@ -11,6 +12,7 @@ namespace MECCG_Deck_Builder
     {
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
         private readonly List<Dictionary<string, string>> sets = new List<Dictionary<string, string>>();
+        private readonly List<List<string>> filters = new List<List<string>>();
         private List<CardnumCard> CardnumCards;
         private List<CardnumSet> CardnumSets;
 
@@ -19,6 +21,8 @@ namespace MECCG_Deck_Builder
             ImportCardnumCardInfo();
             ImportCardnumSetInfo();
         }
+
+        #region GET_SET_INFO
 
         internal int GetSetCount()
         {
@@ -29,6 +33,10 @@ namespace MECCG_Deck_Builder
         {
             return $"{sets[setIndex][setKey]}";
         }
+
+        #endregion
+
+        #region GET_CARD_INFO
 
         private int GetCardIndex(string cardKey, string cardValue)
         {
@@ -44,7 +52,7 @@ namespace MECCG_Deck_Builder
             return -1;
         }
 
-        internal List<string[]> GetCardList(List<string> selectedSets)
+        internal List<string[]> GetCardList(List<string> selectedSets, List<string[]> keyValuePairs)
         {
             List<string[]> cardList = new List<string[]>();
 
@@ -54,12 +62,15 @@ namespace MECCG_Deck_Builder
                 {
                     if (card["set"] == set)
                     {
-                        string[] cardItems = new string[4];
-                        cardItems[(int)CardListField.name] = $"{card["cardname"]}";
-                        cardItems[(int)CardListField.image] = $"{card["imageName"]}";
-                        cardItems[(int)CardListField.set] = $"{card["set"]}";
-                        cardItems[(int)CardListField.id] = $"{card["id"]}";
-                        cardList.Add(cardItems);
+                        if (CardMatchesFilters(card, keyValuePairs))
+                        {
+                            string[] cardItems = new string[4];
+                            cardItems[(int)CardListField.name] = $"{card["cardname"]}";
+                            cardItems[(int)CardListField.image] = $"{card["imageName"]}";
+                            cardItems[(int)CardListField.set] = $"{card["set"]}";
+                            cardItems[(int)CardListField.id] = $"{card["id"]}";
+                            cardList.Add(cardItems);
+                        }
                     }
                 }
             }
@@ -68,15 +79,68 @@ namespace MECCG_Deck_Builder
             return cardList;
         }
 
+        #endregion
+
+        #region GET_FILTER_INFO
+
+        internal List<string> GetKeyNameList()
+        {
+            List<string> keyNames = new List<string>();
+            for (int index = 0; index < filters.Count; index++)
+            {
+                keyNames.Add(filters[index][0]);
+            }
+            return keyNames;
+        }
+        internal List<string> GetKeyValueList(string keyName)
+        {
+            List<string> keyValues = new List<string>
+            {
+                ""
+            };
+            int keyNameIndex = filters.FindIndex(keyList => keyList[0] == keyName);
+            for (int index = 1; index < filters[keyNameIndex].Count; index++)
+            {
+                keyValues.Add(filters[keyNameIndex][index]);
+            }
+            return keyValues;
+        }
+
+        #endregion
+
+        #region UTILITIES
+
         private static int CompareCardsByName(string[] x, string[] y)
         {
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
+        }
+
+        private static int CompareListsByFirstValue(List<string> x, List<string> y)
+        {
+            return $"{x[0]}".CompareTo($"{y[0]}");
         }
 
         private static int CompareCardsByImageName(SortedDictionary<string, string> x, SortedDictionary<string, string> y)
         {
             return $"{x["imageName"]}".CompareTo($"{y["imageName"]}");
         }
+
+        private static bool CardMatchesFilters(SortedDictionary<string, string> card, List<string[]> keyValuePairs)
+        {
+            bool cardMatch = true;
+            for (int index = 0; index < keyValuePairs.Count; index++)
+            {
+                if (card[keyValuePairs[index][0]] != keyValuePairs[index][1])
+                {
+                    cardMatch = false;
+                }
+            }
+            return cardMatch;
+        }
+
+        #endregion
+
+        #region EXPORT
 
         internal void Export_TextFile(List<List<string[]>> deckTabLists, string filePathOutput)
         {
@@ -216,6 +280,10 @@ namespace MECCG_Deck_Builder
             return customDeck;
         }
 
+        #endregion
+
+        #region READ_CARDNUM_CARD_INFO
+
         private void ImportCardnumCardInfo()
         {
             string json;
@@ -260,6 +328,9 @@ namespace MECCG_Deck_Builder
                 }
             }
 
+            // Initialise key names in filters list
+            SetKeys();
+            
             int index = 0;
             foreach (var item in CardnumCards)
             {
@@ -279,10 +350,87 @@ namespace MECCG_Deck_Builder
                     {
                         card["imageName"] = "ice-" + item.ImageName;
                     }
+                    SetCardKeyInfo(card, item);
                     cards.Add(card);
                 }
             }
         }
+
+        /// <summary>
+        /// Build filters member key value lists and add key name/value pairs to card 
+        /// </summary>
+        private void SetCardKeyInfo(SortedDictionary<string, string> card, CardnumCard item)
+        { 
+            if (card["set"] == Constants.METW.ToUpper() || card["set"] == "MEUL")
+            {
+                // Get card value for "Card Type", stored as "Secondary" in Cardnum
+                if (item.Secondary != "")
+                {
+                    // Capitalise first letter 
+                    item.Secondary = char.ToUpper(item.Secondary[0]) + item.Secondary[1..];
+
+                    SetFiltersValue("Card Type", item.Secondary);
+                    card["Card Type"] = $"{char.ToUpper(item.Secondary[0]) + item.Secondary[1..]}";
+
+                    // If "Card Type" is race related store as "Race"
+                    string[] raceCardTypes = { "Ally", "Avatar", "Character", "Faction" };
+                    if (raceCardTypes.Contains(card["Card Type"]))
+                    {
+                        // Group elf/dwarf subraces
+                        if (item.Race.Contains("Dwarf"))
+                        {
+                            item.Race = "Dwarf";
+                        }
+                        else if (item.Race.Contains("Elf"))
+                        {
+                            item.Race = "Elf";
+                        }
+
+                        SetFiltersValue("Race", item.Race);
+                        card["Race"] = $"{item.Race}";
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds new key value and sorts values [1..] in list
+        /// </summary>
+        /// <param name="key">The key name being updated [0]</param>
+        /// <param name="value">The additional key value [1..]</param>
+        private void SetFiltersValue(string key, string value)
+        {
+            // Get index of key values in filters
+            int filtersIndex = filters.FindIndex(keyList => keyList[0] == key);
+
+            // Check whether key value is in key values and add if it is not
+            if (filters[filtersIndex].IndexOf(value) == -1)
+            {
+                filters[filtersIndex].Add(value);
+                filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, null);
+            }
+        }
+
+        /// <summary>
+        /// Set key names as index 0 position in filter member key value lists
+        /// </summary>
+        private void SetKeys()
+        {
+            string[] keys = { "Card Type", "Race" };
+            for (int keyIndex = 0; keyIndex < keys.Length; keyIndex++)
+            {
+                List<string> newKey = new List<string>
+                {
+                    keys[keyIndex]
+                };
+                filters.Add(newKey);
+                filters.Sort(CompareListsByFirstValue);
+            }
+        }
+
+        #endregion
+
+        #region READ_CARDNUM_SET_INFO
 
         private void ImportCardnumSetInfo()
         {
@@ -345,5 +493,7 @@ namespace MECCG_Deck_Builder
                 sets.Add(set);
             }
         }
+
+        #endregion
     }
 }

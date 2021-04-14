@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
 
 namespace MECCG_Deck_Builder
 {
@@ -69,6 +67,7 @@ namespace MECCG_Deck_Builder
         public bool? Released { get; set; }
         public bool? Erratum { get; set; }
         public bool? Ice_errata { get; set; }
+        public bool? Extras { get; set; }
     }
 
 

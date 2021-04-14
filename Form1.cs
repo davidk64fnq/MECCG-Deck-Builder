@@ -32,12 +32,17 @@ namespace MECCG_Deck_Builder
         internal Form1()
         {
             InitializeComponent();
-            CreateSetMenu();
+            CreateMenus();
             UpdateFormTitle();
+            SetKeyNameList(ComboBoxKey1);
         }
 
-        private void CreateSetMenu()
+        /// <summary>
+        /// Dynamic build of set menu list
+        /// </summary>
+        private void CreateMenus()
         {
+            // Set menus
             for (int index = 0; index < meccgCards.GetSetCount(); index++)
             {
                 ToolStripMenuItem MenuSetItem = new ToolStripMenuItem(meccgCards.GetSetValue(index, "name"))
@@ -52,6 +57,11 @@ namespace MECCG_Deck_Builder
                 }
                 ToolStripMenuSet.DropDownItems.Add(MenuSetItem);
             }
+
+            // Filter menus
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
+            ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
         }
 
         #region MASTER_SINGLE_CLICK
@@ -173,7 +183,8 @@ namespace MECCG_Deck_Builder
 
             // Retrieve and set new list of cards
             ListBoxMaster.Items.Clear();
-            masterList = meccgCards.GetCardList(setList);
+            List<string[]> keyValuePairs = GetKeyValuePairs();
+            masterList = meccgCards.GetCardList(setList, keyValuePairs);
             foreach (var card in masterList)
             {
                 ListBoxMaster.Items.Add(card[(int)CardListField.name]);
@@ -283,8 +294,8 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        // Save and read from file a deck in TTS format
-        #region OPEN_CLOSE
+        // Open/Save a deck, export deck as TTS/Cardnum/Text format
+        #region OPEN_CLOSE_EXPORT_DECK
 
         private void NewToolStripMenu_Click(object sender, EventArgs e)
         {
@@ -493,6 +504,7 @@ namespace MECCG_Deck_Builder
             }
             return masterList;
         }
+        
         private List<string[]> GetList(OpenClose OpenCloseItems, ListBox listbox)
         {
             if (listbox == null)
@@ -579,6 +591,39 @@ namespace MECCG_Deck_Builder
                 }
             }
             return -1;
+        }
+
+        #endregion
+
+        #region FILTER
+
+        private void SetKeyNameList(ComboBox comboBox)
+        {
+            comboBox.DataSource = meccgCards.GetKeyNameList();
+        }
+
+        private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (((ComboBox)sender).Name.Contains("Key1"))
+            {
+                ComboBoxValue1.DataSource = SetKeyValueList(ComboBoxKey1);
+            }
+        }
+
+        private List<string> SetKeyValueList(ComboBox keyNameComboBox)
+        {
+            return meccgCards.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+        }
+
+        private List<string[]> GetKeyValuePairs()
+        {
+            List<string[]> keyValuePairs = new List<string[]>();
+            if ((string)ComboBoxValue1.SelectedText != "")
+            {
+                string[] keyValuePair = {ComboBoxKey1.SelectedText, ComboBoxValue1.SelectedText};
+                keyValuePairs.Add(keyValuePair);
+            }
+            return keyValuePairs;
         }
 
         #endregion

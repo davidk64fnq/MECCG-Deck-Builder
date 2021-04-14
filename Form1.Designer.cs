@@ -90,12 +90,24 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuFilter = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuFilterOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.ToolStripMenuFilterSave = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.indexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ComboBoxKey4 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxKey3 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxKey2 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxKey1 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxValue1 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxValue2 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxValue3 = new System.Windows.Forms.ComboBox();
+            this.ComboBoxValue4 = new System.Windows.Forms.ComboBox();
             this.ContextMenuStripMaster.SuspendLayout();
             this.ContextMenuStripTabs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBoxCardImage)).BeginInit();
@@ -453,6 +465,7 @@ namespace MECCG_Deck_Builder
             this.editToolStripMenuItem,
             this.ToolStripMenuTools,
             this.ToolStripMenuSet,
+            this.ToolStripMenuFilter,
             this.helpToolStripMenuItem});
             this.MenuStrip1.Location = new System.Drawing.Point(0, 0);
             this.MenuStrip1.Name = "MenuStrip1";
@@ -652,6 +665,33 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuSet.Size = new System.Drawing.Size(35, 20);
             this.ToolStripMenuSet.Text = "&Set";
             // 
+            // ToolStripMenuFilter
+            // 
+            this.ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuFilterOpen,
+            this.toolStripSeparator6,
+            this.ToolStripMenuFilterSave});
+            this.ToolStripMenuFilter.Name = "ToolStripMenuFilter";
+            this.ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
+            this.ToolStripMenuFilter.Text = "&Filter";
+            // 
+            // ToolStripMenuFilterOpen
+            // 
+            this.ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
+            this.ToolStripMenuFilterOpen.Size = new System.Drawing.Size(103, 22);
+            this.ToolStripMenuFilterOpen.Text = "Open";
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(100, 6);
+            // 
+            // ToolStripMenuFilterSave
+            // 
+            this.ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
+            this.ToolStripMenuFilterSave.Size = new System.Drawing.Size(103, 22);
+            this.ToolStripMenuFilterSave.Text = "Save";
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -693,11 +733,84 @@ namespace MECCG_Deck_Builder
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
             // 
+            // ComboBoxKey4
+            // 
+            this.ComboBoxKey4.FormattingEnabled = true;
+            this.ComboBoxKey4.Location = new System.Drawing.Point(645, 581);
+            this.ComboBoxKey4.Name = "ComboBoxKey4";
+            this.ComboBoxKey4.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey4.TabIndex = 19;
+            // 
+            // ComboBoxKey3
+            // 
+            this.ComboBoxKey3.FormattingEnabled = true;
+            this.ComboBoxKey3.Location = new System.Drawing.Point(432, 581);
+            this.ComboBoxKey3.Name = "ComboBoxKey3";
+            this.ComboBoxKey3.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey3.TabIndex = 20;
+            // 
+            // ComboBoxKey2
+            // 
+            this.ComboBoxKey2.FormattingEnabled = true;
+            this.ComboBoxKey2.Location = new System.Drawing.Point(220, 581);
+            this.ComboBoxKey2.Name = "ComboBoxKey2";
+            this.ComboBoxKey2.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey2.TabIndex = 21;
+            // 
+            // ComboBoxKey1
+            // 
+            this.ComboBoxKey1.FormattingEnabled = true;
+            this.ComboBoxKey1.Location = new System.Drawing.Point(12, 581);
+            this.ComboBoxKey1.Name = "ComboBoxKey1";
+            this.ComboBoxKey1.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey1.TabIndex = 22;
+            this.ComboBoxKey1.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
+            // 
+            // ComboBoxValue1
+            // 
+            this.ComboBoxValue1.FormattingEnabled = true;
+            this.ComboBoxValue1.Location = new System.Drawing.Point(12, 610);
+            this.ComboBoxValue1.Name = "ComboBoxValue1";
+            this.ComboBoxValue1.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue1.TabIndex = 26;
+            // 
+            // ComboBoxValue2
+            // 
+            this.ComboBoxValue2.FormattingEnabled = true;
+            this.ComboBoxValue2.Location = new System.Drawing.Point(220, 610);
+            this.ComboBoxValue2.Name = "ComboBoxValue2";
+            this.ComboBoxValue2.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue2.TabIndex = 25;
+            // 
+            // ComboBoxValue3
+            // 
+            this.ComboBoxValue3.FormattingEnabled = true;
+            this.ComboBoxValue3.Location = new System.Drawing.Point(432, 610);
+            this.ComboBoxValue3.Name = "ComboBoxValue3";
+            this.ComboBoxValue3.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue3.TabIndex = 24;
+            // 
+            // ComboBoxValue4
+            // 
+            this.ComboBoxValue4.FormattingEnabled = true;
+            this.ComboBoxValue4.Location = new System.Drawing.Point(645, 610);
+            this.ComboBoxValue4.Name = "ComboBoxValue4";
+            this.ComboBoxValue4.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue4.TabIndex = 23;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(838, 579);
+            this.ClientSize = new System.Drawing.Size(838, 647);
+            this.Controls.Add(this.ComboBoxValue1);
+            this.Controls.Add(this.ComboBoxValue2);
+            this.Controls.Add(this.ComboBoxValue3);
+            this.Controls.Add(this.ComboBoxValue4);
+            this.Controls.Add(this.ComboBoxKey1);
+            this.Controls.Add(this.ComboBoxKey2);
+            this.Controls.Add(this.ComboBoxKey3);
+            this.Controls.Add(this.ComboBoxKey4);
             this.Controls.Add(this.TabControlDeck);
             this.Controls.Add(this.PictureBoxCardImage);
             this.Controls.Add(this.ListBoxMaster);
@@ -788,6 +901,18 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
+        private System.Windows.Forms.ComboBox ComboBoxKey4;
+        private System.Windows.Forms.ComboBox ComboBoxKey3;
+        private System.Windows.Forms.ComboBox ComboBoxKey2;
+        private System.Windows.Forms.ComboBox ComboBoxKey1;
+        private System.Windows.Forms.ComboBox ComboBoxValue1;
+        private System.Windows.Forms.ComboBox ComboBoxValue2;
+        private System.Windows.Forms.ComboBox ComboBoxValue3;
+        private System.Windows.Forms.ComboBox ComboBoxValue4;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
     }
 }
 
