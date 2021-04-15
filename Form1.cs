@@ -34,7 +34,6 @@ namespace MECCG_Deck_Builder
             InitializeComponent();
             CreateMenus();
             UpdateFormTitle();
-            SetKeyNameList(ComboBoxKey1);
         }
 
         /// <summary>
@@ -62,6 +61,12 @@ namespace MECCG_Deck_Builder
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
             ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
+
+            // Filter key name lists
+            SetKeyNameList(ComboBoxKey1);
+            SetKeyNameList(ComboBoxKey2);
+            SetKeyNameList(ComboBoxKey3);
+            SetKeyNameList(ComboBoxKey4);
         }
 
         #region MASTER_SINGLE_CLICK
@@ -165,13 +170,16 @@ namespace MECCG_Deck_Builder
         private void UpdateMasterList(string setName)
         {
             // Update list of user selected sets
-            if (setList.Contains(setName))
+            if (setName != "")
             {
-                setList.Remove(setName);
-            }
-            else
-            {
-                setList.Add(setName);
+                if (setList.Contains(setName))
+                {
+                    setList.Remove(setName);
+                }
+                else
+                {
+                    setList.Add(setName);
+                }
             }
 
             // Store current card selected before resetting master list
@@ -608,6 +616,23 @@ namespace MECCG_Deck_Builder
             {
                 ComboBoxValue1.DataSource = SetKeyValueList(ComboBoxKey1);
             }
+            else if (((ComboBox)sender).Name.Contains("Key2"))
+            {
+                ComboBoxValue2.DataSource = SetKeyValueList(ComboBoxKey2);
+            }
+            else if (((ComboBox)sender).Name.Contains("Key3"))
+            {
+                ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
+            }
+            else if (((ComboBox)sender).Name.Contains("Key4"))
+            {
+                ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
+            }
+        }
+
+        private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateMasterList("");
         }
 
         private List<string> SetKeyValueList(ComboBox keyNameComboBox)
@@ -618,9 +643,24 @@ namespace MECCG_Deck_Builder
         private List<string[]> GetKeyValuePairs()
         {
             List<string[]> keyValuePairs = new List<string[]>();
-            if ((string)ComboBoxValue1.SelectedText != "")
+            if (ComboBoxValue1.SelectedIndex >= 1)
             {
-                string[] keyValuePair = {ComboBoxKey1.SelectedText, ComboBoxValue1.SelectedText};
+                string[] keyValuePair = { ComboBoxKey1.SelectedItem.ToString(), ComboBoxValue1.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            if (ComboBoxValue2.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            if (ComboBoxValue3.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            if (ComboBoxValue4.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey4.SelectedItem.ToString(), ComboBoxValue4.SelectedItem.ToString() };
                 keyValuePairs.Add(keyValuePair);
             }
             return keyValuePairs;

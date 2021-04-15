@@ -740,6 +740,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxKey4.Name = "ComboBoxKey4";
             this.ComboBoxKey4.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxKey4.TabIndex = 19;
+            this.ComboBoxKey4.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxKey3
             // 
@@ -748,6 +749,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxKey3.Name = "ComboBoxKey3";
             this.ComboBoxKey3.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxKey3.TabIndex = 20;
+            this.ComboBoxKey3.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxKey2
             // 
@@ -756,6 +758,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxKey2.Name = "ComboBoxKey2";
             this.ComboBoxKey2.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxKey2.TabIndex = 21;
+            this.ComboBoxKey2.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxKey1
             // 
@@ -773,6 +776,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue1.Name = "ComboBoxValue1";
             this.ComboBoxValue1.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxValue1.TabIndex = 26;
+            this.ComboBoxValue1.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxValue2
             // 
@@ -781,6 +785,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue2.Name = "ComboBoxValue2";
             this.ComboBoxValue2.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxValue2.TabIndex = 25;
+            this.ComboBoxValue2.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxValue3
             // 
@@ -789,6 +794,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue3.Name = "ComboBoxValue3";
             this.ComboBoxValue3.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxValue3.TabIndex = 24;
+            this.ComboBoxValue3.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxValue4
             // 
@@ -797,6 +803,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue4.Name = "ComboBoxValue4";
             this.ComboBoxValue4.Size = new System.Drawing.Size(180, 23);
             this.ComboBoxValue4.TabIndex = 23;
+            this.ComboBoxValue4.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // Form1
             // 

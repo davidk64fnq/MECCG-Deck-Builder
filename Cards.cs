@@ -130,7 +130,7 @@ namespace MECCG_Deck_Builder
             bool cardMatch = true;
             for (int index = 0; index < keyValuePairs.Count; index++)
             {
-                if (card[keyValuePairs[index][0]] != keyValuePairs[index][1])
+                if (keyValuePairs[0][0] != null && card[keyValuePairs[index][0]] != keyValuePairs[index][1])
                 {
                     cardMatch = false;
                 }
@@ -371,9 +371,16 @@ namespace MECCG_Deck_Builder
 
                     SetFiltersValue("Card Type", item.Secondary);
                     card["Card Type"] = $"{char.ToUpper(item.Secondary[0]) + item.Secondary[1..]}";
+                    card["Race"] = "";
+                    card["Item"] = "";
+                    card["Site"] = "";
+                    card["Event"] = "";
 
                     // If "Card Type" is race related store as "Race"
-                    string[] raceCardTypes = { "Ally", "Avatar", "Character", "Faction" };
+                    string[] raceCardTypes = { "Ally", "Avatar", "Character", "Creature", "Creature/Permanent-event", "Creature/Short-event", "Faction" };
+                    string[] itemCardTypes = { "Gold Ring Item", "Greater Item", "Major Item", "Minor Item", "Special Item" };
+                    string[] siteCardTypes = { "Haven", "Region", "Site" };
+                    string[] eventCardTypes = { "Long-event", "Permanent-event", "Short-event" };
                     if (raceCardTypes.Contains(card["Card Type"]))
                     {
                         // Group elf/dwarf subraces
@@ -389,7 +396,38 @@ namespace MECCG_Deck_Builder
                         SetFiltersValue("Race", item.Race);
                         card["Race"] = $"{item.Race}";
                     }
+                    else if (itemCardTypes.Contains(card["Card Type"]))
+                    {
+                        SetFiltersValue("Item", item.Race);
+                        card["Item"] = $"{item.Race}";
+                    }
+                    else if (siteCardTypes.Contains(card["Card Type"]))
+                    {
+                        SetFiltersValue("Site", item.Site);
+                        card["Site"] = $"{item.Site}";
+                    }
+                    else if (eventCardTypes.Contains(card["Card Type"]))
+                    {
+                        SetFiltersValue("Event", item.Race);
+                        card["Event"] = $"{item.Race}";
+                    }
+                    else
+                    {
+                        MessageBox.Show(Messages.GetMsgBoxText(nameof(SetCardKeyInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                 }
+                else
+                {
+                    MessageBox.Show(Messages.GetMsgBoxText(nameof(SetCardKeyInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            else
+            {
+                card["Card Type"] = "";
+                card["Race"] = "";
+                card["Item"] = "";
+                card["Site"] = "";
+                card["Event"] = "";
             }
         }
 
@@ -400,6 +438,11 @@ namespace MECCG_Deck_Builder
         /// <param name="value">The additional key value [1..]</param>
         private void SetFiltersValue(string key, string value)
         {
+            if (value == "")
+            {
+                return;
+            }
+
             // Get index of key values in filters
             int filtersIndex = filters.FindIndex(keyList => keyList[0] == key);
 
@@ -416,7 +459,7 @@ namespace MECCG_Deck_Builder
         /// </summary>
         private void SetKeys()
         {
-            string[] keys = { "Card Type", "Race" };
+            string[] keys = { "Card Type", "Event", "Item", "Race", "Site" };
             for (int keyIndex = 0; keyIndex < keys.Length; keyIndex++)
             {
                 List<string> newKey = new List<string>

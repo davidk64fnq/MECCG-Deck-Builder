@@ -37,6 +37,10 @@ namespace MECCG_Deck_Builder
                     return $"ImportCardnumCardInfo: Unable to store set information in local copy:{Environment.NewLine}{Environment.NewLine}" +
                         $"\"{Constants.CardnumSetsFile}\"{Environment.NewLine}{Environment.NewLine}" +
                         $"Perhaps a permissions issue in \"{Environment.CurrentDirectory}\"";
+                case "SetCardKeyInfo1":
+                    return $"SetCardKeyInfo: A card on Cardnum has no value for \"Secondary\" field.";
+                case "SetCardKeyInfo2":
+                    return $"SetCardKeyInfo: A card on Cardnum has an unexpected value for \"Secondary\" field.";
                 default:
                     break;
             }
