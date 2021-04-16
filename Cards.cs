@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Linq;
+using NaturalSort.Extension;
 
 namespace MECCG_Deck_Builder
 {
@@ -15,6 +16,10 @@ namespace MECCG_Deck_Builder
         private readonly List<List<string>> filters = new List<List<string>>();
         private List<CardnumCard> CardnumCards;
         private List<CardnumSet> CardnumSets;
+
+        internal string[] filterKeys = { "Primary", "Alignment", "Artist", "Skill", "MPs", "Mind", "Direct", "Prowess", "Body",
+            "Corruption", "Home", "Unique", "Secondary", "Race", "Site", "Region", "Playable", "GoldRing", "GreaterItem",
+            "MajorItem", "MinorItem", "Information", "Palantiri", "Scroll", "Hoard", "Haven", "Strikes", "Specific"};
 
         internal Cards()
         {
@@ -130,9 +135,19 @@ namespace MECCG_Deck_Builder
             bool cardMatch = true;
             for (int index = 0; index < keyValuePairs.Count; index++)
             {
-                if (keyValuePairs[0][0] != null && card[keyValuePairs[index][0]] != keyValuePairs[index][1])
+                if (keyValuePairs[index][0] != "Skill")
                 {
-                    cardMatch = false;
+                    if (keyValuePairs[0][0] != null && card[keyValuePairs[index][0]] != keyValuePairs[index][1])
+                    {
+                        cardMatch = false;
+                    }
+                }
+                else
+                {
+                    if (keyValuePairs[0][0] != null && !card[keyValuePairs[index][0]].Contains(keyValuePairs[index][1]))
+                    {
+                        cardMatch = false;
+                    }
                 }
             }
             return cardMatch;
@@ -342,10 +357,13 @@ namespace MECCG_Deck_Builder
                         { "set", $"{item.Set}" },
                         { "fullCode", $"{item.FullCode}" },
                         { "cardname", $"{item.NameEN}" },
-                        { "alignment", $"{item.Alignment}" },
                         { "text", $"{item.Text}" },
                         { "imageName", $"{item.ImageName}" }
                     };
+                    for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
+                    {
+                        card.Add(filterKeys[keyIndex], Convert.ToString(item[filterKeys[keyIndex]]));
+                    }
                     if (item.Ice_errata == true)
                     {
                         card["imageName"] = "ice-" + item.ImageName;
@@ -360,9 +378,15 @@ namespace MECCG_Deck_Builder
         /// Build filters member key value lists and add key name/value pairs to card 
         /// </summary>
         private void SetCardKeyInfo(SortedDictionary<string, string> card, CardnumCard item)
-        { 
+        {
             if (card["set"] == Constants.METW.ToUpper() || card["set"] == "MEUL")
             {
+                for (int index = 0; index < filterKeys.Length; index++)
+                {
+                    SetFiltersValue(filterKeys[index], Convert.ToString(item[filterKeys[index]]));
+                }
+            }
+/*
                 // Get card value for "Card Type", stored as "Secondary" in Cardnum
                 if (item.Secondary != "")
                 {
@@ -429,6 +453,7 @@ namespace MECCG_Deck_Builder
                 card["Site"] = "";
                 card["Event"] = "";
             }
+*/
         }
 
         /// <summary>
@@ -445,13 +470,29 @@ namespace MECCG_Deck_Builder
 
             // Get index of key values in filters
             int filtersIndex = filters.FindIndex(keyList => keyList[0] == key);
-
-            // Check whether key value is in key values and add if it is not
-            if (filters[filtersIndex].IndexOf(value) == -1)
+            if (key != "Skill")
             {
-                filters[filtersIndex].Add(value);
-                filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, null);
+                // Check whether key value is in key values and add if it is not
+                if (filters[filtersIndex].IndexOf(value) == -1)
+                {
+                    filters[filtersIndex].Add(value);
+                    filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                }
             }
+            else
+            {
+                string[] words = value.Split(null);
+                foreach (string word in words)
+                {
+                    // Check whether key value is in key values and add if it is not
+                    if (filters[filtersIndex].IndexOf(word) == -1)
+                    {
+                        filters[filtersIndex].Add(word);
+                        filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                    }
+                }
+            }
+
         }
 
         /// <summary>
@@ -459,12 +500,11 @@ namespace MECCG_Deck_Builder
         /// </summary>
         private void SetKeys()
         {
-            string[] keys = { "Card Type", "Event", "Item", "Race", "Site" };
-            for (int keyIndex = 0; keyIndex < keys.Length; keyIndex++)
+            for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
             {
                 List<string> newKey = new List<string>
                 {
-                    keys[keyIndex]
+                    filterKeys[keyIndex]
                 };
                 filters.Add(newKey);
                 filters.Sort(CompareListsByFirstValue);

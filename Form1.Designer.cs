@@ -127,7 +127,7 @@ namespace MECCG_Deck_Builder
             this.ListBoxMaster.ItemHeight = 15;
             this.ListBoxMaster.Location = new System.Drawing.Point(12, 37);
             this.ListBoxMaster.Name = "ListBoxMaster";
-            this.ListBoxMaster.Size = new System.Drawing.Size(190, 529);
+            this.ListBoxMaster.Size = new System.Drawing.Size(210, 529);
             this.ListBoxMaster.TabIndex = 0;
             this.ListBoxMaster.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
             this.ListBoxMaster.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxCardList_MouseDoubleClick);
@@ -300,9 +300,9 @@ namespace MECCG_Deck_Builder
             // 
             // PictureBoxCardImage
             // 
-            this.PictureBoxCardImage.Location = new System.Drawing.Point(220, 37);
+            this.PictureBoxCardImage.Location = new System.Drawing.Point(243, 37);
             this.PictureBoxCardImage.Name = "PictureBoxCardImage";
-            this.PictureBoxCardImage.Size = new System.Drawing.Size(375, 525);
+            this.PictureBoxCardImage.Size = new System.Drawing.Size(443, 525);
             this.PictureBoxCardImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PictureBoxCardImage.TabIndex = 1;
             this.PictureBoxCardImage.TabStop = false;
@@ -311,11 +311,12 @@ namespace MECCG_Deck_Builder
             // 
             this.ListBoxPool.AllowDrop = true;
             this.ListBoxPool.ContextMenuStrip = this.ContextMenuStripTabs;
+            this.ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxPool.FormattingEnabled = true;
             this.ListBoxPool.ItemHeight = 15;
-            this.ListBoxPool.Location = new System.Drawing.Point(3, 10);
+            this.ListBoxPool.Location = new System.Drawing.Point(3, 3);
             this.ListBoxPool.Name = "ListBoxPool";
-            this.ListBoxPool.Size = new System.Drawing.Size(198, 484);
+            this.ListBoxPool.Size = new System.Drawing.Size(196, 495);
             this.ListBoxPool.Sorted = true;
             this.ListBoxPool.TabIndex = 4;
             this.ListBoxPool.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
@@ -327,11 +328,12 @@ namespace MECCG_Deck_Builder
             // 
             this.ListBoxResources.AllowDrop = true;
             this.ListBoxResources.ContextMenuStrip = this.ContextMenuStripTabs;
+            this.ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxResources.FormattingEnabled = true;
             this.ListBoxResources.ItemHeight = 15;
-            this.ListBoxResources.Location = new System.Drawing.Point(3, 10);
+            this.ListBoxResources.Location = new System.Drawing.Point(3, 3);
             this.ListBoxResources.Name = "ListBoxResources";
-            this.ListBoxResources.Size = new System.Drawing.Size(198, 484);
+            this.ListBoxResources.Size = new System.Drawing.Size(196, 495);
             this.ListBoxResources.Sorted = true;
             this.ListBoxResources.TabIndex = 5;
             this.ListBoxResources.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
@@ -343,11 +345,12 @@ namespace MECCG_Deck_Builder
             // 
             this.ListBoxHazards.AllowDrop = true;
             this.ListBoxHazards.ContextMenuStrip = this.ContextMenuStripTabs;
+            this.ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxHazards.FormattingEnabled = true;
             this.ListBoxHazards.ItemHeight = 15;
-            this.ListBoxHazards.Location = new System.Drawing.Point(3, 10);
+            this.ListBoxHazards.Location = new System.Drawing.Point(3, 3);
             this.ListBoxHazards.Name = "ListBoxHazards";
-            this.ListBoxHazards.Size = new System.Drawing.Size(198, 484);
+            this.ListBoxHazards.Size = new System.Drawing.Size(196, 495);
             this.ListBoxHazards.Sorted = true;
             this.ListBoxHazards.TabIndex = 6;
             this.ListBoxHazards.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
@@ -359,11 +362,12 @@ namespace MECCG_Deck_Builder
             // 
             this.ListBoxSideboard.AllowDrop = true;
             this.ListBoxSideboard.ContextMenuStrip = this.ContextMenuStripTabs;
+            this.ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxSideboard.FormattingEnabled = true;
             this.ListBoxSideboard.ItemHeight = 15;
-            this.ListBoxSideboard.Location = new System.Drawing.Point(3, 10);
+            this.ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
             this.ListBoxSideboard.Name = "ListBoxSideboard";
-            this.ListBoxSideboard.Size = new System.Drawing.Size(198, 484);
+            this.ListBoxSideboard.Size = new System.Drawing.Size(196, 495);
             this.ListBoxSideboard.Sorted = true;
             this.ListBoxSideboard.TabIndex = 7;
             this.ListBoxSideboard.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
@@ -375,11 +379,12 @@ namespace MECCG_Deck_Builder
             // 
             this.ListBoxSites.AllowDrop = true;
             this.ListBoxSites.ContextMenuStrip = this.ContextMenuStripTabs;
+            this.ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxSites.FormattingEnabled = true;
             this.ListBoxSites.ItemHeight = 15;
-            this.ListBoxSites.Location = new System.Drawing.Point(3, 10);
+            this.ListBoxSites.Location = new System.Drawing.Point(3, 3);
             this.ListBoxSites.Name = "ListBoxSites";
-            this.ListBoxSites.Size = new System.Drawing.Size(198, 484);
+            this.ListBoxSites.Size = new System.Drawing.Size(196, 495);
             this.ListBoxSites.Sorted = true;
             this.ListBoxSites.TabIndex = 8;
             this.ListBoxSites.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
@@ -396,10 +401,10 @@ namespace MECCG_Deck_Builder
             this.TabControlDeck.Controls.Add(this.TabPageSideboard);
             this.TabControlDeck.Controls.Add(this.TabPageSites);
             this.TabControlDeck.ItemSize = new System.Drawing.Size(41, 20);
-            this.TabControlDeck.Location = new System.Drawing.Point(613, 37);
+            this.TabControlDeck.Location = new System.Drawing.Point(706, 37);
             this.TabControlDeck.Name = "TabControlDeck";
             this.TabControlDeck.SelectedIndex = 0;
-            this.TabControlDeck.Size = new System.Drawing.Size(212, 529);
+            this.TabControlDeck.Size = new System.Drawing.Size(210, 529);
             this.TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.TabControlDeck.TabIndex = 14;
             // 
@@ -409,7 +414,7 @@ namespace MECCG_Deck_Builder
             this.TabPagePool.Location = new System.Drawing.Point(4, 24);
             this.TabPagePool.Name = "TabPagePool";
             this.TabPagePool.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPagePool.Size = new System.Drawing.Size(204, 501);
+            this.TabPagePool.Size = new System.Drawing.Size(202, 501);
             this.TabPagePool.TabIndex = 0;
             this.TabPagePool.Text = "Pool";
             this.TabPagePool.UseVisualStyleBackColor = true;
@@ -420,7 +425,7 @@ namespace MECCG_Deck_Builder
             this.TabPageResources.Location = new System.Drawing.Point(4, 24);
             this.TabPageResources.Name = "TabPageResources";
             this.TabPageResources.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPageResources.Size = new System.Drawing.Size(204, 501);
+            this.TabPageResources.Size = new System.Drawing.Size(202, 501);
             this.TabPageResources.TabIndex = 1;
             this.TabPageResources.Text = "Res";
             this.TabPageResources.UseVisualStyleBackColor = true;
@@ -431,7 +436,7 @@ namespace MECCG_Deck_Builder
             this.TabPageHazards.Location = new System.Drawing.Point(4, 24);
             this.TabPageHazards.Name = "TabPageHazards";
             this.TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPageHazards.Size = new System.Drawing.Size(204, 501);
+            this.TabPageHazards.Size = new System.Drawing.Size(202, 501);
             this.TabPageHazards.TabIndex = 2;
             this.TabPageHazards.Text = "Haz";
             this.TabPageHazards.UseVisualStyleBackColor = true;
@@ -442,7 +447,7 @@ namespace MECCG_Deck_Builder
             this.TabPageSideboard.Location = new System.Drawing.Point(4, 24);
             this.TabPageSideboard.Name = "TabPageSideboard";
             this.TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPageSideboard.Size = new System.Drawing.Size(204, 501);
+            this.TabPageSideboard.Size = new System.Drawing.Size(202, 501);
             this.TabPageSideboard.TabIndex = 3;
             this.TabPageSideboard.Text = "Side";
             this.TabPageSideboard.UseVisualStyleBackColor = true;
@@ -453,7 +458,7 @@ namespace MECCG_Deck_Builder
             this.TabPageSites.Location = new System.Drawing.Point(4, 24);
             this.TabPageSites.Name = "TabPageSites";
             this.TabPageSites.Padding = new System.Windows.Forms.Padding(3);
-            this.TabPageSites.Size = new System.Drawing.Size(204, 501);
+            this.TabPageSites.Size = new System.Drawing.Size(202, 501);
             this.TabPageSites.TabIndex = 4;
             this.TabPageSites.Text = "Site";
             this.TabPageSites.UseVisualStyleBackColor = true;
@@ -469,7 +474,7 @@ namespace MECCG_Deck_Builder
             this.helpToolStripMenuItem});
             this.MenuStrip1.Location = new System.Drawing.Point(0, 0);
             this.MenuStrip1.Name = "MenuStrip1";
-            this.MenuStrip1.Size = new System.Drawing.Size(838, 24);
+            this.MenuStrip1.Size = new System.Drawing.Size(926, 24);
             this.MenuStrip1.TabIndex = 15;
             this.MenuStrip1.Text = "File Menu";
             // 
@@ -736,27 +741,27 @@ namespace MECCG_Deck_Builder
             // ComboBoxKey4
             // 
             this.ComboBoxKey4.FormattingEnabled = true;
-            this.ComboBoxKey4.Location = new System.Drawing.Point(645, 581);
+            this.ComboBoxKey4.Location = new System.Drawing.Point(706, 581);
             this.ComboBoxKey4.Name = "ComboBoxKey4";
-            this.ComboBoxKey4.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey4.Size = new System.Drawing.Size(206, 23);
             this.ComboBoxKey4.TabIndex = 19;
             this.ComboBoxKey4.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxKey3
             // 
             this.ComboBoxKey3.FormattingEnabled = true;
-            this.ComboBoxKey3.Location = new System.Drawing.Point(432, 581);
+            this.ComboBoxKey3.Location = new System.Drawing.Point(476, 581);
             this.ComboBoxKey3.Name = "ComboBoxKey3";
-            this.ComboBoxKey3.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey3.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxKey3.TabIndex = 20;
             this.ComboBoxKey3.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxKey2
             // 
             this.ComboBoxKey2.FormattingEnabled = true;
-            this.ComboBoxKey2.Location = new System.Drawing.Point(220, 581);
+            this.ComboBoxKey2.Location = new System.Drawing.Point(243, 581);
             this.ComboBoxKey2.Name = "ComboBoxKey2";
-            this.ComboBoxKey2.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey2.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxKey2.TabIndex = 21;
             this.ComboBoxKey2.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
@@ -765,7 +770,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxKey1.FormattingEnabled = true;
             this.ComboBoxKey1.Location = new System.Drawing.Point(12, 581);
             this.ComboBoxKey1.Name = "ComboBoxKey1";
-            this.ComboBoxKey1.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxKey1.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxKey1.TabIndex = 22;
             this.ComboBoxKey1.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             // 
@@ -774,42 +779,46 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue1.FormattingEnabled = true;
             this.ComboBoxValue1.Location = new System.Drawing.Point(12, 610);
             this.ComboBoxValue1.Name = "ComboBoxValue1";
-            this.ComboBoxValue1.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue1.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxValue1.TabIndex = 26;
+            this.ComboBoxValue1.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
             this.ComboBoxValue1.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxValue2
             // 
             this.ComboBoxValue2.FormattingEnabled = true;
-            this.ComboBoxValue2.Location = new System.Drawing.Point(220, 610);
+            this.ComboBoxValue2.Location = new System.Drawing.Point(243, 610);
             this.ComboBoxValue2.Name = "ComboBoxValue2";
-            this.ComboBoxValue2.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue2.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxValue2.TabIndex = 25;
+            this.ComboBoxValue2.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
             this.ComboBoxValue2.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxValue3
             // 
             this.ComboBoxValue3.FormattingEnabled = true;
-            this.ComboBoxValue3.Location = new System.Drawing.Point(432, 610);
+            this.ComboBoxValue3.Location = new System.Drawing.Point(476, 610);
             this.ComboBoxValue3.Name = "ComboBoxValue3";
-            this.ComboBoxValue3.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue3.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxValue3.TabIndex = 24;
+            this.ComboBoxValue3.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
             this.ComboBoxValue3.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // ComboBoxValue4
             // 
             this.ComboBoxValue4.FormattingEnabled = true;
-            this.ComboBoxValue4.Location = new System.Drawing.Point(645, 610);
+            this.ComboBoxValue4.Location = new System.Drawing.Point(706, 610);
             this.ComboBoxValue4.Name = "ComboBoxValue4";
-            this.ComboBoxValue4.Size = new System.Drawing.Size(180, 23);
+            this.ComboBoxValue4.Size = new System.Drawing.Size(206, 23);
             this.ComboBoxValue4.TabIndex = 23;
+            this.ComboBoxValue4.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
             this.ComboBoxValue4.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(838, 647);
+            this.ClientSize = new System.Drawing.Size(926, 647);
             this.Controls.Add(this.ComboBoxValue1);
             this.Controls.Add(this.ComboBoxValue2);
             this.Controls.Add(this.ComboBoxValue3);

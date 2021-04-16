@@ -4,6 +4,12 @@ namespace MECCG_Deck_Builder
 {
     public class CardnumCard
     {
+        public object this[string propertyName]
+        {
+            get { return this.GetType().GetProperty(propertyName).GetValue(this, null); }
+            set { this.GetType().GetProperty(propertyName).SetValue(this, value, null); }
+        }
+
         public string Set { get; set; }
         public string Primary { get; set; }
         public string Alignment { get; set; }
@@ -63,11 +69,11 @@ namespace MECCG_Deck_Builder
         public string GccgSet { get; set; }
         public string Normalizedtitle { get; set; }
         public string DCpath { get; set; }
-        public bool? Dreamcard { get; set; }
-        public bool? Released { get; set; }
+        public bool Dreamcard { get; set; }
+        public bool Released { get; set; }
         public bool? Erratum { get; set; }
         public bool? Ice_errata { get; set; }
-        public bool? Extras { get; set; }
+        public bool Extras { get; set; }
     }
 
 
