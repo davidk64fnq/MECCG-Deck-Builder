@@ -4,7 +4,6 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using System;
 using System.Net;
-using System.Linq;
 using NaturalSort.Extension;
 
 namespace MECCG_Deck_Builder
@@ -111,6 +110,21 @@ namespace MECCG_Deck_Builder
             return keyValues;
         }
 
+        internal List<string[]> GetCardFilterPairs(string cardId)
+        {
+            List<string[]> filterPairs = new List<string[]>();
+
+            for (int index = 0; index < filters.Count; index++)
+            {
+                if (cards[Convert.ToInt32(cardId)][filters[index][0]] != "")
+                {
+                    string[] pair = { filters[index][0], cards[Convert.ToInt32(cardId)][filters[index][0]] };
+                    filterPairs.Add(pair);
+                }
+            }
+            return filterPairs;
+        }
+
         #endregion
 
         #region UTILITIES
@@ -120,14 +134,9 @@ namespace MECCG_Deck_Builder
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }
 
-        private static int CompareListsByFirstValue(List<string> x, List<string> y)
+        internal static int CompareListsByFirstValue(List<string> x, List<string> y)
         {
             return $"{x[0]}".CompareTo($"{y[0]}");
-        }
-
-        private static int CompareCardsByImageName(SortedDictionary<string, string> x, SortedDictionary<string, string> y)
-        {
-            return $"{x["imageName"]}".CompareTo($"{y["imageName"]}");
         }
 
         private static bool CardMatchesFilters(SortedDictionary<string, string> card, List<string[]> keyValuePairs)
@@ -135,19 +144,9 @@ namespace MECCG_Deck_Builder
             bool cardMatch = true;
             for (int index = 0; index < keyValuePairs.Count; index++)
             {
-                if (keyValuePairs[index][0] != "Skill")
+                if (keyValuePairs[0][0] != null && !card[keyValuePairs[index][0]].Contains(keyValuePairs[index][1]))
                 {
-                    if (keyValuePairs[0][0] != null && card[keyValuePairs[index][0]] != keyValuePairs[index][1])
-                    {
-                        cardMatch = false;
-                    }
-                }
-                else
-                {
-                    if (keyValuePairs[0][0] != null && !card[keyValuePairs[index][0]].Contains(keyValuePairs[index][1]))
-                    {
-                        cardMatch = false;
-                    }
+                    cardMatch = false;
                 }
             }
             return cardMatch;
@@ -344,7 +343,7 @@ namespace MECCG_Deck_Builder
             }
 
             // Initialise key names in filters list
-            SetKeys();
+            SetKeyNames();
             
             int index = 0;
             foreach (var item in CardnumCards)
@@ -368,92 +367,16 @@ namespace MECCG_Deck_Builder
                     {
                         card["imageName"] = "ice-" + item.ImageName;
                     }
-                    SetCardKeyInfo(card, item);
+                    if (card["set"] == Constants.METW.ToUpper() || card["set"] == "MEUL")
+                    {
+                        for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
+                        {
+                            SetKeyValues(filterKeys[keyIndex], Convert.ToString(item[filterKeys[keyIndex]]));
+                        }
+                    }
                     cards.Add(card);
                 }
             }
-        }
-
-        /// <summary>
-        /// Build filters member key value lists and add key name/value pairs to card 
-        /// </summary>
-        private void SetCardKeyInfo(SortedDictionary<string, string> card, CardnumCard item)
-        {
-            if (card["set"] == Constants.METW.ToUpper() || card["set"] == "MEUL")
-            {
-                for (int index = 0; index < filterKeys.Length; index++)
-                {
-                    SetFiltersValue(filterKeys[index], Convert.ToString(item[filterKeys[index]]));
-                }
-            }
-/*
-                // Get card value for "Card Type", stored as "Secondary" in Cardnum
-                if (item.Secondary != "")
-                {
-                    // Capitalise first letter 
-                    item.Secondary = char.ToUpper(item.Secondary[0]) + item.Secondary[1..];
-
-                    SetFiltersValue("Card Type", item.Secondary);
-                    card["Card Type"] = $"{char.ToUpper(item.Secondary[0]) + item.Secondary[1..]}";
-                    card["Race"] = "";
-                    card["Item"] = "";
-                    card["Site"] = "";
-                    card["Event"] = "";
-
-                    // If "Card Type" is race related store as "Race"
-                    string[] raceCardTypes = { "Ally", "Avatar", "Character", "Creature", "Creature/Permanent-event", "Creature/Short-event", "Faction" };
-                    string[] itemCardTypes = { "Gold Ring Item", "Greater Item", "Major Item", "Minor Item", "Special Item" };
-                    string[] siteCardTypes = { "Haven", "Region", "Site" };
-                    string[] eventCardTypes = { "Long-event", "Permanent-event", "Short-event" };
-                    if (raceCardTypes.Contains(card["Card Type"]))
-                    {
-                        // Group elf/dwarf subraces
-                        if (item.Race.Contains("Dwarf"))
-                        {
-                            item.Race = "Dwarf";
-                        }
-                        else if (item.Race.Contains("Elf"))
-                        {
-                            item.Race = "Elf";
-                        }
-
-                        SetFiltersValue("Race", item.Race);
-                        card["Race"] = $"{item.Race}";
-                    }
-                    else if (itemCardTypes.Contains(card["Card Type"]))
-                    {
-                        SetFiltersValue("Item", item.Race);
-                        card["Item"] = $"{item.Race}";
-                    }
-                    else if (siteCardTypes.Contains(card["Card Type"]))
-                    {
-                        SetFiltersValue("Site", item.Site);
-                        card["Site"] = $"{item.Site}";
-                    }
-                    else if (eventCardTypes.Contains(card["Card Type"]))
-                    {
-                        SetFiltersValue("Event", item.Race);
-                        card["Event"] = $"{item.Race}";
-                    }
-                    else
-                    {
-                        MessageBox.Show(Messages.GetMsgBoxText(nameof(SetCardKeyInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show(Messages.GetMsgBoxText(nameof(SetCardKeyInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-            }
-            else
-            {
-                card["Card Type"] = "";
-                card["Race"] = "";
-                card["Item"] = "";
-                card["Site"] = "";
-                card["Event"] = "";
-            }
-*/
         }
 
         /// <summary>
@@ -461,7 +384,7 @@ namespace MECCG_Deck_Builder
         /// </summary>
         /// <param name="key">The key name being updated [0]</param>
         /// <param name="value">The additional key value [1..]</param>
-        private void SetFiltersValue(string key, string value)
+        private void SetKeyValues(string key, string value)
         {
             if (value == "")
             {
@@ -498,7 +421,7 @@ namespace MECCG_Deck_Builder
         /// <summary>
         /// Set key names as index 0 position in filter member key value lists
         /// </summary>
-        private void SetKeys()
+        private void SetKeyNames()
         {
             for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
             {

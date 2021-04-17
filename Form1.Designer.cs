@@ -39,6 +39,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCopyToHazard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyToSideboard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyToSite = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStripTabs = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ToolStripMenuTabCopyCard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
@@ -136,9 +137,10 @@ namespace MECCG_Deck_Builder
             // ContextMenuStripMaster
             // 
             this.ContextMenuStripMaster.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMenuMasterCopyCard});
+            this.ToolStripMenuMasterCopyCard,
+            this.ToolStripMenuMasterCardnumFilters});
             this.ContextMenuStripMaster.Name = "ContextMenuStripMaster";
-            this.ContextMenuStripMaster.Size = new System.Drawing.Size(103, 26);
+            this.ContextMenuStripMaster.Size = new System.Drawing.Size(159, 48);
             // 
             // ToolStripMenuMasterCopyCard
             // 
@@ -149,7 +151,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCopyToSideboard,
             this.ToolStripMenuMasterCopyToSite});
             this.ToolStripMenuMasterCopyCard.Name = "ToolStripMenuMasterCopyCard";
-            this.ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(102, 22);
+            this.ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(158, 22);
             this.ToolStripMenuMasterCopyCard.Text = "Copy";
             // 
             // ToolStripMenuMasterCopyToPool
@@ -186,6 +188,12 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCopyToSite.Size = new System.Drawing.Size(127, 22);
             this.ToolStripMenuMasterCopyToSite.Text = "Sites";
             this.ToolStripMenuMasterCopyToSite.Click += new System.EventHandler(this.ToolStripMenuMaster_Click);
+            // 
+            // ToolStripMenuMasterCardnumFilters
+            // 
+            this.ToolStripMenuMasterCardnumFilters.Name = "ToolStripMenuMasterCardnumFilters";
+            this.ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(158, 22);
+            this.ToolStripMenuMasterCardnumFilters.Text = "Cardnum Filters";
             // 
             // ContextMenuStripTabs
             // 
@@ -740,24 +748,31 @@ namespace MECCG_Deck_Builder
             // 
             // ComboBoxKey4
             // 
+            this.ComboBoxKey4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.ComboBoxKey4.FormattingEnabled = true;
             this.ComboBoxKey4.Location = new System.Drawing.Point(706, 581);
             this.ComboBoxKey4.Name = "ComboBoxKey4";
             this.ComboBoxKey4.Size = new System.Drawing.Size(206, 23);
             this.ComboBoxKey4.TabIndex = 19;
-            this.ComboBoxKey4.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
+            this.ComboBoxKey4.Leave += new System.EventHandler(this.ComboBoxKeyNameHandleTextEntry);
             // 
             // ComboBoxKey3
             // 
+            this.ComboBoxKey3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.ComboBoxKey3.FormattingEnabled = true;
             this.ComboBoxKey3.Location = new System.Drawing.Point(476, 581);
             this.ComboBoxKey3.Name = "ComboBoxKey3";
             this.ComboBoxKey3.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxKey3.TabIndex = 20;
-            this.ComboBoxKey3.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
+            this.ComboBoxKey3.Leave += new System.EventHandler(this.ComboBoxKeyNameHandleTextEntry);
             // 
             // ComboBoxKey2
             // 
+            this.ComboBoxKey2.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxKey2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.ComboBoxKey2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboBoxKey2.FormattingEnabled = true;
             this.ComboBoxKey2.Location = new System.Drawing.Point(243, 581);
             this.ComboBoxKey2.Name = "ComboBoxKey2";
@@ -767,6 +782,9 @@ namespace MECCG_Deck_Builder
             // 
             // ComboBoxKey1
             // 
+            this.ComboBoxKey1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxKey1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.ComboBoxKey1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboBoxKey1.FormattingEnabled = true;
             this.ComboBoxKey1.Location = new System.Drawing.Point(12, 581);
             this.ComboBoxKey1.Name = "ComboBoxKey1";
@@ -776,6 +794,9 @@ namespace MECCG_Deck_Builder
             // 
             // ComboBoxValue1
             // 
+            this.ComboBoxValue1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxValue1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.ComboBoxValue1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboBoxValue1.FormattingEnabled = true;
             this.ComboBoxValue1.Location = new System.Drawing.Point(12, 610);
             this.ComboBoxValue1.Name = "ComboBoxValue1";
@@ -786,6 +807,9 @@ namespace MECCG_Deck_Builder
             // 
             // ComboBoxValue2
             // 
+            this.ComboBoxValue2.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxValue2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.ComboBoxValue2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboBoxValue2.FormattingEnabled = true;
             this.ComboBoxValue2.Location = new System.Drawing.Point(243, 610);
             this.ComboBoxValue2.Name = "ComboBoxValue2";
@@ -796,23 +820,27 @@ namespace MECCG_Deck_Builder
             // 
             // ComboBoxValue3
             // 
+            this.ComboBoxValue3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxValue3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.ComboBoxValue3.FormattingEnabled = true;
             this.ComboBoxValue3.Location = new System.Drawing.Point(476, 610);
             this.ComboBoxValue3.Name = "ComboBoxValue3";
             this.ComboBoxValue3.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxValue3.TabIndex = 24;
             this.ComboBoxValue3.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-            this.ComboBoxValue3.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
+            this.ComboBoxValue3.Leave += new System.EventHandler(this.ComboBoxKeyValueHandleTextEntry);
             // 
             // ComboBoxValue4
             // 
+            this.ComboBoxValue4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.ComboBoxValue4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.ComboBoxValue4.FormattingEnabled = true;
             this.ComboBoxValue4.Location = new System.Drawing.Point(706, 610);
             this.ComboBoxValue4.Name = "ComboBoxValue4";
             this.ComboBoxValue4.Size = new System.Drawing.Size(206, 23);
             this.ComboBoxValue4.TabIndex = 23;
             this.ComboBoxValue4.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
-            this.ComboBoxValue4.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
+            this.ComboBoxValue4.Leave += new System.EventHandler(this.ComboBoxKeyValueHandleTextEntry);
             // 
             // Form1
             // 
@@ -929,6 +957,7 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardnumFilters;
     }
 }
 

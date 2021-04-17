@@ -89,12 +89,33 @@ namespace MECCG_Deck_Builder
                 string cardText = ListBoxMaster.SelectedItem.ToString();
                 ListBoxMaster.DoDragDrop(cardText, DragDropEffects.Copy);
             }
+            if (e.Button == MouseButtons.Right)
+            {
+                // Find the item under the mouse.
+                int index = ListBoxMaster.IndexFromPoint(e.Location);
+                if (index < 0)
+                {
+                    return;
+                }
+                SetToolStripMenuMasterCardnumFilters(masterList[index][(int)CardListField.id]);
+            }
             if (e.Clicks == 2)
             {
                 ListBoxCardList_MouseDoubleClick(sender, e);
             }
             return;
         }
+
+        private void SetToolStripMenuMasterCardnumFilters(string cardId)
+        {
+            ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
+            List<string[]> filterPairs = meccgCards.GetCardFilterPairs(cardId);
+            for (int index = 0; index < filterPairs.Count; index++)
+            {
+                ToolStripMenuMasterCardnumFilters.DropDownItems.Add($"{filterPairs[index][0]}\t\t{filterPairs[index][1]}");
+            }
+        }
+
         private void ToolStripMenuMaster_Click(object sender, EventArgs e)
         {
             ListBox sourceListbox = ListBoxMaster;
@@ -607,7 +628,14 @@ namespace MECCG_Deck_Builder
 
         private void SetKeyNameList(ComboBox comboBox)
         {
-            comboBox.DataSource = meccgCards.GetKeyNameList();
+            if (int.Parse(comboBox.Name[^1].ToString()) <= 2)
+            {
+                comboBox.DataSource = meccgCards.GetKeyNameList();
+            }
+            else
+            {
+                comboBox.DataSource = KeyValue.GetKeyNameList();
+            }
         }
 
         private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -637,7 +665,14 @@ namespace MECCG_Deck_Builder
 
         private List<string> SetKeyValueList(ComboBox keyNameComboBox)
         {
-            return meccgCards.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+            if (int.Parse(keyNameComboBox.Name[^1].ToString()) <= 2)
+            {
+                return meccgCards.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+            }
+            else
+            {
+                return KeyValue.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+            }
         }
 
         private List<string[]> GetKeyValuePairs()
@@ -689,7 +724,58 @@ namespace MECCG_Deck_Builder
             senderComboBox.DropDownWidth = width;
         }
 
+        private void ComboBoxKeyNameHandleTextEntry(object sender, EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            string newKeyName = comboBox.Text;
+            if (newKeyName != "" && !comboBox.Items.Contains(newKeyName))
+            {
+                KeyValue.SetKeyName(newKeyName);
+                string curText = ComboBoxKey3.Text;
+                SetKeyNameList(ComboBoxKey3);
+                if (ComboBoxKey3.Text != curText)
+                {
+                    ComboBoxKey3.Text = curText;
+                }
+                curText = ComboBoxKey4.Text;
+                SetKeyNameList(ComboBoxKey4);
+                if (ComboBoxKey4.Text != curText)
+                {
+                    ComboBoxKey4.Text = curText;
+                }
+                comboBox.SelectedItem = newKeyName;
+                MessageBox.Show($"\"{newKeyName}\" added to user key name list", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void ComboBoxKeyValueHandleTextEntry(object sender, EventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            string newKeyValue = comboBox.Text;
+            string keyName;
+            ComboBox keyNameComboBox;
+            if (comboBox.Name.Contains("Value3"))
+            {
+                keyNameComboBox = ComboBoxKey3;
+                keyName = ComboBoxKey3.SelectedItem.ToString();
+            }
+            else
+            {
+                keyNameComboBox = ComboBoxKey4;
+                keyName = ComboBoxKey4.SelectedItem.ToString();
+            }
+            if (newKeyValue != "" && !comboBox.Items.Contains(newKeyValue))
+            {
+                KeyValue.SetKeyValue(keyName, newKeyValue);
+                comboBox.DataSource = SetKeyValueList(keyNameComboBox);
+                comboBox.SelectedItem = newKeyValue;
+                MessageBox.Show($"\"{newKeyValue}\" added to user key \"{keyName}\" value list", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
         #endregion
+
+        #region TOOLS
 
         private void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
         {
@@ -709,5 +795,8 @@ namespace MECCG_Deck_Builder
                 }
             }
         }
+
+        #endregion
+
     }
 }
