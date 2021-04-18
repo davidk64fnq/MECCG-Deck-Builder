@@ -33,6 +33,7 @@ namespace MECCG_Deck_Builder
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.ListBoxMaster = new System.Windows.Forms.ListBox();
             this.ContextMenuStripMaster = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ToolStripMenuMasterCardname = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyCard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyToResource = new System.Windows.Forms.ToolStripMenuItem();
@@ -40,7 +41,9 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCopyToSideboard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyToSite = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuMasterAddKeyValue = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStripTabs = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ToolStripMenuTabCardname = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabCopyCard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabCopyToPool = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabCopyToResource = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,6 +57,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuTabMoveToSideboard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabMoveToSite = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabDeleteCard = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuTabCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
             this.PictureBoxCardImage = new System.Windows.Forms.PictureBox();
             this.ListBoxPool = new System.Windows.Forms.ListBox();
             this.ListBoxResources = new System.Windows.Forms.ListBox();
@@ -137,10 +141,20 @@ namespace MECCG_Deck_Builder
             // ContextMenuStripMaster
             // 
             this.ContextMenuStripMaster.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuMasterCardname,
             this.ToolStripMenuMasterCopyCard,
-            this.ToolStripMenuMasterCardnumFilters});
+            this.ToolStripMenuMasterCardnumFilters,
+            this.ToolStripMenuMasterAddKeyValue});
             this.ContextMenuStripMaster.Name = "ContextMenuStripMaster";
-            this.ContextMenuStripMaster.Size = new System.Drawing.Size(159, 48);
+            this.ContextMenuStripMaster.Size = new System.Drawing.Size(181, 92);
+            // 
+            // ToolStripMenuMasterCardname
+            // 
+            this.ToolStripMenuMasterCardname.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.ToolStripMenuMasterCardname.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.ToolStripMenuMasterCardname.Name = "ToolStripMenuMasterCardname";
+            this.ToolStripMenuMasterCardname.Size = new System.Drawing.Size(180, 22);
+            this.ToolStripMenuMasterCardname.Text = "toolStripMenuItem1";
             // 
             // ToolStripMenuMasterCopyCard
             // 
@@ -151,7 +165,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCopyToSideboard,
             this.ToolStripMenuMasterCopyToSite});
             this.ToolStripMenuMasterCopyCard.Name = "ToolStripMenuMasterCopyCard";
-            this.ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(158, 22);
+            this.ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuMasterCopyCard.Text = "Copy";
             // 
             // ToolStripMenuMasterCopyToPool
@@ -192,18 +206,32 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuMasterCardnumFilters
             // 
             this.ToolStripMenuMasterCardnumFilters.Name = "ToolStripMenuMasterCardnumFilters";
-            this.ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(158, 22);
+            this.ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuMasterCardnumFilters.Text = "Cardnum Filters";
+            // 
+            // ToolStripMenuMasterAddKeyValue
+            // 
+            this.ToolStripMenuMasterAddKeyValue.Name = "ToolStripMenuMasterAddKeyValue";
+            this.ToolStripMenuMasterAddKeyValue.Size = new System.Drawing.Size(180, 22);
+            this.ToolStripMenuMasterAddKeyValue.Text = "Add Key Value";
             // 
             // ContextMenuStripTabs
             // 
             this.ContextMenuStripTabs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuTabCardname,
             this.ToolStripMenuTabCopyCard,
             this.ToolStripMenuTabMoveCard,
-            this.ToolStripMenuTabDeleteCard});
+            this.ToolStripMenuTabDeleteCard,
+            this.ToolStripMenuTabCardnumFilters});
             this.ContextMenuStripTabs.Name = "ContextMenuStripTabs";
-            this.ContextMenuStripTabs.Size = new System.Drawing.Size(108, 70);
-            this.ContextMenuStripTabs.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStripTabs_Opening);
+            this.ContextMenuStripTabs.Size = new System.Drawing.Size(181, 114);
+            // 
+            // ToolStripMenuTabCardname
+            // 
+            this.ToolStripMenuTabCardname.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.ToolStripMenuTabCardname.Name = "ToolStripMenuTabCardname";
+            this.ToolStripMenuTabCardname.Size = new System.Drawing.Size(180, 22);
+            this.ToolStripMenuTabCardname.Text = "toolStripMenuItem1";
             // 
             // ToolStripMenuTabCopyCard
             // 
@@ -214,7 +242,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuTabCopyToSideboard,
             this.ToolStripMenuTabCopyToSite});
             this.ToolStripMenuTabCopyCard.Name = "ToolStripMenuTabCopyCard";
-            this.ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(107, 22);
+            this.ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuTabCopyCard.Text = "Copy";
             // 
             // ToolStripMenuTabCopyToPool
@@ -261,7 +289,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuTabMoveToSideboard,
             this.ToolStripMenuTabMoveToSite});
             this.ToolStripMenuTabMoveCard.Name = "ToolStripMenuTabMoveCard";
-            this.ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(107, 22);
+            this.ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuTabMoveCard.Text = "Move";
             // 
             // ToolStripMenuTabMoveToPool
@@ -302,9 +330,15 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuTabDeleteCard
             // 
             this.ToolStripMenuTabDeleteCard.Name = "ToolStripMenuTabDeleteCard";
-            this.ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(107, 22);
+            this.ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuTabDeleteCard.Text = "Delete";
             this.ToolStripMenuTabDeleteCard.Click += new System.EventHandler(this.ToolStripMenuTab_Click);
+            // 
+            // ToolStripMenuTabCardnumFilters
+            // 
+            this.ToolStripMenuTabCardnumFilters.Name = "ToolStripMenuTabCardnumFilters";
+            this.ToolStripMenuTabCardnumFilters.Size = new System.Drawing.Size(180, 22);
+            this.ToolStripMenuTabCardnumFilters.Text = "Cardnum Filters";
             // 
             // PictureBoxCardImage
             // 
@@ -318,7 +352,6 @@ namespace MECCG_Deck_Builder
             // ListBoxPool
             // 
             this.ListBoxPool.AllowDrop = true;
-            this.ListBoxPool.ContextMenuStrip = this.ContextMenuStripTabs;
             this.ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxPool.FormattingEnabled = true;
             this.ListBoxPool.ItemHeight = 15;
@@ -331,11 +364,11 @@ namespace MECCG_Deck_Builder
             this.ListBoxPool.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragDrop);
             this.ListBoxPool.DragOver += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragOver);
             this.ListBoxPool.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDoubleClick);
+            this.ListBoxPool.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDown);
             // 
             // ListBoxResources
             // 
             this.ListBoxResources.AllowDrop = true;
-            this.ListBoxResources.ContextMenuStrip = this.ContextMenuStripTabs;
             this.ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxResources.FormattingEnabled = true;
             this.ListBoxResources.ItemHeight = 15;
@@ -348,11 +381,11 @@ namespace MECCG_Deck_Builder
             this.ListBoxResources.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragDrop);
             this.ListBoxResources.DragOver += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragOver);
             this.ListBoxResources.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDoubleClick);
+            this.ListBoxResources.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDown);
             // 
             // ListBoxHazards
             // 
             this.ListBoxHazards.AllowDrop = true;
-            this.ListBoxHazards.ContextMenuStrip = this.ContextMenuStripTabs;
             this.ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxHazards.FormattingEnabled = true;
             this.ListBoxHazards.ItemHeight = 15;
@@ -365,11 +398,11 @@ namespace MECCG_Deck_Builder
             this.ListBoxHazards.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragDrop);
             this.ListBoxHazards.DragOver += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragOver);
             this.ListBoxHazards.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDoubleClick);
+            this.ListBoxHazards.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDown);
             // 
             // ListBoxSideboard
             // 
             this.ListBoxSideboard.AllowDrop = true;
-            this.ListBoxSideboard.ContextMenuStrip = this.ContextMenuStripTabs;
             this.ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxSideboard.FormattingEnabled = true;
             this.ListBoxSideboard.ItemHeight = 15;
@@ -382,11 +415,11 @@ namespace MECCG_Deck_Builder
             this.ListBoxSideboard.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragDrop);
             this.ListBoxSideboard.DragOver += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragOver);
             this.ListBoxSideboard.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDoubleClick);
+            this.ListBoxSideboard.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDown);
             // 
             // ListBoxSites
             // 
             this.ListBoxSites.AllowDrop = true;
-            this.ListBoxSites.ContextMenuStrip = this.ContextMenuStripTabs;
             this.ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ListBoxSites.FormattingEnabled = true;
             this.ListBoxSites.ItemHeight = 15;
@@ -399,10 +432,10 @@ namespace MECCG_Deck_Builder
             this.ListBoxSites.DragDrop += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragDrop);
             this.ListBoxSites.DragOver += new System.Windows.Forms.DragEventHandler(this.ListBoxTab_DragOver);
             this.ListBoxSites.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDoubleClick);
+            this.ListBoxSites.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ListBoxTab_MouseDown);
             // 
             // TabControlDeck
             // 
-            this.TabControlDeck.ContextMenuStrip = this.ContextMenuStripTabs;
             this.TabControlDeck.Controls.Add(this.TabPagePool);
             this.TabControlDeck.Controls.Add(this.TabPageResources);
             this.TabControlDeck.Controls.Add(this.TabPageHazards);
@@ -755,6 +788,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxKey4.Name = "ComboBoxKey4";
             this.ComboBoxKey4.Size = new System.Drawing.Size(206, 23);
             this.ComboBoxKey4.TabIndex = 19;
+            this.ComboBoxKey4.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             this.ComboBoxKey4.Leave += new System.EventHandler(this.ComboBoxKeyNameHandleTextEntry);
             // 
             // ComboBoxKey3
@@ -766,6 +800,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxKey3.Name = "ComboBoxKey3";
             this.ComboBoxKey3.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxKey3.TabIndex = 20;
+            this.ComboBoxKey3.SelectedIndexChanged += new System.EventHandler(this.KeyName_ComboBox_SelectedIndexChanged);
             this.ComboBoxKey3.Leave += new System.EventHandler(this.ComboBoxKeyNameHandleTextEntry);
             // 
             // ComboBoxKey2
@@ -958,6 +993,10 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardnumFilters;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterAddKeyValue;
     }
 }
 

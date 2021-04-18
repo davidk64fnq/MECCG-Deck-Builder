@@ -7,6 +7,7 @@ namespace MECCG_Deck_Builder
 {
     class KeyValue
     {
+        static private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
         static private readonly List<List<string>> filters = new List<List<string>>();
 
         /// <summary>
@@ -32,6 +33,28 @@ namespace MECCG_Deck_Builder
                 keyNames.Add(filters[index][0]);
             }
             return keyNames;
+        }
+
+        static internal List<string> GetCardKeyNameList(string cardId)
+        {
+            List<string> cardKeyNameList = new List<string>();
+
+            for (int cardIndex = 0; cardIndex < cards.Count; cardIndex++)
+            {
+                if (cards[cardIndex]["id"] == cardId)
+                {
+                    SortedDictionary<string, string> card = cards[cardIndex];
+                    foreach (var pair in card)
+                    {
+                        if (pair.Key != "id")
+                        {
+                            cardKeyNameList.Add(pair.Key);
+                        }
+                    }
+                }
+            }
+
+            return cardKeyNameList;
         }
 
         /// <summary>
