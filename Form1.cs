@@ -72,7 +72,6 @@ namespace MECCG_Deck_Builder
 
         #region MASTER_SINGLE_CLICK
 
-
         private void ListBoxMasterList_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -99,8 +98,9 @@ namespace MECCG_Deck_Builder
                     return;
                 }
                 ToolStripMenuMasterCardname.Text = masterList[selectedIndex][(int)CardListField.name];
-                SetToolStripMenuMasterCardnumFilters(masterList[selectedIndex][(int)CardListField.id]);
-                SetToolStripMenuMasterAddKeyValue(masterList[selectedIndex][(int)CardListField.id]);
+                SetToolStripMenuMasterCardnumFilters();
+                SetToolStripMenuMasterCustomFilters();
+                SetToolStripMenuMasterAddKeyValue();
             }
             if (e.Clicks == 2)
             {
@@ -109,10 +109,10 @@ namespace MECCG_Deck_Builder
             return;
         }
 
-        private void SetToolStripMenuMasterCardnumFilters(string cardId)
+        private void SetToolStripMenuMasterCardnumFilters()
         {
             ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
-            List<string[]> filterPairs = meccgCards.GetCardFilterPairs(cardId);
+            List<string[]> filterPairs = meccgCards.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
             int maxLength = filterPairs.Max(ot => ot[0].Length);
             Font curFont = ToolStripMenuMasterCardnumFilters.Font;
             for (int index = 0; index < filterPairs.Count; index++)
@@ -120,6 +120,29 @@ namespace MECCG_Deck_Builder
                 string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
                 ToolStripMenuMasterCardnumFilters.DropDownItems.Add(pair);
                 ToolStripMenuMasterCardnumFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
+            }
+        }
+
+        private void SetToolStripMenuMasterCustomFilters()
+        {
+            int maxLength = 0;
+            ToolStripMenuItem customFilters = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            List<string[]> filterPairs = KeyValue.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
+            if (filterPairs.Count > 0)
+            {
+                maxLength = filterPairs.Max(ot => ot[0].Length);
+            }
+            for (int index = 0; index < filterPairs.Count; index++)
+            {
+                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
+                ToolStripMenuItem newKeyPair = new ToolStripMenuItem(pair);
+                customFilters.DropDownItems.Add(newKeyPair);
+                customFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
+            }
+            ContextMenuStripMaster.Items.RemoveByKey("Custom Filters");
+            if (customFilters.HasDropDownItems)
+            {
+                ContextMenuStripMaster.Items.Add(customFilters);
             }
         }
 
@@ -149,6 +172,42 @@ namespace MECCG_Deck_Builder
                 currentTabList.Add(masterList[ListBoxMaster.SelectedIndex]);
                 currentTabList.Sort(CompareCardsByName);
             }
+        }
+
+        private void SetToolStripMenuMasterAddKeyValue()
+        {
+            List<string> keyNameList = KeyValue.GetKeyNameList();
+            List<string> cardKeyNameList = KeyValue.GetCardKeyNameList(masterList[selectedIndex][(int)CardListField.id]);
+            List<string> keyValueList;
+
+            ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
+            ToolStripMenuItem addKeyValue = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+            for (int keyIndex = 0; keyIndex < keyNameList.Count; keyIndex++)
+            {
+                if (!cardKeyNameList.Contains(keyNameList[keyIndex]))
+                {
+                    ToolStripMenuItem newKeyName = new ToolStripMenuItem(keyNameList[keyIndex]);
+                    keyValueList = KeyValue.GetKeyValueList(keyNameList[keyIndex]);
+                    for (int valueIndex = 1; valueIndex < keyValueList.Count; valueIndex++)
+                    {
+                        ToolStripMenuItem newKeyValue = new ToolStripMenuItem(keyValueList[valueIndex]);
+                        newKeyValue.Click += SetCardNewKeyValue;
+                        newKeyName.DropDownItems.Add(newKeyValue);
+                    }
+                    addKeyValue.DropDownItems.Add(newKeyName);
+                }
+            }
+            if (addKeyValue.HasDropDownItems)
+            {
+                ContextMenuStripMaster.Items.Add(addKeyValue);
+            }
+        }
+
+        private void SetCardNewKeyValue(object sender, EventArgs e)
+        {
+            string newKeyValue = ((ToolStripMenuItem)sender).Text;
+            string newKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
+            KeyValue.SetCardKeyValue(newKeyName, newKeyValue, masterList[selectedIndex][(int)CardListField.id]);
         }
 
         #endregion
@@ -667,18 +726,22 @@ namespace MECCG_Deck_Builder
         {
             if (((ComboBox)sender).Name.Contains("Key1"))
             {
+                ComboBoxValue1.DataSource = null;
                 ComboBoxValue1.DataSource = SetKeyValueList(ComboBoxKey1);
             }
             else if (((ComboBox)sender).Name.Contains("Key2"))
             {
+                ComboBoxValue2.DataSource = null;
                 ComboBoxValue2.DataSource = SetKeyValueList(ComboBoxKey2);
             }
             else if (((ComboBox)sender).Name.Contains("Key3"))
             {
+                ComboBoxValue3.DataSource = null;
                 ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
             }
             else if (((ComboBox)sender).Name.Contains("Key4"))
             {
+                ComboBoxValue4.DataSource = null;
                 ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
             }
         }
@@ -777,19 +840,27 @@ namespace MECCG_Deck_Builder
         {
             ComboBox keyValueComboBox = (ComboBox)sender;
             string newKeyValue = keyValueComboBox.Text;
-            string keyName;
+            if (newKeyValue == "")
+            {
+                return;
+            }
             ComboBox keyNameComboBox;
+            string keyName;
             if (keyValueComboBox.Name.Contains("Value3"))
             {
                 keyNameComboBox = ComboBoxKey3;
-                keyName = ComboBoxKey3.SelectedItem.ToString();
+                keyName = ComboBoxKey3.SelectedItem?.ToString();
             }
             else
             {
                 keyNameComboBox = ComboBoxKey4;
-                keyName = ComboBoxKey4.SelectedItem.ToString();
+                keyName = ComboBoxKey4.SelectedItem?.ToString();
             }
-            if (newKeyValue != "" && !keyValueComboBox.Items.Contains(newKeyValue))
+            if (keyName == "")
+            {
+                return;
+            }
+            if (!keyValueComboBox.Items.Contains(newKeyValue))
             {
                 KeyValue.SetKeyValue(keyName, newKeyValue);
                 keyValueComboBox.DataSource = SetKeyValueList(keyNameComboBox);
@@ -824,18 +895,5 @@ namespace MECCG_Deck_Builder
         #endregion
 
 
-        private void SetToolStripMenuMasterAddKeyValue(string cardId)
-        {
-            List<string> keyNameList = KeyValue.GetKeyNameList();
-            List<string> cardKeyNameList = KeyValue.GetCardKeyNameList(masterList[selectedIndex][(int)CardListField.id]);
-            ToolStripMenuMasterAddKeyValue.DropDownItems.Clear();
-            for (int keyIndex = 0; keyIndex < keyNameList.Count; keyIndex++)
-            {
-                if (!cardKeyNameList.Contains(keyNameList[keyIndex]))
-                {
-                    ToolStripMenuMasterAddKeyValue.DropDownItems.Add(keyNameList[keyIndex]);
-                }
-            }
-        }
     }
 }

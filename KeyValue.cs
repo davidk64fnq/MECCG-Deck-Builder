@@ -23,6 +23,53 @@ namespace MECCG_Deck_Builder
             filters.Sort(Cards.CompareListsByFirstValue);
         }
 
+        static internal void SetCardKeyValue(string keyName, string keyValue, string cardId)
+        {
+            bool cardFound = false;
+            for (int cardIndex = 0; cardIndex < cards.Count && !cardFound; cardIndex++)
+            {
+                if (cards[cardIndex]["id"] == cardId)
+                {
+                    SortedDictionary<string, string> card = cards[cardIndex];
+                    card.Add(keyName, keyValue);
+                    cardFound = true;
+                }
+            }
+            if (!cardFound)
+            {
+                SortedDictionary<string, string> card = new SortedDictionary<string, string>
+                {
+                    { "id", cardId },
+                    { keyName, keyValue }
+                };
+                cards.Add(card);
+            }
+        }
+
+        static internal List<string[]> GetCardFilterPairs(string cardId)
+        {
+            List<string[]> filterPairs = new List<string[]>();
+
+            bool cardFound = false;
+            for (int cardIndex = 0; cardIndex < cards.Count && !cardFound; cardIndex++)
+            {
+                if (cards[cardIndex]["id"] == cardId)
+                {
+                    cardFound = true;
+                    foreach (var pair in cards[cardIndex])
+                    {
+                        if (pair.Key != "id")
+                        {
+                            string[] keyNameValue = { pair.Key, pair.Value };
+                            filterPairs.Add(keyNameValue);
+                        }
+                    }
+                }
+            }
+
+            return filterPairs;
+        }
+
         #region GET_FILTER_INFO
 
         static internal List<string> GetKeyNameList()
@@ -43,8 +90,7 @@ namespace MECCG_Deck_Builder
             {
                 if (cards[cardIndex]["id"] == cardId)
                 {
-                    SortedDictionary<string, string> card = cards[cardIndex];
-                    foreach (var pair in card)
+                    foreach (var pair in cards[cardIndex])
                     {
                         if (pair.Key != "id")
                         {

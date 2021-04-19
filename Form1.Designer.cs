@@ -41,7 +41,6 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCopyToSideboard = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCopyToSite = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuMasterCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuMasterAddKeyValue = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenuStripTabs = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ToolStripMenuTabCardname = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuTabCopyCard = new System.Windows.Forms.ToolStripMenuItem();
@@ -143,10 +142,9 @@ namespace MECCG_Deck_Builder
             this.ContextMenuStripMaster.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ToolStripMenuMasterCardname,
             this.ToolStripMenuMasterCopyCard,
-            this.ToolStripMenuMasterCardnumFilters,
-            this.ToolStripMenuMasterAddKeyValue});
+            this.ToolStripMenuMasterCardnumFilters});
             this.ContextMenuStripMaster.Name = "ContextMenuStripMaster";
-            this.ContextMenuStripMaster.Size = new System.Drawing.Size(181, 92);
+            this.ContextMenuStripMaster.Size = new System.Drawing.Size(181, 70);
             // 
             // ToolStripMenuMasterCardname
             // 
@@ -208,12 +206,6 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuMasterCardnumFilters.Name = "ToolStripMenuMasterCardnumFilters";
             this.ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(180, 22);
             this.ToolStripMenuMasterCardnumFilters.Text = "Cardnum Filters";
-            // 
-            // ToolStripMenuMasterAddKeyValue
-            // 
-            this.ToolStripMenuMasterAddKeyValue.Name = "ToolStripMenuMasterAddKeyValue";
-            this.ToolStripMenuMasterAddKeyValue.Size = new System.Drawing.Size(180, 22);
-            this.ToolStripMenuMasterAddKeyValue.Text = "Add Key Value";
             // 
             // ContextMenuStripTabs
             // 
@@ -996,7 +988,6 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterAddKeyValue;
     }
 }
 
