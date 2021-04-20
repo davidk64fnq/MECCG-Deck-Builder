@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MECCG_Deck_Builder
 {
-    class OpenClose
+    class OpenCloseDeck
     {
         public string CurrentDeckTitle { get; set; }
         public List<string[]> poolList = new List<string[]>();

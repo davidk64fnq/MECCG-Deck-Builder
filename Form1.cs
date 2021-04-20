@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Reflection;
 
 namespace MECCG_Deck_Builder
 {
@@ -25,6 +26,7 @@ namespace MECCG_Deck_Builder
         private readonly List<string[]> siteList = new List<string[]>();
         private readonly List<string> setList = new List<string>();
         private readonly Cards meccgCards = new Cards();
+        private readonly KeyValue userKeyValues = new KeyValue();
         private ListBox callingListbox;
         private int selectedIndex;
         private string currentDeckTitle = "New Deck";
@@ -101,6 +103,7 @@ namespace MECCG_Deck_Builder
                 SetToolStripMenuMasterCardnumFilters();
                 SetToolStripMenuMasterCustomFilters();
                 SetToolStripMenuMasterAddKeyValue();
+                SetToolStripMenuMasterDeleteKeyValue();
             }
             if (e.Clicks == 2)
             {
@@ -127,7 +130,7 @@ namespace MECCG_Deck_Builder
         {
             int maxLength = 0;
             ToolStripMenuItem customFilters = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
-            List<string[]> filterPairs = KeyValue.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
+            List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
             if (filterPairs.Count > 0)
             {
                 maxLength = filterPairs.Max(ot => ot[0].Length);
@@ -176,8 +179,8 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuMasterAddKeyValue()
         {
-            List<string> keyNameList = KeyValue.GetKeyNameList();
-            List<string> cardKeyNameList = KeyValue.GetCardKeyNameList(masterList[selectedIndex][(int)CardListField.id]);
+            List<string> keyNameList = userKeyValues.GetKeyNameList();
+            List<string> cardKeyNameList = userKeyValues.GetCardKeyNameList(masterList[selectedIndex][(int)CardListField.id]);
             List<string> keyValueList;
 
             ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
@@ -187,7 +190,7 @@ namespace MECCG_Deck_Builder
                 if (!cardKeyNameList.Contains(keyNameList[keyIndex]))
                 {
                     ToolStripMenuItem newKeyName = new ToolStripMenuItem(keyNameList[keyIndex]);
-                    keyValueList = KeyValue.GetKeyValueList(keyNameList[keyIndex]);
+                    keyValueList = userKeyValues.GetKeyValueList(keyNameList[keyIndex]);
                     for (int valueIndex = 1; valueIndex < keyValueList.Count; valueIndex++)
                     {
                         ToolStripMenuItem newKeyValue = new ToolStripMenuItem(keyValueList[valueIndex]);
@@ -202,18 +205,44 @@ namespace MECCG_Deck_Builder
                 ContextMenuStripMaster.Items.Add(addKeyValue);
             }
         }
+        
+        private void SetToolStripMenuMasterDeleteKeyValue()
+        {
+            List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
+
+            ContextMenuStripMaster.Items.RemoveByKey("Delete Key Value");
+            ToolStripMenuItem delKeyNameValue = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            for (int keyIndex = 0; keyIndex < filterPairs.Count; keyIndex++)
+            {
+                ToolStripMenuItem delKeyName = new ToolStripMenuItem(filterPairs[keyIndex][0]);
+                ToolStripMenuItem delKeyValue = new ToolStripMenuItem(filterPairs[keyIndex][1]);
+                delKeyValue.Click += DeleteCardKeyValue;
+                delKeyName.DropDownItems.Add(delKeyValue);
+                delKeyNameValue.DropDownItems.Add(delKeyName);
+            }
+            if (delKeyNameValue.HasDropDownItems)
+            {
+                ContextMenuStripMaster.Items.Add(delKeyNameValue);
+            }
+        }
 
         private void SetCardNewKeyValue(object sender, EventArgs e)
         {
             string newKeyValue = ((ToolStripMenuItem)sender).Text;
             string newKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
-            KeyValue.SetCardKeyValue(newKeyName, newKeyValue, masterList[selectedIndex][(int)CardListField.id]);
+            userKeyValues.SetCardKeyValue(newKeyName, newKeyValue, masterList[selectedIndex][(int)CardListField.id]);
+        }
+        private void DeleteCardKeyValue(object sender, EventArgs e)
+        {
+            string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
+            userKeyValues.DeleteCardKeyValue(delKeyName, masterList[selectedIndex][(int)CardListField.id]);
         }
 
         #endregion
 
         // Display image of selected card
         #region SELECTED_INDEX
+
         private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             ListBox currentListBox = GetListBox(((ListBox)sender).Parent.Name);
@@ -352,6 +381,7 @@ namespace MECCG_Deck_Builder
             destList.Sort(CompareCardsByName);
             UpdateFormTitle();
         }
+        
         private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
         {
             listBox.Items.Remove(listBox.Items[index]);
@@ -384,6 +414,63 @@ namespace MECCG_Deck_Builder
         private int CompareCardsByName(string[] x, string[] y)
         {
             return x[(int)CardListField.name].CompareTo(y[(int)CardListField.name]);
+        }
+
+        #endregion
+
+        #region OPEN_CLOSE_FILTER
+
+        private void OpenFilterMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = Constants.AppTitle,
+                CheckPathExists = true,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json",
+                FilterIndex = 1,
+                RestoreDirectory = false,
+                AutoUpgradeEnabled = true
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                using StreamReader r = new StreamReader(openFileDialog.FileName);
+                string json = r.ReadToEnd();
+                OpenCloseFilter OpenCloseItems = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
+                userKeyValues.cards = OpenCloseItems.cards;
+                userKeyValues.filters = OpenCloseItems.filters;
+                SetKeyNameList(ComboBoxKey3);
+                SetKeyNameList(ComboBoxKey4);
+                SetKeyValueList(ComboBoxKey3);
+                SetKeyValueList(ComboBoxKey4);
+                UpdateMasterList("");
+            }
+        }
+
+        private void SaveFilterMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Title = Constants.AppTitle,
+                CheckPathExists = true,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json",
+                FilterIndex = 1,
+                RestoreDirectory = false,
+                AutoUpgradeEnabled = true
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                OpenCloseFilter OpenCloseItems = new OpenCloseFilter
+                {
+                    cards = userKeyValues.cards,
+                    filters = userKeyValues.filters
+                };
+                string indentedJsonString = JsonConvert.SerializeObject(OpenCloseItems, Formatting.Indented);
+                File.WriteAllText(saveFileDialog.FileName, indentedJsonString);
+            }
         }
 
         #endregion
@@ -464,7 +551,7 @@ namespace MECCG_Deck_Builder
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 currentDeckTitle = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                OpenClose OpenCloseItems = new OpenClose
+                OpenCloseDeck OpenCloseItems = new OpenCloseDeck
                 {
                     CurrentDeckTitle = currentDeckTitle,
                     setList = setList
@@ -498,7 +585,7 @@ namespace MECCG_Deck_Builder
             {
                 using StreamReader r = new StreamReader(openFileDialog.FileName);
                 string json = r.ReadToEnd();
-                OpenClose OpenCloseItems = JsonConvert.DeserializeObject<OpenClose>(json);
+                OpenCloseDeck OpenCloseItems = JsonConvert.DeserializeObject<OpenCloseDeck>(json);
                 currentDeckTitle = OpenCloseItems.CurrentDeckTitle;
                 foreach (ToolStripMenuItem item in ToolStripMenuSet.DropDownItems)
                 {
@@ -618,7 +705,7 @@ namespace MECCG_Deck_Builder
             return masterList;
         }
         
-        private List<string[]> GetList(OpenClose OpenCloseItems, ListBox listbox)
+        private List<string[]> GetList(OpenCloseDeck OpenCloseItems, ListBox listbox)
         {
             if (listbox == null)
             {
@@ -708,109 +795,9 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
+        // Handles two sets of key name-value filter sets, one read in from Cardnum, the other user maintained
+        // Routines to display available filters, edit filters, assign/remove filters from individual cards
         #region FILTER
-
-        private void SetKeyNameList(ComboBox comboBox)
-        {
-            if (int.Parse(comboBox.Name[^1].ToString()) <= 2)
-            {
-                comboBox.DataSource = meccgCards.GetKeyNameList();
-            }
-            else
-            {
-                comboBox.DataSource = KeyValue.GetKeyNameList();
-            }
-        }
-
-        private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (((ComboBox)sender).Name.Contains("Key1"))
-            {
-                ComboBoxValue1.DataSource = null;
-                ComboBoxValue1.DataSource = SetKeyValueList(ComboBoxKey1);
-            }
-            else if (((ComboBox)sender).Name.Contains("Key2"))
-            {
-                ComboBoxValue2.DataSource = null;
-                ComboBoxValue2.DataSource = SetKeyValueList(ComboBoxKey2);
-            }
-            else if (((ComboBox)sender).Name.Contains("Key3"))
-            {
-                ComboBoxValue3.DataSource = null;
-                ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
-            }
-            else if (((ComboBox)sender).Name.Contains("Key4"))
-            {
-                ComboBoxValue4.DataSource = null;
-                ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
-            }
-        }
-
-        private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateMasterList("");
-        }
-
-        private List<string> SetKeyValueList(ComboBox keyNameComboBox)
-        {
-            if (int.Parse(keyNameComboBox.Name[^1].ToString()) <= 2)
-            {
-                return meccgCards.GetKeyValueList((string)keyNameComboBox.SelectedItem);
-            }
-            else
-            {
-                return KeyValue.GetKeyValueList((string)keyNameComboBox.SelectedItem);
-            }
-        }
-
-        private List<string[]> GetKeyValuePairs()
-        {
-            List<string[]> keyValuePairs = new List<string[]>();
-            if (ComboBoxValue1.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = { ComboBoxKey1.SelectedItem.ToString(), ComboBoxValue1.SelectedItem.ToString() };
-                keyValuePairs.Add(keyValuePair);
-            }
-            if (ComboBoxValue2.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = { ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString() };
-                keyValuePairs.Add(keyValuePair);
-            }
-            if (ComboBoxValue3.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = { ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString() };
-                keyValuePairs.Add(keyValuePair);
-            }
-            if (ComboBoxValue4.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = { ComboBoxKey4.SelectedItem.ToString(), ComboBoxValue4.SelectedItem.ToString() };
-                keyValuePairs.Add(keyValuePair);
-            }
-            return keyValuePairs;
-        }
-
-        private void AdjustWidthComboBox_DropDown(object sender, System.EventArgs e)
-        {
-            ComboBox senderComboBox = (ComboBox)sender;
-            int width = senderComboBox.DropDownWidth;
-            Graphics g = senderComboBox.CreateGraphics();
-            Font font = senderComboBox.Font;
-            int vertScrollBarWidth =
-                (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
-                ? SystemInformation.VerticalScrollBarWidth : 0;
-
-            int newWidth;
-            foreach (string s in ((ComboBox)sender).Items)
-            {
-                newWidth = (int)g.MeasureString(s, font).Width
-                    + vertScrollBarWidth;
-                if (width < newWidth)
-                {
-                    width = newWidth;
-                }
-            }
-            senderComboBox.DropDownWidth = width;
-        }
 
         private void ComboBoxKeyNameHandleTextEntry(object sender, EventArgs e)
         {
@@ -818,7 +805,7 @@ namespace MECCG_Deck_Builder
             string newKeyName = comboBox.Text;
             if (newKeyName != "" && !comboBox.Items.Contains(newKeyName))
             {
-                KeyValue.SetKeyName(newKeyName);
+                userKeyValues.SetKeyName(newKeyName);
                 string curText = ComboBoxKey3.Text;
                 SetKeyNameList(ComboBoxKey3);
                 if (ComboBoxKey3.Text != curText)
@@ -862,11 +849,113 @@ namespace MECCG_Deck_Builder
             }
             if (!keyValueComboBox.Items.Contains(newKeyValue))
             {
-                KeyValue.SetKeyValue(keyName, newKeyValue);
+                userKeyValues.SetKeyValue(keyName, newKeyValue);
                 keyValueComboBox.DataSource = SetKeyValueList(keyNameComboBox);
                 keyValueComboBox.SelectedItem = newKeyValue;
                 MessageBox.Show($"\"{newKeyValue}\" added to user key \"{keyName}\" value list", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private List<string[]> GetKeyValuePairs()
+        {
+            List<string[]> keyValuePairs = new List<string[]>();
+            if (ComboBoxValue1.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey1.SelectedItem.ToString(), ComboBoxValue1.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            if (ComboBoxValue2.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            if (ComboBoxValue3.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            if (ComboBoxValue4.SelectedIndex >= 1)
+            {
+                string[] keyValuePair = { ComboBoxKey4.SelectedItem.ToString(), ComboBoxValue4.SelectedItem.ToString() };
+                keyValuePairs.Add(keyValuePair);
+            }
+            return keyValuePairs;
+        }
+
+        private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (((ComboBox)sender).Name.Contains("Key1"))
+            {
+                ComboBoxValue1.DataSource = null;
+                ComboBoxValue1.DataSource = SetKeyValueList(ComboBoxKey1);
+            }
+            else if (((ComboBox)sender).Name.Contains("Key2"))
+            {
+                ComboBoxValue2.DataSource = null;
+                ComboBoxValue2.DataSource = SetKeyValueList(ComboBoxKey2);
+            }
+            else if (((ComboBox)sender).Name.Contains("Key3"))
+            {
+                ComboBoxValue3.DataSource = null;
+                ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
+            }
+            else if (((ComboBox)sender).Name.Contains("Key4"))
+            {
+                ComboBoxValue4.DataSource = null;
+                ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
+            }
+        }
+
+        private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateMasterList("");
+        }
+
+        private void SetKeyNameList(ComboBox comboBox)
+        {
+            if (int.Parse(comboBox.Name[^1].ToString()) <= 2)
+            {
+                comboBox.DataSource = meccgCards.GetKeyNameList();
+            }
+            else
+            {
+                comboBox.DataSource = userKeyValues.GetKeyNameList();
+            }
+        }
+
+        private List<string> SetKeyValueList(ComboBox keyNameComboBox)
+        {
+            if (int.Parse(keyNameComboBox.Name[^1].ToString()) <= 2)
+            {
+                return meccgCards.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+            }
+            else
+            {
+                return userKeyValues.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+            }
+        }
+
+        private void AdjustWidthComboBox_DropDown(object sender, System.EventArgs e)
+        {
+            ComboBox senderComboBox = (ComboBox)sender;
+            int width = senderComboBox.DropDownWidth;
+            Graphics g = senderComboBox.CreateGraphics();
+            Font font = senderComboBox.Font;
+            int vertScrollBarWidth =
+                (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
+                ? SystemInformation.VerticalScrollBarWidth : 0;
+
+            int newWidth;
+            foreach (string s in ((ComboBox)sender).Items)
+            {
+                newWidth = (int)g.MeasureString(s, font).Width
+                    + vertScrollBarWidth;
+                if (width < newWidth)
+                {
+                    width = newWidth;
+                }
+            }
+            senderComboBox.DropDownWidth = width;
         }
 
         #endregion

@@ -12,7 +12,7 @@ namespace MECCG_Deck_Builder
     {
         private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
         private readonly List<Dictionary<string, string>> sets = new List<Dictionary<string, string>>();
-        private readonly List<List<string>> filters = new List<List<string>>();
+        private readonly List<List<string>> filters = new List<List<string>>(); // each filter is keyName at index 0 and keyValue(s) from 1..Count
         private List<CardnumCard> CardnumCards;
         private List<CardnumSet> CardnumSets;
 
@@ -44,16 +44,7 @@ namespace MECCG_Deck_Builder
 
         private int GetCardIndex(string cardKey, string cardValue)
         {
-            int index = 0;
-            foreach (var card in cards)
-            {
-                if ($"{card[cardKey]}" == cardValue)
-                {
-                    return index;
-                }
-                index++;
-            }
-            return -1;
+            return cards.FindIndex(card => card[cardKey] == cardValue);
         }
 
         internal List<string[]> GetCardList(List<string> selectedSets, List<string[]> keyValuePairs)
@@ -90,19 +81,20 @@ namespace MECCG_Deck_Builder
         internal List<string> GetKeyNameList()
         {
             List<string> keyNames = new List<string>();
-            for (int index = 0; index < filters.Count; index++)
+            foreach (List<string> filter in filters)
             {
-                keyNames.Add(filters[index][0]);
+                keyNames.Add(filter[0]);
             }
             return keyNames;
         }
+        
         internal List<string> GetKeyValueList(string keyName)
         {
             List<string> keyValues = new List<string>
             {
                 ""
             };
-            int keyNameIndex = filters.FindIndex(keyList => keyList[0] == keyName);
+            int keyNameIndex = filters.FindIndex(filter => filter[0] == keyName);
             for (int index = 1; index < filters[keyNameIndex].Count; index++)
             {
                 keyValues.Add(filters[keyNameIndex][index]);

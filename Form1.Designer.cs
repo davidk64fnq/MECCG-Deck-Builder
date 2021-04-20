@@ -718,6 +718,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
             this.ToolStripMenuFilterOpen.Size = new System.Drawing.Size(103, 22);
             this.ToolStripMenuFilterOpen.Text = "Open";
+            this.ToolStripMenuFilterOpen.Click += new System.EventHandler(this.OpenFilterMenuItem_Click);
             // 
             // toolStripSeparator6
             // 
@@ -729,6 +730,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
             this.ToolStripMenuFilterSave.Size = new System.Drawing.Size(103, 22);
             this.ToolStripMenuFilterSave.Text = "Save";
+            this.ToolStripMenuFilterSave.Click += new System.EventHandler(this.SaveFilterMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
