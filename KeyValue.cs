@@ -126,11 +126,11 @@ namespace MECCG_Deck_Builder
             return cardKeyNameList;
         }
 
-        internal List<string[]> GetCardList(List<string[]> masterList, List<string[]> keyValuePairs)
+        internal List<string[]> GetCardList(List<string[]> cardList, List<string[]> keyValuePairs)
         {
-            List<string[]> cardList = new List<string[]>();
+            List<string[]> returnCardList = new List<string[]>();
 
-            foreach (string[] master in masterList)
+            foreach (string[] master in cardList)
             {
                 // Is card from masterList in list of custom cards
                 int masterIndex = cards.FindIndex(card => card["id"] == master[(int)CardListField.id]);
@@ -140,16 +140,16 @@ namespace MECCG_Deck_Builder
                 {
                     if (CardMatchesFilters(cards[masterIndex], keyValuePairs))
                     {
-                        cardList.Add(master);
+                        returnCardList.Add(master);
                     }
                 }
                 else if (keyValuePairs.Count == 0)
                 {
-                    cardList.Add(master);
+                    returnCardList.Add(master);
                 }
             }
 
-            return cardList;
+            return returnCardList;
         }
 
         internal List<string> GetKeyNameList()

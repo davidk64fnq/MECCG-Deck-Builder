@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
-using System.Reflection;
 
 namespace MECCG_Deck_Builder
 {
@@ -429,6 +428,20 @@ namespace MECCG_Deck_Builder
             for (int tabIndex = 0; tabIndex < TabControlDeck.TabCount; tabIndex++)
             {
                 newFormTitle += $"{((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Items.Count}";
+                if (((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Name.Contains(Constants.Resource))
+                {
+                    int noCharacters = 0;
+                    List<string[]> keyValuePairs = new List<string[]>();
+                    foreach (string[] card in resourceList)
+                    {
+                        keyValuePairs = meccgCards.GetCardFilterPairs(card[(int)CardListField.id]);
+                        if (keyValuePairs.Exists(pair => pair[0] == "Primary" && pair[1] == "Character"))
+                        {
+                            noCharacters++;
+                        }
+                    }
+                    newFormTitle += $"[{noCharacters}]";
+                }
                 if (tabIndex != TabControlDeck.TabCount - 1)
                 {
                     newFormTitle += "/";
