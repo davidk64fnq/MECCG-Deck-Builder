@@ -94,6 +94,8 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuFilter = new System.Windows.Forms.ToolStripMenuItem();
             this.ToolStripMenuFilterOpen = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -699,9 +701,26 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuSet
             // 
+            this.ToolStripMenuSet.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolStripMenuSetSelectAll,
+            this.ToolStripMenuSetClearAll});
             this.ToolStripMenuSet.Name = "ToolStripMenuSet";
             this.ToolStripMenuSet.Size = new System.Drawing.Size(35, 20);
             this.ToolStripMenuSet.Text = "&Set";
+            // 
+            // ToolStripMenuSetSelectAll
+            // 
+            this.ToolStripMenuSetSelectAll.Name = "ToolStripMenuSetSelectAll";
+            this.ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(122, 22);
+            this.ToolStripMenuSetSelectAll.Text = "Select All";
+            this.ToolStripMenuSetSelectAll.Click += new System.EventHandler(this.ToolStripMenuSetSelectAll_Click);
+            // 
+            // ToolStripMenuSetClearAll
+            // 
+            this.ToolStripMenuSetClearAll.Name = "ToolStripMenuSetClearAll";
+            this.ToolStripMenuSetClearAll.Size = new System.Drawing.Size(122, 22);
+            this.ToolStripMenuSetClearAll.Text = "Clear All";
+            this.ToolStripMenuSetClearAll.Click += new System.EventHandler(this.ToolStripMenuSetClearAll_Click);
             // 
             // ToolStripMenuFilter
             // 
@@ -712,6 +731,7 @@ namespace MECCG_Deck_Builder
             this.ToolStripMenuFilter.Name = "ToolStripMenuFilter";
             this.ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
             this.ToolStripMenuFilter.Text = "&Filter";
+            this.ToolStripMenuFilter.Click += new System.EventHandler(this.SetFilterMenuDeleteKeyNameValue_Click);
             // 
             // ToolStripMenuFilterOpen
             // 
@@ -857,6 +877,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue3.Size = new System.Drawing.Size(210, 23);
             this.ComboBoxValue3.TabIndex = 24;
             this.ComboBoxValue3.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
+            this.ComboBoxValue3.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             this.ComboBoxValue3.Leave += new System.EventHandler(this.ComboBoxKeyValueHandleTextEntry);
             // 
             // ComboBoxValue4
@@ -869,6 +890,7 @@ namespace MECCG_Deck_Builder
             this.ComboBoxValue4.Size = new System.Drawing.Size(206, 23);
             this.ComboBoxValue4.TabIndex = 23;
             this.ComboBoxValue4.DropDown += new System.EventHandler(this.AdjustWidthComboBox_DropDown);
+            this.ComboBoxValue4.SelectedIndexChanged += new System.EventHandler(this.KeyValue_ComboBox_SelectedIndexChanged);
             this.ComboBoxValue4.Leave += new System.EventHandler(this.ComboBoxKeyValueHandleTextEntry);
             // 
             // Form1
@@ -990,6 +1012,8 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
     }
 }
 

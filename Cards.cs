@@ -121,7 +121,7 @@ namespace MECCG_Deck_Builder
 
         #region UTILITIES
 
-        private static int CompareCardsByName(string[] x, string[] y)
+        internal static int CompareCardsByName(string[] x, string[] y)
         {
             return $"{x[(int)CardListField.name]}".CompareTo($"{y[(int)CardListField.name]}");
         }

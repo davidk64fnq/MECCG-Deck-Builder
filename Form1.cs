@@ -232,6 +232,7 @@ namespace MECCG_Deck_Builder
             string newKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
             userKeyValues.SetCardKeyValue(newKeyName, newKeyValue, masterList[selectedIndex][(int)CardListField.id]);
         }
+        
         private void DeleteCardKeyValue(object sender, EventArgs e)
         {
             string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
@@ -282,6 +283,30 @@ namespace MECCG_Deck_Builder
             UpdateMasterList(((ToolStripMenuItem)sender).Tag.ToString());
         }
 
+        private void ToolStripMenuSetClearAll_Click(object sender, EventArgs e)
+        {
+            // Ignore first two items which are select all and clear all
+            for (int setIndex = 2; setIndex < ToolStripMenuSet.DropDownItems.Count; setIndex++)
+            {
+                if (((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).Checked)
+                {
+                    ((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).PerformClick();
+                }
+            }
+        }
+
+        private void ToolStripMenuSetSelectAll_Click(object sender, EventArgs e)
+        {
+            // Ignore first two items which are select all and clear all
+            for (int setIndex = 2; setIndex < ToolStripMenuSet.DropDownItems.Count; setIndex++)
+            {
+                if (!((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).Checked)
+                {
+                    ((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).PerformClick();
+                }
+            }
+        }
+
         private void UpdateMasterList(string setName)
         {
             // Update list of user selected sets
@@ -306,8 +331,10 @@ namespace MECCG_Deck_Builder
 
             // Retrieve and set new list of cards
             ListBoxMaster.Items.Clear();
-            List<string[]> keyValuePairs = GetKeyValuePairs();
+            List<string[]> keyValuePairs = GetCardnumKeyValuePairs();
             masterList = meccgCards.GetCardList(setList, keyValuePairs);
+            keyValuePairs = GetCustomKeyValuePairs();
+            masterList = userKeyValues.GetCardList(masterList, keyValuePairs);
             foreach (var card in masterList)
             {
                 ListBoxMaster.Items.Add(card[(int)CardListField.name]);
@@ -418,7 +445,37 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        #region OPEN_CLOSE_FILTER
+        #region OPEN_CLOSE_DELETE_FILTER
+
+        private void SetFilterMenuDeleteKeyNameValue_Click(object sender, EventArgs e)
+        {
+            List<string> keyNames = userKeyValues.GetKeyNameList();
+            List<string> keyValues;
+
+            ToolStripMenuItem delKeyNameValue = new ToolStripMenuItem("Delete Key") { Name = "Delete Key" };
+            if (keyNames.Count == 0)
+            {
+                delKeyNameValue.Enabled = false;
+            }
+            foreach (string keyName in keyNames)
+            {
+                ToolStripMenuItem delKeyName = new ToolStripMenuItem(keyName);
+                delKeyName.Click += DeleteKeyName;
+                keyValues = userKeyValues.GetKeyValueList(keyName);
+                foreach (string keyValue in keyValues)
+                {
+                    if(keyValue != "")
+                    {
+                        ToolStripMenuItem delKeyValue = new ToolStripMenuItem(keyValue);
+                        delKeyValue.Click += DeleteKeyValue;
+                        delKeyName.DropDownItems.Add(delKeyValue);
+                    }
+                }
+                delKeyNameValue.DropDownItems.Add(delKeyName);
+            }
+            ToolStripMenuFilter.DropDownItems.RemoveByKey("Delete Key");
+            ToolStripMenuFilter.DropDownItems.Insert(0, delKeyNameValue);
+        }
 
         private void OpenFilterMenuItem_Click(object sender, EventArgs e)
         {
@@ -655,6 +712,7 @@ namespace MECCG_Deck_Builder
                 List<string[]> callingList = GetList(callingListbox);
                 ToolStripMenuTabCardname.Text = callingList[selectedIndex][(int)CardListField.name];
                 SetToolStripMenuTabCardnumFilters(callingList[selectedIndex][(int)CardListField.id]);
+                SetToolStripMenuTabCustomFilters(callingList[selectedIndex][(int)CardListField.id]);
                 ContextMenuStripTabs.Show(Cursor.Position);
             }
         }
@@ -670,6 +728,28 @@ namespace MECCG_Deck_Builder
                 string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
                 ToolStripMenuTabCardnumFilters.DropDownItems.Add(pair);
                 ToolStripMenuTabCardnumFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
+            }
+        }
+        private void SetToolStripMenuTabCustomFilters(string cardId)
+        {
+            int maxLength = 0;
+            ToolStripMenuItem customFilters = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(cardId);
+            if (filterPairs.Count > 0)
+            {
+                maxLength = filterPairs.Max(ot => ot[0].Length);
+            }
+            for (int index = 0; index < filterPairs.Count; index++)
+            {
+                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
+                ToolStripMenuItem newKeyPair = new ToolStripMenuItem(pair);
+                customFilters.DropDownItems.Add(newKeyPair);
+                customFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
+            }
+            ContextMenuStripTabs.Items.RemoveByKey("Custom Filters");
+            if (customFilters.HasDropDownItems)
+            {
+                ContextMenuStripTabs.Items.Add(customFilters);
             }
         }
 
@@ -856,7 +936,7 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        private List<string[]> GetKeyValuePairs()
+        private List<string[]> GetCardnumKeyValuePairs()
         {
             List<string[]> keyValuePairs = new List<string[]>();
             if (ComboBoxValue1.SelectedIndex >= 1)
@@ -869,6 +949,59 @@ namespace MECCG_Deck_Builder
                 string[] keyValuePair = { ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString() };
                 keyValuePairs.Add(keyValuePair);
             }
+            return keyValuePairs;
+        }
+
+        private void DeleteKeyName(object sender, EventArgs e)
+        {
+            string delKeyName = ((ToolStripMenuItem)sender).Text;
+
+            DialogResult dialogResult = MessageBox.Show($"Delete \"{delKeyName}\" key name?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialogResult == DialogResult.Yes)
+            {
+                userKeyValues.DeleteKeyName(delKeyName);
+                userKeyValues.DeleteCardsKeyName(delKeyName);
+                if (ComboBoxKey3.Text == delKeyName)
+                {
+                    SetKeyNameList(ComboBoxKey3);
+                }
+                if (ComboBoxKey4.Text == delKeyName)
+                {
+                    SetKeyNameList(ComboBoxKey4);
+                }
+                UpdateMasterList("");
+                MessageBox.Show($"\"{delKeyName}\" key name deleted.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void DeleteKeyValue(object sender, EventArgs e)
+        {
+            string delKeyValue = ((ToolStripMenuItem)sender).Text;
+            string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
+
+            DialogResult dialogResult = MessageBox.Show($"Delete \"{delKeyValue}\" value from \"{delKeyName}\" key list?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialogResult == DialogResult.Yes)
+            {
+                userKeyValues.DeleteKeyValue(delKeyName, delKeyValue);
+                userKeyValues.DeleteCardsKeyValue(delKeyName, delKeyValue);
+                if (ComboBoxKey3.Text == delKeyName)
+                {
+                    ComboBoxValue3.DataSource = null;
+                    ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
+                }
+                if (ComboBoxKey4.Text == delKeyName)
+                {
+                    ComboBoxValue4.DataSource = null;
+                    ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
+                }
+                UpdateMasterList("");
+                MessageBox.Show($"\"{delKeyValue}\" value deleted from \"{delKeyName}\" key list.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private List<string[]> GetCustomKeyValuePairs()
+        {
+            List<string[]> keyValuePairs = new List<string[]>();
             if (ComboBoxValue3.SelectedIndex >= 1)
             {
                 string[] keyValuePair = { ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString() };
@@ -915,10 +1048,12 @@ namespace MECCG_Deck_Builder
         {
             if (int.Parse(comboBox.Name[^1].ToString()) <= 2)
             {
+                comboBox.DataSource = null;
                 comboBox.DataSource = meccgCards.GetKeyNameList();
             }
             else
             {
+                comboBox.DataSource = null;
                 comboBox.DataSource = userKeyValues.GetKeyNameList();
             }
         }
@@ -981,8 +1116,8 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        #endregion
 
+        #endregion
 
     }
 }

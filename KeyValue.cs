@@ -12,6 +12,26 @@ namespace MECCG_Deck_Builder
         internal List<List<string>> filters = new List<List<string>>(); // each filter is keyName at index 0 and keyValue(s) from 1..Count
 
 
+        private static bool CardMatchesFilters(SortedDictionary<string, string> card, List<string[]> keyValuePairs)
+        {
+            bool cardMatch = true;
+            for (int index = 0; index < keyValuePairs.Count; index++)
+            {
+                if (card.ContainsKey(keyValuePairs[index][0]))
+                {
+                    if (!card[keyValuePairs[index][0]].Contains(keyValuePairs[index][1]))
+                    {
+                        cardMatch = false;
+                    }
+                }
+                else
+                {
+                    cardMatch = false;
+                }
+            }
+            return cardMatch;
+        }
+
         /// <summary>
         /// Delete key name-value pair (and card) if it's the last pair
         /// </summary>
@@ -27,6 +47,42 @@ namespace MECCG_Deck_Builder
             {
                 cards.RemoveAt(cardIndex);
             }
+        }
+
+        internal void DeleteCardsKeyName(string keyName)
+        {
+            foreach (SortedDictionary<string, string> card in cards)
+            {
+                if (card.ContainsKey(keyName))
+                {
+                    card.Remove(keyName);
+                }
+            }
+            cards.RemoveAll(card => card.Count == 1);
+        }
+
+        internal void DeleteCardsKeyValue(string keyName, string keyValue)
+        {
+            foreach (SortedDictionary<string, string> card in cards)
+            {
+                if (card.ContainsKey(keyName) && card[keyName] == keyValue)
+                {
+                    card.Remove(keyName);
+                }
+            }
+            cards.RemoveAll(card => card.Count == 1);
+        }
+
+        internal void DeleteKeyName(string keyName)
+        {
+            int keyNameIndex = filters.FindIndex(filter => filter[0] == keyName);
+            filters.RemoveAt(keyNameIndex);
+        }
+
+        internal void DeleteKeyValue(string keyName, string keyValue)
+        {
+            int keyNameIndex = filters.FindIndex(filter => filter[0] == keyName);
+            filters[keyNameIndex].Remove(keyValue);
         }
 
         internal List<string[]> GetCardFilterPairs(string cardId)
@@ -68,6 +124,32 @@ namespace MECCG_Deck_Builder
             }
 
             return cardKeyNameList;
+        }
+
+        internal List<string[]> GetCardList(List<string[]> masterList, List<string[]> keyValuePairs)
+        {
+            List<string[]> cardList = new List<string[]>();
+
+            foreach (string[] master in masterList)
+            {
+                // Is card from masterList in list of custom cards
+                int masterIndex = cards.FindIndex(card => card["id"] == master[(int)CardListField.id]);
+
+                // Check card matches current custom filter values
+                if (masterIndex != -1)
+                {
+                    if (CardMatchesFilters(cards[masterIndex], keyValuePairs))
+                    {
+                        cardList.Add(master);
+                    }
+                }
+                else if (keyValuePairs.Count == 0)
+                {
+                    cardList.Add(master);
+                }
+            }
+
+            return cardList;
         }
 
         internal List<string> GetKeyNameList()
