@@ -298,6 +298,7 @@ namespace MECCG_Deck_Builder
                 WebClient wc = new WebClient();
                 json = wc.DownloadString(Constants.CardnumCardsURL);
                 CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
+                json = wc.DownloadString(Constants.CardnumCardsURL);
                 try
                 {
                     using StreamWriter w = new StreamWriter(Constants.CardnumCardsFile);

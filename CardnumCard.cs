@@ -29,12 +29,12 @@ namespace MECCG_Deck_Builder
         public string Text { get; set; }
         public string Skill { get; set; }
         public string MPs { get; set; }
-        public int? Mind { get; set; }
-        public int? Direct { get; set; }
+        public string Mind { get; set; }
+        public string Direct { get; set; }
         public int? General { get; set; }
         public int? Prowess { get; set; }
-        public int? Body { get; set; }
-        public int? Corruption { get; set; }
+        public string Body { get; set; }
+        public string Corruption { get; set; }
         public string Home { get; set; }
         public string Unique { get; set; }
         public string Secondary { get; set; }
