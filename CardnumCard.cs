@@ -29,7 +29,7 @@ namespace MECCG_Deck_Builder
         public string Text { get; set; }
         public string Skill { get; set; }
         public string MPs { get; set; }
-        public string Mind { get; set; }
+        public string Mind  { get; set; }
         public string Direct { get; set; }
         public int? General { get; set; }
         public int? Prowess { get; set; }
