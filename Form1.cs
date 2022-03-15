@@ -236,6 +236,7 @@ namespace MECCG_Deck_Builder
         {
             string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
             userKeyValues.DeleteCardKeyValue(delKeyName, masterList[selectedIndex][(int)CardListField.id]);
+            UpdateMasterList("");
         }
 
         #endregion
@@ -974,14 +975,8 @@ namespace MECCG_Deck_Builder
             {
                 userKeyValues.DeleteKeyName(delKeyName);
                 userKeyValues.DeleteCardsKeyName(delKeyName);
-                if (ComboBoxKey3.Text == delKeyName)
-                {
-                    SetKeyNameList(ComboBoxKey3);
-                }
-                if (ComboBoxKey4.Text == delKeyName)
-                {
-                    SetKeyNameList(ComboBoxKey4);
-                }
+                SetKeyNameList(ComboBoxKey3);
+                SetKeyNameList(ComboBoxKey4);
                 UpdateMasterList("");
                 MessageBox.Show($"\"{delKeyName}\" key name deleted.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
