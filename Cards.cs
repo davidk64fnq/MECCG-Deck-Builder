@@ -277,7 +277,7 @@ namespace MECCG_Deck_Builder
                 tabString += "\t";
             }
             customDeck = $"{tabString}\"{index + 1}\": {{\n";
-            customDeck += $"{tabString}\t\"FaceURL\": \"https://cardnum.net/img/cards/{setFolder}/{imageName}\",\n";
+            customDeck += $"{tabString}\t\"FaceURL\": \"http://70.180.210.3:1042/img/cards/{setFolder}/{imageName}\",\n";
             customDeck += $"{tabString}\t\"BackURL\": \"https://i.imgur.com/gUPyTI4.jpg\",\n";
             customDeck += $"{tabString}\t\"BackIsHidden\": \"true\",\n";
             customDeck += $"{tabString}\t\"NumWidth\": 1,\n";

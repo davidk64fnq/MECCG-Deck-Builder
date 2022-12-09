@@ -269,7 +269,7 @@ namespace MECCG_Deck_Builder
                 List<string[]> currentList = GetList(currentListBox);
                 string setFolder = currentList[currentIndex][(int)CardListField.set];
                 string imageName = currentList[currentIndex][(int)CardListField.image];
-                PictureBoxCardImage.Image = cardImageCache.GetOrCreate($"https://cardnum.net/img/cards/{setFolder}/{imageName}", setFolder, imageName);
+                PictureBoxCardImage.Image = cardImageCache.GetOrCreate($"http://70.180.210.3:1042/img/cards/{setFolder}/{imageName}", setFolder, imageName);
             }
         }
 
