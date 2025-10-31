@@ -1,30 +1,33 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
+﻿using NaturalSort.Extension;
 using Newtonsoft.Json;
 using System;
-using System.Net;
-using NaturalSort.Extension;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Windows.Forms;
 
 namespace MECCG_Deck_Builder
 {
     internal class Cards
     {
-        private readonly List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
-        private readonly List<Dictionary<string, string>> sets = new List<Dictionary<string, string>>();
-        private readonly List<List<string>> filters = new List<List<string>>(); // each filter is keyName at index 0 and keyValue(s) from 1..Count
+        private readonly List<SortedDictionary<string, string>> cards = [];
+        private readonly List<Dictionary<string, string>> sets = [];
+        private readonly List<List<string>> filters = []; // each filter is keyName at index 0 and keyValue(s) from 1..Count
         private List<CardnumCard> CardnumCards;
         private List<CardnumSet> CardnumSets;
 
-        internal string[] filterKeys = { "Primary", "Alignment", "Artist", "Skill", "MPs", "Mind", "Direct", "Prowess", "Body",
+        internal string[] filterKeys = [ "Primary", "Alignment", "Artist", "Skill", "MPs", "Mind", "Direct", "Prowess", "Body",
             "Corruption", "Home", "Unique", "Secondary", "Race", "Site", "Region", "Playable", "GoldRing", "GreaterItem",
-            "MajorItem", "MinorItem", "Information", "Palantiri", "Scroll", "Hoard", "Haven", "Strikes", "Specific"};
+            "MajorItem", "MinorItem", "Information", "Palantiri", "Scroll", "Hoard", "Haven", "Strikes", "Specific"];
 
         internal Cards()
         {
             ImportCardnumCardInfo();
             ImportCardnumSetInfo();
         }
+
+        // HttpClient should be a shared, static, or long-lived instance
+        private static readonly HttpClient s_httpClient = new();
 
         #region GET_SET_INFO
 
@@ -49,7 +52,7 @@ namespace MECCG_Deck_Builder
 
         internal List<string[]> GetCardList(List<string> selectedSets, List<string[]> keyValuePairs)
         {
-            List<string[]> cardList = new List<string[]>();
+            List<string[]> cardList = [];
 
             foreach (string set in selectedSets)
             {
@@ -59,11 +62,13 @@ namespace MECCG_Deck_Builder
                     {
                         if (CardMatchesFilters(card, keyValuePairs))
                         {
-                            string[] cardItems = new string[4];
-                            cardItems[(int)CardListField.name] = $"{card["cardname"]}";
-                            cardItems[(int)CardListField.image] = $"{card["imageName"]}";
-                            cardItems[(int)CardListField.set] = $"{card["set"]}";
-                            cardItems[(int)CardListField.id] = $"{card["id"]}";
+                            string[] cardItems =
+                            [
+                                $"{card["cardname"]}",
+                                $"{card["imageName"]}",
+                                $"{card["set"]}",
+                                $"{card["id"]}",
+                            ];
                             cardList.Add(cardItems);
                         }
                     }
@@ -80,7 +85,7 @@ namespace MECCG_Deck_Builder
 
         internal List<string> GetKeyNameList()
         {
-            List<string> keyNames = new List<string>();
+            List<string> keyNames = [];
             foreach (List<string> filter in filters)
             {
                 keyNames.Add(filter[0]);
@@ -90,10 +95,10 @@ namespace MECCG_Deck_Builder
         
         internal List<string> GetKeyValueList(string keyName)
         {
-            List<string> keyValues = new List<string>
-            {
+            List<string> keyValues =
+            [
                 ""
-            };
+            ];
             int keyNameIndex = filters.FindIndex(filter => filter[0] == keyName);
             for (int index = 1; index < filters[keyNameIndex].Count; index++)
             {
@@ -104,13 +109,13 @@ namespace MECCG_Deck_Builder
 
         internal List<string[]> GetCardFilterPairs(string cardId)
         {
-            List<string[]> filterPairs = new List<string[]>();
+            List<string[]> filterPairs = [];
 
             for (int index = 0; index < filters.Count; index++)
             {
                 if (cards[Convert.ToInt32(cardId)][filters[index][0]] != "")
                 {
-                    string[] pair = { filters[index][0], cards[Convert.ToInt32(cardId)][filters[index][0]] };
+                    string[] pair = [filters[index][0], cards[Convert.ToInt32(cardId)][filters[index][0]]];
                     filterPairs.Add(pair);
                 }
             }
@@ -148,7 +153,7 @@ namespace MECCG_Deck_Builder
 
         #region EXPORT
 
-        internal void Export_TextFile(List<List<string[]>> deckTabLists, string filePathOutput)
+        internal static void Export_TextFile(List<List<string[]>> deckTabLists, string filePathOutput)
         {
             string textOutput = "";
 
@@ -163,6 +168,69 @@ namespace MECCG_Deck_Builder
             }
 
             File.WriteAllText(filePathOutput, textOutput);
+        }
+
+        internal static void Export_PlayMECCGfile(List<List<string[]>> deckTabLists, string filePathOutput)
+        {
+            string textOutput = "";
+            
+            System.Text.Encoding ansiEncoding = System.Text.Encoding.GetEncoding(1252);
+
+            // Pool
+            textOutput += "####" + Environment.NewLine;
+            textOutput += Constants.TabList[0] + Environment.NewLine;
+            textOutput += "####" + Environment.NewLine + Environment.NewLine;
+            for (int index = 0; index < deckTabLists[0].Count; index++)
+            {
+                textOutput += GetPlayMECCGCardname(deckTabLists[0][index][(int)CardListField.name]) + Environment.NewLine;
+            }
+            textOutput += Environment.NewLine;
+
+            // Resources and hazards tabs combined
+            textOutput += "####" + Environment.NewLine;
+            textOutput += "Deck" + Environment.NewLine;
+            textOutput += "####" + Environment.NewLine + Environment.NewLine;
+            for (int index = 0; index < deckTabLists[1].Count; index++)
+            {
+                textOutput += Cards.GetPlayMECCGCardname(deckTabLists[1][index][(int)CardListField.name]) + Environment.NewLine;
+            }
+            for (int index = 0; index < deckTabLists[2].Count; index++)
+            {
+                textOutput += Cards.GetPlayMECCGCardname(deckTabLists[2][index][(int)CardListField.name]) + Environment.NewLine;
+            }
+            textOutput += Environment.NewLine;
+
+            // Sideboard
+            textOutput += "####" + Environment.NewLine;
+            textOutput += "Sideboard" + Environment.NewLine;
+            textOutput += "####" + Environment.NewLine + Environment.NewLine;
+            for (int index = 0; index < deckTabLists[3].Count; index++)
+            {
+                textOutput += Cards.GetPlayMECCGCardname(deckTabLists[3][index][(int)CardListField.name]) + Environment.NewLine;
+            }
+            textOutput += Environment.NewLine;
+
+            // Sites
+            textOutput += "####" + Environment.NewLine;
+            textOutput += "Sites" + Environment.NewLine;
+            textOutput += "####" + Environment.NewLine + Environment.NewLine;
+            for (int index = 0; index < deckTabLists[4].Count; index++)
+            {
+                textOutput += Cards.GetPlayMECCGCardname(deckTabLists[4][index][(int)CardListField.name]) + Environment.NewLine;
+            }
+            textOutput += Environment.NewLine;
+
+            File.WriteAllText(filePathOutput, textOutput, ansiEncoding);
+        }
+
+        internal static string GetPlayMECCGCardname(string cardName)
+        {
+            return cardName switch
+            {
+                "Mûmak - Oliphant" => "Mûmak (Oliphant)",
+                "Olog-hai - Trolls" => "Olog-hai (Trolls)",
+                _ => cardName // The underscore (_) acts as the 'default' case, returning the original input.
+            };
         }
 
         internal void Export_CardnumFile(List<List<string[]>> deckTabLists, string filePathOutput)
@@ -247,7 +315,7 @@ namespace MECCG_Deck_Builder
             File.WriteAllText(filePathOutput, jsonOutput);
         }
 
-        private string SetTTStransform(int noTabs)
+        private static string SetTTStransform(int noTabs)
         {
             string transform;
             string tabString = "";
@@ -277,7 +345,7 @@ namespace MECCG_Deck_Builder
                 tabString += "\t";
             }
             customDeck = $"{tabString}\"{index + 1}\": {{\n";
-            customDeck += $"{tabString}\t\"FaceURL\": \"http://70.180.210.3:1042/img/cards/{setFolder}/{imageName}\",\n";
+            customDeck += $"{tabString}\t\"FaceURL\": \"https://cardnum.net/img/cards/{setFolder}/{imageName}\",\n";
             customDeck += $"{tabString}\t\"BackURL\": \"https://i.imgur.com/gUPyTI4.jpg\",\n";
             customDeck += $"{tabString}\t\"BackIsHidden\": \"true\",\n";
             customDeck += $"{tabString}\t\"NumWidth\": 1,\n";
@@ -292,16 +360,26 @@ namespace MECCG_Deck_Builder
 
         private void ImportCardnumCardInfo()
         {
-            string json;
+            string json = null;
+            bool downloadSuccess = false;
+
+            // --- Attempt to Download from URL (Network operation) ---
             try
             {
-                WebClient wc = new WebClient();
-                json = wc.DownloadString(Constants.CardnumCardsURL);
+                // Replace wc.DownloadString(url) with s_httpClient.GetStringAsync(url).Result
+                // The .Result causes the current thread to block until the download is complete.
+                json = s_httpClient.GetStringAsync(Constants.CardnumCardsURL).Result;
+
+                // 1. Deserialize the downloaded JSON
                 CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
-                json = wc.DownloadString(Constants.CardnumCardsURL);
+
+                downloadSuccess = true;
+
+                // 2. Save the successfully downloaded JSON to a local file
                 try
                 {
-                    using StreamWriter w = new StreamWriter(Constants.CardnumCardsFile);
+                    // Use the JSON string that was just downloaded
+                    using StreamWriter w = new(Constants.CardnumCardsFile);
                     w.Write(json);
                 }
                 catch (Exception)
@@ -309,27 +387,43 @@ namespace MECCG_Deck_Builder
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "3"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
+            catch (AggregateException)
+            {
+                // Catch exceptions from the blocking .Result call (e.g., HttpRequestException)
+                // If you need to log, you can inspect ae.InnerException
+                downloadSuccess = false;
+            }
             catch (Exception)
+            {
+                // Catch other exceptions (e.g., Json deserialization error)
+                downloadSuccess = false;
+            }
+
+            // --- If Download Failed, Attempt to Load from File (Fallback) ---
+            if (!downloadSuccess)
             {
                 try
                 {
-                    using StreamReader r = new StreamReader(Constants.CardnumCardsFile);
+                    using StreamReader r = new(Constants.CardnumCardsFile);
                     json = r.ReadToEnd();
                     CardnumCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
+
+                    // Inform user that fallback to local file was necessary
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 catch (Exception)
                 {
-                    SortedDictionary<string, string> card = new SortedDictionary<string, string>
+                    // --- If File Load Fails, Initialize Default Data ---
+                    SortedDictionary<string, string> card = new()
                     {
-                        { "id", "0" },
-                        { "set", "METW" },
-                        { "fullCode", "Adrazar (TW)" },
-                        { "cardname", "Adrazar" },
-                        { "alignment", "Hero" },
-                        { "imageName", "metw_adrazar.jpg" }
-                    };
-                    cards.Add(card);
+                { "id", "0" },
+                { "set", "METW" },
+                { "fullCode", "Adrazar (TW)" },
+                { "cardname", "Adrazar" },
+                { "alignment", "Hero" },
+                { "imageName", "metw_adrazar.jpg" }
+            };
+                    cards.Add(card); // Assuming 'cards' is accessible here
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -337,21 +431,21 @@ namespace MECCG_Deck_Builder
 
             // Initialise key names in filters list
             SetKeyNames();
-            
+
             int index = 0;
             foreach (var item in CardnumCards)
             {
                 if (item.Dreamcard == true || item.Released == true)
                 {
-                    SortedDictionary<string, string> card = new SortedDictionary<string, string>
+                    SortedDictionary<string, string> card = new()
                     {
-                        { "id", $"{index++}" },
-                        { "set", $"{item.Set}" },
-                        { "fullCode", $"{item.FullCode}" },
-                        { "cardname", $"{item.NameEN}" },
-                        { "text", $"{item.Text}" },
-                        { "imageName", $"{item.ImageName}" }
-                    };
+                { "id", $"{index++}" },
+                { "set", $"{item.Set}" },
+                { "fullCode", $"{item.FullCode}" },
+                { "cardname", $"{item.NameEN}" },
+                { "text", $"{item.Text}" },
+                { "imageName", $"{item.ImageName}" }
+            };
                     for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
                     {
                         card.Add(filterKeys[keyIndex], Convert.ToString(item[filterKeys[keyIndex]]));
@@ -360,7 +454,7 @@ namespace MECCG_Deck_Builder
                     {
                         card["imageName"] = "ice-" + item.ImageName;
                     }
-                    if (card["set"] == Constants.METW.ToUpper() || card["set"] == "MEUL")
+                    if (card["set"].Equals(Constants.METW, StringComparison.CurrentCultureIgnoreCase) || card["set"] == "MEUL")
                     {
                         for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
                         {
@@ -418,10 +512,10 @@ namespace MECCG_Deck_Builder
         {
             for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
             {
-                List<string> newKey = new List<string>
-                {
+                List<string> newKey =
+                [
                     filterKeys[keyIndex]
-                };
+                ];
                 filters.Add(newKey);
                 filters.Sort(CompareListsByFirstValue);
             }
@@ -433,34 +527,51 @@ namespace MECCG_Deck_Builder
 
         private void ImportCardnumSetInfo()
         {
-            string json;
+            string json = string.Empty; // Initialize json to allow it to be used in the first try-block scope.
+
+            // -------------------------------------------------------------------
+            // 1. PRIMARY ATTEMPT: Download from URL (Sync via GetAwaiter().GetResult())
+            // -------------------------------------------------------------------
             try
             {
-                WebClient wc = new WebClient();
-                json = wc.DownloadString(Constants.CardnumSetsURL);
+                // Use HttpClient, but force it to behave synchronously by blocking on the result.
+                // NOTE: This can freeze the UI thread in desktop applications.
+                using HttpClient client = new();
+
+                // This blocks the calling thread until the download is complete.
+                json = client.GetStringAsync(Constants.CardnumSetsURL).GetAwaiter().GetResult();
+
                 CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
+
+                // Attempt to save the data to a local file
                 try
                 {
-                    using StreamWriter w = new StreamWriter(Constants.CardnumSetsFile);
-                    w.Write(json);
+                    // Use synchronous file writing
+                    File.WriteAllText(Constants.CardnumSetsFile, json);
                 }
                 catch (Exception)
                 {
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "3"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
+            // -------------------------------------------------------------------
+            // 2. FALLBACK ATTEMPT: Read from local file (Sync)
+            // -------------------------------------------------------------------
             catch (Exception)
             {
                 try
                 {
-                    using StreamReader r = new StreamReader(Constants.CardnumSetsFile);
-                    json = r.ReadToEnd();
+                    // Use synchronous file reading
+                    json = File.ReadAllText(Constants.CardnumSetsFile);
                     CardnumSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "1"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+                // -------------------------------------------------------------------
+                // 3. FINAL FALLBACK: Hardcode default set
+                // -------------------------------------------------------------------
                 catch (Exception)
                 {
-                    Dictionary<string, string> set = new Dictionary<string, string>
+                    Dictionary<string, string> set = new()
                     {
                         { "id", "0" },
                         { "code", "METW" },
@@ -470,16 +581,34 @@ namespace MECCG_Deck_Builder
                         { "dreamcards", "false" },
                         { "released", "true" }
                     };
+                    // Assuming 'sets' is a field/property available in this scope
+                    // sets.Clear(); // Uncomment if needed
+                    // NOTE: The original code used 'sets.Add(set)' before CardnumSets was defined.
+                    // If CardnumSets is null at this point, the following foreach will throw
+                    // unless 'sets' is a global list intended for this fallback.
                     sets.Add(set);
+
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumSetInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
 
+            // -------------------------------------------------------------------
+            // 4. PROCESS THE DESERIALIZED DATA
+            // -------------------------------------------------------------------
+            // Clear the existing data if the download/fallback was successful before populating
+            // sets.Clear(); 
+
             int index = 0;
+            // NOTE: If the second catch block executed the FINAL FALLBACK and returned, 
+            // we never reach this section. This is consistent with the original logic.
+
+            // An optional null check for safety after deserialization:
+            if (CardnumSets == null) return;
+
             foreach (var item in CardnumSets)
             {
-                Dictionary<string, string> set = new Dictionary<string, string>
+                Dictionary<string, string> set = new()
                 {
                     { "id", $"{index++}" },
                     { "code", $"{item.Code}" },

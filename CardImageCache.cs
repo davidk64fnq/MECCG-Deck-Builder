@@ -1,14 +1,18 @@
 ﻿
+using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Drawing;
 using System.IO;
-using Microsoft.Extensions.Caching.Memory;
+using System.Net.Http;
 
 namespace MECCG_Deck_Builder
 {
     public class CardImageCache
     {
-        private readonly MemoryCache Cache = new MemoryCache(new MemoryCacheOptions()
+        // HttpClient should be a shared, static, or long-lived instance
+        private static readonly HttpClient s_httpClient = new();
+
+        private readonly MemoryCache Cache = new(new MemoryCacheOptions()
         {
             SizeLimit = 10000
         });
@@ -40,31 +44,43 @@ namespace MECCG_Deck_Builder
                 else
                 {
                     // Card not in cache but is on disk so get it from there
-                    Bitmap card = new Bitmap($"{Path.Combine(setFolder, imageName)}");
+                    Bitmap card = new($"{Path.Combine(setFolder, imageName)}");
                     return card;
                 }
             }
             return cacheEntry;
         }
 
-        internal Bitmap CreateItem(string key)
+        internal static Bitmap CreateItem(string key)
         {
             try
             {
-                System.Net.WebRequest request = System.Net.WebRequest.Create(key);
-                System.Net.WebResponse response = request.GetResponse();
-                Stream responseStream = response.GetResponseStream();
-                if (responseStream != null)
+                // 1. Synchronously get the image data as a byte array by blocking
+                //    the current thread using .Result. This is what makes it non-async.
+                //    .Result is placed inside a try/catch to handle exceptions gracefully.
+                byte[] imageBytes = s_httpClient.GetByteArrayAsync(key).Result;
+
+                // 2. Convert the byte array into a memory stream
+                using var ms = new MemoryStream(imageBytes);
+                using var img = Image.FromStream(ms);   // temporary Image that uses the stream
+                return new Bitmap(img);                 // clone into a Bitmap that doesn't depend on the stream
+            }
+            catch (AggregateException ae)
+            {
+                // When using .Result, exceptions are often wrapped in an AggregateException.
+                // Check for specific inner exceptions if needed (e.g., HttpRequestException)
+                if (ae.InnerExceptions.Count > 0)
                 {
-                    Bitmap card = new Bitmap(responseStream);
-                    return card;
+                    // You can log ae.InnerExceptions[0] for details
                 }
+                return null;
             }
             catch (Exception)
             {
+                // Catch other exceptions (e.g., ArgumentException for invalid URI,
+                // or errors during Bitmap construction)
                 return null;
             }
-            return null;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace MECCG_Deck_Builder
     internal enum SaveType
     {
         TTS = 1,
+        PlayMECCG,
         Cardnum,
         Text
     }
@@ -19,13 +20,13 @@ namespace MECCG_Deck_Builder
     static class Constants
     {
 
-        public static readonly string[] TabList = {
+        public static readonly string[] TabList = [
             "Pool",
             "Resources",
             "Hazards",
             "Sideboard",
             "Sites"
-        };
+        ];
         public const string METW = "metw";
         public const string AppTitle = "MECCG Deck Builder";
         public const string CardnumCardsFile = "cards-dc.json";

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
 using System.IO;
-using Newtonsoft.Json;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace MECCG_Deck_Builder
 {
@@ -17,19 +17,19 @@ namespace MECCG_Deck_Builder
         // tabs and deleted from a tab. Each listbox has an associated list with the card set
         // and id. "meccgCards" is where all information about each card is stored.
 
-        private List<string[]> masterList = new List<string[]>();
-        private readonly List<string[]> poolList = new List<string[]>();
-        private readonly List<string[]> resourceList = new List<string[]>();
-        private readonly List<string[]> hazardList = new List<string[]>();
-        private readonly List<string[]> sideboardList = new List<string[]>();
-        private readonly List<string[]> siteList = new List<string[]>();
-        private readonly List<string> setList = new List<string>();
-        private readonly Cards meccgCards = new Cards();
-        private readonly KeyValue userKeyValues = new KeyValue();
+        private List<string[]> masterList = [];
+        private readonly List<string[]> poolList = [];
+        private readonly List<string[]> resourceList = [];
+        private readonly List<string[]> hazardList = [];
+        private readonly List<string[]> sideboardList = [];
+        private readonly List<string[]> siteList = [];
+        private readonly List<string> setList = [];
+        private readonly Cards meccgCards = new();
+        private readonly KeyValue userKeyValues = new();
         private ListBox callingListbox;
         private int selectedIndex;
         private string currentDeckTitle = "New Deck";
-        private readonly CardImageCache cardImageCache = new CardImageCache();
+        private readonly CardImageCache cardImageCache = new();
 
         internal Form1()
         {
@@ -46,7 +46,7 @@ namespace MECCG_Deck_Builder
             // Set menus
             for (int index = 0; index < meccgCards.GetSetCount(); index++)
             {
-                ToolStripMenuItem MenuSetItem = new ToolStripMenuItem(meccgCards.GetSetValue(index, "name"))
+                ToolStripMenuItem MenuSetItem = new(meccgCards.GetSetValue(index, "name"))
                 {
                     Tag = meccgCards.GetSetValue(index, "code"),
                     CheckOnClick = true,
@@ -60,7 +60,7 @@ namespace MECCG_Deck_Builder
             }
 
             // Filter menus
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new(typeof(Form1));
             ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
             ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
 
@@ -128,7 +128,7 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuMasterCustomFilters()
         {
             int maxLength = 0;
-            ToolStripMenuItem customFilters = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            ToolStripMenuItem customFilters = new("Custom Filters") { Name = "Custom Filters" };
             List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
             if (filterPairs.Count > 0)
             {
@@ -137,7 +137,7 @@ namespace MECCG_Deck_Builder
             for (int index = 0; index < filterPairs.Count; index++)
             {
                 string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
-                ToolStripMenuItem newKeyPair = new ToolStripMenuItem(pair);
+                ToolStripMenuItem newKeyPair = new(pair);
                 customFilters.DropDownItems.Add(newKeyPair);
                 customFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
             }
@@ -183,16 +183,16 @@ namespace MECCG_Deck_Builder
             List<string> keyValueList;
 
             ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
-            ToolStripMenuItem addKeyValue = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+            ToolStripMenuItem addKeyValue = new("Add Key Value") { Name = "Add Key Value" };
             for (int keyIndex = 0; keyIndex < keyNameList.Count; keyIndex++)
             {
                 if (!cardKeyNameList.Contains(keyNameList[keyIndex]))
                 {
-                    ToolStripMenuItem newKeyName = new ToolStripMenuItem(keyNameList[keyIndex]);
+                    ToolStripMenuItem newKeyName = new(keyNameList[keyIndex]);
                     keyValueList = userKeyValues.GetKeyValueList(keyNameList[keyIndex]);
                     for (int valueIndex = 1; valueIndex < keyValueList.Count; valueIndex++)
                     {
-                        ToolStripMenuItem newKeyValue = new ToolStripMenuItem(keyValueList[valueIndex]);
+                        ToolStripMenuItem newKeyValue = new(keyValueList[valueIndex]);
                         newKeyValue.Click += SetCardNewKeyValue;
                         newKeyName.DropDownItems.Add(newKeyValue);
                     }
@@ -204,17 +204,17 @@ namespace MECCG_Deck_Builder
                 ContextMenuStripMaster.Items.Add(addKeyValue);
             }
         }
-        
+
         private void SetToolStripMenuMasterDeleteKeyValue()
         {
             List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
 
             ContextMenuStripMaster.Items.RemoveByKey("Delete Key Value");
-            ToolStripMenuItem delKeyNameValue = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            ToolStripMenuItem delKeyNameValue = new("Delete Key Value") { Name = "Delete Key Value" };
             for (int keyIndex = 0; keyIndex < filterPairs.Count; keyIndex++)
             {
-                ToolStripMenuItem delKeyName = new ToolStripMenuItem(filterPairs[keyIndex][0]);
-                ToolStripMenuItem delKeyValue = new ToolStripMenuItem(filterPairs[keyIndex][1]);
+                ToolStripMenuItem delKeyName = new(filterPairs[keyIndex][0]);
+                ToolStripMenuItem delKeyValue = new(filterPairs[keyIndex][1]);
                 delKeyValue.Click += DeleteCardKeyValue;
                 delKeyName.DropDownItems.Add(delKeyValue);
                 delKeyNameValue.DropDownItems.Add(delKeyName);
@@ -231,7 +231,7 @@ namespace MECCG_Deck_Builder
             string newKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
             userKeyValues.SetCardKeyValue(newKeyName, newKeyValue, masterList[selectedIndex][(int)CardListField.id]);
         }
-        
+
         private void DeleteCardKeyValue(object sender, EventArgs e)
         {
             string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
@@ -269,7 +269,7 @@ namespace MECCG_Deck_Builder
                 List<string[]> currentList = GetList(currentListBox);
                 string setFolder = currentList[currentIndex][(int)CardListField.set];
                 string imageName = currentList[currentIndex][(int)CardListField.image];
-                PictureBoxCardImage.Image = cardImageCache.GetOrCreate($"http://70.180.210.3:1042/img/cards/{setFolder}/{imageName}", setFolder, imageName);
+                PictureBoxCardImage.Image = cardImageCache.GetOrCreate($"https://cardnum.net/img/cards/{setFolder}/{imageName}", setFolder, imageName);
             }
         }
 
@@ -312,11 +312,7 @@ namespace MECCG_Deck_Builder
             // Update list of user selected sets
             if (setName != "")
             {
-                if (setList.Contains(setName))
-                {
-                    setList.Remove(setName);
-                }
-                else
+                if (!setList.Remove(setName))
                 {
                     setList.Add(setName);
                 }
@@ -408,7 +404,7 @@ namespace MECCG_Deck_Builder
             destList.Sort(CompareCardsByName);
             UpdateFormTitle();
         }
-        
+
         private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
         {
             listBox.Items.Remove(listBox.Items[index]);
@@ -425,14 +421,14 @@ namespace MECCG_Deck_Builder
         {
             string newFormTitle;
 
-            newFormTitle = "MECCG Deck Builder - \"" + currentDeckTitle + "\" ("; 
+            newFormTitle = "MECCG Deck Builder - \"" + currentDeckTitle + "\" (";
             for (int tabIndex = 0; tabIndex < TabControlDeck.TabCount; tabIndex++)
             {
                 newFormTitle += $"{((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Items.Count}";
                 if (((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Name.Contains(Constants.Resource))
                 {
                     int noCharacters = 0;
-                    List<string[]> keyValuePairs = new List<string[]>();
+                    List<string[]> keyValuePairs = [];
                     foreach (string[] card in resourceList)
                     {
                         keyValuePairs = meccgCards.GetCardFilterPairs(card[(int)CardListField.id]);
@@ -466,21 +462,21 @@ namespace MECCG_Deck_Builder
             List<string> keyNames = userKeyValues.GetKeyNameList();
             List<string> keyValues;
 
-            ToolStripMenuItem delKeyNameValue = new ToolStripMenuItem("Delete Key") { Name = "Delete Key" };
+            ToolStripMenuItem delKeyNameValue = new("Delete Key") { Name = "Delete Key" };
             if (keyNames.Count == 0)
             {
                 delKeyNameValue.Enabled = false;
             }
             foreach (string keyName in keyNames)
             {
-                ToolStripMenuItem delKeyName = new ToolStripMenuItem(keyName);
+                ToolStripMenuItem delKeyName = new(keyName);
                 delKeyName.Click += DeleteKeyName;
                 keyValues = userKeyValues.GetKeyValueList(keyName);
                 foreach (string keyValue in keyValues)
                 {
-                    if(keyValue != "")
+                    if (keyValue != "")
                     {
-                        ToolStripMenuItem delKeyValue = new ToolStripMenuItem(keyValue);
+                        ToolStripMenuItem delKeyValue = new(keyValue);
                         delKeyValue.Click += DeleteKeyValue;
                         delKeyName.DropDownItems.Add(delKeyValue);
                     }
@@ -493,7 +489,7 @@ namespace MECCG_Deck_Builder
 
         private void OpenFilterMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            OpenFileDialog openFileDialog = new()
             {
                 Title = Constants.AppTitle,
                 CheckPathExists = true,
@@ -506,7 +502,7 @@ namespace MECCG_Deck_Builder
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using StreamReader r = new StreamReader(openFileDialog.FileName);
+                using StreamReader r = new(openFileDialog.FileName);
                 string json = r.ReadToEnd();
                 OpenCloseFilter OpenCloseItems = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
                 userKeyValues.cards = OpenCloseItems.cards;
@@ -521,7 +517,7 @@ namespace MECCG_Deck_Builder
 
         private void SaveFilterMenuItem_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            SaveFileDialog saveFileDialog = new()
             {
                 Title = Constants.AppTitle,
                 CheckPathExists = true,
@@ -534,7 +530,7 @@ namespace MECCG_Deck_Builder
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                OpenCloseFilter OpenCloseItems = new OpenCloseFilter
+                OpenCloseFilter OpenCloseItems = new()
                 {
                     cards = userKeyValues.cards,
                     filters = userKeyValues.filters
@@ -555,7 +551,7 @@ namespace MECCG_Deck_Builder
             if (selectedOption == DialogResult.No)
             {
                 currentDeckTitle = "New Deck";
-                for (int index = 0; index < Constants.TabList.Count(); index++)
+                for (int index = 0; index < Constants.TabList.Length; index++)
                 {
                     ListBox currentListBox = GetListBox(Constants.TabList[index]);
                     currentListBox.Items.Clear();
@@ -568,10 +564,10 @@ namespace MECCG_Deck_Builder
 
         private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using SaveFileDialog saveFileDialog = new SaveFileDialog
+            using SaveFileDialog saveFileDialog = new()
             {
                 Title = Constants.AppTitle,
-                Filter = "Tabletop Simulator (*.json)|*.json|Cardnum (*.cnum)|*.cnum|Text (*.txt)|*.txt",
+                Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*play|Cardnum (*.cnum)|*.cnum|Text (*.txt)|*.txt",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
@@ -579,14 +575,14 @@ namespace MECCG_Deck_Builder
             if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
             {
                 string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                List<List<string[]>> deckTabLists = new List<List<string[]>>
-                {
+                List<List<string[]>> deckTabLists =
+                [
                     poolList,
                     resourceList,
                     hazardList,
                     sideboardList,
                     siteList
-                };
+                ];
                 if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
                 {
                     meccgCards.Export_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
@@ -595,20 +591,24 @@ namespace MECCG_Deck_Builder
                     meccgCards.Export_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
                     meccgCards.Export_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
                 }
+                else if (saveFileDialog.FilterIndex == (int)SaveType.PlayMECCG)
+                {
+                    Cards.Export_PlayMECCGfile(deckTabLists, savePrefix + ".play");
+                }
                 else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
                 {
                     meccgCards.Export_CardnumFile(deckTabLists, savePrefix + ".cnum");
                 }
                 else
                 {
-                    meccgCards.Export_TextFile(deckTabLists, savePrefix + ".txt");
+                    Cards.Export_TextFile(deckTabLists, savePrefix + ".txt");
                 }
             }
         }
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            SaveFileDialog saveFileDialog = new()
             {
                 Title = Constants.AppTitle,
                 CheckPathExists = true,
@@ -622,16 +622,16 @@ namespace MECCG_Deck_Builder
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 currentDeckTitle = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                OpenCloseDeck OpenCloseItems = new OpenCloseDeck
+                OpenCloseDeck OpenCloseItems = new()
                 {
                     CurrentDeckTitle = currentDeckTitle,
-                    setList = setList
+                    setList = setList,
+                    poolList = poolList,
+                    resourceList = resourceList,
+                    hazardList = hazardList,
+                    sideboardList = sideboardList,
+                    siteList = siteList
                 };
-                OpenCloseItems.poolList = poolList;
-                OpenCloseItems.resourceList = resourceList;
-                OpenCloseItems.hazardList = hazardList;
-                OpenCloseItems.sideboardList = sideboardList;
-                OpenCloseItems.siteList = siteList;
                 string indentedJsonString = JsonConvert.SerializeObject(OpenCloseItems, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, indentedJsonString);
                 UpdateFormTitle();
@@ -640,7 +640,7 @@ namespace MECCG_Deck_Builder
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            OpenFileDialog openFileDialog = new()
             {
                 Title = Constants.AppTitle,
                 CheckPathExists = true,
@@ -654,7 +654,7 @@ namespace MECCG_Deck_Builder
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using StreamReader r = new StreamReader(openFileDialog.FileName);
+                using StreamReader r = new(openFileDialog.FileName);
                 string json = r.ReadToEnd();
                 OpenCloseDeck OpenCloseItems = JsonConvert.DeserializeObject<OpenCloseDeck>(json);
                 currentDeckTitle = OpenCloseItems.CurrentDeckTitle;
@@ -669,7 +669,7 @@ namespace MECCG_Deck_Builder
                         item.Checked = true;
                     }
                 }
-                for (int index = 0; index < Constants.TabList.Count(); index++)
+                for (int index = 0; index < Constants.TabList.Length; index++)
                 {
                     ListBox currentListBox = GetListBox(Constants.TabList[index]);
                     List<string[]> savedList = GetList(OpenCloseItems, currentListBox);
@@ -747,7 +747,7 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuTabCustomFilters(string cardId)
         {
             int maxLength = 0;
-            ToolStripMenuItem customFilters = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            ToolStripMenuItem customFilters = new("Custom Filters") { Name = "Custom Filters" };
             List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(cardId);
             if (filterPairs.Count > 0)
             {
@@ -756,7 +756,7 @@ namespace MECCG_Deck_Builder
             for (int index = 0; index < filterPairs.Count; index++)
             {
                 string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
-                ToolStripMenuItem newKeyPair = new ToolStripMenuItem(pair);
+                ToolStripMenuItem newKeyPair = new(pair);
                 customFilters.DropDownItems.Add(newKeyPair);
                 customFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
             }
@@ -798,8 +798,8 @@ namespace MECCG_Deck_Builder
             }
             return masterList;
         }
-        
-        private List<string[]> GetList(OpenCloseDeck OpenCloseItems, ListBox listbox)
+
+        private static List<string[]> GetList(OpenCloseDeck OpenCloseItems, ListBox listbox)
         {
             if (listbox == null)
             {
@@ -853,7 +853,7 @@ namespace MECCG_Deck_Builder
             return null;
         }
 
-        private string GetOperation(object sender)
+        private static string GetOperation(object sender)
         {
             string operation;
             if (((ToolStripMenuItem)sender).Name.Contains(Constants.Copy))
@@ -952,15 +952,15 @@ namespace MECCG_Deck_Builder
 
         private List<string[]> GetCardnumKeyValuePairs()
         {
-            List<string[]> keyValuePairs = new List<string[]>();
+            List<string[]> keyValuePairs = [];
             if (ComboBoxValue1.SelectedIndex >= 1)
             {
-                string[] keyValuePair = { ComboBoxKey1.SelectedItem.ToString(), ComboBoxValue1.SelectedItem.ToString() };
+                string[] keyValuePair = [ComboBoxKey1.SelectedItem.ToString(), ComboBoxValue1.SelectedItem.ToString()];
                 keyValuePairs.Add(keyValuePair);
             }
             if (ComboBoxValue2.SelectedIndex >= 1)
             {
-                string[] keyValuePair = { ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString() };
+                string[] keyValuePair = [ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString()];
                 keyValuePairs.Add(keyValuePair);
             }
             return keyValuePairs;
@@ -1009,15 +1009,15 @@ namespace MECCG_Deck_Builder
 
         private List<string[]> GetCustomKeyValuePairs()
         {
-            List<string[]> keyValuePairs = new List<string[]>();
+            List<string[]> keyValuePairs = [];
             if (ComboBoxValue3.SelectedIndex >= 1)
             {
-                string[] keyValuePair = { ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString() };
+                string[] keyValuePair = [ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString()];
                 keyValuePairs.Add(keyValuePair);
             }
             if (ComboBoxValue4.SelectedIndex >= 1)
             {
-                string[] keyValuePair = { ComboBoxKey4.SelectedItem.ToString(), ComboBoxValue4.SelectedItem.ToString() };
+                string[] keyValuePair = [ComboBoxKey4.SelectedItem.ToString(), ComboBoxValue4.SelectedItem.ToString()];
                 keyValuePairs.Add(keyValuePair);
             }
             return keyValuePairs;
@@ -1112,7 +1112,7 @@ namespace MECCG_Deck_Builder
                 string imageName = masterList[cardIndex][(int)CardListField.image];
                 string setFolder = masterList[cardIndex][(int)CardListField.set];
                 Bitmap cardImage;
-                cardImage = cardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
+                cardImage = CardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
                 if (cardImage != null)
                 {
                     if (!Directory.Exists(setFolder))
@@ -1124,8 +1124,101 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void CreatePBEMFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using SaveFileDialog saveFileDialog = new()
+            {
+                Title = Constants.AppTitle,
+                Filter = "Play MECCG PBEM (*.playPBEM)|*playPBEM",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
+
+            if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
+            {
+                string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                List<List<string[]>> deckTabLists =
+                [
+                    poolList,
+                    resourceList,
+                    hazardList,
+                    sideboardList,
+                    siteList
+                ];
+                string textOutput = "";
+                string filePathOutput = savePrefix + ".playPBEM";
+
+                System.Text.Encoding ansiEncoding = System.Text.Encoding.GetEncoding(1252);
+
+                // Store a complete list of all the cards in the currently selected sets as Pool, excluding region and site cards
+                textOutput += "####" + Environment.NewLine;
+                textOutput += "Pool" + Environment.NewLine;
+                textOutput += "####" + Environment.NewLine + Environment.NewLine;
+                for (int index = 0; index < masterList.Count; index++)
+                {
+                    // get card id and cardnum filter pairs, then skip cards whose Primary == "Region" or "Site"
+                    string cardId = masterList[index][(int)CardListField.id];
+                    List<string[]> filterPairs = meccgCards.GetCardFilterPairs(cardId);
+
+                    bool primaryIsRegionOrSet = filterPairs.Exists(p => p[0] == "Primary" && (p[1] == "Region" || p[1] == "Site"));
+                    if (!primaryIsRegionOrSet)
+                    {
+                        textOutput += Cards.GetPlayMECCGCardname(masterList[index][(int)CardListField.name]) + Environment.NewLine;
+                    }
+                }
+                textOutput += Environment.NewLine;
+
+                // Pool, Resources, Hazards tabs combined
+                textOutput += "####" + Environment.NewLine;
+                textOutput += "Deck" + Environment.NewLine;
+                textOutput += "####" + Environment.NewLine + Environment.NewLine;
+                for (int index = 0; index < deckTabLists[0].Count; index++)
+                {
+                    textOutput += Cards.GetPlayMECCGCardname(deckTabLists[0][index][(int)CardListField.name]) + Environment.NewLine;
+                }
+                for (int index = 0; index < deckTabLists[1].Count; index++)
+                {
+                    textOutput += Cards.GetPlayMECCGCardname(deckTabLists[1][index][(int)CardListField.name]) + Environment.NewLine;
+                }
+                for (int index = 0; index < deckTabLists[2].Count; index++)
+                {
+                    textOutput += Cards.GetPlayMECCGCardname(deckTabLists[2][index][(int)CardListField.name]) + Environment.NewLine;
+                }
+                textOutput += Environment.NewLine;
+
+                // Sideboard
+                textOutput += "####" + Environment.NewLine;
+                textOutput += "Sideboard" + Environment.NewLine;
+                textOutput += "####" + Environment.NewLine + Environment.NewLine;
+                for (int index = 0; index < deckTabLists[3].Count; index++)
+                {
+                    textOutput += Cards.GetPlayMECCGCardname(deckTabLists[3][index][(int)CardListField.name]) + Environment.NewLine;
+                }
+                textOutput += Environment.NewLine;
+
+                // Sites and regions
+                textOutput += "####" + Environment.NewLine;
+                textOutput += "Sites" + Environment.NewLine;
+                textOutput += "####" + Environment.NewLine + Environment.NewLine;
+                for (int index = 0; index < masterList.Count; index++)
+                {
+                    // get card id and cardnum filter pairs, then include cards whose Primary == "Region" or "Site"
+                    string cardId = masterList[index][(int)CardListField.id];
+                    List<string[]> filterPairs = meccgCards.GetCardFilterPairs(cardId);
+
+                    bool primaryIsRegionOrSet = filterPairs.Exists(p => p[0] == "Primary" && (p[1] == "Region" || p[1] == "Site"));
+                    if (primaryIsRegionOrSet)
+                    {
+                        textOutput += Cards.GetPlayMECCGCardname(masterList[index][(int)CardListField.name]) + Environment.NewLine;
+                    }
+                }
+                textOutput += Environment.NewLine;
+
+                File.WriteAllText(filePathOutput, textOutput, ansiEncoding);
+
+            }
+        }
 
         #endregion
-
     }
 }
