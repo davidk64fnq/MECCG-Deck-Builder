@@ -114,13 +114,28 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuMasterCardnumFilters()
         {
             ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
+
+            // 1. Get the data pairs
             List<string[]> filterPairs = meccgCards.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
+
+            // 2. Calculate max length based on the key (filter name)
             int maxLength = filterPairs.Max(ot => ot[0].Length);
-            Font curFont = ToolStripMenuMasterCardnumFilters.Font;
+
             for (int index = 0; index < filterPairs.Count; index++)
             {
-                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
+                // Get the key value string (e.g., "Ruins & Lairs")
+                string filterValue = filterPairs[index][1];
+
+                // --- FIX: ESCAPE THE AMPERSAND ---
+                // Replace all single '&' characters with '&&' for display purposes.
+                string escapedFilterValue = filterValue.Replace("&", "&&");
+
+                // Construct the padded pair string using the escaped value
+                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{escapedFilterValue}";
+
                 ToolStripMenuMasterCardnumFilters.DropDownItems.Add(pair);
+
+                // The rest of the code is fine, though using Consolas at 8.0f for alignment is smart.
                 ToolStripMenuMasterCardnumFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
             }
         }
@@ -567,7 +582,7 @@ namespace MECCG_Deck_Builder
             using SaveFileDialog saveFileDialog = new()
             {
                 Title = Constants.AppTitle,
-                Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*play|Cardnum (*.cnum)|*.cnum|Text (*.txt)|*.txt",
+                Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
                 FilterIndex = 1,
                 RestoreDirectory = true
             };
@@ -598,6 +613,10 @@ namespace MECCG_Deck_Builder
                 else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
                 {
                     meccgCards.Export_CardnumFile(deckTabLists, savePrefix + ".cnum");
+                }
+                else if (saveFileDialog.FilterIndex == (int)SaveType.Archive)
+                {
+                    meccgCards.Export_ArchiveFile(deckTabLists, savePrefix + ".archive");
                 }
                 else
                 {

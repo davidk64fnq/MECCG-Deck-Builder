@@ -14,6 +14,7 @@ namespace MECCG_Deck_Builder
         TTS = 1,
         PlayMECCG,
         Cardnum,
+        Archive,
         Text
     }
 

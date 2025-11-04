@@ -122,6 +122,32 @@ namespace MECCG_Deck_Builder
             return filterPairs;
         }
 
+        /// <summary>
+        /// Safely retrieves the value of a filter key from a card dictionary, 
+        /// truncating the value if the key is "Secondary" and contains a slash.
+        /// </summary>
+        private static string GetCardFilterValue(SortedDictionary<string, string> card, string key)
+        {
+            if (card.TryGetValue(key, out string value))
+            {
+                // 1. Check if the key is "Secondary" and if the value contains a slash
+                if (key.Equals("Secondary", StringComparison.OrdinalIgnoreCase) && value.Contains('/'))
+                {
+                    // 2. Find the index of the first slash
+                    int slashIndex = value.IndexOf('/');
+
+                    // 3. Return the substring to the left of the slash
+                    return value[..slashIndex].Trim();
+                }
+
+                // Return the value as is for other keys or for "Secondary" without a slash
+                return value;
+            }
+
+            // Return empty string if the key doesn't exist
+            return string.Empty;
+        }
+
         #endregion
 
         #region UTILITIES
@@ -168,6 +194,205 @@ namespace MECCG_Deck_Builder
             }
 
             File.WriteAllText(filePathOutput, textOutput);
+        }
+
+        internal void Export_ArchiveFile(List<List<string[]>> deckTabLists, string filePathOutput)
+        {
+            string[] archiveCategories = ["Minor Item", "Major Item", "Greater Item", "Gold Ring Item", "Special Item",
+                "Resource Short", "Resource Long", "Resource Permanent", "Ally", "Faction",
+                "Creature Unique", "Creature", "Hazard Short", "Hazard Long", "Hazard Permanent",
+                "Dunadan", "Dwarf", "Elf", "Hobbit", "Man (Wose)", "Wizard",
+                "Free-hold", "Border-hold", "Ruins & Lairs", "Shadow-hold", "Dark-hold", "Region"];
+
+            int numberOfCardsArchived = 0;
+
+            // NEW STRUCTURE: Outer key is Category, Inner key is Set Name, Value is the List of cards
+            Dictionary<string, Dictionary<string, List<string>>> cardDataBySet = [];
+
+            // 1. Initialize the outer dictionary with Categories
+            foreach (string title in archiveCategories)
+            {
+                // Each category starts with an empty inner dictionary
+                cardDataBySet.Add(title, []);
+            }
+
+            // 2. Populate the dictionary (assuming the logic goes here)
+            for (int tabIndex = 0; tabIndex < deckTabLists.Count; tabIndex++)
+            {
+                for (int index = 0; index < deckTabLists[tabIndex].Count; index++)
+                {
+                    // Get card data from the class member 'cards' using the ID from the deck list
+                    string cardId = deckTabLists[tabIndex][index][(int)CardListField.id];
+
+                    // NOTE: The 'cards' field is a List<SortedDictionary<string, string>>.
+                    // We use the ID to get the full card dictionary.
+                    if (!int.TryParse(cardId, out int cardIndex))
+                    {
+                        // Handle bad ID if necessary
+                        continue;
+                    }
+
+                    // Retrieve the full card data dictionary
+                    var card = this.cards[cardIndex];
+
+                    // Extract the required keys
+                    string primaryFilter = GetCardFilterValue(card, "Primary");
+                    string secondaryFilter = GetCardFilterValue(card, "Secondary");
+                    string uniqueFilter = GetCardFilterValue(card, "Unique");
+                    string raceFilter = GetCardFilterValue(card, "Race");
+                    string siteFilter = GetCardFilterValue(card, "Site");
+                    string categoryKey = GetArchiveCategoryKey(primaryFilter, secondaryFilter, uniqueFilter, raceFilter, siteFilter);
+
+                    // Only proceed if a valid category was found (i.e., it's one of the archiveCategories)
+                    if (string.IsNullOrEmpty(categoryKey) || !cardDataBySet.ContainsKey(categoryKey))
+                    {
+                        // Card does not match any required archive category, skip it.
+                        continue;
+                    }
+
+                    // Extract the data for the nested dictionary and final output
+                    string setKey = card["set"]; // deckTabLists[tabIndex][index][(int)CardListField.set]
+                    string cardString = card["cardname"]; // deckTabLists[tabIndex][index][(int)CardListField.name]
+
+                    // Example of how to add a card string for a specific Category and Set:
+                    if (!cardDataBySet[categoryKey].TryGetValue(setKey, out List<string> value))
+                    {
+                        value = [];
+                        // If this Set hasn't been seen yet for this Category, create its List
+                        cardDataBySet[categoryKey].Add(setKey, value);
+                    }
+
+                    value.Add(cardString);
+                    numberOfCardsArchived++;
+                }
+            }
+
+            // 3. Write to File
+            using StreamWriter writer = new(filePathOutput);
+
+            writer.WriteLine($"--- {filePathOutput} ({numberOfCardsArchived} cards) ---");
+            writer.WriteLine(); // Add an empty line for separation
+
+            // Iterate through the Categories
+            foreach (var categoryEntry in cardDataBySet)
+            {
+                string categoryTitle = categoryEntry.Key;
+                var setsInThisCategory = categoryEntry.Value;
+
+                writer.WriteLine($"--- CATEGORY: {categoryTitle} ---");
+
+                // Iterate through the Sets within this Category
+                foreach (var setEntry in setsInThisCategory)
+                {
+                    string setTitle = setEntry.Key;
+                    List<string> cardsInThisSet = setEntry.Value;
+
+                    if (cardsInThisSet.Count == 0)
+                    {
+                        continue; // Skip empty sets
+                    }
+
+                    // Write the Set title
+                    writer.WriteLine($"\tSET: {setTitle} ({cardsInThisSet.Count})");
+
+                    // Write each associated card on a new line
+                    foreach (string card in cardsInThisSet)
+                    {
+                        writer.WriteLine($"\t\t{card}"); // Use tabs for indentation
+                    }
+                }
+                writer.WriteLine(); // Add an empty line for separation
+            }
+        }
+
+        /// <summary>
+        /// Determines the correct Archive Category based on Primary/Secondary/Unique/Race/Site filter values.
+        /// </summary>
+        private static string GetArchiveCategoryKey(string primary, string secondary, string unique, string race, string site)
+        {
+            // 1. Resources
+            if (primary.Equals("Resource", StringComparison.OrdinalIgnoreCase))
+            {
+                return secondary switch
+                {
+                    "Minor Item" => "Minor Item",
+                    "Major Item" => "Major Item",
+                    "Greater Item" => "Greater Item",
+                    "Gold Ring Item" => "Gold Ring Item",
+                    "Special Item" => "Special Item",
+                    "Short-event" => "Resource Short",
+                    "Long-event" => "Resource Long",
+                    "Permanent-event" => "Resource Permanent",
+                    "Ally" => "Ally",
+                    "Faction" => "Faction",
+                    _ => string.Empty, // Some other non-archived resource type
+                };
+            }
+
+            // 2. Creatures
+            if (secondary.Equals("Creature", StringComparison.OrdinalIgnoreCase))
+            {
+                return unique switch
+                {
+                    "unique" => "Creature Unique",
+                    _ => "Creature", // A creature without "Unique" as first word in card text has Unique value of ""
+                };
+            }
+
+            // 3. Hazards
+            if (primary.Equals("Hazard", StringComparison.OrdinalIgnoreCase))
+            {
+                return secondary switch
+                {
+                    "Short-event" => "Hazard Short",
+                    "Long-event" => "Hazard Long",
+                    "Permanent-event" => "Hazard Permanent",
+                    _ => string.Empty, // Some other non-archived hazard type (note creatures handled above
+                };
+            }
+
+            // 4. CHARACTERS 
+            if (primary.Equals("Character", StringComparison.OrdinalIgnoreCase))
+            {
+                if (race.Equals("Dúnadan", StringComparison.OrdinalIgnoreCase))
+                {
+                    return "Dunadan";
+                }
+
+                return race switch
+                {
+                    "Dwarf" => "Dwarf",
+                    "Elf" => "Elf",
+                    "Hobbit" => "Hobbit",
+                    "Man" => "Man (Wose)",
+                    "Wizard" => "Wizard",
+                    _ => string.Empty, // Some other non-archived character race
+                };
+            }
+
+            // 5. SITES (Free-hold, Border-hold, Ruins & Lairs, Shadow-hold, Dark-hold)
+            if (primary.Equals("Site", StringComparison.OrdinalIgnoreCase))
+            {
+                // Your logic for sites needs to be inferred from the Site filter value itself
+                return site switch
+                {
+                    "Free-hold" => "Free-hold",
+                    "Border-hold" => "Border-hold",
+                    "Ruins & Lairs" => "Ruins & Lairs",
+                    "Shadow-hold" => "Shadow-hold",
+                    "Dark-hold" => "Dark-hold",
+                    "Region" => "Region",
+                    _ => string.Empty, // Not an archived site type
+                };
+            }
+
+            // 6. Regions
+            if (primary.Equals("Region", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Region";
+            }
+
+            return string.Empty; // Default if no category match is found
         }
 
         internal static void Export_PlayMECCGfile(List<List<string[]>> deckTabLists, string filePathOutput)
@@ -416,12 +641,12 @@ namespace MECCG_Deck_Builder
                     // --- If File Load Fails, Initialize Default Data ---
                     SortedDictionary<string, string> card = new()
                     {
-                { "id", "0" },
-                { "set", "METW" },
-                { "fullCode", "Adrazar (TW)" },
-                { "cardname", "Adrazar" },
-                { "alignment", "Hero" },
-                { "imageName", "metw_adrazar.jpg" }
+                        { "id", "0" },
+                        { "set", "METW" },
+                        { "fullCode", "Adrazar (TW)" },
+                        { "cardname", "Adrazar" },
+                        { "alignment", "Hero" },
+                        { "imageName", "metw_adrazar.jpg" }
             };
                     cards.Add(card); // Assuming 'cards' is accessible here
                     MessageBox.Show(Messages.GetMsgBoxText(nameof(ImportCardnumCardInfo) + "2"), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -439,16 +664,24 @@ namespace MECCG_Deck_Builder
                 {
                     SortedDictionary<string, string> card = new()
                     {
-                { "id", $"{index++}" },
-                { "set", $"{item.Set}" },
-                { "fullCode", $"{item.FullCode}" },
-                { "cardname", $"{item.NameEN}" },
-                { "text", $"{item.Text}" },
-                { "imageName", $"{item.ImageName}" }
+                        { "id", $"{index++}" },
+                        { "set", $"{item.Set}" },
+                        { "fullCode", $"{item.FullCode}" },
+                        { "cardname", $"{item.NameEN}" },
+                        { "text", $"{item.Text}" },
+                        { "imageName", $"{item.ImageName}" }
             };
                     for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
                     {
-                        card.Add(filterKeys[keyIndex], Convert.ToString(item[filterKeys[keyIndex]]));
+                        // The value returned by the indexer. It could be string, int?, or bool.
+                        object value = item[filterKeys[keyIndex]];
+
+                        // Safely convert any type to string. 
+                        // This will call the appropriate .ToString() method (e.g., Int32.ToString(), String.ToString(), etc.)
+                        // For null values, it safely returns string.Empty.
+                        string stringValue = value?.ToString() ?? string.Empty;
+
+                        card.Add(filterKeys[keyIndex], stringValue);
                     }
                     if (item.Ice_errata == true)
                     {
@@ -458,7 +691,10 @@ namespace MECCG_Deck_Builder
                     {
                         for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
                         {
-                            SetKeyValues(filterKeys[keyIndex], Convert.ToString(item[filterKeys[keyIndex]]));
+                            object value = item[filterKeys[keyIndex]];
+                            string stringValue = value?.ToString() ?? string.Empty;
+
+                            SetKeyValues(filterKeys[keyIndex], stringValue);
                         }
                     }
                     cards.Add(card);
