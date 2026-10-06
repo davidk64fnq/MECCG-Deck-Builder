@@ -67,7 +67,7 @@
 
 - Internal Strings: Standard .NET UTF-16 strings.
 - JSON Serialization: Use UTF-8 without BOM (System.Text.Json or Newtonsoft.Json).
-- Legacy Play MECCG Files (.play, .playPBEM): Explicitly specify Windows-1252 ANSI:
+- Legacy Play MECCG Files (.play): Explicitly specify Windows-1252 ANSI:
   - Encoding.GetEncoding(1252)
 - HTML Help Files (.hhp, .hhc, .hhk): Must be saved as ANSI (Windows-1252) or UTF-8 without BOM/signature. Never save help project files with a UTF-8 BOM.
 

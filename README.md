@@ -20,7 +20,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - **Custom User Taxonomy:** Create custom tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`) and tag individual cards.
 - **Multi-Platform Export Formats:**
   - **Tabletop Simulator (`.json`):** Generates ready-to-use deck files compatible with TTS MECCG mods.
-  - **Play MECCG (`.play` & `.playPBEM`):** Native format for online play and Play-By-Email tournaments.
+  - **Play MECCG (`.play` & `.playPBEM`):** Native format for online play.
   - **Cardnum Deck (`.cnum`):** Standard `1 <Code>` listing format.
   - **Archive Breakdown (`.archive`):** Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - **Plain Text (`.txt`):** Formatted deck listing.

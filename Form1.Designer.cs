@@ -93,7 +93,6 @@ namespace MECCG_Deck_Builder
             selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
-            createPBEMFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -639,7 +638,7 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuTools
             // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsGetImages, createPBEMFileToolStripMenuItem });
+            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsGetImages});
             ToolStripMenuTools.Name = "ToolStripMenuTools";
             ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
             ToolStripMenuTools.Text = "&Tools";
@@ -650,13 +649,6 @@ namespace MECCG_Deck_Builder
             ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(169, 22);
             ToolStripMenuToolsGetImages.Text = "Download Images";
             ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
-            // 
-            // createPBEMFileToolStripMenuItem
-            // 
-            createPBEMFileToolStripMenuItem.Name = "createPBEMFileToolStripMenuItem";
-            createPBEMFileToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
-            createPBEMFileToolStripMenuItem.Text = "Create PBEM File";
-            createPBEMFileToolStripMenuItem.Click += CreatePBEMFileToolStripMenuItem_Click;
             // 
             // ToolStripMenuSet
             // 
@@ -964,7 +956,6 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
-        private System.Windows.Forms.ToolStripMenuItem createPBEMFileToolStripMenuItem;
     }
 }
 

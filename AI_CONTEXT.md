@@ -77,7 +77,7 @@ Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<
 - Convert HttpClient downloads to async (async/await) with UI progress indication.
 - Replace GDI+ file-locking image loads with non-locking memory stream clones and properly dispose old images.
 - Fix filter indexing and populate filters from all active/released sets.
-- Add unit tests for deck export formatting (TTS, Play MECCG, Cardnum, PBEM).
+- Add unit tests for deck export formatting (TTS, Play MECCG, Cardnum).
 
 ---
 
