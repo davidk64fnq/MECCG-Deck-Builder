@@ -1242,14 +1242,22 @@ namespace MECCG_Deck_Builder
 
         #region HELP
 
+        #region HELP
+
         private void ContentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string helpFile = Path.Combine(Application.StartupPath, "Resources\\Help\\MECCG_Deck_Builder.chm");
+            string helpFile = Path.Combine(Application.StartupPath, "Resources", "Help", "MECCG_Deck_Builder.chm");
             if (File.Exists(helpFile))
             {
                 Help.ShowHelp(this, helpFile, HelpNavigator.TableOfContents);
             }
+            else
+            {
+                MessageBox.Show($"Help file not found at:\n{helpFile}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
+
+        #endregion
 
         #endregion
 
