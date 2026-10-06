@@ -1239,5 +1239,19 @@ namespace MECCG_Deck_Builder
         }
 
         #endregion
+
+        #region HELP
+
+        private void ContentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string helpFile = Path.Combine(Application.StartupPath, "Resources\\Help\\MECCG_Deck_Builder.chm");
+            if (File.Exists(helpFile))
+            {
+                Help.ShowHelp(this, helpFile, HelpNavigator.TableOfContents);
+            }
+        }
+
+        #endregion
+
     }
 }

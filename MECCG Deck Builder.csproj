@@ -12,10 +12,14 @@
 
   <ItemGroup>
     <None Remove="MECCGicon.ico" />
+    <None Remove="Resources\Help\MECCG_Deck_Builder.chm" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="MECCGicon.ico" />
+    <Content Include="Resources\Help\MECCG_Deck_Builder.chm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

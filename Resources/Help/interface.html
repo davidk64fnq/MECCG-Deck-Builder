@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Interface Walkthrough</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Interface Walkthrough</div>
+    <h1>User Interface Walkthrough</h1>
+    <p>The application interface is divided into four main functional zones:</p>
+
+    <h2>1. Master Card List (Left Pane)</h2>
+    <p>
+        The left listbox displays all available cards matching your selected sets and active filter criteria, sorted alphabetically.
+    </p>
+    <ul>
+        <li><strong>Single-Click:</strong> Selects the card and loads its image into the central preview panel.</li>
+        <li><strong>Double-Click:</strong> Immediately appends the card to the currently selected deck tab on the right.</li>
+        <li><strong>Right-Click:</strong> Opens the master context menu to copy the card into a specific deck tab, inspect its Cardnum metadata, or assign custom user tags.</li>
+        <li><strong>Drag &amp; Drop:</strong> Left-click and hold to drag the card title onto any deck listbox.</li>
+    </ul>
+
+    <h2>2. Card Image Preview (Center Pane)</h2>
+    <p>
+        Displays a high-resolution preview of the selected card. Images are downloaded automatically from <code>cardnum.net</code> upon first selection and saved into a local folder named after the card set (e.g., <code>METW/</code>, <code>MEDM/</code>).
+    </p>
+    <div class="note">
+        <strong>Errata Notice:</strong> Cards flagged with ICE errata automatically load their corrected image counterpart prefixed with <code>ice-</code>.
+    </div>
+
+    <h2>3. Deck Tabs (Right Pane)</h2>
+    <p>
+        The right pane features five tabbed lists representing standard MECCG deck sections:
+    </p>
+    <table>
+        <tr>
+            <th>Tab</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>Pool</code></td>
+            <td>Starting Pool</td>
+            <td>Characters, starting items, and starter resources.</td>
+        </tr>
+        <tr>
+            <td><code>Res</code></td>
+            <td>Resources</td>
+            <td>Resource events, allies, factions, and playable items.</td>
+        </tr>
+        <tr>
+            <td><code>Haz</code></td>
+            <td>Hazards</td>
+            <td>Creatures, hazard events, and corruption cards.</td>
+        </tr>
+        <tr>
+            <td><code>Side</code></td>
+            <td>Sideboard</td>
+            <td>Reserve cards accessible during the game.</td>
+        </tr>
+        <tr>
+            <td><code>Site</code></td>
+            <td>Sites</td>
+            <td>Site cards and region movement paths.</td>
+        </tr>
+    </table>
+
+    <h2>4. Filter Bar (Bottom Panel)</h2>
+    <p>
+        Located beneath the three main panes, four pairs of ComboBoxes allow fine-grained catalog filtering:
+    </p>
+    <ul>
+        <li><strong>Slots 1 &amp; 2 (Cardnum Filters):</strong> Select from official card properties (Primary type, Mind, Direct Influence, Artist, etc.).</li>
+        <li><strong>Slots 3 &amp; 4 (Custom Filters):</strong> Create, manage, and filter using user-defined classification tags.</li>
+    </ul>
+
+    <h2>Dynamic Title Bar Summary</h2>
+    <p>The window title updates automatically to reflect deck statistics:</p>
+    <p><code>MECCG Deck Builder - "[Deck Title]" (Pool/Res[Characters]/Haz/Side/Site)</code></p>
+    <p>For example: <code>MECCG Deck Builder - "Ring Hunter" (5/30[4]/30/20/12)</code> indicates 5 pool cards, 30 resource cards (including 4 characters), 30 hazards, 20 sideboard cards, and 12 sites.</p>
+</body>
+</html>

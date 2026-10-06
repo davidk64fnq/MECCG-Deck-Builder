@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Saving &amp; Exporting</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Saving &amp; Exporting</div>
+    <h1>Saving &amp; Export Formats</h1>
+
+    <h2>Native Deck Files (.json)</h2>
+    <p>
+        Use <strong>File &gt; Save</strong> or <strong>File &gt; Open</strong> (<kbd>Ctrl+O</kbd>) to store and load complete deck configurations in native JSON format. This preserves:
+    </p>
+    <ul>
+        <li>The full contents of all 5 tabs (Pool, Resources, Hazards, Sideboard, Sites).</li>
+        <li>Active set selections.</li>
+        <li>Deck title.</li>
+    </ul>
+
+    <h2>Export Options (File &gt; Export / Ctrl+S)</h2>
+    <p>Choose <strong>File &gt; Export</strong> to open the export dialog and select from the dropdown filter:</p>
+
+    <table>
+        <tr>
+            <th>Format</th>
+            <th>Extension</th>
+            <th>Target Platform &amp; Usage</th>
+        </tr>
+        <tr>
+            <td><strong>Tabletop Simulator</strong></td>
+            <td><code>.json</code></td>
+            <td>
+                Generates five JSON deck files (one for each section: <code>_pool.json</code>, <code>_resource.json</code>, <code>_hazard.json</code>, <code>_sideboard.json</code>, <code>_site.json</code>) ready to be dropped into Tabletop Simulator's <code>Saved Objects</code> folder.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Play MECCG</strong></td>
+            <td><code>.play</code></td>
+            <td>
+                Standard export for the online <em>Play MECCG</em> client. Formats cards with parenthetical subtitle convention (e.g. <code>Adrazar (TW)</code>) using Windows-1252 ANSI encoding.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Cardnum Deck</strong></td>
+            <td><code>.cnum</code></td>
+            <td>
+                Exports deck listings using standard Cardnum code prefixes (e.g. <code>1 Adrazar (TW)</code>) grouped by deck sections.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Archive Listing</strong></td>
+            <td><code>.archive</code></td>
+            <td>
+                A structured analysis format that breaks down your deck by category: Items (Minor, Major, Greater, Ring), Events (Short, Long, Permanent), Allies, Factions, Characters by race, and Sites by type.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Text File</strong></td>
+            <td><code>.txt</code></td>
+            <td>
+                A clean, human-readable plain text breakdown of all deck sections with section headers.
+            </td>
+        </tr>
+    </table>
+
+    <h2>Play MECCG PBEM Generation (Tools Menu)</h2>
+    <p>
+        Selecting <strong>Tools &gt; Create PBEM File</strong> (<code>.playPBEM</code>) prepares a special format designed for Play-By-Email games:
+    </p>
+    <ul>
+        <li>The <strong>Pool</strong> section automatically includes every legal, non-site/non-region card in your active sets as an accessible card pool.</li>
+        <li>The <strong>Deck</strong> section bundles your Pool, Resources, and Hazards tabs together.</li>
+        <li>The <strong>Sites</strong> section includes all sites and regions across your active sets.</li>
+    </ul>
+</body>
+</html>

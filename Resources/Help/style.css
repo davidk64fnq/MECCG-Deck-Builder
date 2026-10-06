@@ -1,0 +1,120 @@
+﻿body {
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #222222;
+    background-color: #FFFFFF;
+    margin: 16px 20px 24px 20px;
+}
+
+h1 {
+    font-size: 16pt;
+    color: #1A365D;
+    border-bottom: 2px solid #2B6CB0;
+    padding-bottom: 4px;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+h2 {
+    font-size: 13pt;
+    color: #2B6CB0;
+    border-bottom: 1px solid #CBD5E0;
+    padding-bottom: 3px;
+    margin-top: 18px;
+    margin-bottom: 8px;
+}
+
+h3 {
+    font-size: 11pt;
+    color: #2D3748;
+    margin-top: 14px;
+    margin-bottom: 6px;
+}
+
+p {
+    margin: 0 0 10px 0;
+}
+
+ul, ol {
+    margin: 0 0 12px 0;
+    padding-left: 24px;
+}
+
+li {
+    margin-bottom: 4px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0 16px 0;
+    font-size: 9.5pt;
+}
+
+th, td {
+    border: 1px solid #CBD5E0;
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background-color: #EDF2F7;
+    color: #1A202C;
+    font-weight: bold;
+}
+
+tr:nth-child(even) td {
+    background-color: #F7FAFC;
+}
+
+code, kbd {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 9.5pt;
+    background-color: #EDF2F7;
+    border: 1px solid #CBD5E0;
+    border-radius: 3px;
+    padding: 1px 4px;
+}
+
+.note {
+    background-color: #EBF8FF;
+    border-left: 4px solid #3182CE;
+    padding: 8px 12px;
+    margin: 12px 0;
+    font-size: 9.5pt;
+}
+
+.tip {
+    background-color: #F0FFF4;
+    border-left: 4px solid #38A169;
+    padding: 8px 12px;
+    margin: 12px 0;
+    font-size: 9.5pt;
+}
+
+.warning {
+    background-color: #FFF5F5;
+    border-left: 4px solid #E53E3E;
+    padding: 8px 12px;
+    margin: 12px 0;
+    font-size: 9.5pt;
+}
+
+.nav-bar {
+    font-size: 8.5pt;
+    color: #718096;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 6px;
+}
+
+    .nav-bar a {
+        color: #2B6CB0;
+        text-decoration: none;
+    }
+
+        .nav-bar a:hover {
+            text-decoration: underline;
+        }

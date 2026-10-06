@@ -1,0 +1,18 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=MECCG_Deck_Builder.chm
+Contents file=Help.hhc
+Default topic=index.html
+Display compile progress=Yes
+Full-text search=Yes
+Language=0x409 English (United States)
+Title=MECCG Deck Builder Help
+
+[FILES]
+style.css
+index.html
+interface.html
+deck_building.html
+sets_and_filters.html
+exporting_saving.html
+tools_and_cache.html

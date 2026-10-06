@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MECCG Deck Builder - Overview</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar">Home &gt; Overview</div>
+    <h1>MECCG Deck Builder</h1>
+    <p>
+        <strong>MECCG Deck Builder</strong> is a dedicated Windows desktop application designed to build, organize, filter, and export decks for the <em>Middle-earth Collectible Card Game (MECCG)</em> published by Iron Crown Enterprises (I.C.E.), including official expansions and player council Dreamcard sets.
+    </p>
+
+    <h2>Key Capabilities</h2>
+    <ul>
+        <li><strong>Live Data Integration:</strong> Synchronizes cards and expansion sets from the Cardnum open database, with seamless local offline JSON fallbacks.</li>
+        <li><strong>On-Demand Image Preview &amp; Caching:</strong> Displays high-resolution card artwork downloaded on demand and cached locally to conserve bandwidth.</li>
+        <li><strong>Five-Section Deck Partitioning:</strong> Organizes cards into standard MECCG deck sections: <em>Pool</em>, <em>Resources</em>, <em>Hazards</em>, <em>Sideboard</em>, and <em>Sites</em>.</li>
+        <li><strong>Dual Filtering Engine:</strong> Filter the card catalog simultaneously by official Cardnum metadata (rarity, race, skills, items, alignments) and customizable user-defined tags.</li>
+        <li><strong>Multi-Platform Exporting:</strong> Directly export decks to Tabletop Simulator (TTS), Play MECCG online client (including PBEM format), Cardnum list format, structured text archives, or plain text lists.</li>
+    </ul>
+
+    <h2>Quick Start Guide</h2>
+    <ol>
+        <li><strong>Select Card Sets:</strong> Click <strong>Set</strong> in the top menu bar to check the expansions you want to browse (defaults to <em>The Wizards</em>).</li>
+        <li><strong>Filter Cards:</strong> Use the dropdown menus at the bottom left to filter by card properties (such as <code>Primary</code> = <code>Character</code>, <code>Race</code> = <code>Dúnadan</code>).</li>
+        <li>
+            <strong>Add Cards to Your Deck:</strong>
+            <ul>
+                <li>Double-click any card in the Master List to add it to the active tab on the right.</li>
+                <li>Or drag and drop cards directly into any deck tab.</li>
+                <li>Or right-click a card in the Master List and choose <strong>Copy &gt; [Target Tab]</strong>.</li>
+            </ul>
+        </li>
+        <li><strong>Review Title Bar Counters:</strong> Watch the window title update dynamically with card counts: <code>MECCG Deck Builder - "DeckName" (Pool/Resources[Characters]/Hazards/Sideboard/Sites)</code>.</li>
+        <li><strong>Save or Export:</strong> Choose <strong>File &gt; Save</strong> to keep your deck in native JSON format, or <strong>File &gt; Export</strong> to generate files for Tabletop Simulator or Play MECCG.</li>
+    </ol>
+</body>
+</html>

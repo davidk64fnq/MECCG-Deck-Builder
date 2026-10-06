@@ -450,12 +450,20 @@ namespace MECCG_Deck_Builder
 
         internal static string GetPlayMECCGCardname(string cardName)
         {
-            return cardName switch
+            // Check for a dash with spaces around it
+            if (cardName.Contains(" - "))
             {
-                "Mûmak - Oliphant" => "Mûmak (Oliphant)",
-                "Olog-hai - Trolls" => "Olog-hai (Trolls)",
-                _ => cardName // The underscore (_) acts as the 'default' case, returning the original input.
-            };
+                // Strip any literal quotation marks if they exist (like around "William")
+                string cleanName = cardName.Replace("\"", "");
+
+                int dashIndex = cleanName.IndexOf(" - ");
+                string mainTitle = cleanName.Substring(0, dashIndex).Trim();
+                string subTitle = cleanName.Substring(dashIndex + 3).Trim();
+
+                return $"{mainTitle} ({subTitle})";
+            }
+
+            return cardName;
         }
 
         internal void Export_CardnumFile(List<List<string[]>> deckTabLists, string filePathOutput)
