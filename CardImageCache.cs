@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Drawing;
 using System.IO;
@@ -19,66 +18,90 @@ namespace MECCG_Deck_Builder
 
         internal Bitmap GetOrCreate(string key, string setFolder, string imageName)
         {
-            if (!Cache.TryGetValue(key, out Bitmap cacheEntry))// Look for cache key.
+            // 1. Check in-memory cache
+            if (Cache.TryGetValue(key, out Bitmap cacheEntry))
             {
-                if (!File.Exists($"{Path.Combine(setFolder, imageName)}"))
-                {
-                    // Card not in cache or stored on disk so retrieve from Cardnum
-                    cacheEntry = CreateItem(key);
+                return cacheEntry;
+            }
 
-                    if (cacheEntry != null)
+            string filePath = Path.Combine(setFolder, imageName);
+
+            // 2. Fall back to local disk
+            if (File.Exists(filePath))
+            {
+                cacheEntry = LoadImageNonLocking(filePath);
+            }
+            else
+            {
+                // 3. Fall back to remote network download
+                cacheEntry = CreateItem(key);
+
+                if (cacheEntry != null)
+                {
+                    try
                     {
-                        // Store card locally on disk as well
-                        if (!Directory.Exists(setFolder)){
+                        if (!Directory.Exists(setFolder))
+                        {
                             Directory.CreateDirectory(setFolder);
                         }
-                        cacheEntry.Save($"{Path.Combine(setFolder, imageName)}");
-
-                        var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            .SetSize(1);
-
-                        // Save data in cache.
-                        Cache.Set(key, cacheEntry, cacheEntryOptions);
+                        cacheEntry.Save(filePath);
+                    }
+                    catch (Exception)
+                    {
+                        // Disk write failure should not prevent using the downloaded in-memory image
                     }
                 }
-                else
-                {
-                    // Card not in cache but is on disk so get it from there
-                    Bitmap card = new($"{Path.Combine(setFolder, imageName)}");
-                    return card;
-                }
             }
+
+            // 4. Populate MemoryCache on disk hit or network download
+            if (cacheEntry != null)
+            {
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSize(1);
+
+                Cache.Set(key, cacheEntry, cacheEntryOptions);
+            }
+
             return cacheEntry;
+        }
+
+        /// <summary>
+        /// Reads image bytes into memory before creating a Bitmap so GDI+ does not lock the file on disk.
+        /// </summary>
+        private static Bitmap LoadImageNonLocking(string filePath)
+        {
+            try
+            {
+                byte[] bytes = File.ReadAllBytes(filePath);
+                using var ms = new MemoryStream(bytes);
+                using var img = Image.FromStream(ms);
+                return new Bitmap(img);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         internal static Bitmap CreateItem(string key)
         {
             try
             {
-                // 1. Synchronously get the image data as a byte array by blocking
-                //    the current thread using .Result. This is what makes it non-async.
-                //    .Result is placed inside a try/catch to handle exceptions gracefully.
                 byte[] imageBytes = s_httpClient.GetByteArrayAsync(key).Result;
-
-                // 2. Convert the byte array into a memory stream
                 using var ms = new MemoryStream(imageBytes);
-                using var img = Image.FromStream(ms);   // temporary Image that uses the stream
-                return new Bitmap(img);                 // clone into a Bitmap that doesn't depend on the stream
+                using var img = Image.FromStream(ms);
+                return new Bitmap(img);
             }
             catch (AggregateException ae)
             {
-                // When using .Result, exceptions are often wrapped in an AggregateException.
-                // Check for specific inner exceptions if needed (e.g., HttpRequestException)
                 if (ae.InnerExceptions.Count > 0)
                 {
-                    // You can log ae.InnerExceptions[0] for details
+                    // Log inner exceptions if necessary
                 }
                 return null;
             }
             catch (Exception)
             {
-                // Catch other exceptions (e.g., ArgumentException for invalid URI,
-                // or errors during Bitmap construction)
                 return null;
             }
         }

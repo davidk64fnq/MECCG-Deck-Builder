@@ -1130,6 +1130,11 @@ namespace MECCG_Deck_Builder
             {
                 string imageName = masterList[cardIndex][(int)CardListField.image];
                 string setFolder = masterList[cardIndex][(int)CardListField.set];
+                string targetPath = Path.Combine(setFolder, imageName);
+                if (File.Exists(targetPath))
+                {
+                    continue; // Skip cards already downloaded
+                }
                 Bitmap cardImage;
                 cardImage = CardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
                 if (cardImage != null)
