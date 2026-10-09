@@ -1126,31 +1126,58 @@ namespace MECCG_Deck_Builder
 
         private void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
         {
+            int downloadedCount = 0;
+            int skippedCount = 0;
+
             for (int cardIndex = 0; cardIndex < masterList.Count; cardIndex++)
             {
                 string imageName = masterList[cardIndex][(int)CardListField.image];
                 string setFolder = masterList[cardIndex][(int)CardListField.set];
+
+                if (string.IsNullOrEmpty(imageName) || string.IsNullOrEmpty(setFolder))
+                {
+                    continue;
+                }
+
                 string targetPath = Path.Combine(setFolder, imageName);
+
+                // Skip downloading if the card image is already cached on disk
                 if (File.Exists(targetPath))
                 {
-                    continue; // Skip cards already downloaded
+                    skippedCount++;
+                    continue;
                 }
-                Bitmap cardImage;
-                cardImage = CardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
+
+                // Ensure the target directory exists before saving
+                if (!Directory.Exists(setFolder))
+                {
+                    Directory.CreateDirectory(setFolder);
+                }
+
+                // Properly dispose of the downloaded Bitmap to prevent GDI+ leaks
+                using Bitmap cardImage = CardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
                 if (cardImage != null)
                 {
-                    if (!Directory.Exists(setFolder))
+                    try
                     {
-                        Directory.CreateDirectory(setFolder);
+                        cardImage.Save(targetPath);
+                        downloadedCount++;
                     }
-                    cardImage.Save($"{Path.Combine(setFolder, imageName)}");
+                    catch (Exception)
+                    {
+                        // Continue downloading remaining cards even if a single save fails
+                    }
                 }
             }
+
+            MessageBox.Show(
+                $"Image download complete.\n\nDownloaded: {downloadedCount}\nAlready cached: {skippedCount}",
+                Constants.AppTitle,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         #endregion
-
-        #region HELP
 
         #region HELP
 
@@ -1166,8 +1193,6 @@ namespace MECCG_Deck_Builder
                 MessageBox.Show($"Help file not found at:\n{helpFile}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-
-        #endregion
 
         #endregion
 
