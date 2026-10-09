@@ -164,15 +164,37 @@ namespace MECCG_Deck_Builder
 
         private static bool CardMatchesFilters(SortedDictionary<string, string> card, List<string[]> keyValuePairs)
         {
-            bool cardMatch = true;
             for (int index = 0; index < keyValuePairs.Count; index++)
             {
-                if (keyValuePairs[0][0] != null && !card[keyValuePairs[index][0]].Contains(keyValuePairs[index][1]))
+                string[] pair = keyValuePairs[index];
+                if (pair == null || pair.Length < 2)
                 {
-                    cardMatch = false;
+                    continue;
+                }
+
+                string key = pair[0];
+                string expectedValue = pair[1];
+
+                if (string.IsNullOrEmpty(key))
+                {
+                    continue;
+                }
+
+                // Safely check if the card contains the filter key
+                if (!card.TryGetValue(key, out string cardValue))
+                {
+                    return false;
+                }
+
+                // If a non-empty value was expected, ensure the card attribute matches
+                if (!string.IsNullOrEmpty(expectedValue) &&
+                    !cardValue.Contains(expectedValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
                 }
             }
-            return cardMatch;
+
+            return true;
         }
 
         #endregion
@@ -457,8 +479,8 @@ namespace MECCG_Deck_Builder
                 string cleanName = cardName.Replace("\"", "");
 
                 int dashIndex = cleanName.IndexOf(" - ");
-                string mainTitle = cleanName.Substring(0, dashIndex).Trim();
-                string subTitle = cleanName.Substring(dashIndex + 3).Trim();
+                string mainTitle = cleanName[..dashIndex].Trim();
+                string subTitle = cleanName[(dashIndex + 3)..].Trim();
 
                 return $"{mainTitle} ({subTitle})";
             }
