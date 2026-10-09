@@ -700,33 +700,25 @@ namespace MECCG_Deck_Builder
                         { "cardname", $"{item.NameEN}" },
                         { "text", $"{item.Text}" },
                         { "imageName", $"{item.ImageName}" }
-            };
+                    };
+
                     for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
                     {
-                        // The value returned by the indexer. It could be string, int?, or bool.
-                        object value = item[filterKeys[keyIndex]];
-
-                        // Safely convert any type to string. 
-                        // This will call the appropriate .ToString() method (e.g., Int32.ToString(), String.ToString(), etc.)
-                        // For null values, it safely returns string.Empty.
+                        string filterKey = filterKeys[keyIndex];
+                        object value = item[filterKey];
                         string stringValue = value?.ToString() ?? string.Empty;
 
-                        card.Add(filterKeys[keyIndex], stringValue);
+                        card.Add(filterKey, stringValue);
+
+                        // Populate filter values for all released and dreamcard sets
+                        SetKeyValues(filterKey, stringValue);
                     }
+
                     if (item.Ice_errata == true)
                     {
                         card["imageName"] = "ice-" + item.ImageName;
                     }
-                    if (card["set"].Equals(Constants.METW, StringComparison.CurrentCultureIgnoreCase) || card["set"] == "MEUL")
-                    {
-                        for (int keyIndex = 0; keyIndex < filterKeys.Length; keyIndex++)
-                        {
-                            object value = item[filterKeys[keyIndex]];
-                            string stringValue = value?.ToString() ?? string.Empty;
 
-                            SetKeyValues(filterKeys[keyIndex], stringValue);
-                        }
-                    }
                     cards.Add(card);
                 }
             }
@@ -739,36 +731,46 @@ namespace MECCG_Deck_Builder
         /// <param name="value">The additional key value [1..]</param>
         private void SetKeyValues(string key, string value)
         {
-            if (value == "")
+            if (string.IsNullOrEmpty(value))
             {
                 return;
             }
 
             // Get index of key values in filters
             int filtersIndex = filters.FindIndex(keyList => keyList[0] == key);
+            if (filtersIndex == -1)
+            {
+                return;
+            }
+
             if (key != "Skill")
             {
                 // Check whether key value is in key values and add if it is not
                 if (filters[filtersIndex].IndexOf(value) == -1)
                 {
                     filters[filtersIndex].Add(value);
-                    filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                    if (filters[filtersIndex].Count > 2)
+                    {
+                        filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                    }
                 }
             }
             else
             {
-                string[] words = value.Split(null);
+                string[] words = value.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string word in words)
                 {
                     // Check whether key value is in key values and add if it is not
                     if (filters[filtersIndex].IndexOf(word) == -1)
                     {
                         filters[filtersIndex].Add(word);
-                        filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                        if (filters[filtersIndex].Count > 2)
+                        {
+                            filters[filtersIndex].Sort(1, filters[filtersIndex].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                        }
                     }
                 }
             }
-
         }
 
         /// <summary>
