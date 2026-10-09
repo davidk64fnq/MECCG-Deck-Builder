@@ -1,12 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MECCG_Deck_Builder
 {
-    class OpenCloseFilter
+    internal sealed class OpenCloseFilter
     {
-        public List<SortedDictionary<string, string>> cards = new List<SortedDictionary<string, string>>();
-        public List<List<string>> filters = new List<List<string>>(); // each filter is keyName at index 0 and keyValue(s) from 1..Count
+        public List<SortedDictionary<string, string>> Cards { get; set; } = [];
+        public List<List<string>> Filters { get; set; } = [];
+
+        public static OpenCloseFilter FromFilterService(CardFilterService filterService)
+        {
+            var dto = new OpenCloseFilter();
+
+            foreach (var filterList in filterService.CustomFilters)
+            {
+                dto.Filters.Add([.. filterList]);
+            }
+
+            foreach (var (cardId, tags) in filterService.CardCustomTags)
+            {
+                var dict = new SortedDictionary<string, string>
+                {
+                    ["id"] = cardId
+                };
+                foreach (var (k, v) in tags)
+                {
+                    dict[k] = v;
+                }
+                dto.Cards.Add(dict);
+            }
+
+            return dto;
+        }
     }
 }

@@ -1,178 +1,449 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace MECCG_Deck_Builder
 {
-
     internal partial class Form1 : Form
     {
-        // There is a master listbox of all cards in selected sets on the left from which
-        // cards can be copied to the tabs on the right. On the right are five tabs each with 
-        // a listbox for pool/resource/hazard/sideboard/site, cards can be copied/moved between 
-        // tabs and deleted from a tab. Each listbox has an associated list with the card set
-        // and id. "meccgCards" is where all information about each card is stored.
+        private readonly CardCatalogService _catalogService = new();
+        private readonly CardFilterService _filterService = new();
+        private readonly Deck _currentDeck = new();
+        private readonly CardImageCache _cardImageCache = new();
 
-        private List<string[]> masterList = [];
-        private readonly List<string[]> poolList = [];
-        private readonly List<string[]> resourceList = [];
-        private readonly List<string[]> hazardList = [];
-        private readonly List<string[]> sideboardList = [];
-        private readonly List<string[]> siteList = [];
-        private readonly List<string> setList = [];
-        private readonly Cards meccgCards = new();
-        private readonly KeyValue userKeyValues = new();
-        private ListBox callingListbox;
-        private int selectedIndex;
-        private string currentDeckTitle = "New Deck";
-        private readonly CardImageCache cardImageCache = new();
-        private CancellationTokenSource imageLoadCts;
+        private List<Card> _masterCards = [];
+        private ListBox _callingListBox;
+        private int _selectedMasterIndex;
+        private int _selectedTabIndex;
+        private CancellationTokenSource _imageLoadCts;
+        private Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
 
         internal Form1()
         {
             InitializeComponent();
-            CreateMenus();
-            UpdateFormTitle();
+            _catalogService.WarningOccurred += (s, msg) =>
+                MessageBox.Show(msg, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+            Shown += Form1_Shown;
         }
 
-        /// <summary>
-        /// Dynamic build of set menu list
-        /// </summary>
+        private async void Form1_Shown(object sender, EventArgs e)
+        {
+            Enabled = false;
+            Text = $"{Constants.AppTitle} - Initializing Card Catalog...";
+
+            try
+            {
+                await _catalogService.InitializeAsync();
+                CreateMenus();
+                UpdateMasterList();
+                UpdateFormTitle();
+            }
+            finally
+            {
+                Enabled = true;
+                UpdateFormTitle();
+            }
+        }
+
         private void CreateMenus()
         {
-            // Set menus
-            for (int index = 0; index < meccgCards.GetSetCount(); index++)
+            // Set menu items
+            for (int i = 0; i < _catalogService.Sets.Count; i++)
             {
-                ToolStripMenuItem MenuSetItem = new(meccgCards.GetSetValue(index, "name"))
+                var set = _catalogService.Sets[i];
+                var menuItem = new ToolStripMenuItem(set.Name)
                 {
-                    Tag = meccgCards.GetSetValue(index, "code"),
-                    CheckOnClick = true,
+                    Tag = set.Code,
+                    CheckOnClick = true
                 };
-                MenuSetItem.CheckedChanged += new EventHandler(ToolStripMenuSet_CheckedChanged);
-                if (index == 0)
+                menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
+                if (i == 0)
                 {
-                    MenuSetItem.Checked = true;
+                    menuItem.Checked = true;
                 }
-                ToolStripMenuSet.DropDownItems.Add(MenuSetItem);
+                ToolStripMenuSet.DropDownItems.Add(menuItem);
             }
 
-            // Filter menus
-            System.ComponentModel.ComponentResourceManager resources = new(typeof(Form1));
+            // Filter menu icons
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
             ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
 
-            // Filter key name lists
-            SetKeyNameList(ComboBoxKey1);
-            SetKeyNameList(ComboBoxKey2);
-            SetKeyNameList(ComboBoxKey3);
-            SetKeyNameList(ComboBoxKey4);
+            // Filter ComboBoxes
+            RefreshFilterKeyDropdowns();
         }
 
-        #region MASTER_SINGLE_CLICK
+        private void RefreshFilterKeyDropdowns()
+        {
+            ComboBoxKey1.DataSource = _catalogService.GetFilterKeys();
+            ComboBoxKey2.DataSource = _catalogService.GetFilterKeys();
+            ComboBoxKey3.DataSource = _filterService.GetCustomKeyNames();
+            ComboBoxKey4.DataSource = _filterService.GetCustomKeyNames();
+        }
+
+        #region MASTER_LIST_INTERACTION
 
         private void ListBoxMasterList_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                // Find the item under the mouse.
                 int index = ListBoxMaster.IndexFromPoint(e.Location);
-                if (index < 0)
-                {
-                    return;
-                }
+                if (index < 0) return;
+
                 ListBoxMaster.SelectedIndex = index;
                 ListBox_SelectedIndexChanged(sender, e);
 
-                // Drag the item.
-                string cardText = ListBoxMaster.SelectedItem.ToString();
-                ListBoxMaster.DoDragDrop(cardText, DragDropEffects.Copy);
+                // Define drag threshold rectangle so double-clicks are not swallowed
+                Size dragSize = SystemInformation.DragSize;
+                _dragBoxFromMouseDown = new Rectangle(
+                    new Point(e.X - (dragSize.Width / 2), e.Y - (dragSize.Height / 2)),
+                    dragSize);
             }
-            if (e.Button == MouseButtons.Right)
+            else if (e.Button == MouseButtons.Right)
             {
-                // Find the item under the mouse.
-                selectedIndex = ListBoxMaster.IndexFromPoint(e.Location);
-                if (selectedIndex < 0)
-                {
-                    return;
-                }
-                ToolStripMenuMasterCardname.Text = masterList[selectedIndex][(int)CardListField.name];
-                SetToolStripMenuMasterCardnumFilters();
-                SetToolStripMenuMasterCustomFilters();
-                SetToolStripMenuMasterAddKeyValue();
-                SetToolStripMenuMasterDeleteKeyValue();
+                _dragBoxFromMouseDown = Rectangle.Empty;
+                _selectedMasterIndex = ListBoxMaster.IndexFromPoint(e.Location);
+                if (_selectedMasterIndex < 0 || _selectedMasterIndex >= _masterCards.Count) return;
+
+                var card = _masterCards[_selectedMasterIndex];
+                ToolStripMenuMasterCardname.Text = card.Name;
+
+                SetToolStripMenuMasterCardnumFilters(card);
+                SetToolStripMenuMasterCustomFilters(card);
+                SetToolStripMenuMasterAddKeyValue(card);
+                SetToolStripMenuMasterDeleteKeyValue(card);
             }
-            if (e.Clicks == 2)
-            {
-                ListBoxCardList_MouseDoubleClick(sender, e);
-            }
-            return;
         }
 
-        private void SetToolStripMenuMasterCardnumFilters()
+        private void ListBoxMaster_MouseMove(object sender, MouseEventArgs e)
+        {
+            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+            {
+                // Only start drag-and-drop if the mouse has moved outside the drag box
+                if (_dragBoxFromMouseDown != Rectangle.Empty && !_dragBoxFromMouseDown.Contains(e.X, e.Y))
+                {
+                    _dragBoxFromMouseDown = Rectangle.Empty;
+                    if (ListBoxMaster.SelectedItem != null)
+                    {
+                        ListBoxMaster.DoDragDrop(ListBoxMaster.SelectedItem.ToString(), DragDropEffects.Copy);
+                    }
+                }
+            }
+        }
+
+        private void SetToolStripMenuMasterCardnumFilters(Card card)
         {
             ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
+            var pairs = new List<(string Key, string Value)>();
 
-            // 1. Get the data pairs
-            List<string[]> filterPairs = meccgCards.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
-
-            // 2. Calculate max length based on the key (filter name)
-            int maxLength = filterPairs.Max(ot => ot[0].Length);
-
-            for (int index = 0; index < filterPairs.Count; index++)
+            foreach (string key in CardCatalogService.FilterKeys)
             {
-                // Get the key value string (e.g., "Ruins & Lairs")
-                string filterValue = filterPairs[index][1];
+                string val = card.GetAttribute(key);
+                if (!string.IsNullOrEmpty(val))
+                {
+                    pairs.Add((key, val));
+                }
+            }
 
-                // --- FIX: ESCAPE THE AMPERSAND ---
-                // Replace all single '&' characters with '&&' for display purposes.
-                string escapedFilterValue = filterValue.Replace("&", "&&");
+            if (pairs.Count == 0) return;
+            int maxLen = pairs.Max(p => p.Key.Length);
 
-                // Construct the padded pair string using the escaped value
-                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{escapedFilterValue}";
-
-                ToolStripMenuMasterCardnumFilters.DropDownItems.Add(pair);
-
-                // The rest of the code is fine, though using Consolas at 8.0f for alignment is smart.
-                ToolStripMenuMasterCardnumFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                string escapedVal = pairs[i].Value.Replace("&", "&&");
+                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{escapedVal}";
+                var item = new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) };
+                ToolStripMenuMasterCardnumFilters.DropDownItems.Add(item);
             }
         }
 
-        private void SetToolStripMenuMasterCustomFilters()
+        private void SetToolStripMenuMasterCustomFilters(Card card)
         {
-            int maxLength = 0;
-            ToolStripMenuItem customFilters = new("Custom Filters") { Name = "Custom Filters" };
-            List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
-            if (filterPairs.Count > 0)
-            {
-                maxLength = filterPairs.Max(ot => ot[0].Length);
-            }
-            for (int index = 0; index < filterPairs.Count; index++)
-            {
-                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
-                ToolStripMenuItem newKeyPair = new(pair);
-                customFilters.DropDownItems.Add(newKeyPair);
-                customFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
-            }
+            var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
             ContextMenuStripMaster.Items.RemoveByKey("Custom Filters");
-            if (customFilters.HasDropDownItems)
+
+            if (pairs.Count == 0) return;
+
+            var customMenu = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            int maxLen = pairs.Max(p => p.Key.Length);
+
+            for (int i = 0; i < pairs.Count; i++)
             {
-                ContextMenuStripMaster.Items.Add(customFilters);
+                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value}";
+                customMenu.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
             }
+
+            ContextMenuStripMaster.Items.Add(customMenu);
+        }
+
+        private void SetToolStripMenuMasterAddKeyValue(Card card)
+        {
+            ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
+            var keyNames = _filterService.GetCustomKeyNames();
+            var cardKeys = _filterService.GetCardCustomKeyNames(card.Id);
+
+            var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+
+            foreach (string key in keyNames)
+            {
+                if (!cardKeys.Contains(key))
+                {
+                    var keyItem = new ToolStripMenuItem(key);
+                    var values = _filterService.GetCustomKeyValues(key);
+                    for (int v = 1; v < values.Count; v++)
+                    {
+                        var valItem = new ToolStripMenuItem(values[v]);
+                        valItem.Click += (s, ev) =>
+                        {
+                            _filterService.SetCardCustomTag(card.Id, key, valItem.Text);
+                            UpdateMasterList();
+                        };
+                        keyItem.DropDownItems.Add(valItem);
+                    }
+                    addMenu.DropDownItems.Add(keyItem);
+                }
+            }
+
+            if (addMenu.HasDropDownItems)
+            {
+                ContextMenuStripMaster.Items.Add(addMenu);
+            }
+        }
+
+        private void SetToolStripMenuMasterDeleteKeyValue(Card card)
+        {
+            ContextMenuStripMaster.Items.RemoveByKey("Delete Key Value");
+            var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
+            if (pairs.Count == 0) return;
+
+            var delMenu = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            foreach (var (key, value) in pairs)
+            {
+                var keyItem = new ToolStripMenuItem(key);
+                var valItem = new ToolStripMenuItem(value);
+                valItem.Click += (s, ev) =>
+                {
+                    _filterService.DeleteCardCustomTag(card.Id, key);
+                    UpdateMasterList();
+                };
+                keyItem.DropDownItems.Add(valItem);
+                delMenu.DropDownItems.Add(keyItem);
+            }
+
+            ContextMenuStripMaster.Items.Add(delMenu);
         }
 
         private void ToolStripMenuMaster_Click(object sender, EventArgs e)
         {
-            ListBox sourceListbox = ListBoxMaster;
-            List<string[]> sourceList = masterList;
-            ListBox destListbox = GetListBox(((ToolStripMenuItem)sender).Name);
-            List<string[]> destList = GetList(destListbox);
-            AddCard(sourceListbox, destListbox, sourceList, destList, selectedIndex);
-            TabControlDeck.SelectTab(GetTabIndex(destListbox));
+            if (_selectedMasterIndex < 0 || _selectedMasterIndex >= _masterCards.Count) return;
+
+            var sectionType = GetSectionTypeFromMenuName(((ToolStripMenuItem)sender).Name);
+            AddCardToSection(_masterCards[_selectedMasterIndex], sectionType);
+            TabControlDeck.SelectedIndex = (int)sectionType;
+        }
+
+        #endregion
+
+        #region IMAGE_PREVIEW
+
+        private async void ListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (sender is not ListBox listBox || listBox.SelectedIndex < 0) return;
+
+            Card selectedCard = null;
+
+            if (listBox == ListBoxMaster)
+            {
+                if (listBox.SelectedIndex < _masterCards.Count)
+                {
+                    selectedCard = _masterCards[listBox.SelectedIndex];
+                }
+            }
+            else
+            {
+                var sectionType = GetSectionTypeFromListBox(listBox);
+                var sectionCards = _currentDeck.GetSection(sectionType);
+                if (listBox.SelectedIndex < sectionCards.Count)
+                {
+                    selectedCard = sectionCards[listBox.SelectedIndex];
+                }
+            }
+
+            if (selectedCard == null) return;
+
+            // Deselect other listboxes
+            if (listBox != ListBoxMaster) ListBoxMaster.ClearSelected();
+            if (listBox != ListBoxPool) ListBoxPool.ClearSelected();
+            if (listBox != ListBoxResources) ListBoxResources.ClearSelected();
+            if (listBox != ListBoxHazards) ListBoxHazards.ClearSelected();
+            if (listBox != ListBoxSideboard) ListBoxSideboard.ClearSelected();
+            if (listBox != ListBoxSites) ListBoxSites.ClearSelected();
+
+            string imageUrl = $"https://cardnum.net/img/cards/{selectedCard.Set}/{selectedCard.ImageName}";
+
+            _imageLoadCts?.Cancel();
+            _imageLoadCts?.Dispose();
+            _imageLoadCts = new CancellationTokenSource();
+            var token = _imageLoadCts.Token;
+
+            try
+            {
+                var bitmap = await _cardImageCache.GetOrCreateAsync(imageUrl, selectedCard.Set, selectedCard.ImageName, token);
+                if (!token.IsCancellationRequested && bitmap != null)
+                {
+                    PictureBoxCardImage.Image = bitmap;
+                }
+            }
+            catch (OperationCanceledException) { }
+        }
+
+        #endregion
+
+        #region SET_MANAGEMENT
+
+        private void ToolStripMenuSet_CheckedChanged(object sender, EventArgs e)
+        {
+            var item = (ToolStripMenuItem)sender;
+            string setCode = item.Tag?.ToString();
+            if (string.IsNullOrEmpty(setCode)) return;
+
+            if (item.Checked)
+            {
+                _currentDeck.IncludedSets.Add(setCode);
+            }
+            else
+            {
+                _currentDeck.IncludedSets.Remove(setCode);
+            }
+
+            UpdateMasterList();
+        }
+
+        private void ToolStripMenuSetClearAll_Click(object sender, EventArgs e)
+        {
+            for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+            {
+                if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && item.Checked)
+                {
+                    item.Checked = false;
+                }
+            }
+        }
+
+        private void ToolStripMenuSetSelectAll_Click(object sender, EventArgs e)
+        {
+            for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+            {
+                if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && !item.Checked)
+                {
+                    item.Checked = true;
+                }
+            }
+        }
+
+        private void UpdateMasterList()
+        {
+            string curCardId = (ListBoxMaster.SelectedIndex >= 0 && ListBoxMaster.SelectedIndex < _masterCards.Count)
+                ? _masterCards[ListBoxMaster.SelectedIndex].Id
+                : string.Empty;
+
+            var cardnumFilters = GetActiveCardnumFilters();
+            var customFilters = GetActiveCustomFilters();
+
+            _masterCards = _filterService.Filter(_catalogService.Cards, _currentDeck.IncludedSets, cardnumFilters, customFilters);
+
+            ListBoxMaster.BeginUpdate();
+            ListBoxMaster.Items.Clear();
+            foreach (var card in _masterCards)
+            {
+                ListBoxMaster.Items.Add(card.Name);
+            }
+            ListBoxMaster.EndUpdate();
+
+            // Restore focus
+            int foundIndex = -1;
+            if (!string.IsNullOrEmpty(curCardId))
+            {
+                foundIndex = _masterCards.FindIndex(c => c.Id == curCardId);
+            }
+
+            if (foundIndex >= 0)
+            {
+                ListBoxMaster.SelectedIndex = foundIndex;
+            }
+            else if (ListBoxMaster.Items.Count > 0)
+            {
+                ListBoxMaster.SelectedIndex = 0;
+            }
+        }
+
+        #endregion
+
+        #region CARD_OPERATIONS & DRAG_DROP
+
+        private void AddCardToSection(Card card, DeckSectionType sectionType)
+        {
+            var section = _currentDeck.GetSection(sectionType);
+            section.Add(card);
+            section.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+
+            RefreshSectionListBox(sectionType);
+            UpdateFormTitle();
+        }
+
+        private void RemoveCardFromSection(DeckSectionType sectionType, int index)
+        {
+            var section = _currentDeck.GetSection(sectionType);
+            if (index >= 0 && index < section.Count)
+            {
+                section.RemoveAt(index);
+                RefreshSectionListBox(sectionType);
+                UpdateFormTitle();
+            }
+        }
+
+        private void RefreshSectionListBox(DeckSectionType sectionType)
+        {
+            var listBox = GetListBoxFromSectionType(sectionType);
+            var section = _currentDeck.GetSection(sectionType);
+
+            listBox.BeginUpdate();
+            listBox.Items.Clear();
+            foreach (var card in section)
+            {
+                listBox.Items.Add(card.Name);
+            }
+            listBox.EndUpdate();
+        }
+
+        private void ListBoxCardList_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            int index = ListBoxMaster.IndexFromPoint(e.Location);
+            if (index >= 0 && index < _masterCards.Count)
+            {
+                var currentSection = (DeckSectionType)TabControlDeck.SelectedIndex;
+                AddCardToSection(_masterCards[index], currentSection);
+            }
+        }
+
+        private void ListBoxTab_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            var sectionType = (DeckSectionType)TabControlDeck.SelectedIndex;
+            var listBox = GetListBoxFromSectionType(sectionType);
+            int index = listBox.IndexFromPoint(e.Location);
+            var section = _currentDeck.GetSection(sectionType);
+
+            if (index >= 0 && index < section.Count)
+            {
+                AddCardToSection(section[index], sectionType);
+            }
         }
 
         private void ListBoxTab_DragOver(object sender, DragEventArgs e)
@@ -182,979 +453,456 @@ namespace MECCG_Deck_Builder
 
         private void ListBoxTab_DragDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            if (ListBoxMaster.SelectedIndex >= 0 && ListBoxMaster.SelectedIndex < _masterCards.Count)
             {
-                string str = (string)e.Data.GetData(DataFormats.StringFormat);
-                ListBox currentTabListBox = GetListBox(((ListBox)sender).Parent.Name);
-                currentTabListBox.Items.Add(str);
-                List<string[]> currentTabList = GetList(currentTabListBox);
-                currentTabList.Add(masterList[ListBoxMaster.SelectedIndex]);
-                currentTabList.Sort(CompareCardsByName);
+                var targetListBox = (ListBox)sender;
+                var sectionType = GetSectionTypeFromListBox(targetListBox);
+                AddCardToSection(_masterCards[ListBoxMaster.SelectedIndex], sectionType);
             }
-        }
-
-        private void SetToolStripMenuMasterAddKeyValue()
-        {
-            List<string> keyNameList = userKeyValues.GetKeyNameList();
-            List<string> cardKeyNameList = userKeyValues.GetCardKeyNameList(masterList[selectedIndex][(int)CardListField.id]);
-            List<string> keyValueList;
-
-            ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
-            ToolStripMenuItem addKeyValue = new("Add Key Value") { Name = "Add Key Value" };
-            for (int keyIndex = 0; keyIndex < keyNameList.Count; keyIndex++)
-            {
-                if (!cardKeyNameList.Contains(keyNameList[keyIndex]))
-                {
-                    ToolStripMenuItem newKeyName = new(keyNameList[keyIndex]);
-                    keyValueList = userKeyValues.GetKeyValueList(keyNameList[keyIndex]);
-                    for (int valueIndex = 1; valueIndex < keyValueList.Count; valueIndex++)
-                    {
-                        ToolStripMenuItem newKeyValue = new(keyValueList[valueIndex]);
-                        newKeyValue.Click += SetCardNewKeyValue;
-                        newKeyName.DropDownItems.Add(newKeyValue);
-                    }
-                    addKeyValue.DropDownItems.Add(newKeyName);
-                }
-            }
-            if (addKeyValue.HasDropDownItems)
-            {
-                ContextMenuStripMaster.Items.Add(addKeyValue);
-            }
-        }
-
-        private void SetToolStripMenuMasterDeleteKeyValue()
-        {
-            List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(masterList[selectedIndex][(int)CardListField.id]);
-
-            ContextMenuStripMaster.Items.RemoveByKey("Delete Key Value");
-            ToolStripMenuItem delKeyNameValue = new("Delete Key Value") { Name = "Delete Key Value" };
-            for (int keyIndex = 0; keyIndex < filterPairs.Count; keyIndex++)
-            {
-                ToolStripMenuItem delKeyName = new(filterPairs[keyIndex][0]);
-                ToolStripMenuItem delKeyValue = new(filterPairs[keyIndex][1]);
-                delKeyValue.Click += DeleteCardKeyValue;
-                delKeyName.DropDownItems.Add(delKeyValue);
-                delKeyNameValue.DropDownItems.Add(delKeyName);
-            }
-            if (delKeyNameValue.HasDropDownItems)
-            {
-                ContextMenuStripMaster.Items.Add(delKeyNameValue);
-            }
-        }
-
-        private void SetCardNewKeyValue(object sender, EventArgs e)
-        {
-            string newKeyValue = ((ToolStripMenuItem)sender).Text;
-            string newKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
-            userKeyValues.SetCardKeyValue(newKeyName, newKeyValue, masterList[selectedIndex][(int)CardListField.id]);
-        }
-
-        private void DeleteCardKeyValue(object sender, EventArgs e)
-        {
-            string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
-            userKeyValues.DeleteCardKeyValue(delKeyName, masterList[selectedIndex][(int)CardListField.id]);
-            UpdateMasterList("");
-        }
-
-        #endregion
-
-        // Display image of selected card
-        #region SELECTED_INDEX
-
-        private async void ListBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            ListBox currentListBox = GetListBox(((ListBox)sender).Parent.Name);
-            if (currentListBox != null && currentListBox.SelectedIndex >= 0)
-            {
-                int currentIndex = currentListBox.SelectedIndex;
-
-                // Deselect other listboxes
-                if (currentListBox.Name != ListBoxMaster.Name)
-                    ListBoxMaster.ClearSelected();
-                if (currentListBox.Name != ListBoxPool.Name)
-                    ListBoxPool.ClearSelected();
-                if (currentListBox.Name != ListBoxResources.Name)
-                    ListBoxResources.ClearSelected();
-                if (currentListBox.Name != ListBoxHazards.Name)
-                    ListBoxHazards.ClearSelected();
-                if (currentListBox.Name != ListBoxSideboard.Name)
-                    ListBoxSideboard.ClearSelected();
-                if (currentListBox.Name != ListBoxSites.Name)
-                    ListBoxSites.ClearSelected();
-
-                List<string[]> currentList = GetList(currentListBox);
-                if (currentIndex >= currentList.Count)
-                {
-                    return;
-                }
-
-                string setFolder = currentList[currentIndex][(int)CardListField.set];
-                string imageName = currentList[currentIndex][(int)CardListField.image];
-                string imageUrl = $"https://cardnum.net/img/cards/{setFolder}/{imageName}";
-
-                // Cancel any pending image load from rapid selection changes
-                imageLoadCts?.Cancel();
-                imageLoadCts?.Dispose();
-                imageLoadCts = new CancellationTokenSource();
-                CancellationToken token = imageLoadCts.Token;
-
-                try
-                {
-                    // Asynchronously fetch card image (instant for cache hits)
-                    Bitmap cardBitmap = await cardImageCache.GetOrCreateAsync(imageUrl, setFolder, imageName, token);
-
-                    // Only update the display if this selection is still active
-                    if (!token.IsCancellationRequested && cardBitmap != null)
-                    {
-                        PictureBoxCardImage.Image = cardBitmap;
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    // Selection changed before image finished loading; safe to ignore
-                }
-            }
-        }
-
-        #endregion
-
-        // User can choose which sets to include in the master list on left from "Set" menu
-        #region SET_MANAGEMENT
-
-        private void ToolStripMenuSet_CheckedChanged(object sender, EventArgs e)
-        {
-            UpdateMasterList(((ToolStripMenuItem)sender).Tag.ToString());
-        }
-
-        private void ToolStripMenuSetClearAll_Click(object sender, EventArgs e)
-        {
-            // Ignore first two items which are select all and clear all
-            for (int setIndex = 2; setIndex < ToolStripMenuSet.DropDownItems.Count; setIndex++)
-            {
-                if (((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).Checked)
-                {
-                    ((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).PerformClick();
-                }
-            }
-        }
-
-        private void ToolStripMenuSetSelectAll_Click(object sender, EventArgs e)
-        {
-            // Ignore first two items which are select all and clear all
-            for (int setIndex = 2; setIndex < ToolStripMenuSet.DropDownItems.Count; setIndex++)
-            {
-                if (!((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).Checked)
-                {
-                    ((ToolStripMenuItem)ToolStripMenuSet.DropDownItems[setIndex]).PerformClick();
-                }
-            }
-        }
-
-        private void UpdateMasterList(string setName)
-        {
-            // Update list of user selected sets
-            if (setName != "")
-            {
-                if (!setList.Remove(setName))
-                {
-                    setList.Add(setName);
-                }
-            }
-
-            // Store current card selected before resetting master list
-            string curCardId = "";
-            if (ListBoxMaster.SelectedIndex >= 0)
-            {
-                curCardId = masterList[ListBoxMaster.SelectedIndex][(int)CardListField.id];
-            }
-
-            // Retrieve and set new list of cards
-            ListBoxMaster.Items.Clear();
-            List<string[]> keyValuePairs = GetCardnumKeyValuePairs();
-            masterList = meccgCards.GetCardList(setList, keyValuePairs);
-            keyValuePairs = GetCustomKeyValuePairs();
-            masterList = userKeyValues.GetCardList(masterList, keyValuePairs);
-            foreach (var card in masterList)
-            {
-                ListBoxMaster.Items.Add(card[(int)CardListField.name]);
-            }
-
-            // Set currently selected card
-            SetCardFocusAfterSetChange(curCardId);
-        }
-
-        private void SetCardFocusAfterSetChange(string curCardId)
-        {
-            // Find new location of selected card if it's still in master list
-            int index = 0;
-            foreach (var card in masterList)
-            {
-                if (card[(int)CardListField.id] == curCardId)
-                {
-                    ListBoxMaster.SelectedIndex = index;
-                    return;
-                }
-                index++;
-            }
-
-            // Default choice
-            if (ListBoxMaster.Items.Count > 0)
-            {
-                ListBoxMaster.SelectedIndex = 0;
-            }
-        }
-
-        #endregion
-
-        // Double click on card in master list copies it to current tab on right, double click
-        // on card in current tab on right duplicates it in that tab
-        #region DOUBLE_CLICK
-
-        private void ListBoxCardList_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            ListBox sourceListbox = ListBoxMaster;
-            ListBox destListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
-            List<string[]> sourceList = masterList;
-            List<string[]> destList = GetList(destListbox);
-            int index = ListBoxMaster.IndexFromPoint(e.X, e.Y);
-            AddCard(sourceListbox, destListbox, sourceList, destList, index);
-        }
-
-        private void ListBoxTab_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            ListBox sourceListbox = (ListBox)TabControlDeck.SelectedTab.Controls[0];
-            ListBox destListbox = sourceListbox;
-            List<string[]> sourceList = GetList(destListbox);
-            List<string[]> destList = sourceList;
-            int index = sourceListbox.IndexFromPoint(e.X, e.Y);
-            AddCard(sourceListbox, destListbox, sourceList, destList, index);
-        }
-
-        #endregion
-
-        // Add/Remove a card from a tab listbox and associated list, compare cards in lists for sorting,
-        // update application window title
-        #region CARD_OPS
-
-        private void AddCard(ListBox sourceListbox, ListBox destListbox, List<string[]> sourceList, List<string[]> destList, int index)
-        {
-            if (index == ListBox.NoMatches)
-            {
-                return;
-            }
-            destListbox.Items.Add(sourceListbox.Items[index]);
-            destList.Add(sourceList[index]);
-            destList.Sort(CompareCardsByName);
-            UpdateFormTitle();
-        }
-
-        private void RemoveCard(ListBox listBox, List<string[]> cardList, int index)
-        {
-            listBox.Items.Remove(listBox.Items[index]);
-            cardList.Remove(cardList[index]);
-            if (listBox.Items.Count > 0)
-            {
-                listBox.SelectedIndex = 0;
-            }
-            cardList.Sort(CompareCardsByName);
-            UpdateFormTitle();
         }
 
         private void UpdateFormTitle()
         {
-            string newFormTitle;
-
-            newFormTitle = "MECCG Deck Builder - \"" + currentDeckTitle + "\" (";
-            for (int tabIndex = 0; tabIndex < TabControlDeck.TabCount; tabIndex++)
-            {
-                newFormTitle += $"{((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Items.Count}";
-                if (((ListBox)TabControlDeck.Controls[tabIndex].Controls[0]).Name.Contains(Constants.Resource))
-                {
-                    int noCharacters = 0;
-                    List<string[]> keyValuePairs = [];
-                    foreach (string[] card in resourceList)
-                    {
-                        keyValuePairs = meccgCards.GetCardFilterPairs(card[(int)CardListField.id]);
-                        if (keyValuePairs.Exists(pair => pair[0] == "Primary" && pair[1] == "Character"))
-                        {
-                            noCharacters++;
-                        }
-                    }
-                    newFormTitle += $"[{noCharacters}]";
-                }
-                if (tabIndex != TabControlDeck.TabCount - 1)
-                {
-                    newFormTitle += "/";
-                }
-            }
-            newFormTitle += ")";
-            Text = newFormTitle;
-        }
-
-        private int CompareCardsByName(string[] x, string[] y)
-        {
-            return x[(int)CardListField.name].CompareTo(y[(int)CardListField.name]);
+            Text = $"{Constants.AppTitle} - \"{_currentDeck.Title}\" " +
+                   $"({_currentDeck.Pool.Count}/" +
+                   $"{_currentDeck.Resources.Count}[{_currentDeck.CountCharactersInResources()}]/" +
+                   $"{_currentDeck.Hazards.Count}/" +
+                   $"{_currentDeck.Sideboard.Count}/" +
+                   $"{_currentDeck.Sites.Count})";
         }
 
         #endregion
 
-        #region OPEN_CLOSE_DELETE_FILTER
+        #region TAB_CONTEXT_MENU
 
-        private void SetFilterMenuDeleteKeyNameValue_Click(object sender, EventArgs e)
+        private void ListBoxTab_MouseDown(object sender, MouseEventArgs e)
         {
-            List<string> keyNames = userKeyValues.GetKeyNameList();
-            List<string> keyValues;
+            if (e.Button != MouseButtons.Right) return;
 
-            ToolStripMenuItem delKeyNameValue = new("Delete Key") { Name = "Delete Key" };
-            if (keyNames.Count == 0)
-            {
-                delKeyNameValue.Enabled = false;
-            }
-            foreach (string keyName in keyNames)
-            {
-                ToolStripMenuItem delKeyName = new(keyName);
-                delKeyName.Click += DeleteKeyName;
-                keyValues = userKeyValues.GetKeyValueList(keyName);
-                foreach (string keyValue in keyValues)
-                {
-                    if (keyValue != "")
-                    {
-                        ToolStripMenuItem delKeyValue = new(keyValue);
-                        delKeyValue.Click += DeleteKeyValue;
-                        delKeyName.DropDownItems.Add(delKeyValue);
-                    }
-                }
-                delKeyNameValue.DropDownItems.Add(delKeyName);
-            }
-            ToolStripMenuFilter.DropDownItems.RemoveByKey("Delete Key");
-            ToolStripMenuFilter.DropDownItems.Insert(0, delKeyNameValue);
+            _callingListBox = (ListBox)sender;
+            _selectedTabIndex = _callingListBox.IndexFromPoint(e.Location);
+            if (_selectedTabIndex < 0) return;
+
+            var sectionType = GetSectionTypeFromListBox(_callingListBox);
+            var sectionCards = _currentDeck.GetSection(sectionType);
+            if (_selectedTabIndex >= sectionCards.Count) return;
+
+            var card = sectionCards[_selectedTabIndex];
+            ToolStripMenuTabCardname.Text = card.Name;
+
+            SetToolStripMenuTabCardnumFilters(card);
+            SetToolStripMenuTabCustomFilters(card);
+            ContextMenuStripTabs.Show(Cursor.Position);
         }
 
-        private void OpenFilterMenuItem_Click(object sender, EventArgs e)
+        private void SetToolStripMenuTabCardnumFilters(Card card)
         {
-            OpenFileDialog openFileDialog = new()
-            {
-                Title = Constants.AppTitle,
-                CheckPathExists = true,
-                DefaultExt = "json",
-                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json",
-                FilterIndex = 1,
-                RestoreDirectory = false,
-                AutoUpgradeEnabled = true
-            };
+            ToolStripMenuTabCardnumFilters.DropDownItems.Clear();
+            var pairs = new List<(string Key, string Value)>();
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            foreach (string key in CardCatalogService.FilterKeys)
             {
-                using StreamReader r = new(openFileDialog.FileName);
-                string json = r.ReadToEnd();
-                OpenCloseFilter OpenCloseItems = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
-                userKeyValues.cards = OpenCloseItems.cards;
-                userKeyValues.filters = OpenCloseItems.filters;
-                SetKeyNameList(ComboBoxKey3);
-                SetKeyNameList(ComboBoxKey4);
-                SetKeyValueList(ComboBoxKey3);
-                SetKeyValueList(ComboBoxKey4);
-                UpdateMasterList("");
+                string val = card.GetAttribute(key);
+                if (!string.IsNullOrEmpty(val)) pairs.Add((key, val));
+            }
+
+            if (pairs.Count == 0) return;
+            int maxLen = pairs.Max(p => p.Key.Length);
+
+            for (int i = 0; i < pairs.Count; i++)
+            {
+                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value.Replace("&", "&&")}";
+                ToolStripMenuTabCardnumFilters.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
             }
         }
 
-        private void SaveFilterMenuItem_Click(object sender, EventArgs e)
+        private void SetToolStripMenuTabCustomFilters(Card card)
         {
-            SaveFileDialog saveFileDialog = new()
-            {
-                Title = Constants.AppTitle,
-                CheckPathExists = true,
-                DefaultExt = "json",
-                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json",
-                FilterIndex = 1,
-                RestoreDirectory = false,
-                AutoUpgradeEnabled = true
-            };
+            var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
+            ContextMenuStripTabs.Items.RemoveByKey("Custom Filters");
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (pairs.Count == 0) return;
+
+            var customMenu = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            int maxLen = pairs.Max(p => p.Key.Length);
+
+            for (int i = 0; i < pairs.Count; i++)
             {
-                OpenCloseFilter OpenCloseItems = new()
-                {
-                    cards = userKeyValues.cards,
-                    filters = userKeyValues.filters
-                };
-                string indentedJsonString = JsonConvert.SerializeObject(OpenCloseItems, Formatting.Indented);
-                File.WriteAllText(saveFileDialog.FileName, indentedJsonString);
+                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value}";
+                customMenu.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
+            }
+
+            ContextMenuStripTabs.Items.Add(customMenu);
+        }
+
+        private void ToolStripMenuTab_Click(object sender, EventArgs e)
+        {
+            if (_callingListBox == null || _selectedTabIndex < 0) return;
+
+            var sourceSectionType = GetSectionTypeFromListBox(_callingListBox);
+            var sourceSection = _currentDeck.GetSection(sourceSectionType);
+            if (_selectedTabIndex >= sourceSection.Count) return;
+
+            var card = sourceSection[_selectedTabIndex];
+            string menuItemName = ((ToolStripMenuItem)sender).Name;
+
+            if (menuItemName.Contains(Constants.Delete))
+            {
+                RemoveCardFromSection(sourceSectionType, _selectedTabIndex);
+                return;
+            }
+
+            var destSectionType = GetSectionTypeFromMenuName(menuItemName);
+            AddCardToSection(card, destSectionType);
+
+            if (menuItemName.Contains(Constants.Move))
+            {
+                RemoveCardFromSection(sourceSectionType, _selectedTabIndex);
             }
         }
 
         #endregion
 
-        // Open/Save a deck, export deck as TTS/Cardnum/Text format
-        #region OPEN_CLOSE_EXPORT_DECK
+        #region FILE_MENU_OPEN_SAVE_EXPORT
 
         private void NewToolStripMenu_Click(object sender, EventArgs e)
         {
-            var selectedOption = MessageBox.Show("Do you want to save the current deck?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
-            if (selectedOption == DialogResult.No)
+            var result = MessageBox.Show("Do you want to clear the current deck?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+            if (result == DialogResult.Yes)
             {
-                currentDeckTitle = "New Deck";
-                for (int index = 0; index < Constants.TabList.Length; index++)
+                _currentDeck.Clear();
+                foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
                 {
-                    ListBox currentListBox = GetListBox(Constants.TabList[index]);
-                    currentListBox.Items.Clear();
-                    List<string[]> currentList = GetList(currentListBox);
-                    currentList.Clear();
+                    RefreshSectionListBox(sectionType);
                 }
                 UpdateFormTitle();
             }
         }
 
-        private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using SaveFileDialog saveFileDialog = new()
-            {
-                Title = Constants.AppTitle,
-                Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
-                FilterIndex = 1,
-                RestoreDirectory = true
-            };
-
-            if (saveFileDialog.ShowDialog() != DialogResult.Cancel)
-            {
-                string savePrefix = Path.GetDirectoryName(saveFileDialog.FileName) + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                List<List<string[]>> deckTabLists =
-                [
-                    poolList,
-                    resourceList,
-                    hazardList,
-                    sideboardList,
-                    siteList
-                ];
-                if (saveFileDialog.FilterIndex == (int)SaveType.TTS)
-                {
-                    meccgCards.Export_TTSfile(poolList, savePrefix + Constants.poolFileSuffix + ".json");
-                    meccgCards.Export_TTSfile(resourceList, savePrefix + Constants.resourceFileSuffix + ".json");
-                    meccgCards.Export_TTSfile(hazardList, savePrefix + Constants.hazardFileSuffix + ".json");
-                    meccgCards.Export_TTSfile(sideboardList, savePrefix + Constants.sideboardFileSuffix + ".json");
-                    meccgCards.Export_TTSfile(siteList, savePrefix + Constants.siteFileSuffix + ".json");
-                }
-                else if (saveFileDialog.FilterIndex == (int)SaveType.PlayMECCG)
-                {
-                    Cards.Export_PlayMECCGfile(deckTabLists, savePrefix + ".play");
-                }
-                else if (saveFileDialog.FilterIndex == (int)SaveType.Cardnum)
-                {
-                    meccgCards.Export_CardnumFile(deckTabLists, savePrefix + ".cnum");
-                }
-                else if (saveFileDialog.FilterIndex == (int)SaveType.Archive)
-                {
-                    meccgCards.Export_ArchiveFile(deckTabLists, savePrefix + ".archive");
-                }
-                else
-                {
-                    Cards.Export_TextFile(deckTabLists, savePrefix + ".txt");
-                }
-            }
-        }
-
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog = new()
+            using var saveFileDialog = new SaveFileDialog
             {
                 Title = Constants.AppTitle,
                 CheckPathExists = true,
                 DefaultExt = "json",
                 Filter = "MECCG Deck Builder Deck (*.json)|*.json",
-                FilterIndex = 1,
-                RestoreDirectory = false,
-                AutoUpgradeEnabled = true
+                FilterIndex = 1
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                currentDeckTitle = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
-                OpenCloseDeck OpenCloseItems = new()
-                {
-                    CurrentDeckTitle = currentDeckTitle,
-                    setList = setList,
-                    poolList = poolList,
-                    resourceList = resourceList,
-                    hazardList = hazardList,
-                    sideboardList = sideboardList,
-                    siteList = siteList
-                };
-                string indentedJsonString = JsonConvert.SerializeObject(OpenCloseItems, Formatting.Indented);
-                File.WriteAllText(saveFileDialog.FileName, indentedJsonString);
+                _currentDeck.Title = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                var dto = OpenCloseDeck.FromDeck(_currentDeck);
+                string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
+                File.WriteAllText(saveFileDialog.FileName, json);
                 UpdateFormTitle();
             }
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new()
+            using var openFileDialog = new OpenFileDialog
             {
                 Title = Constants.AppTitle,
                 CheckPathExists = true,
                 DefaultExt = "json",
                 Filter = "MECCG Deck Builder Deck (*.json)|*.json",
-                FilterIndex = 1,
-                RestoreDirectory = false,
-                Multiselect = true,
-                AutoUpgradeEnabled = true
+                FilterIndex = 1
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                using StreamReader r = new(openFileDialog.FileName);
-                string json = r.ReadToEnd();
-                OpenCloseDeck OpenCloseItems = JsonConvert.DeserializeObject<OpenCloseDeck>(json);
-                currentDeckTitle = OpenCloseItems.CurrentDeckTitle;
-                foreach (ToolStripMenuItem item in ToolStripMenuSet.DropDownItems)
+                string json = File.ReadAllText(openFileDialog.FileName);
+                var dto = JsonConvert.DeserializeObject<OpenCloseDeck>(json);
+                if (dto == null) return;
+
+                var loadedDeck = dto.ToDeck(_catalogService);
+                _currentDeck.Clear();
+                _currentDeck.Title = loadedDeck.Title;
+
+                foreach (var s in loadedDeck.IncludedSets)
                 {
-                    if (item.Checked == true)
+                    _currentDeck.IncludedSets.Add(s);
+                }
+
+                _currentDeck.Pool.AddRange(loadedDeck.Pool);
+                _currentDeck.Resources.AddRange(loadedDeck.Resources);
+                _currentDeck.Hazards.AddRange(loadedDeck.Hazards);
+                _currentDeck.Sideboard.AddRange(loadedDeck.Sideboard);
+                _currentDeck.Sites.AddRange(loadedDeck.Sites);
+
+                // Sync UI menu checks
+                foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                {
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
                     {
-                        item.Checked = false;
-                    }
-                    if (OpenCloseItems.setList.Contains(item.Tag))
-                    {
-                        item.Checked = true;
+                        setItem.Checked = _currentDeck.IncludedSets.Contains(tag);
                     }
                 }
-                for (int index = 0; index < Constants.TabList.Length; index++)
+
+                foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
                 {
-                    ListBox currentListBox = GetListBox(Constants.TabList[index]);
-                    List<string[]> savedList = GetList(OpenCloseItems, currentListBox);
-                    List<string[]> currentList = GetList(currentListBox);
-                    currentListBox.Items.Clear();
-                    currentList.Clear();
-                    foreach (var card in savedList)
-                    {
-                        currentListBox.Items.Add(card[(int)CardListField.name]);
-                        currentList.Add(card);
-                    }
+                    RefreshSectionListBox(sectionType);
                 }
+
+                UpdateMasterList();
                 UpdateFormTitle();
             }
         }
 
-        #endregion
-
-        // Right click on current tab with a card selected brings up context menu allowing three operations:
-        // 1. Copy card to same or other tab
-        // 2. Move card to another tab
-        // 3. Delete card from current tab
-        #region TABS_CONTEXT_MENU
-
-        private void ToolStripMenuTab_Click(object sender, EventArgs e)
+        private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ListBox sourceListbox = callingListbox;
-            List<string[]> sourceList = GetList(sourceListbox);
-            if (GetOperation(sender) == Constants.Delete)
+            using var saveFileDialog = new SaveFileDialog
             {
-                RemoveCard(sourceListbox, sourceList, selectedIndex);
-                return;
-            }
-            ListBox destListbox = GetListBox(((ToolStripMenuItem)sender).Name);
-            List<string[]> destList = GetList(destListbox);
-            AddCard(sourceListbox, destListbox, sourceList, destList, selectedIndex);
-            if (GetOperation(sender) == Constants.Move)
-            {
-                RemoveCard(sourceListbox, sourceList, selectedIndex);
-            }
-        }
+                Title = Constants.AppTitle,
+                Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*.play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
+                FilterIndex = 1,
+                RestoreDirectory = true
+            };
 
-        private void ListBoxTab_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
-                callingListbox = GetListBox(((ListBox)sender).Name);
-                // Find the item under the mouse.
-                selectedIndex = callingListbox.IndexFromPoint(e.Location);
-                if (selectedIndex < 0)
-                {
-                    return;
-                }
-                List<string[]> callingList = GetList(callingListbox);
-                ToolStripMenuTabCardname.Text = callingList[selectedIndex][(int)CardListField.name];
-                SetToolStripMenuTabCardnumFilters(callingList[selectedIndex][(int)CardListField.id]);
-                SetToolStripMenuTabCustomFilters(callingList[selectedIndex][(int)CardListField.id]);
-                ContextMenuStripTabs.Show(Cursor.Position);
-            }
-        }
+            if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
-        private void SetToolStripMenuTabCardnumFilters(string cardId)
-        {
-            ToolStripMenuTabCardnumFilters.DropDownItems.Clear();
-            List<string[]> filterPairs = meccgCards.GetCardFilterPairs(cardId);
-            int maxLength = filterPairs.Max(ot => ot[0].Length);
-            Font curFont = ToolStripMenuTabCardnumFilters.Font;
-            for (int index = 0; index < filterPairs.Count; index++)
-            {
-                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
-                ToolStripMenuTabCardnumFilters.DropDownItems.Add(pair);
-                ToolStripMenuTabCardnumFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
-            }
-        }
-        private void SetToolStripMenuTabCustomFilters(string cardId)
-        {
-            int maxLength = 0;
-            ToolStripMenuItem customFilters = new("Custom Filters") { Name = "Custom Filters" };
-            List<string[]> filterPairs = userKeyValues.GetCardFilterPairs(cardId);
-            if (filterPairs.Count > 0)
-            {
-                maxLength = filterPairs.Max(ot => ot[0].Length);
-            }
-            for (int index = 0; index < filterPairs.Count; index++)
-            {
-                string pair = $"{filterPairs[index][0].PadRight(maxLength + 3)}{filterPairs[index][1]}";
-                ToolStripMenuItem newKeyPair = new(pair);
-                customFilters.DropDownItems.Add(newKeyPair);
-                customFilters.DropDownItems[index].Font = new Font("Consolas", 8.0f);
-            }
-            ContextMenuStripTabs.Items.RemoveByKey("Custom Filters");
-            if (customFilters.HasDropDownItems)
-            {
-                ContextMenuStripTabs.Items.Add(customFilters);
-            }
-        }
+            string basePrefix = Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName) ?? "", Path.GetFileNameWithoutExtension(saveFileDialog.FileName));
 
-        #endregion
-
-        // Utility methods for determining correct listbox, list, tab or operation. Validate filename
-        // suffix when opening file
-        #region LOOKUPS
-
-        private List<string[]> GetList(ListBox listbox)
-        {
-            if (listbox == null)
+            switch ((SaveType)saveFileDialog.FilterIndex)
             {
-                return null;
-            }
-            switch (listbox.Name)
-            {
-                case "ListBoxCardList":
-                    return masterList;
-                case "ListBoxPool":
-                    return poolList;
-                case "ListBoxResources":
-                    return resourceList;
-                case "ListBoxHazards":
-                    return hazardList;
-                case "ListBoxSideboard":
-                    return sideboardList;
-                case "ListBoxSites":
-                    return siteList;
+                case SaveType.TTS:
+                    DeckExportService.ExportToTts(_currentDeck.Pool, $"{basePrefix}{Constants.poolFileSuffix}.json");
+                    DeckExportService.ExportToTts(_currentDeck.Resources, $"{basePrefix}{Constants.resourceFileSuffix}.json");
+                    DeckExportService.ExportToTts(_currentDeck.Hazards, $"{basePrefix}{Constants.hazardFileSuffix}.json");
+                    DeckExportService.ExportToTts(_currentDeck.Sideboard, $"{basePrefix}{Constants.sideboardFileSuffix}.json");
+                    DeckExportService.ExportToTts(_currentDeck.Sites, $"{basePrefix}{Constants.siteFileSuffix}.json");
+                    break;
+                case SaveType.PlayMECCG:
+                    DeckExportService.ExportToPlayMeccg(_currentDeck, $"{basePrefix}.play");
+                    break;
+                case SaveType.Cardnum:
+                    DeckExportService.ExportToCardnum(_currentDeck, $"{basePrefix}.cnum");
+                    break;
+                case SaveType.Archive:
+                    DeckExportService.ExportToArchive(_currentDeck, $"{basePrefix}.archive");
+                    break;
                 default:
+                    DeckExportService.ExportToText(_currentDeck, $"{basePrefix}.txt");
                     break;
             }
-            return masterList;
-        }
-
-        private static List<string[]> GetList(OpenCloseDeck OpenCloseItems, ListBox listbox)
-        {
-            if (listbox == null)
-            {
-                return null;
-            }
-            switch (listbox.Name)
-            {
-                case "ListBoxPool":
-                    return OpenCloseItems.poolList;
-                case "ListBoxResources":
-                    return OpenCloseItems.resourceList;
-                case "ListBoxHazards":
-                    return OpenCloseItems.hazardList;
-                case "ListBoxSideboard":
-                    return OpenCloseItems.sideboardList;
-                case "ListBoxSites":
-                    return OpenCloseItems.siteList;
-                default:
-                    break;
-            }
-            return null;
-        }
-
-        private ListBox GetListBox(string stringToSearch)
-        {
-            StringComparison comp = StringComparison.OrdinalIgnoreCase;
-            if (stringToSearch.Contains(Constants.Form, comp))
-            {
-                return ListBoxMaster;
-            }
-            else if (stringToSearch.Contains(Constants.Pool, comp))
-            {
-                return ListBoxPool;
-            }
-            else if (stringToSearch.Contains(Constants.Resource, comp))
-            {
-                return ListBoxResources;
-            }
-            else if (stringToSearch.Contains(Constants.Hazard, comp))
-            {
-                return ListBoxHazards;
-            }
-            else if (stringToSearch.Contains(Constants.Sideboard, comp))
-            {
-                return ListBoxSideboard;
-            }
-            else if (stringToSearch.Contains(Constants.Site, comp))
-            {
-                return ListBoxSites;
-            }
-            return null;
-        }
-
-        private static string GetOperation(object sender)
-        {
-            string operation;
-            if (((ToolStripMenuItem)sender).Name.Contains(Constants.Copy))
-            {
-                operation = Constants.Copy;
-            }
-            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Move))
-            {
-                operation = Constants.Move;
-            }
-            else if (((ToolStripMenuItem)sender).Name.Contains(Constants.Delete))
-            {
-                operation = Constants.Delete;
-            }
-            else
-            {
-                operation = "";
-            }
-            return operation;
-        }
-
-        private int GetTabIndex(ListBox listbox)
-        {
-            for (int tabIndex = 0; tabIndex < TabControlDeck.TabCount; tabIndex++)
-            {
-                if (TabControlDeck.Controls[tabIndex].Controls[0].Name == listbox.Name)
-                {
-                    return tabIndex;
-                }
-            }
-            return -1;
         }
 
         #endregion
 
-        // Handles two sets of key name-value filter sets, one read in from Cardnum, the other user maintained
-        // Routines to display available filters, edit filters, assign/remove filters from individual cards
-        #region FILTER
+        #region CUSTOM_FILTERS_OPEN_SAVE
 
-        private void ComboBoxKeyNameHandleTextEntry(object sender, EventArgs e)
+        private void OpenFilterMenuItem_Click(object sender, EventArgs e)
         {
-            ComboBox comboBox = (ComboBox)sender;
-            string newKeyName = comboBox.Text;
-            if (newKeyName != "" && !comboBox.Items.Contains(newKeyName))
+            using var openFileDialog = new OpenFileDialog
             {
-                userKeyValues.SetKeyName(newKeyName);
-                string curText = ComboBoxKey3.Text;
-                SetKeyNameList(ComboBoxKey3);
-                if (ComboBoxKey3.Text != curText)
+                Title = Constants.AppTitle,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string json = File.ReadAllText(openFileDialog.FileName);
+                var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
+                if (dto != null)
                 {
-                    ComboBoxKey3.Text = curText;
+                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards);
+                    RefreshFilterKeyDropdowns();
+                    UpdateMasterList();
                 }
-                curText = ComboBoxKey4.Text;
-                SetKeyNameList(ComboBoxKey4);
-                if (ComboBoxKey4.Text != curText)
+            }
+        }
+
+        private void SaveFilterMenuItem_Click(object sender, EventArgs e)
+        {
+            using var saveFileDialog = new SaveFileDialog
+            {
+                Title = Constants.AppTitle,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var dto = OpenCloseFilter.FromFilterService(_filterService);
+                string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
+                File.WriteAllText(saveFileDialog.FileName, json);
+            }
+        }
+
+        private void SetFilterMenuDeleteKeyNameValue_Click(object sender, EventArgs e)
+        {
+            var keyNames = _filterService.GetCustomKeyNames();
+            var delMenu = new ToolStripMenuItem("Delete Key") { Name = "Delete Key", Enabled = keyNames.Count > 0 };
+
+            foreach (string keyName in keyNames)
+            {
+                var keyItem = new ToolStripMenuItem(keyName);
+                keyItem.Click += (s, ev) =>
                 {
-                    ComboBoxKey4.Text = curText;
-                }
-                comboBox.SelectedItem = newKeyName;
-                MessageBox.Show($"\"{newKeyName}\" added to user key name list", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
+                    _filterService.DeleteCustomKeyName(keyName);
+                    RefreshFilterKeyDropdowns();
+                    UpdateMasterList();
+                };
 
-        private void ComboBoxKeyValueHandleTextEntry(object sender, EventArgs e)
-        {
-            ComboBox keyValueComboBox = (ComboBox)sender;
-            string newKeyValue = keyValueComboBox.Text;
-            if (newKeyValue == "")
-            {
-                return;
-            }
-            ComboBox keyNameComboBox;
-            string keyName;
-            if (keyValueComboBox.Name.Contains("Value3"))
-            {
-                keyNameComboBox = ComboBoxKey3;
-                keyName = ComboBoxKey3.SelectedItem?.ToString();
-            }
-            else
-            {
-                keyNameComboBox = ComboBoxKey4;
-                keyName = ComboBoxKey4.SelectedItem?.ToString();
-            }
-            if (keyName == "")
-            {
-                return;
-            }
-            if (!keyValueComboBox.Items.Contains(newKeyValue))
-            {
-                userKeyValues.SetKeyValue(keyName, newKeyValue);
-                keyValueComboBox.DataSource = SetKeyValueList(keyNameComboBox);
-                keyValueComboBox.SelectedItem = newKeyValue;
-                MessageBox.Show($"\"{newKeyValue}\" added to user key \"{keyName}\" value list", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private List<string[]> GetCardnumKeyValuePairs()
-        {
-            List<string[]> keyValuePairs = [];
-            if (ComboBoxValue1.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = [ComboBoxKey1.SelectedItem.ToString(), ComboBoxValue1.SelectedItem.ToString()];
-                keyValuePairs.Add(keyValuePair);
-            }
-            if (ComboBoxValue2.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = [ComboBoxKey2.SelectedItem.ToString(), ComboBoxValue2.SelectedItem.ToString()];
-                keyValuePairs.Add(keyValuePair);
-            }
-            return keyValuePairs;
-        }
-
-        private void DeleteKeyName(object sender, EventArgs e)
-        {
-            string delKeyName = ((ToolStripMenuItem)sender).Text;
-
-            DialogResult dialogResult = MessageBox.Show($"Delete \"{delKeyName}\" key name?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dialogResult == DialogResult.Yes)
-            {
-                userKeyValues.DeleteKeyName(delKeyName);
-                userKeyValues.DeleteCardsKeyName(delKeyName);
-                SetKeyNameList(ComboBoxKey3);
-                SetKeyNameList(ComboBoxKey4);
-                UpdateMasterList("");
-                MessageBox.Show($"\"{delKeyName}\" key name deleted.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
-        private void DeleteKeyValue(object sender, EventArgs e)
-        {
-            string delKeyValue = ((ToolStripMenuItem)sender).Text;
-            string delKeyName = ((ToolStripMenuItem)sender).OwnerItem.Text;
-
-            DialogResult dialogResult = MessageBox.Show($"Delete \"{delKeyValue}\" value from \"{delKeyName}\" key list?", Constants.AppTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dialogResult == DialogResult.Yes)
-            {
-                userKeyValues.DeleteKeyValue(delKeyName, delKeyValue);
-                userKeyValues.DeleteCardsKeyValue(delKeyName, delKeyValue);
-                if (ComboBoxKey3.Text == delKeyName)
+                var values = _filterService.GetCustomKeyValues(keyName);
+                foreach (string val in values)
                 {
-                    ComboBoxValue3.DataSource = null;
-                    ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
+                    if (!string.IsNullOrEmpty(val))
+                    {
+                        var valItem = new ToolStripMenuItem(val);
+                        valItem.Click += (s, ev) =>
+                        {
+                            _filterService.DeleteCustomKeyValue(keyName, val);
+                            UpdateMasterList();
+                        };
+                        keyItem.DropDownItems.Add(valItem);
+                    }
                 }
-                if (ComboBoxKey4.Text == delKeyName)
-                {
-                    ComboBoxValue4.DataSource = null;
-                    ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
-                }
-                UpdateMasterList("");
-                MessageBox.Show($"\"{delKeyValue}\" value deleted from \"{delKeyName}\" key list.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                delMenu.DropDownItems.Add(keyItem);
             }
+
+            ToolStripMenuFilter.DropDownItems.RemoveByKey("Delete Key");
+            ToolStripMenuFilter.DropDownItems.Insert(0, delMenu);
         }
 
-        private List<string[]> GetCustomKeyValuePairs()
+        #endregion
+
+        #region FILTER_EVENT_HANDLERS
+
+        private List<KeyValuePair<string, string>> GetActiveCardnumFilters()
         {
-            List<string[]> keyValuePairs = [];
-            if (ComboBoxValue3.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = [ComboBoxKey3.SelectedItem.ToString(), ComboBoxValue3.SelectedItem.ToString()];
-                keyValuePairs.Add(keyValuePair);
-            }
-            if (ComboBoxValue4.SelectedIndex >= 1)
-            {
-                string[] keyValuePair = [ComboBoxKey4.SelectedItem.ToString(), ComboBoxValue4.SelectedItem.ToString()];
-                keyValuePairs.Add(keyValuePair);
-            }
-            return keyValuePairs;
+            var list = new List<KeyValuePair<string, string>>();
+            if (ComboBoxValue1.SelectedIndex > 0 && ComboBoxKey1.SelectedItem is string k1 && ComboBoxValue1.SelectedItem is string v1)
+                list.Add(new(k1, v1));
+            if (ComboBoxValue2.SelectedIndex > 0 && ComboBoxKey2.SelectedItem is string k2 && ComboBoxValue2.SelectedItem is string v2)
+                list.Add(new(k2, v2));
+            return list;
+        }
+
+        private List<KeyValuePair<string, string>> GetActiveCustomFilters()
+        {
+            var list = new List<KeyValuePair<string, string>>();
+            if (ComboBoxValue3.SelectedIndex > 0 && ComboBoxKey3.SelectedItem is string k3 && ComboBoxValue3.SelectedItem is string v3)
+                list.Add(new(k3, v3));
+            if (ComboBoxValue4.SelectedIndex > 0 && ComboBoxKey4.SelectedItem is string k4 && ComboBoxValue4.SelectedItem is string v4)
+                list.Add(new(k4, v4));
+            return list;
         }
 
         private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (((ComboBox)sender).Name.Contains("Key1"))
+            if (sender == ComboBoxKey1 && ComboBoxKey1.SelectedItem is string k1)
             {
-                ComboBoxValue1.DataSource = null;
-                ComboBoxValue1.DataSource = SetKeyValueList(ComboBoxKey1);
+                ComboBoxValue1.DataSource = _catalogService.GetFilterValues(k1);
             }
-            else if (((ComboBox)sender).Name.Contains("Key2"))
+            else if (sender == ComboBoxKey2 && ComboBoxKey2.SelectedItem is string k2)
             {
-                ComboBoxValue2.DataSource = null;
-                ComboBoxValue2.DataSource = SetKeyValueList(ComboBoxKey2);
+                ComboBoxValue2.DataSource = _catalogService.GetFilterValues(k2);
             }
-            else if (((ComboBox)sender).Name.Contains("Key3"))
+            else if (sender == ComboBoxKey3 && ComboBoxKey3.SelectedItem is string k3)
             {
-                ComboBoxValue3.DataSource = null;
-                ComboBoxValue3.DataSource = SetKeyValueList(ComboBoxKey3);
+                ComboBoxValue3.DataSource = _filterService.GetCustomKeyValues(k3);
             }
-            else if (((ComboBox)sender).Name.Contains("Key4"))
+            else if (sender == ComboBoxKey4 && ComboBoxKey4.SelectedItem is string k4)
             {
-                ComboBoxValue4.DataSource = null;
-                ComboBoxValue4.DataSource = SetKeyValueList(ComboBoxKey4);
+                ComboBoxValue4.DataSource = _filterService.GetCustomKeyValues(k4);
             }
         }
 
         private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateMasterList("");
+            UpdateMasterList();
         }
 
-        private void SetKeyNameList(ComboBox comboBox)
+        private void ComboBoxKeyNameHandleTextEntry(object sender, EventArgs e)
         {
-            if (int.Parse(comboBox.Name[^1].ToString()) <= 2)
+            var cb = (ComboBox)sender;
+            string keyName = cb.Text.Trim();
+            if (!string.IsNullOrEmpty(keyName) && !cb.Items.Contains(keyName))
             {
-                comboBox.DataSource = null;
-                comboBox.DataSource = meccgCards.GetKeyNameList();
-            }
-            else
-            {
-                comboBox.DataSource = null;
-                comboBox.DataSource = userKeyValues.GetKeyNameList();
-            }
-        }
-
-        private List<string> SetKeyValueList(ComboBox keyNameComboBox)
-        {
-            if (int.Parse(keyNameComboBox.Name[^1].ToString()) <= 2)
-            {
-                return meccgCards.GetKeyValueList((string)keyNameComboBox.SelectedItem);
-            }
-            else
-            {
-                return userKeyValues.GetKeyValueList((string)keyNameComboBox.SelectedItem);
+                _filterService.AddCustomKeyName(keyName);
+                RefreshFilterKeyDropdowns();
+                cb.SelectedItem = keyName;
             }
         }
 
-        private void AdjustWidthComboBox_DropDown(object sender, System.EventArgs e)
+        private void ComboBoxKeyValueHandleTextEntry(object sender, EventArgs e)
         {
-            ComboBox senderComboBox = (ComboBox)sender;
-            int width = senderComboBox.DropDownWidth;
-            Graphics g = senderComboBox.CreateGraphics();
-            Font font = senderComboBox.Font;
-            int vertScrollBarWidth =
-                (senderComboBox.Items.Count > senderComboBox.MaxDropDownItems)
-                ? SystemInformation.VerticalScrollBarWidth : 0;
+            var cb = (ComboBox)sender;
+            string val = cb.Text.Trim();
+            var keyCb = cb == ComboBoxValue3 ? ComboBoxKey3 : ComboBoxKey4;
+            string key = keyCb.Text.Trim();
 
-            int newWidth;
-            foreach (string s in ((ComboBox)sender).Items)
+            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val) && !cb.Items.Contains(val))
             {
-                newWidth = (int)g.MeasureString(s, font).Width
-                    + vertScrollBarWidth;
-                if (width < newWidth)
+                _filterService.AddCustomKeyValue(key, val);
+                cb.DataSource = _filterService.GetCustomKeyValues(key);
+                cb.SelectedItem = val;
+            }
+        }
+
+        private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
+        {
+            var cb = (ComboBox)sender;
+            int width = cb.DropDownWidth;
+            using var g = cb.CreateGraphics();
+            int vertWidth = cb.Items.Count > cb.MaxDropDownItems ? SystemInformation.VerticalScrollBarWidth : 0;
+
+            foreach (var item in cb.Items)
+            {
+                if (item != null)
                 {
-                    width = newWidth;
+                    int itemWidth = (int)g.MeasureString(item.ToString(), cb.Font).Width + vertWidth;
+                    if (itemWidth > width) width = itemWidth;
                 }
             }
-            senderComboBox.DropDownWidth = width;
+            cb.DropDownWidth = width;
         }
 
         #endregion
 
-        #region TOOLS
+        #region HELPERS_AND_LOOKUPS
+
+        private static DeckSectionType GetSectionTypeFromListBox(ListBox lb) => lb.Name switch
+        {
+            nameof(ListBoxPool) => DeckSectionType.Pool,
+            nameof(ListBoxResources) => DeckSectionType.Resources,
+            nameof(ListBoxHazards) => DeckSectionType.Hazards,
+            nameof(ListBoxSideboard) => DeckSectionType.Sideboard,
+            nameof(ListBoxSites) => DeckSectionType.Sites,
+            _ => DeckSectionType.Pool
+        };
+
+        private ListBox GetListBoxFromSectionType(DeckSectionType type) => type switch
+        {
+            DeckSectionType.Pool => ListBoxPool,
+            DeckSectionType.Resources => ListBoxResources,
+            DeckSectionType.Hazards => ListBoxHazards,
+            DeckSectionType.Sideboard => ListBoxSideboard,
+            DeckSectionType.Sites => ListBoxSites,
+            _ => ListBoxPool
+        };
+
+        private static DeckSectionType GetSectionTypeFromMenuName(string menuName)
+        {
+            if (menuName.Contains(Constants.Pool)) return DeckSectionType.Pool;
+            if (menuName.Contains(Constants.Resource)) return DeckSectionType.Resources;
+            if (menuName.Contains(Constants.Hazard)) return DeckSectionType.Hazards;
+            if (menuName.Contains(Constants.Sideboard)) return DeckSectionType.Sideboard;
+            if (menuName.Contains(Constants.Site)) return DeckSectionType.Sites;
+            return DeckSectionType.Pool;
+        }
+
+        #endregion
+
+        #region TOOLS_AND_HELP
 
         private async void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
         {
-            if (masterList.Count == 0)
+            if (_masterCards.Count == 0)
             {
                 MessageBox.Show("No cards available in the master list to download.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -1165,73 +913,49 @@ namespace MECCG_Deck_Builder
 
             int downloadedCount = 0;
             int skippedCount = 0;
-            var cardsToProcess = masterList.ToList();
-            int totalCards = cardsToProcess.Count;
+            var cardsToProcess = _masterCards.ToList();
+            int total = cardsToProcess.Count;
 
             try
             {
-                for (int cardIndex = 0; cardIndex < totalCards; cardIndex++)
+                for (int i = 0; i < total; i++)
                 {
-                    string cardName = cardsToProcess[cardIndex][(int)CardListField.name];
-                    string imageName = cardsToProcess[cardIndex][(int)CardListField.image];
-                    string setFolder = cardsToProcess[cardIndex][(int)CardListField.set];
+                    var card = cardsToProcess[i];
+                    Text = $"{Constants.AppTitle} - Downloading Images ({i + 1}/{total}): {card.Name}";
 
-                    // Update live progress in the window title bar
-                    Text = $"MECCG Deck Builder - Downloading Images ({cardIndex + 1}/{totalCards}): {cardName}";
+                    if (string.IsNullOrEmpty(card.ImageName) || string.IsNullOrEmpty(card.Set)) continue;
 
-                    if (string.IsNullOrEmpty(imageName) || string.IsNullOrEmpty(setFolder))
-                    {
-                        continue;
-                    }
-
-                    string targetPath = Path.Combine(setFolder, imageName);
-
-                    // Skip downloading if the card image is already cached on disk
+                    string targetPath = Path.Combine(card.Set, card.ImageName);
                     if (File.Exists(targetPath))
                     {
                         skippedCount++;
                         continue;
                     }
 
-                    // Ensure the target directory exists before saving
-                    if (!Directory.Exists(setFolder))
-                    {
-                        Directory.CreateDirectory(setFolder);
-                    }
+                    if (!Directory.Exists(card.Set)) Directory.CreateDirectory(card.Set);
 
-                    // Download image asynchronously without blocking the UI thread
-                    using Bitmap cardImage = await CardImageCache.CreateItemAsync($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
-                    if (cardImage != null)
+                    using var bmp = await CardImageCache.CreateItemAsync($"https://cardnum.net/img/cards/{card.Set}/{card.ImageName}");
+                    if (bmp != null)
                     {
                         try
                         {
-                            cardImage.Save(targetPath);
+                            bmp.Save(targetPath);
                             downloadedCount++;
                         }
-                        catch (Exception)
-                        {
-                            // Continue downloading remaining cards even if a single save fails
-                        }
+                        catch { }
                     }
                 }
 
-                MessageBox.Show(
-                    $"Image download complete.\n\nDownloaded: {downloadedCount}\nAlready cached: {skippedCount}",
-                    Constants.AppTitle,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                MessageBox.Show($"Image download complete.\n\nDownloaded: {downloadedCount}\nAlready cached: {skippedCount}",
+                    Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             finally
             {
                 ToolStripMenuToolsGetImages.Enabled = true;
                 Cursor = Cursors.Default;
-                UpdateFormTitle(); // Restores standard window title format
+                UpdateFormTitle();
             }
         }
-
-        #endregion
-
-        #region HELP
 
         private void ContentsToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1247,6 +971,5 @@ namespace MECCG_Deck_Builder
         }
 
         #endregion
-
     }
 }

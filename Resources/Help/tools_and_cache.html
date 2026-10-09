@@ -11,7 +11,7 @@
 
     <h2>Card Artwork Cache System</h2>
     <p>
-        The application employs a two-tier caching architecture implemented in <code>CardImageCache.cs</code>:
+        The application employs a two-tier caching architecture:
     </p>
     <ol>
         <li><strong>Memory Cache:</strong> An in-memory cache holding up to 10,000 active Bitmaps for instant display when scrolling or clicking.</li>
@@ -19,7 +19,7 @@
             <strong>Local Disk Cache:</strong> Whenever a card image is requested, the application checks for an existing image on disk under a folder matching the set code (e.g., <code>METW/metw_adrazar.jpg</code>).
             <ul>
                 <li>If found locally, the image loads immediately with zero network latency.</li>
-                <li>If not found, it downloads from <code>https://cardnum.net/img/cards/{set}/{image}</code>, saves a copy into the set folder, and stores it in memory.</li>
+                <li>If not found, it downloads from Cardnum, saves a copy into the set folder, and stores it in memory.</li>
             </ul>
         </li>
     </ol>
@@ -34,14 +34,14 @@
         <li>Select <strong>Tools &gt; Download Images</strong>.</li>
     </ol>
     <div class="note">
-        <strong>Note:</strong> The batch downloader runs synchronously through the current Master List, creating set folders on disk and saving each card image.
+        <strong>Note:</strong> The batch downloader runs asynchronously in the background with real-time progress reported in the window title bar, ensuring the application remains responsive while saving each card image to disk.
     </div>
 
     <h2>Offline Data Fallbacks</h2>
     <p>The builder is resilient against network outages:</p>
     <ul>
-        <li><strong>Cards:</strong> Tries downloading latest data from <code>Constants.CardnumCardsURL</code>. If offline, it automatically reads the local <code>cards-dc.json</code> file.</li>
-        <li><strong>Sets:</strong> Tries downloading from <code>Constants.CardnumSetsURL</code>. If offline, it reads the local <code>sets-dc.json</code> file.</li>
+        <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch. If offline or unavailable, it seamlessly falls back to the bundled local <code>cards-dc.json</code> file.</li>
+        <li><strong>Sets:</strong> Automatically attempts to download the latest expansion set metadata. If offline, it reads the bundled local <code>sets-dc.json</code> file.</li>
     </ul>
 </body>
 </html>

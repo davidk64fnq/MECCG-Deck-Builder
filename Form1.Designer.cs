@@ -138,6 +138,7 @@ namespace MECCG_Deck_Builder
             ListBoxMaster.SelectedIndexChanged += ListBox_SelectedIndexChanged;
             ListBoxMaster.MouseDoubleClick += ListBoxCardList_MouseDoubleClick;
             ListBoxMaster.MouseDown += ListBoxMasterList_MouseDown;
+            ListBoxMaster.MouseMove += ListBoxMaster_MouseMove;
             // 
             // ContextMenuStripMaster
             // 
