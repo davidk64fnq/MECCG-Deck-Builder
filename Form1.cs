@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace MECCG_Deck_Builder
@@ -30,6 +31,7 @@ namespace MECCG_Deck_Builder
         private int selectedIndex;
         private string currentDeckTitle = "New Deck";
         private readonly CardImageCache cardImageCache = new();
+        private CancellationTokenSource imageLoadCts;
 
         internal Form1()
         {
@@ -259,7 +261,7 @@ namespace MECCG_Deck_Builder
         // Display image of selected card
         #region SELECTED_INDEX
 
-        private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
+        private async void ListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             ListBox currentListBox = GetListBox(((ListBox)sender).Parent.Name);
             if (currentListBox != null && currentListBox.SelectedIndex >= 0)
@@ -280,11 +282,37 @@ namespace MECCG_Deck_Builder
                 if (currentListBox.Name != ListBoxSites.Name)
                     ListBoxSites.ClearSelected();
 
-                // Display card image from correct set
                 List<string[]> currentList = GetList(currentListBox);
+                if (currentIndex >= currentList.Count)
+                {
+                    return;
+                }
+
                 string setFolder = currentList[currentIndex][(int)CardListField.set];
                 string imageName = currentList[currentIndex][(int)CardListField.image];
-                PictureBoxCardImage.Image = cardImageCache.GetOrCreate($"https://cardnum.net/img/cards/{setFolder}/{imageName}", setFolder, imageName);
+                string imageUrl = $"https://cardnum.net/img/cards/{setFolder}/{imageName}";
+
+                // Cancel any pending image load from rapid selection changes
+                imageLoadCts?.Cancel();
+                imageLoadCts?.Dispose();
+                imageLoadCts = new CancellationTokenSource();
+                CancellationToken token = imageLoadCts.Token;
+
+                try
+                {
+                    // Asynchronously fetch card image (instant for cache hits)
+                    Bitmap cardBitmap = await cardImageCache.GetOrCreateAsync(imageUrl, setFolder, imageName, token);
+
+                    // Only update the display if this selection is still active
+                    if (!token.IsCancellationRequested && cardBitmap != null)
+                    {
+                        PictureBoxCardImage.Image = cardBitmap;
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // Selection changed before image finished loading; safe to ignore
+                }
             }
         }
 
@@ -1124,57 +1152,81 @@ namespace MECCG_Deck_Builder
 
         #region TOOLS
 
-        private void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
+        private async void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
         {
-            int downloadedCount = 0;
-            int skippedCount = 0;
-
-            for (int cardIndex = 0; cardIndex < masterList.Count; cardIndex++)
+            if (masterList.Count == 0)
             {
-                string imageName = masterList[cardIndex][(int)CardListField.image];
-                string setFolder = masterList[cardIndex][(int)CardListField.set];
-
-                if (string.IsNullOrEmpty(imageName) || string.IsNullOrEmpty(setFolder))
-                {
-                    continue;
-                }
-
-                string targetPath = Path.Combine(setFolder, imageName);
-
-                // Skip downloading if the card image is already cached on disk
-                if (File.Exists(targetPath))
-                {
-                    skippedCount++;
-                    continue;
-                }
-
-                // Ensure the target directory exists before saving
-                if (!Directory.Exists(setFolder))
-                {
-                    Directory.CreateDirectory(setFolder);
-                }
-
-                // Properly dispose of the downloaded Bitmap to prevent GDI+ leaks
-                using Bitmap cardImage = CardImageCache.CreateItem($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
-                if (cardImage != null)
-                {
-                    try
-                    {
-                        cardImage.Save(targetPath);
-                        downloadedCount++;
-                    }
-                    catch (Exception)
-                    {
-                        // Continue downloading remaining cards even if a single save fails
-                    }
-                }
+                MessageBox.Show("No cards available in the master list to download.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
 
-            MessageBox.Show(
-                $"Image download complete.\n\nDownloaded: {downloadedCount}\nAlready cached: {skippedCount}",
-                Constants.AppTitle,
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            ToolStripMenuToolsGetImages.Enabled = false;
+            Cursor = Cursors.WaitCursor;
+
+            int downloadedCount = 0;
+            int skippedCount = 0;
+            var cardsToProcess = masterList.ToList();
+            int totalCards = cardsToProcess.Count;
+
+            try
+            {
+                for (int cardIndex = 0; cardIndex < totalCards; cardIndex++)
+                {
+                    string cardName = cardsToProcess[cardIndex][(int)CardListField.name];
+                    string imageName = cardsToProcess[cardIndex][(int)CardListField.image];
+                    string setFolder = cardsToProcess[cardIndex][(int)CardListField.set];
+
+                    // Update live progress in the window title bar
+                    Text = $"MECCG Deck Builder - Downloading Images ({cardIndex + 1}/{totalCards}): {cardName}";
+
+                    if (string.IsNullOrEmpty(imageName) || string.IsNullOrEmpty(setFolder))
+                    {
+                        continue;
+                    }
+
+                    string targetPath = Path.Combine(setFolder, imageName);
+
+                    // Skip downloading if the card image is already cached on disk
+                    if (File.Exists(targetPath))
+                    {
+                        skippedCount++;
+                        continue;
+                    }
+
+                    // Ensure the target directory exists before saving
+                    if (!Directory.Exists(setFolder))
+                    {
+                        Directory.CreateDirectory(setFolder);
+                    }
+
+                    // Download image asynchronously without blocking the UI thread
+                    using Bitmap cardImage = await CardImageCache.CreateItemAsync($"https://cardnum.net/img/cards/{setFolder}/{imageName}");
+                    if (cardImage != null)
+                    {
+                        try
+                        {
+                            cardImage.Save(targetPath);
+                            downloadedCount++;
+                        }
+                        catch (Exception)
+                        {
+                            // Continue downloading remaining cards even if a single save fails
+                        }
+                    }
+                }
+
+                MessageBox.Show(
+                    $"Image download complete.\n\nDownloaded: {downloadedCount}\nAlready cached: {skippedCount}",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+            finally
+            {
+                ToolStripMenuToolsGetImages.Enabled = true;
+                Cursor = Cursors.Default;
+                UpdateFormTitle(); // Restores standard window title format
+            }
         }
 
         #endregion
