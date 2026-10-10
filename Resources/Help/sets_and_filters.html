@@ -2,26 +2,68 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Set Management &amp; Filters</title>
+    <title>Sets &amp; Filter Management</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
     <div class="nav-bar"><a href="index.html">Home</a> &gt; Sets &amp; Filters</div>
     <h1>Sets &amp; Filter Management</h1>
 
-    <h2>Managing Sets</h2>
+    <h2>Managing Card Sets</h2>
     <p>
-        Click the <strong>Set</strong> menu in the top bar to toggle expansions. You can combine multiple sets at will:
+        Click the <strong>Set</strong> menu in the top bar to choose which expansions are active in the Master List. You can combine multiple sets at will:
     </p>
     <ul>
-        <li><strong>Select All:</strong> Enables every available official and Dreamcard expansion.</li>
+        <li><strong>Select All:</strong> Enables all official sets and Dreamcard expansions.</li>
         <li><strong>Clear All:</strong> Deselects all expansions.</li>
-        <li><strong>Individual Sets:</strong> Check or uncheck individual sets (e.g. <em>The Wizards</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or Dreamcard expansions).</li>
+        <li><strong>Individual Sets:</strong> Check or uncheck individual expansions (e.g., <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or player council Dreamcard sets).</li>
     </ul>
+
+    <h2>Dual-Layer Filtering Architecture</h2>
+    <p>
+        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. The filter bar is organized into two distinct layers:
+    </p>
+
+    <table>
+        <tr>
+            <th>Filter Layer</th>
+            <th>Data Source</th>
+            <th>User Modifiability</th>
+            <th>Input Style</th>
+        </tr>
+        <tr>
+            <td>
+                <strong>Slots 1 &amp; 2:<br />Built-in Database Filters</strong>
+            </td>
+            <td>
+                <strong>Cardnum Open Database:</strong> Canonical card statistics synchronized from <code>cardnum.net</code> and GitHub, representing published cards from Iron Crown Enterprises (I.C.E.) and Council of Elrond Dreamcards.
+            </td>
+            <td>
+                <strong>Read-Only:</strong> Attributes and values are fixed. You cannot type into, edit, or delete items in these two slots.
+            </td>
+            <td>
+                Fixed Drop-Down Selection list.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <strong>Slots 3 &amp; 4:<br />Custom User Taxonomy</strong>
+            </td>
+            <td>
+                <strong>User-Defined:</strong> Managed locally in your deck builder session and saved to custom filter files (<code>.json</code>).
+            </td>
+            <td>
+                <strong>Completely Alterable:</strong> You can invent new keys, type new values, assign them to cards via right-click, or delete them globally.
+            </td>
+            <td>
+                Editable Text ComboBox (type new entries directly or pick from existing values).
+            </td>
+        </tr>
+    </table>
 
     <h2>Cardnum Built-in Filters (Slots 1 &amp; 2)</h2>
     <p>
-        The first two key-value pairs at the bottom-left filter cards based on official metadata:
+        The two left-hand key-value selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
     </p>
     <table>
         <tr>
@@ -64,32 +106,83 @@
 
     <h2>Custom User Filters (Slots 3 &amp; 4)</h2>
     <p>
-        You can create your own custom tagging system to classify cards (e.g., categorizing cards by strategy: <code>Archetype</code> &rarr; <code>Ring Destruction</code> or <code>Faction Rush</code>):
+        The two right-hand slots allow you to create your own classification system to tag cards by playstyle, hazard package, or deck archetype (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code> or <code>Role</code> &rarr; <code>Scout Support</code>).
     </p>
 
     <h3>1. Creating a New Custom Key</h3>
     <ol>
-        <li>Click into the text box of <strong>ComboBoxKey3</strong> or <strong>ComboBoxKey4</strong>.</li>
-        <li>Type the new key name (e.g., <code>Strategy</code>) and press <kbd>Tab</kbd> or click away to commit.</li>
+        <li>Click directly into the text box of <strong>ComboBoxKey3</strong> or <strong>ComboBoxKey4</strong>.</li>
+        <li>Type your new key name (e.g., <code>Strategy</code>) and press <kbd>Tab</kbd> or click away to commit.</li>
     </ol>
 
     <h3>2. Adding Values to a Key</h3>
     <ol>
-        <li>Select the newly created key in Key Slot 3 or 4.</li>
-        <li>Type a new value into <strong>Value3</strong> or <strong>Value4</strong> (e.g., <code>One Ring Victory</code>) and leave the box to commit.</li>
+        <li>Select or type the desired key in Key Slot 3 or 4.</li>
+        <li>Click into the corresponding <strong>Value3</strong> or <strong>Value4</strong> box.</li>
+        <li>Type a new value (e.g., <code>One Ring Victory</code>) and press <kbd>Tab</kbd> or click away to commit.</li>
     </ol>
 
     <h3>3. Assigning Custom Tags to Cards</h3>
     <ol>
         <li>Right-click any card in the Master List.</li>
         <li>Navigate to <strong>Add Key Value &gt; [Your Key Name] &gt; [Your Value]</strong>.</li>
+        <li>The card is immediately associated with that tag. You can view all custom tags on a card by right-clicking it and inspecting the <strong>Custom Filters</strong> section.</li>
     </ol>
 
-    <h3>4. Saving and Opening Custom Filter Sets</h3>
+    <h3>4. Deleting Custom Keys and Values</h3>
+    <p>
+        The application supports selective deletion at three distinct levels:
+    </p>
+
+    <table>
+        <tr>
+            <th>Operation</th>
+            <th>How to Perform</th>
+            <th>Scope &amp; Impact</th>
+        </tr>
+        <tr>
+            <td><strong>Delete Entire Key</strong><br /><em>(Key &amp; all associated values)</em></td>
+            <td>
+                Open <strong>Filter &gt; Delete Key</strong> and click directly on the <strong>Key Name</strong> (the parent menu item itself; do not expand the fly-out sub-menu).
+            </td>
+            <td>
+                Permanently deletes the key category, removes all of its associated values, strips that tag from every card in the database, and clears any active filter slots currently using that key.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Delete Single Key Value</strong><br /><em>(Individual leaf value)</em></td>
+            <td>
+                Open <strong>Filter &gt; Delete Key</strong>, hover over the Key Name to expand its fly-out sub-menu, and click the specific <strong>Value</strong>.
+            </td>
+            <td>
+                Deletes only that individual value from the key taxonomy and removes it from all cards tagged with it. The parent key and all other sibling values remain intact.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Unassign Tag from Single Card</strong></td>
+            <td>
+                Right-click the card in the Master List or Deck Tab, then select <strong>Delete Key Value &gt; [Key] &gt; [Value]</strong>.
+            </td>
+            <td>
+                Only removes the tag from that specific card. The key and value remain preserved in your taxonomy for use on other cards.
+            </td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <strong>Global Database Scope:</strong> Deleting a key or value via <code>Filter &gt; Delete Key</code> permanently removes it across the <strong>entire card database</strong>. This affects all cards and all expansions, including sets that are currently unchecked or hidden in the <strong>Set</strong> menu.
+        <br /><br />
+        If you only wish to remove a tag from specific cards without deleting the term from your taxonomy, right-click the card directly and use <code>Delete Key Value &gt; [Key] &gt; [Value]</code> instead.
+    </div>
+
+    <div class="note">
+        <strong>Real-time Synchronization:</strong> Whenever a key or value is created or deleted, both custom filter slots (Slots 3 and 4) refresh their drop-down lists immediately in real time, even if both slots are currently configured to the same key. If a deleted item was actively selected, the slot automatically resets to blank.
+    </div>
+
+    <h3>5. Saving and Opening Custom Filter Sets</h3>
     <ul>
-        <li>Choose <strong>Filter &gt; Save</strong> to save your custom tag taxonomy and card assignments to a <code>.json</code> file.</li>
-        <li>Choose <strong>Filter &gt; Open</strong> to load a previously saved filter file.</li>
-        <li>Use <strong>Filter &gt; Delete Key</strong> to remove obsolete custom keys or individual values.</li>
+        <li><strong>Filter &gt; Save:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
+        <li><strong>Filter &gt; Open:</strong> Loads a previously saved custom filter set, restoring all keys, values, and card mappings.</li>
     </ul>
 </body>
 </html>

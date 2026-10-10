@@ -191,22 +191,42 @@ namespace MECCG_Deck_Builder
 
             var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
 
-            foreach (string key in keyNames)
+            foreach (string keyName in keyNames)
             {
-                if (!cardKeys.Contains(key))
+                // Skip the leading blank key entry
+                if (string.IsNullOrWhiteSpace(keyName))
                 {
-                    var keyItem = new ToolStripMenuItem(key);
-                    var values = _filterService.GetCustomKeyValues(key);
-                    for (int v = 1; v < values.Count; v++)
+                    continue;
+                }
+
+                // Only offer keys that this card doesn't already have assigned
+                if (!cardKeys.Contains(keyName))
+                {
+                    var keyItem = new ToolStripMenuItem(keyName);
+                    var values = _filterService.GetCustomKeyValues(keyName);
+
+                    // Filter out any blank values (e.g. the leading "")
+                    var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+
+                    if (definedValues.Count > 0)
                     {
-                        var valItem = new ToolStripMenuItem(values[v]);
-                        valItem.Click += (s, ev) =>
+                        foreach (string val in definedValues)
                         {
-                            _filterService.SetCardCustomTag(card.Id, key, valItem.Text);
-                            UpdateMasterList();
-                        };
-                        keyItem.DropDownItems.Add(valItem);
+                            var valItem = new ToolStripMenuItem(val);
+                            valItem.Click += (s, ev) =>
+                            {
+                                _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                                UpdateMasterList();
+                            };
+                            keyItem.DropDownItems.Add(valItem);
+                        }
                     }
+                    else
+                    {
+                        // Option B: Informative, disabled placeholder item
+                        keyItem.DropDownItems.Add(new ToolStripMenuItem("(No values defined)") { Enabled = false });
+                    }
+
                     addMenu.DropDownItems.Add(keyItem);
                 }
             }
@@ -743,6 +763,21 @@ namespace MECCG_Deck_Builder
                 keyItem.Click += (s, ev) =>
                 {
                     _filterService.DeleteCustomKeyName(keyName);
+
+                    // If Slot 3 was using this key, reset it
+                    if (string.Equals(ComboBoxKey3.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ComboBoxValue3.DataSource = new List<string> { "" };
+                        ComboBoxValue3.SelectedIndex = 0;
+                    }
+
+                    // If Slot 4 was using this key, reset it
+                    if (string.Equals(ComboBoxKey4.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ComboBoxValue4.DataSource = new List<string> { "" };
+                        ComboBoxValue4.SelectedIndex = 0;
+                    }
+
                     RefreshFilterKeyDropdowns();
                     UpdateMasterList();
                 };
@@ -756,6 +791,10 @@ namespace MECCG_Deck_Builder
                         valItem.Click += (s, ev) =>
                         {
                             _filterService.DeleteCustomKeyValue(keyName, val);
+
+                            // Sync BOTH Slot 3 and Slot 4 immediately
+                            RefreshCustomValueDropdowns(keyName, val);
+
                             UpdateMasterList();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -839,7 +878,10 @@ namespace MECCG_Deck_Builder
             if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val) && !cb.Items.Contains(val))
             {
                 _filterService.AddCustomKeyValue(key, val);
-                cb.DataSource = _filterService.GetCustomKeyValues(key);
+
+                // Refresh BOTH custom value dropdowns so sibling slots stay in sync
+                RefreshCustomValueDropdowns(key);
+
                 cb.SelectedItem = val;
             }
         }
@@ -860,6 +902,41 @@ namespace MECCG_Deck_Builder
                 }
             }
             cb.DropDownWidth = width;
+        }
+
+        private void RefreshCustomValueDropdowns(string affectedKey = null, string deletedValue = null)
+        {
+            RefreshCustomSlot(ComboBoxKey3, ComboBoxValue3, affectedKey, deletedValue);
+            RefreshCustomSlot(ComboBoxKey4, ComboBoxValue4, affectedKey, deletedValue);
+        }
+
+        private void RefreshCustomSlot(ComboBox keyCb, ComboBox valCb, string affectedKey, string deletedValue)
+        {
+            string currentKey = keyCb.Text.Trim();
+            if (string.IsNullOrEmpty(currentKey))
+            {
+                return;
+            }
+
+            // Refresh if this slot is using the affected key (or if affectedKey is null, refresh unconditionally)
+            if (affectedKey == null || string.Equals(currentKey, affectedKey, StringComparison.OrdinalIgnoreCase))
+            {
+                string prevVal = valCb.Text;
+                var values = _filterService.GetCustomKeyValues(currentKey);
+                valCb.DataSource = values;
+
+                // If the deleted value was selected in this slot, reset it to blank (index 0)
+                if (!string.IsNullOrEmpty(deletedValue) && string.Equals(prevVal, deletedValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    valCb.SelectedIndex = 0;
+                }
+                else
+                {
+                    // Otherwise, preserve whatever selection was already made
+                    int idx = values.FindIndex(v => string.Equals(v, prevVal, StringComparison.OrdinalIgnoreCase));
+                    valCb.SelectedIndex = idx >= 0 ? idx : 0;
+                }
+            }
         }
 
         #endregion
