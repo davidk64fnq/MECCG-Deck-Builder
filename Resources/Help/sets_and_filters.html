@@ -184,5 +184,59 @@
         <li><strong>Filter &gt; Save:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
         <li><strong>Filter &gt; Open:</strong> Loads a previously saved custom filter set, restoring all keys, values, and card mappings.</li>
     </ul>
+
+    <h2>Clearing and Resetting Filters</h2>
+    <p>
+        Filters can be deactivated individually or reset globally using several quick methods:
+    </p>
+
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Shortcut / Gesture</th>
+            <th>Scope &amp; Behavior</th>
+        </tr>
+        <tr>
+            <td><strong>Global Reset</strong></td>
+            <td>
+                Menu: <strong>Filter &gt; Clear All Filters</strong><br />
+                Keyboard: <kbd>Ctrl+R</kbd>
+            </td>
+            <td>
+                Instantly resets all four key-value pairs (Slots 1–4) to blank and refreshes the master card list.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Slot Context Menu</strong></td>
+            <td>
+                <strong>Right-Click</strong> any of the 8 filter ComboBoxes
+            </td>
+            <td>
+                Opens a context menu with options to:
+                <ul>
+                    <li><strong>Clear This Filter:</strong> Resets both the Key and Value of that specific slot to blank.</li>
+                    <li><strong>Clear All Filters:</strong> Resets all four slots at once.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Quick Keyboard Reset</strong></td>
+            <td>
+                <kbd>Escape</kbd>
+            </td>
+            <td>
+                When focused inside any Key or Value ComboBox, pressing <kbd>Escape</kbd> immediately resets that box to the blank (<code>""</code>) entry.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Manual Dropdown Reset</strong></td>
+            <td>
+                Select the top blank entry (<code>""</code>)
+            </td>
+            <td>
+                Selecting the empty item at the top of any Key dropdown resets that slot and clears its paired Value list.
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

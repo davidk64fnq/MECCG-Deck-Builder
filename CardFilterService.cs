@@ -18,14 +18,21 @@ namespace MECCG_Deck_Builder
 
         public List<string> GetCustomKeyNames()
         {
-            var names = new List<string>(_customFilters.Select(f => f[0]));
-            names.Sort(StringComparer.Ordinal);
+            var names = new List<string> { "" }; // Index 0 is blank
+            var sortedNames = _customFilters.Select(f => f[0]).ToList();
+            sortedNames.Sort(StringComparer.Ordinal);
+            names.AddRange(sortedNames);
             return names;
         }
 
         public List<string> GetCustomKeyValues(string keyName)
         {
             var values = new List<string> { "" };
+            if (string.IsNullOrWhiteSpace(keyName))
+            {
+                return values;
+            }
+
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {

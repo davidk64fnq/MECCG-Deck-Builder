@@ -27,6 +27,10 @@ namespace MECCG_Deck_Builder
         internal Form1()
         {
             InitializeComponent();
+
+            // Wire up filter shortcuts and context menus
+            InitializeFilterClearing();
+
             _catalogService.WarningOccurred += (s, msg) =>
                 MessageBox.Show(msg, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
@@ -71,12 +75,20 @@ namespace MECCG_Deck_Builder
                 ToolStripMenuSet.DropDownItems.Add(menuItem);
             }
 
-            // Filter menu icons
+            // Filter menu icons & Clear All item
             var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
             ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
 
-            // Filter ComboBoxes
+            var clearMenuItem = new ToolStripMenuItem("Clear All Filters")
+            {
+                ShortcutKeys = Keys.Control | Keys.R
+            };
+            clearMenuItem.Click += (s, e) => ResetAllFilters();
+
+            ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
+            ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
+
             RefreshFilterKeyDropdowns();
         }
 
@@ -833,22 +845,32 @@ namespace MECCG_Deck_Builder
 
         private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (sender == ComboBoxKey1 && ComboBoxKey1.SelectedItem is string k1)
+            if (sender == ComboBoxKey1)
             {
+                string k1 = ComboBoxKey1.SelectedItem as string ?? "";
                 ComboBoxValue1.DataSource = _catalogService.GetFilterValues(k1);
+                ComboBoxValue1.SelectedIndex = 0;
             }
-            else if (sender == ComboBoxKey2 && ComboBoxKey2.SelectedItem is string k2)
+            else if (sender == ComboBoxKey2)
             {
+                string k2 = ComboBoxKey2.SelectedItem as string ?? "";
                 ComboBoxValue2.DataSource = _catalogService.GetFilterValues(k2);
+                ComboBoxValue2.SelectedIndex = 0;
             }
-            else if (sender == ComboBoxKey3 && ComboBoxKey3.SelectedItem is string k3)
+            else if (sender == ComboBoxKey3)
             {
+                string k3 = ComboBoxKey3.SelectedItem as string ?? "";
                 ComboBoxValue3.DataSource = _filterService.GetCustomKeyValues(k3);
+                ComboBoxValue3.SelectedIndex = 0;
             }
-            else if (sender == ComboBoxKey4 && ComboBoxKey4.SelectedItem is string k4)
+            else if (sender == ComboBoxKey4)
             {
+                string k4 = ComboBoxKey4.SelectedItem as string ?? "";
                 ComboBoxValue4.DataSource = _filterService.GetCustomKeyValues(k4);
+                ComboBoxValue4.SelectedIndex = 0;
             }
+
+            UpdateMasterList();
         }
 
         private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -937,6 +959,86 @@ namespace MECCG_Deck_Builder
                     valCb.SelectedIndex = idx >= 0 ? idx : 0;
                 }
             }
+        }
+
+        private void InitializeFilterClearing()
+        {
+            // Context menu for individual slots
+            var filterContextMenu = new ContextMenuStrip();
+
+            var clearSlotItem = new ToolStripMenuItem("Clear This Filter");
+            clearSlotItem.Click += (s, e) =>
+            {
+                if (filterContextMenu.SourceControl is ComboBox cb)
+                {
+                    ClearSlotForControl(cb);
+                }
+            };
+
+            var clearAllItem = new ToolStripMenuItem("Clear All Filters") { ShortcutKeyDisplayString = "Ctrl+R" };
+            clearAllItem.Click += (s, e) => ResetAllFilters();
+
+            filterContextMenu.Items.Add(clearSlotItem);
+            filterContextMenu.Items.Add(new ToolStripSeparator());
+            filterContextMenu.Items.Add(clearAllItem);
+
+            // Attach to all 8 ComboBoxes
+            ComboBox[] filterBoxes = [
+                ComboBoxKey1, ComboBoxValue1,
+        ComboBoxKey2, ComboBoxValue2,
+        ComboBoxKey3, ComboBoxValue3,
+        ComboBoxKey4, ComboBoxValue4
+            ];
+
+            foreach (var cb in filterBoxes)
+            {
+                cb.ContextMenuStrip = filterContextMenu;
+                cb.KeyDown += FilterComboBox_KeyDown;
+            }
+        }
+
+        private void FilterComboBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Pressing Escape blanks the focused ComboBox
+            if (e.KeyCode == Keys.Escape && sender is ComboBox cb)
+            {
+                cb.SelectedIndex = 0;
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        private void ClearSlotForControl(ComboBox cb)
+        {
+            // If user right-clicks either the key or value in Slot 1, reset both
+            if (cb == ComboBoxKey1 || cb == ComboBoxValue1)
+            {
+                ComboBoxKey1.SelectedIndex = 0;
+            }
+            else if (cb == ComboBoxKey2 || cb == ComboBoxValue2)
+            {
+                ComboBoxKey2.SelectedIndex = 0;
+            }
+            else if (cb == ComboBoxKey3 || cb == ComboBoxValue3)
+            {
+                ComboBoxKey3.SelectedIndex = 0;
+            }
+            else if (cb == ComboBoxKey4 || cb == ComboBoxValue4)
+            {
+                ComboBoxKey4.SelectedIndex = 0;
+            }
+
+            UpdateMasterList();
+        }
+
+        public void ResetAllFilters()
+        {
+            ComboBoxKey1.SelectedIndex = 0;
+            ComboBoxKey2.SelectedIndex = 0;
+            ComboBoxKey3.SelectedIndex = 0;
+            ComboBoxKey4.SelectedIndex = 0;
+
+            UpdateMasterList();
         }
 
         #endregion

@@ -37,9 +37,12 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | Drag & Drop | Master List -> Tab | Add card to the target tab |
 | Right Click | Master List | Context menu: Copy to tab, view Cardnum attributes, assign custom tags |
 | Right Click | Deck Tab | Context menu: Copy, Move to another tab, Delete, view metadata |
+| Right Click | Filter ComboBox | Context menu: Clear this filter slot or clear all filters |
+| Escape | Filter ComboBox | Reset focused filter ComboBox to blank |
 | Ctrl + N | Global | Start a new deck |
 | Ctrl + O | Global | Open saved deck (`.json`) |
 | Ctrl + S | Global | Export deck dialog |
+| Ctrl + R | Global | Clear all active filter slots |
 
 ---
 

@@ -42,8 +42,10 @@ namespace MECCG_Deck_Builder
 
         public IReadOnlyList<string> GetFilterKeys()
         {
-            var keys = new List<string>(_filterOptions.Keys);
-            keys.Sort(StringComparer.Ordinal);
+            var keys = new List<string> { "" }; // Index 0 is blank
+            var sortedKeys = new List<string>(_filterOptions.Keys);
+            sortedKeys.Sort(StringComparer.Ordinal);
+            keys.AddRange(sortedKeys);
             return keys;
         }
 
@@ -53,7 +55,7 @@ namespace MECCG_Deck_Builder
             {
                 return values;
             }
-            return [""];
+            return [""]; // If key is blank, values list is just blank
         }
 
         public async Task InitializeAsync(CancellationToken cancellationToken = default)
