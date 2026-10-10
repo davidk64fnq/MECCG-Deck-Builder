@@ -12,10 +12,26 @@ namespace MECCG_Deck_Builder
 {
     internal partial class Form1 : Form
     {
+        private sealed class FilterSlot(int index, FilterType type, ComboBox keyBox, ComboBox valueBox)
+        {
+            public int Index { get; } = index;
+            public FilterType Type { get; } = type;
+            public ComboBox KeyBox { get; } = keyBox;
+            public ComboBox ValueBox { get; } = valueBox;
+
+            public string CurrentKey => KeyBox.Text.Trim();
+            public string CurrentValue => ValueBox.Text.Trim();
+
+            public FilterCriterion ToCriterion() => new(Type, CurrentKey, CurrentValue);
+        }
+
         private readonly CardCatalogService _catalogService = new();
         private readonly CardFilterService _filterService = new();
         private readonly Deck _currentDeck = new();
         private readonly CardImageCache _cardImageCache = new();
+
+        private readonly FilterSlot[] _filterSlots;
+        private bool _isUpdatingFilters;
 
         private List<Card> _masterCards = [];
         private ListBox _callingListBox;
@@ -28,7 +44,13 @@ namespace MECCG_Deck_Builder
         {
             InitializeComponent();
 
-            // Wire up filter shortcuts and context menus
+            _filterSlots = [
+                new FilterSlot(0, FilterType.Cardnum, ComboBoxKey1, ComboBoxValue1),
+                new FilterSlot(1, FilterType.Cardnum, ComboBoxKey2, ComboBoxValue2),
+                new FilterSlot(2, FilterType.Custom, ComboBoxKey3, ComboBoxValue3),
+                new FilterSlot(3, FilterType.Custom, ComboBoxKey4, ComboBoxValue4)
+            ];
+
             InitializeFilterClearing();
 
             _catalogService.WarningOccurred += (s, msg) =>
@@ -46,7 +68,8 @@ namespace MECCG_Deck_Builder
             {
                 await _catalogService.InitializeAsync();
                 CreateMenus();
-                UpdateMasterList();
+                RefreshFilterKeyDropdowns();
+                UpdateFacetedFilters();
                 UpdateFormTitle();
             }
             finally
@@ -58,24 +81,31 @@ namespace MECCG_Deck_Builder
 
         private void CreateMenus()
         {
-            // Set menu items
-            for (int i = 0; i < _catalogService.Sets.Count; i++)
+            _isUpdatingFilters = true;
+            try
             {
-                var set = _catalogService.Sets[i];
-                var menuItem = new ToolStripMenuItem(set.Name)
+                for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
-                    Tag = set.Code,
-                    CheckOnClick = true
-                };
-                menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
-                if (i == 0)
-                {
-                    menuItem.Checked = true;
+                    var set = _catalogService.Sets[i];
+                    var menuItem = new ToolStripMenuItem(set.Name)
+                    {
+                        Tag = set.Code,
+                        CheckOnClick = true
+                    };
+                    menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
+                    if (i == 0)
+                    {
+                        menuItem.Checked = true;
+                        _currentDeck.IncludedSets.Add(set.Code);
+                    }
+                    ToolStripMenuSet.DropDownItems.Add(menuItem);
                 }
-                ToolStripMenuSet.DropDownItems.Add(menuItem);
+            }
+            finally
+            {
+                _isUpdatingFilters = false;
             }
 
-            // Filter menu icons & Clear All item
             var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
             ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
@@ -88,16 +118,49 @@ namespace MECCG_Deck_Builder
 
             ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
             ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
-
-            RefreshFilterKeyDropdowns();
         }
 
         private void RefreshFilterKeyDropdowns()
         {
-            ComboBoxKey1.DataSource = _catalogService.GetFilterKeys();
-            ComboBoxKey2.DataSource = _catalogService.GetFilterKeys();
-            ComboBoxKey3.DataSource = _filterService.GetCustomKeyNames();
-            ComboBoxKey4.DataSource = _filterService.GetCustomKeyNames();
+            _isUpdatingFilters = true;
+            try
+            {
+                SetKeyDropdownDataSource(ComboBoxKey1, _catalogService.GetFilterKeys());
+                SetKeyDropdownDataSource(ComboBoxKey2, _catalogService.GetFilterKeys());
+                SetKeyDropdownDataSource(ComboBoxKey3, _filterService.GetCustomKeyNames());
+                SetKeyDropdownDataSource(ComboBoxKey4, _filterService.GetCustomKeyNames());
+            }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
+        }
+
+        private static void SetKeyDropdownDataSource(ComboBox cb, IReadOnlyList<string> items)
+        {
+            string current = cb.Text.Trim();
+            cb.DataSource = items;
+            int idx = -1;
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (string.Equals(items[i], current, StringComparison.OrdinalIgnoreCase))
+                {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx >= 0)
+            {
+                cb.SelectedIndex = idx;
+            }
+            else if (items.Count > 0)
+            {
+                cb.SelectedIndex = 0;
+            }
+            else
+            {
+                cb.SelectedIndex = -1;
+            }
         }
 
         #region MASTER_LIST_INTERACTION
@@ -112,7 +175,6 @@ namespace MECCG_Deck_Builder
                 ListBoxMaster.SelectedIndex = index;
                 ListBox_SelectedIndexChanged(sender, e);
 
-                // Define drag threshold rectangle so double-clicks are not swallowed
                 Size dragSize = SystemInformation.DragSize;
                 _dragBoxFromMouseDown = new Rectangle(
                     new Point(e.X - (dragSize.Width / 2), e.Y - (dragSize.Height / 2)),
@@ -138,7 +200,6 @@ namespace MECCG_Deck_Builder
         {
             if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
             {
-                // Only start drag-and-drop if the mouse has moved outside the drag box
                 if (_dragBoxFromMouseDown != Rectangle.Empty && !_dragBoxFromMouseDown.Contains(e.X, e.Y))
                 {
                     _dragBoxFromMouseDown = Rectangle.Empty;
@@ -205,19 +266,15 @@ namespace MECCG_Deck_Builder
 
             foreach (string keyName in keyNames)
             {
-                // Skip the leading blank key entry
                 if (string.IsNullOrWhiteSpace(keyName))
                 {
                     continue;
                 }
 
-                // Only offer keys that this card doesn't already have assigned
                 if (!cardKeys.Contains(keyName))
                 {
                     var keyItem = new ToolStripMenuItem(keyName);
                     var values = _filterService.GetCustomKeyValues(keyName);
-
-                    // Filter out any blank values (e.g. the leading "")
                     var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
 
                     if (definedValues.Count > 0)
@@ -228,14 +285,13 @@ namespace MECCG_Deck_Builder
                             valItem.Click += (s, ev) =>
                             {
                                 _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
-                                UpdateMasterList();
+                                UpdateFacetedFilters();
                             };
                             keyItem.DropDownItems.Add(valItem);
                         }
                     }
                     else
                     {
-                        // Option B: Informative, disabled placeholder item
                         keyItem.DropDownItems.Add(new ToolStripMenuItem("(No values defined)") { Enabled = false });
                     }
 
@@ -263,7 +319,7 @@ namespace MECCG_Deck_Builder
                 valItem.Click += (s, ev) =>
                 {
                     _filterService.DeleteCardCustomTag(card.Id, key);
-                    UpdateMasterList();
+                    UpdateFacetedFilters();
                 };
                 keyItem.DropDownItems.Add(valItem);
                 delMenu.DropDownItems.Add(keyItem);
@@ -287,7 +343,17 @@ namespace MECCG_Deck_Builder
 
         private async void ListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (sender is not ListBox listBox || listBox.SelectedIndex < 0) return;
+            if (sender is not ListBox listBox) return;
+
+            if (listBox.SelectedIndex < 0)
+            {
+                if (listBox == ListBoxMaster)
+                {
+                    _imageLoadCts?.Cancel();
+                    PictureBoxCardImage.Image = null;
+                }
+                return;
+            }
 
             Card selectedCard = null;
 
@@ -310,7 +376,6 @@ namespace MECCG_Deck_Builder
 
             if (selectedCard == null) return;
 
-            // Deselect other listboxes
             if (listBox != ListBoxMaster) ListBoxMaster.ClearSelected();
             if (listBox != ListBoxPool) ListBoxPool.ClearSelected();
             if (listBox != ListBoxResources) ListBoxResources.ClearSelected();
@@ -342,6 +407,8 @@ namespace MECCG_Deck_Builder
 
         private void ToolStripMenuSet_CheckedChanged(object sender, EventArgs e)
         {
+            if (_isUpdatingFilters) return;
+
             var item = (ToolStripMenuItem)sender;
             string setCode = item.Tag?.ToString();
             if (string.IsNullOrEmpty(setCode)) return;
@@ -355,29 +422,57 @@ namespace MECCG_Deck_Builder
                 _currentDeck.IncludedSets.Remove(setCode);
             }
 
-            UpdateMasterList();
+            UpdateFacetedFilters();
         }
 
         private void ToolStripMenuSetClearAll_Click(object sender, EventArgs e)
         {
-            for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+            _isUpdatingFilters = true;
+            try
             {
-                if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && item.Checked)
+                for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
                 {
-                    item.Checked = false;
+                    if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && item.Checked)
+                    {
+                        item.Checked = false;
+                        if (item.Tag is string code)
+                        {
+                            _currentDeck.IncludedSets.Remove(code);
+                        }
+                    }
                 }
             }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
+
+            UpdateFacetedFilters();
         }
 
         private void ToolStripMenuSetSelectAll_Click(object sender, EventArgs e)
         {
-            for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+            _isUpdatingFilters = true;
+            try
             {
-                if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && !item.Checked)
+                for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
                 {
-                    item.Checked = true;
+                    if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && !item.Checked)
+                    {
+                        item.Checked = true;
+                        if (item.Tag is string code)
+                        {
+                            _currentDeck.IncludedSets.Add(code);
+                        }
+                    }
                 }
             }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
+
+            UpdateFacetedFilters();
         }
 
         private void UpdateMasterList()
@@ -386,10 +481,12 @@ namespace MECCG_Deck_Builder
                 ? _masterCards[ListBoxMaster.SelectedIndex].Id
                 : string.Empty;
 
-            var cardnumFilters = GetActiveCardnumFilters();
-            var customFilters = GetActiveCustomFilters();
+            var activeCriteria = _filterSlots
+                .Where(s => !string.IsNullOrWhiteSpace(s.CurrentKey) && !string.IsNullOrWhiteSpace(s.CurrentValue))
+                .Select(s => s.ToCriterion())
+                .ToList();
 
-            _masterCards = _filterService.Filter(_catalogService.Cards, _currentDeck.IncludedSets, cardnumFilters, customFilters);
+            _masterCards = _filterService.Filter(_catalogService.Cards, _currentDeck.IncludedSets, activeCriteria);
 
             ListBoxMaster.BeginUpdate();
             ListBoxMaster.Items.Clear();
@@ -398,6 +495,13 @@ namespace MECCG_Deck_Builder
                 ListBoxMaster.Items.Add(card.Name);
             }
             ListBoxMaster.EndUpdate();
+
+            if (_masterCards.Count == 0)
+            {
+                _imageLoadCts?.Cancel();
+                PictureBoxCardImage.Image = null;
+                return;
+            }
 
             // Restore focus
             int foundIndex = -1;
@@ -410,7 +514,7 @@ namespace MECCG_Deck_Builder
             {
                 ListBoxMaster.SelectedIndex = foundIndex;
             }
-            else if (ListBoxMaster.Items.Count > 0)
+            else
             {
                 ListBoxMaster.SelectedIndex = 0;
             }
@@ -664,13 +768,20 @@ namespace MECCG_Deck_Builder
                 _currentDeck.Sideboard.AddRange(loadedDeck.Sideboard);
                 _currentDeck.Sites.AddRange(loadedDeck.Sites);
 
-                // Sync UI menu checks
-                foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                _isUpdatingFilters = true;
+                try
                 {
-                    if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
+                    foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
                     {
-                        setItem.Checked = _currentDeck.IncludedSets.Contains(tag);
+                        if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
+                        {
+                            setItem.Checked = _currentDeck.IncludedSets.Contains(tag);
+                        }
                     }
+                }
+                finally
+                {
+                    _isUpdatingFilters = false;
                 }
 
                 foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
@@ -678,7 +789,7 @@ namespace MECCG_Deck_Builder
                     RefreshSectionListBox(sectionType);
                 }
 
-                UpdateMasterList();
+                UpdateFacetedFilters();
                 UpdateFormTitle();
             }
         }
@@ -742,7 +853,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.LoadCustomFilters(dto.Filters, dto.Cards);
                     RefreshFilterKeyDropdowns();
-                    UpdateMasterList();
+                    UpdateFacetedFilters();
                 }
             }
         }
@@ -771,27 +882,27 @@ namespace MECCG_Deck_Builder
 
             foreach (string keyName in keyNames)
             {
+                if (string.IsNullOrWhiteSpace(keyName)) continue;
+
                 var keyItem = new ToolStripMenuItem(keyName);
                 keyItem.Click += (s, ev) =>
                 {
                     _filterService.DeleteCustomKeyName(keyName);
 
-                    // If Slot 3 was using this key, reset it
                     if (string.Equals(ComboBoxKey3.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
                     {
-                        ComboBoxValue3.DataSource = new List<string> { "" };
+                        ComboBoxKey3.SelectedIndex = 0;
                         ComboBoxValue3.SelectedIndex = 0;
                     }
 
-                    // If Slot 4 was using this key, reset it
                     if (string.Equals(ComboBoxKey4.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
                     {
-                        ComboBoxValue4.DataSource = new List<string> { "" };
+                        ComboBoxKey4.SelectedIndex = 0;
                         ComboBoxValue4.SelectedIndex = 0;
                     }
 
                     RefreshFilterKeyDropdowns();
-                    UpdateMasterList();
+                    UpdateFacetedFilters();
                 };
 
                 var values = _filterService.GetCustomKeyValues(keyName);
@@ -803,11 +914,7 @@ namespace MECCG_Deck_Builder
                         valItem.Click += (s, ev) =>
                         {
                             _filterService.DeleteCustomKeyValue(keyName, val);
-
-                            // Sync BOTH Slot 3 and Slot 4 immediately
-                            RefreshCustomValueDropdowns(keyName, val);
-
-                            UpdateMasterList();
+                            UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
                     }
@@ -821,65 +928,137 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        #region FILTER_EVENT_HANDLERS
+        #region FACETED_FILTER_ENGINE
 
-        private List<KeyValuePair<string, string>> GetActiveCardnumFilters()
+        private void UpdateFacetedFilters()
         {
-            var list = new List<KeyValuePair<string, string>>();
-            if (ComboBoxValue1.SelectedIndex > 0 && ComboBoxKey1.SelectedItem is string k1 && ComboBoxValue1.SelectedItem is string v1)
-                list.Add(new(k1, v1));
-            if (ComboBoxValue2.SelectedIndex > 0 && ComboBoxKey2.SelectedItem is string k2 && ComboBoxValue2.SelectedItem is string v2)
-                list.Add(new(k2, v2));
-            return list;
-        }
+            if (_isUpdatingFilters) return;
+            _isUpdatingFilters = true;
 
-        private List<KeyValuePair<string, string>> GetActiveCustomFilters()
-        {
-            var list = new List<KeyValuePair<string, string>>();
-            if (ComboBoxValue3.SelectedIndex > 0 && ComboBoxKey3.SelectedItem is string k3 && ComboBoxValue3.SelectedItem is string v3)
-                list.Add(new(k3, v3));
-            if (ComboBoxValue4.SelectedIndex > 0 && ComboBoxKey4.SelectedItem is string k4 && ComboBoxValue4.SelectedItem is string v4)
-                list.Add(new(k4, v4));
-            return list;
+            try
+            {
+                // Invalidation loop: detect dead-ends and reset invalid values to blank
+                bool changed;
+                int maxIterations = 4;
+                do
+                {
+                    changed = false;
+                    for (int i = 0; i < _filterSlots.Length; i++)
+                    {
+                        var slot = _filterSlots[i];
+                        if (string.IsNullOrWhiteSpace(slot.CurrentKey) || string.IsNullOrWhiteSpace(slot.CurrentValue))
+                        {
+                            continue;
+                        }
+
+                        var otherCriteria = _filterSlots
+                            .Where(s => s.Index != i && !string.IsNullOrWhiteSpace(s.CurrentKey) && !string.IsNullOrWhiteSpace(s.CurrentValue))
+                            .Select(s => s.ToCriterion())
+                            .ToList();
+
+                        var availableValues = _filterService.GetAvailableValues(
+                            _catalogService.Cards,
+                            _currentDeck.IncludedSets,
+                            otherCriteria,
+                            slot.Type,
+                            slot.CurrentKey);
+
+                        if (!availableValues.Exists(v => string.Equals(v, slot.CurrentValue, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            if (slot.ValueBox.DataSource is List<string> list && list.Count > 0)
+                            {
+                                slot.ValueBox.SelectedIndex = 0;
+                            }
+                            else
+                            {
+                                slot.ValueBox.Text = "";
+                            }
+                            changed = true;
+                        }
+                    }
+                } while (changed && --maxIterations > 0);
+
+                // Context-sensitive pruning: update dropdown contents for all 4 slots
+                for (int i = 0; i < _filterSlots.Length; i++)
+                {
+                    var slot = _filterSlots[i];
+                    string key = slot.CurrentKey;
+                    string prevVal = slot.CurrentValue;
+
+                    if (string.IsNullOrWhiteSpace(key))
+                    {
+                        slot.ValueBox.DataSource = new List<string> { "" };
+                        slot.ValueBox.SelectedIndex = 0;
+                        continue;
+                    }
+
+                    var otherCriteria = _filterSlots
+                        .Where(s => s.Index != i && !string.IsNullOrWhiteSpace(s.CurrentKey) && !string.IsNullOrWhiteSpace(s.CurrentValue))
+                        .Select(s => s.ToCriterion())
+                        .ToList();
+
+                    var availableValues = _filterService.GetAvailableValues(
+                        _catalogService.Cards,
+                        _currentDeck.IncludedSets,
+                        otherCriteria,
+                        slot.Type,
+                        key);
+
+                    slot.ValueBox.DataSource = availableValues;
+
+                    int matchIdx = availableValues.FindIndex(v => string.Equals(v, prevVal, StringComparison.OrdinalIgnoreCase));
+                    slot.ValueBox.SelectedIndex = matchIdx >= 0 ? matchIdx : 0;
+                }
+
+                UpdateMasterList();
+            }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
         }
 
         private void KeyName_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (sender == ComboBoxKey1)
-            {
-                string k1 = ComboBoxKey1.SelectedItem as string ?? "";
-                ComboBoxValue1.DataSource = _catalogService.GetFilterValues(k1);
-                ComboBoxValue1.SelectedIndex = 0;
-            }
-            else if (sender == ComboBoxKey2)
-            {
-                string k2 = ComboBoxKey2.SelectedItem as string ?? "";
-                ComboBoxValue2.DataSource = _catalogService.GetFilterValues(k2);
-                ComboBoxValue2.SelectedIndex = 0;
-            }
-            else if (sender == ComboBoxKey3)
-            {
-                string k3 = ComboBoxKey3.SelectedItem as string ?? "";
-                ComboBoxValue3.DataSource = _filterService.GetCustomKeyValues(k3);
-                ComboBoxValue3.SelectedIndex = 0;
-            }
-            else if (sender == ComboBoxKey4)
-            {
-                string k4 = ComboBoxKey4.SelectedItem as string ?? "";
-                ComboBoxValue4.DataSource = _filterService.GetCustomKeyValues(k4);
-                ComboBoxValue4.SelectedIndex = 0;
-            }
+            if (_isUpdatingFilters) return;
 
-            UpdateMasterList();
+            int slotIndex = GetSlotIndexForControl((Control)sender);
+            if (slotIndex >= 0)
+            {
+                _isUpdatingFilters = true;
+                try
+                {
+                    var valueBox = _filterSlots[slotIndex].ValueBox;
+                    if (valueBox.Items.Count > 0)
+                    {
+                        valueBox.SelectedIndex = 0;
+                    }
+                    else
+                    {
+                        valueBox.SelectedIndex = -1;
+                        valueBox.Text = string.Empty;
+                    }
+                }
+                finally
+                {
+                    _isUpdatingFilters = false;
+                }
+
+                UpdateFacetedFilters();
+            }
         }
 
         private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateMasterList();
+            if (_isUpdatingFilters) return;
+
+            UpdateFacetedFilters();
         }
 
         private void ComboBoxKeyNameHandleTextEntry(object sender, EventArgs e)
         {
+            if (_isUpdatingFilters) return;
+
             var cb = (ComboBox)sender;
             string keyName = cb.Text.Trim();
             if (!string.IsNullOrEmpty(keyName) && !cb.Items.Contains(keyName))
@@ -887,24 +1066,25 @@ namespace MECCG_Deck_Builder
                 _filterService.AddCustomKeyName(keyName);
                 RefreshFilterKeyDropdowns();
                 cb.SelectedItem = keyName;
+
+                UpdateFacetedFilters();
             }
         }
 
         private void ComboBoxKeyValueHandleTextEntry(object sender, EventArgs e)
         {
+            if (_isUpdatingFilters) return;
+
             var cb = (ComboBox)sender;
             string val = cb.Text.Trim();
             var keyCb = cb == ComboBoxValue3 ? ComboBoxKey3 : ComboBoxKey4;
             string key = keyCb.Text.Trim();
 
-            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val) && !cb.Items.Contains(val))
+            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val))
             {
                 _filterService.AddCustomKeyValue(key, val);
 
-                // Refresh BOTH custom value dropdowns so sibling slots stay in sync
-                RefreshCustomValueDropdowns(key);
-
-                cb.SelectedItem = val;
+                UpdateFacetedFilters();
             }
         }
 
@@ -926,44 +1106,8 @@ namespace MECCG_Deck_Builder
             cb.DropDownWidth = width;
         }
 
-        private void RefreshCustomValueDropdowns(string affectedKey = null, string deletedValue = null)
-        {
-            RefreshCustomSlot(ComboBoxKey3, ComboBoxValue3, affectedKey, deletedValue);
-            RefreshCustomSlot(ComboBoxKey4, ComboBoxValue4, affectedKey, deletedValue);
-        }
-
-        private void RefreshCustomSlot(ComboBox keyCb, ComboBox valCb, string affectedKey, string deletedValue)
-        {
-            string currentKey = keyCb.Text.Trim();
-            if (string.IsNullOrEmpty(currentKey))
-            {
-                return;
-            }
-
-            // Refresh if this slot is using the affected key (or if affectedKey is null, refresh unconditionally)
-            if (affectedKey == null || string.Equals(currentKey, affectedKey, StringComparison.OrdinalIgnoreCase))
-            {
-                string prevVal = valCb.Text;
-                var values = _filterService.GetCustomKeyValues(currentKey);
-                valCb.DataSource = values;
-
-                // If the deleted value was selected in this slot, reset it to blank (index 0)
-                if (!string.IsNullOrEmpty(deletedValue) && string.Equals(prevVal, deletedValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    valCb.SelectedIndex = 0;
-                }
-                else
-                {
-                    // Otherwise, preserve whatever selection was already made
-                    int idx = values.FindIndex(v => string.Equals(v, prevVal, StringComparison.OrdinalIgnoreCase));
-                    valCb.SelectedIndex = idx >= 0 ? idx : 0;
-                }
-            }
-        }
-
         private void InitializeFilterClearing()
         {
-            // Context menu for individual slots
             var filterContextMenu = new ContextMenuStrip();
 
             var clearSlotItem = new ToolStripMenuItem("Clear This Filter");
@@ -982,12 +1126,11 @@ namespace MECCG_Deck_Builder
             filterContextMenu.Items.Add(new ToolStripSeparator());
             filterContextMenu.Items.Add(clearAllItem);
 
-            // Attach to all 8 ComboBoxes
             ComboBox[] filterBoxes = [
                 ComboBoxKey1, ComboBoxValue1,
-        ComboBoxKey2, ComboBoxValue2,
-        ComboBoxKey3, ComboBoxValue3,
-        ComboBoxKey4, ComboBoxValue4
+                ComboBoxKey2, ComboBoxValue2,
+                ComboBoxKey3, ComboBoxValue3,
+                ComboBoxKey4, ComboBoxValue4
             ];
 
             foreach (var cb in filterBoxes)
@@ -999,46 +1142,82 @@ namespace MECCG_Deck_Builder
 
         private void FilterComboBox_KeyDown(object sender, KeyEventArgs e)
         {
-            // Pressing Escape blanks the focused ComboBox
             if (e.KeyCode == Keys.Escape && sender is ComboBox cb)
             {
                 cb.SelectedIndex = 0;
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
+            else if (e.KeyCode == Keys.Enter && sender is ComboBox enterCb)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                if (enterCb == ComboBoxKey3 || enterCb == ComboBoxKey4)
+                {
+                    ComboBoxKeyNameHandleTextEntry(enterCb, EventArgs.Empty);
+                }
+                else if (enterCb == ComboBoxValue3 || enterCb == ComboBoxValue4)
+                {
+                    ComboBoxKeyValueHandleTextEntry(enterCb, EventArgs.Empty);
+                }
+            }
         }
 
         private void ClearSlotForControl(ComboBox cb)
         {
-            // If user right-clicks either the key or value in Slot 1, reset both
-            if (cb == ComboBoxKey1 || cb == ComboBoxValue1)
+            int slotIndex = GetSlotIndexForControl(cb);
+            if (slotIndex >= 0)
             {
-                ComboBoxKey1.SelectedIndex = 0;
-            }
-            else if (cb == ComboBoxKey2 || cb == ComboBoxValue2)
-            {
-                ComboBoxKey2.SelectedIndex = 0;
-            }
-            else if (cb == ComboBoxKey3 || cb == ComboBoxValue3)
-            {
-                ComboBoxKey3.SelectedIndex = 0;
-            }
-            else if (cb == ComboBoxKey4 || cb == ComboBoxValue4)
-            {
-                ComboBoxKey4.SelectedIndex = 0;
-            }
+                _isUpdatingFilters = true;
+                try
+                {
+                    var slot = _filterSlots[slotIndex];
+                    if (slot.KeyBox.Items.Count > 0) slot.KeyBox.SelectedIndex = 0;
+                    else { slot.KeyBox.SelectedIndex = -1; slot.KeyBox.Text = ""; }
 
-            UpdateMasterList();
+                    if (slot.ValueBox.Items.Count > 0) slot.ValueBox.SelectedIndex = 0;
+                    else { slot.ValueBox.SelectedIndex = -1; slot.ValueBox.Text = ""; }
+                }
+                finally
+                {
+                    _isUpdatingFilters = false;
+                }
+
+                UpdateFacetedFilters();
+            }
         }
 
         public void ResetAllFilters()
         {
-            ComboBoxKey1.SelectedIndex = 0;
-            ComboBoxKey2.SelectedIndex = 0;
-            ComboBoxKey3.SelectedIndex = 0;
-            ComboBoxKey4.SelectedIndex = 0;
+            if (_isUpdatingFilters) return;
+            _isUpdatingFilters = true;
 
-            UpdateMasterList();
+            try
+            {
+                foreach (var slot in _filterSlots)
+                {
+                    if (slot.KeyBox.Items.Count > 0) slot.KeyBox.SelectedIndex = 0;
+                    else slot.KeyBox.Text = "";
+
+                    if (slot.ValueBox.Items.Count > 0) slot.ValueBox.SelectedIndex = 0;
+                    else slot.ValueBox.Text = "";
+                }
+            }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
+
+            UpdateFacetedFilters();
+        }
+
+        private int GetSlotIndexForControl(Control control)
+        {
+            if (control == ComboBoxKey1 || control == ComboBoxValue1) return 0;
+            if (control == ComboBoxKey2 || control == ComboBoxValue2) return 1;
+            if (control == ComboBoxKey3 || control == ComboBoxValue3) return 2;
+            if (control == ComboBoxKey4 || control == ComboBoxValue4) return 3;
+            return -1;
         }
 
         #endregion

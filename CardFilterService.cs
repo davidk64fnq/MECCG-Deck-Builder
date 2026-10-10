@@ -194,29 +194,106 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        #region FILTER_EVALUATION
+        #region FILTER_AND_FACET_EVALUATION
+
+        public static bool MatchesCardnumCriterion(Card card, string key, string value)
+        {
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+            {
+                return true;
+            }
+
+            string cardValue = card.GetAttribute(key);
+            if (string.IsNullOrEmpty(cardValue))
+            {
+                return false;
+            }
+
+            if (string.Equals(key, "Skill", StringComparison.OrdinalIgnoreCase))
+            {
+                string[] skills = cardValue.Split([' ', '/'], StringSplitOptions.RemoveEmptyEntries);
+                foreach (var s in skills)
+                {
+                    if (string.Equals(s, value, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            return string.Equals(cardValue.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool MatchesCustomCriterion(string cardId, string key, string value)
+        {
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+            {
+                return true;
+            }
+
+            if (!_cardCustomTags.TryGetValue(cardId, out var tags))
+            {
+                return false;
+            }
+
+            if (!tags.TryGetValue(key, out string tagVal) || string.IsNullOrEmpty(tagVal))
+            {
+                return false;
+            }
+
+            return string.Equals(tagVal.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool MatchesCriteria(Card card, IReadOnlyList<FilterCriterion> criteria)
+        {
+            if (criteria == null || criteria.Count == 0)
+            {
+                return true;
+            }
+
+            foreach (var c in criteria)
+            {
+                if (!c.IsActive)
+                {
+                    continue;
+                }
+
+                if (c.Type == FilterType.Cardnum)
+                {
+                    if (!MatchesCardnumCriterion(card, c.Key, c.Value))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (!MatchesCustomCriterion(card.Id, c.Key, c.Value))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
         public List<Card> Filter(
-            IEnumerable<Card> sourceCards,
-            ISet<string> selectedSets,
-            IReadOnlyList<KeyValuePair<string, string>> cardnumFilters,
-            IReadOnlyList<KeyValuePair<string, string>> customFilters)
+    IEnumerable<Card> sourceCards,
+    ISet<string> selectedSets,
+    IReadOnlyList<FilterCriterion> criteria)
         {
             var result = new List<Card>();
 
             foreach (var card in sourceCards)
             {
-                if (selectedSets != null && selectedSets.Count > 0 && !selectedSets.Contains(card.Set))
+                // If a set filter collection is provided and does not contain this card's set, skip it
+                if (selectedSets != null && !selectedSets.Contains(card.Set))
                 {
                     continue;
                 }
 
-                if (!MatchesCardnumFilters(card, cardnumFilters))
-                {
-                    continue;
-                }
-
-                if (!MatchesCustomFilters(card.Id, customFilters))
+                if (!MatchesCriteria(card, criteria))
                 {
                     continue;
                 }
@@ -228,56 +305,71 @@ namespace MECCG_Deck_Builder
             return result;
         }
 
-        private static bool MatchesCardnumFilters(Card card, IReadOnlyList<KeyValuePair<string, string>> filters)
+        public List<string> GetAvailableValues(
+    IEnumerable<Card> sourceCards,
+    ISet<string> selectedSets,
+    IReadOnlyList<FilterCriterion> otherCriteria,
+    FilterType targetType,
+    string targetKey)
         {
-            if (filters == null || filters.Count == 0)
+            var result = new List<string> { "" };
+
+            if (string.IsNullOrWhiteSpace(targetKey))
             {
-                return true;
+                return result;
             }
 
-            foreach (var filter in filters)
+            var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var card in sourceCards)
             {
-                if (string.IsNullOrEmpty(filter.Key) || string.IsNullOrEmpty(filter.Value))
+                // If a set filter collection is provided and does not contain this card's set, skip it
+                if (selectedSets != null && !selectedSets.Contains(card.Set))
                 {
                     continue;
                 }
 
-                string cardValue = card.GetAttribute(filter.Key);
-                if (string.IsNullOrEmpty(cardValue) || !cardValue.Contains(filter.Value, StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private bool MatchesCustomFilters(string cardId, IReadOnlyList<KeyValuePair<string, string>> filters)
-        {
-            if (filters == null || filters.Count == 0)
-            {
-                return true;
-            }
-
-            if (!_cardCustomTags.TryGetValue(cardId, out var tags))
-            {
-                return false;
-            }
-
-            foreach (var filter in filters)
-            {
-                if (string.IsNullOrEmpty(filter.Key) || string.IsNullOrEmpty(filter.Value))
+                if (!MatchesCriteria(card, otherCriteria))
                 {
                     continue;
                 }
 
-                if (!tags.TryGetValue(filter.Key, out string tagVal) || !tagVal.Contains(filter.Value, StringComparison.OrdinalIgnoreCase))
+                if (targetType == FilterType.Cardnum)
                 {
-                    return false;
+                    string attr = card.GetAttribute(targetKey);
+                    if (string.IsNullOrWhiteSpace(attr))
+                    {
+                        continue;
+                    }
+
+                    if (string.Equals(targetKey, "Skill", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string[] words = attr.Split([' ', '/'], StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string word in words)
+                        {
+                            distinctValues.Add(word.Trim());
+                        }
+                    }
+                    else
+                    {
+                        distinctValues.Add(attr.Trim());
+                    }
+                }
+                else
+                {
+                    if (_cardCustomTags.TryGetValue(card.Id, out var tags) &&
+                        tags.TryGetValue(targetKey, out string tagVal) &&
+                        !string.IsNullOrWhiteSpace(tagVal))
+                    {
+                        distinctValues.Add(tagVal.Trim());
+                    }
                 }
             }
 
-            return true;
+            var sortedList = distinctValues.ToList();
+            sortedList.Sort(StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+            result.AddRange(sortedList);
+            return result;
         }
 
         #endregion

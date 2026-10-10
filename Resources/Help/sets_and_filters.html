@@ -61,6 +61,32 @@
         </tr>
     </table>
 
+    <h2>Cascading Faceted Search &amp; Conflict Resolution</h2>
+    <p>
+        The filter system operates as an <strong>order-independent faceted search engine</strong>. All four slots continuously communicate with each other and with the active expansion set selections:
+    </p>
+    <ul>
+        <li>
+            <strong>Context-Sensitive Value Pruning:</strong> The value dropdown for any slot only displays options present among cards that satisfy your active expansion sets and the other active filter slots. Selecting any choice from a dropdown is guaranteed to match at least one card, completely eliminating dead-end queries.
+        </li>
+        <li>
+            <strong>Order-Independent (Symmetric) Narrowing:</strong> You can choose filters in any order. For example, selecting <code>Skill</code> = <code>Diplomat</code> in Slot 2 first will automatically prune Slot 1's <code>Primary</code> dropdown down to only card types that feature diplomats (<em>Character</em> and <em>Ally</em>).
+        </li>
+        <li>
+            <strong>Automatic Conflict Resolution:</strong> If an existing selection in Slot A becomes impossible due to a new choice in Slot B (e.g., you have <code>Race</code> = <code>Demon</code> selected in Slot 2 and subsequently change Slot 1 to <code>Primary</code> = <code>Character</code>), Slot 2 will automatically and silently reset to blank (<code>""</code>). This prevents empty result states while keeping Slot 2 ready for a valid selection.
+        </li>
+        <li>
+            <strong>Cross-Layer Integration:</strong> Custom tags in Slots 3 &amp; 4 participate fully in faceting. Selecting a custom archetype (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code>) will prune the Cardnum dropdowns (Slots 1 &amp; 2) to only show primary types, races, and skills present on cards tagged with that archetype.
+        </li>
+        <li>
+            <strong>Expansion Set Pruning:</strong> Checking or unchecking sets in the <strong>Set</strong> menu dynamically recalculates available filter values. If all expansions are deselected, the master list and card image preview are cleared.
+        </li>
+    </ul>
+
+    <div class="note">
+        <strong>Custom Taxonomy Text Entry Exemption:</strong> While the drop-down list in Slots 3 &amp; 4 is pruned to matching cards, you can still type brand-new keys and values directly into the editable text boxes to register new terms into your taxonomy before assigning them to cards.
+    </div>
+
     <h2>Cardnum Built-in Filters (Slots 1 &amp; 2)</h2>
     <p>
         The two left-hand key-value selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
