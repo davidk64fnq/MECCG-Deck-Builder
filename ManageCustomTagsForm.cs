@@ -32,7 +32,7 @@ namespace MECCG_Deck_Builder
 
             var grpKeys = new GroupBox
             {
-                Text = "Categories (Keys)",
+                Text = "Categories",
                 Location = new Point(12, 12),
                 Size = new Size(245, 330)
             };
@@ -47,7 +47,7 @@ namespace MECCG_Deck_Builder
 
             _btnAddKey = new Button
             {
-                Text = "Add Key...",
+                Text = "Add...",
                 Location = new Point(10, 260),
                 Size = new Size(70, 26)
             };
@@ -75,7 +75,7 @@ namespace MECCG_Deck_Builder
 
             var grpValues = new GroupBox
             {
-                Text = "Values",
+                Text = "Tags",
                 Location = new Point(275, 12),
                 Size = new Size(245, 330)
             };
@@ -90,7 +90,7 @@ namespace MECCG_Deck_Builder
 
             _btnAddValue = new Button
             {
-                Text = "Add Value...",
+                Text = "Add...",
                 Location = new Point(10, 260),
                 Size = new Size(78, 26),
                 Enabled = false
@@ -119,7 +119,7 @@ namespace MECCG_Deck_Builder
 
             var lblNote = new Label
             {
-                Text = "Note: Deleting a key or value removes that tag from all assigned cards.",
+                Text = "Note: Deleting a category or tag removes it from all cards across the catalog.",
                 Location = new Point(12, 355),
                 Size = new Size(410, 30),
                 ForeColor = Color.DimGray
@@ -232,7 +232,7 @@ namespace MECCG_Deck_Builder
 
         private void BtnAddKey_Click(object sender, EventArgs e)
         {
-            string newKey = PromptDialog.Show(this, "Add New Category", "Enter custom category (key) name:");
+            string newKey = PromptDialog.Show(this, "Add New Category", "Enter category name:");
             if (string.IsNullOrWhiteSpace(newKey)) return;
 
             newKey = newKey.Trim();
@@ -257,7 +257,7 @@ namespace MECCG_Deck_Builder
             if (_listBoxKeys.SelectedItem is not string currentKey) return;
 
             var res = MessageBox.Show(this,
-                $"Are you sure you want to delete the category '{currentKey}' and all its values?\n\nThis will remove this tag from all cards across the database.",
+                $"Are you sure you want to delete the category '{currentKey}' and all its tags?\n\nThis will remove this category from all cards across the catalog.",
                 "Delete Category",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
@@ -273,7 +273,7 @@ namespace MECCG_Deck_Builder
         {
             if (_listBoxKeys.SelectedItem is not string currentKey) return;
 
-            string newVal = PromptDialog.Show(this, "Add Value", $"Enter new value for category '{currentKey}':");
+            string newVal = PromptDialog.Show(this, "Add New Tag", $"Enter new tag for category '{currentKey}':");
             if (string.IsNullOrWhiteSpace(newVal)) return;
 
             newVal = newVal.Trim();
@@ -286,7 +286,7 @@ namespace MECCG_Deck_Builder
             if (_listBoxKeys.SelectedItem is not string currentKey ||
                 _listBoxValues.SelectedItem is not string currentVal) return;
 
-            string renamedVal = PromptDialog.Show(this, "Rename Value", $"Enter new name for value '{currentVal}':", currentVal);
+            string renamedVal = PromptDialog.Show(this, "Rename Tag", $"Enter new name for tag '{currentVal}':", currentVal);
             if (string.IsNullOrWhiteSpace(renamedVal) || string.Equals(renamedVal, currentVal, StringComparison.OrdinalIgnoreCase)) return;
 
             renamedVal = renamedVal.Trim();
@@ -300,8 +300,8 @@ namespace MECCG_Deck_Builder
                 _listBoxValues.SelectedItem is not string currentVal) return;
 
             var res = MessageBox.Show(this,
-                $"Are you sure you want to delete the value '{currentVal}' from category '{currentKey}'?\n\nThis will remove this tag value from all cards tagged with it.",
-                "Delete Value",
+                $"Are you sure you want to delete the tag '{currentVal}' from category '{currentKey}'?\n\nThis will remove this tag from all cards tagged with it.",
+                "Delete Tag",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 

@@ -36,7 +36,7 @@ namespace MECCG_Deck_Builder
 
             var lblKey = new Label
             {
-                Text = "Category (Key):",
+                Text = "Category:",
                 Location = new Point(12, 40),
                 Size = new Size(356, 16)
             };
@@ -52,7 +52,7 @@ namespace MECCG_Deck_Builder
 
             var lblValue = new Label
             {
-                Text = "Tag Value:",
+                Text = "Tag:",
                 Location = new Point(12, 90),
                 Size = new Size(356, 16)
             };
@@ -132,14 +132,14 @@ namespace MECCG_Deck_Builder
         {
             if (string.IsNullOrWhiteSpace(SelectedKey))
             {
-                MessageBox.Show(this, "Please enter or select a category (key).", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Please enter or select a category.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 _cmbKey.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(SelectedValue))
             {
-                MessageBox.Show(this, "Please enter or select a tag value.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Please enter or select a tag.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 _cmbValue.Focus();
                 return;
             }

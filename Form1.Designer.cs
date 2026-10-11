@@ -201,7 +201,7 @@
             // 
             ToolStripMenuMasterCardnumFilters.Name = "ToolStripMenuMasterCardnumFilters";
             ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(180, 22);
-            ToolStripMenuMasterCardnumFilters.Text = "Cardnum Filters";
+            ToolStripMenuMasterCardnumFilters.Text = "Card Attributes";
             // 
             // ContextMenuStripTabs
             // 
@@ -311,7 +311,7 @@
             // 
             ToolStripMenuTabCardnumFilters.Name = "ToolStripMenuTabCardnumFilters";
             ToolStripMenuTabCardnumFilters.Size = new System.Drawing.Size(180, 22);
-            ToolStripMenuTabCardnumFilters.Text = "Cardnum Filters";
+            ToolStripMenuTabCardnumFilters.Text = "Card Attributes";
             // 
             // PictureBoxCardImage
             // 
@@ -696,7 +696,7 @@
             // 
             ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
             ToolStripMenuFilterOpen.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterOpen.Text = "Open";
+            ToolStripMenuFilterOpen.Text = "Load Tag Set...";
             ToolStripMenuFilterOpen.Click += OpenFilterMenuItem_Click;
             // 
             // toolStripSeparator6
@@ -708,7 +708,7 @@
             // 
             ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
             ToolStripMenuFilterSave.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterSave.Text = "Save";
+            ToolStripMenuFilterSave.Text = "Save Tag Set...";
             ToolStripMenuFilterSave.Click += SaveFilterMenuItem_Click;
             // 
             // helpToolStripMenuItem

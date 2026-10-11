@@ -15,7 +15,7 @@
 ## Application Architecture & Core Files
 
 - Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, 4 filter combo pairs, menus.
-- ManageCustomTagsForm.cs: Dedicated modal dialog for creating, renaming, and deleting custom keys and values.
+- ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags.
 - AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
@@ -35,25 +35,17 @@
 
 ---
 
-## Critical Data Structures & Conventions
+## Standardized Taxonomy & Filtering Vocabulary
 
-### Card Representations
-1. Domain Representation (`Card`):
-   - Strongly-typed class containing all standard card properties and dynamic attribute lookup.
-2. Catalog Management (`CardCatalogService`):
-   - Enumerable `IReadOnlyList<Card>` and O(1) indexed `IReadOnlyDictionary<string, Card> CardsById`.
-
-### Deck Sections (Tabs)
-Five deck sections correspond to standard MECCG rules:
-1. Pool (`DeckSectionType.Pool`)
-2. Resources (`DeckSectionType.Resources`)
-3. Hazards (`DeckSectionType.Hazards`)
-4. Sideboard (`DeckSectionType.Sideboard`)
-5. Sites (`DeckSectionType.Sites`)
-
-### Title Bar Counting Format
-Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<Side>/<Site>)
-- Resource characters are dynamically counted by inspecting cards in Resources where Primary == "Character".
+1. **Official Card Attributes (Filter Slots 1 & 2):**
+   - Canonical rules properties from the database: `Attribute` (e.g. *Race*, *Skill*) and `Value` (e.g. *Dúnadan*, *Warrior*).
+   - Inspected via context menu item: `Card Attributes`.
+2. **Custom User Taxonomy (Filter Slots 3 & 4):**
+   - User-defined taxonomy: `Category` (e.g. *Archetype*, *Role*) and `Tag` (e.g. *Ring Destruction*, *Scout Support*).
+   - Inspected via context menu item: `Assigned Tags`.
+   - Card tagging actions: `Assign Tag` (with `+ Author New Tag...` and `+ Add Tag...`), `Remove Tag`.
+   - Dedicated manager: `Filter > Manage Custom Tags...` (`Categories`, `Tags`, `Add...`, `Rename...`, `Delete`).
+   - Tag file persistence: `Filter > Load Tag Set...` and `Filter > Save Tag Set...`.
 
 ---
 
@@ -62,6 +54,7 @@ Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<
 - [x] **v0.1.0 - Foundation & Documentation** (100% complete)
 - [x] **v0.2.0 - Modernization & Bug Fixes** (100% complete)
 - [x] **v0.3.0 - Domain Refactoring & Tag Decoupling** (100% complete)
+- [x] **v0.3.5 - UI & Documentation Vocabulary Standardization** (100% complete)
 - [ ] **v0.4.0 - Curated Filter Taxonomy** (Next)
 - [ ] **v0.5.0 - Procedural Deck Generator**
 - [ ] **v1.0.0 - First Public Release**
@@ -83,9 +76,9 @@ Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<
 #### v0.3.0 - Domain Refactoring & Tag Decoupling
 - Strongly-typed domain models (`Card`, `CardSet`, `Deck`, `DeckSectionType`).
 - Decoupled headless services (`CardCatalogService`, `CardFilterService`, `DeckExportService`).
-- Issue #16: Decoupled custom taxonomy authoring from catalog filtering:
-  - Converted filter ComboBoxes 3 & 4 to read-only `DropDownList`.
-  - Added dedicated `ManageCustomTagsForm` (Filter > Manage Custom Tags...) for taxonomy authoring.
-  - Added `AddTagDialog` and `PromptDialog` to card context menus for inline tag creation and assignment without wiping active filter selections.
-  - Seamless tag remapping: context menus always show categories, display checkmarks for active tags, and allow direct reassignment without manual deletion.
-  - Removed redundant runtime `Filter > Delete Key` menu.
+- Issue #16: Decoupled custom taxonomy authoring from catalog filtering.
+
+#### v0.3.5 - UI & Documentation Vocabulary Standardization
+- Standardized terminology across UI, context menus, dialogs, and CHM HTML documentation:
+  - Replaced programmer jargon (`Key`, `Value`, `Key Value`) with clean domain terms: `Category`, `Tag`, `Card Attributes`, `Assigned Tags`, `Assign Tag`, `Remove Tag`.
+  - Clarified file operations (`Load Tag Set...` / `Save Tag Set...`).

@@ -16,8 +16,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
 - **Dynamic Stats Summary:** Window title bar displays live card counts per section with dedicated character counts: `(Pool / Res [Characters] / Haz / Side / Site)`.
 - **Card Artwork Preview & Caching:** On-demand card artwork download from Cardnum with local disk caching (`METW/`, `MEDM/`, etc.) and an in-memory cache. ICE errata cards load corrected artwork automatically.
 - **Dual-Layer Filtering:**
-  - **Cardnum Built-in (Slots 1 & 2):** Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
-  - **Custom User Taxonomy (Slots 3 & 4):** Filter by custom tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`). Author tags via the dedicated **Manage Custom Tags** dialog or right-click **Add Key Value > [+ Add New Tag...]** without disturbing active filter criteria.
+  - **Official Card Attributes (Slots 1 & 2):** Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
+  - **Custom User Taxonomy (Slots 3 & 4):** Filter by custom categories and tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`). Author tags via the dedicated **Manage Custom Tags** dialog or right-click **Assign Tag > [+ Author New Tag...]** without disturbing active filter criteria.
 - **Multi-Platform Export Formats:**
   - **Tabletop Simulator (`.json`):** Generates ready-to-use deck files compatible with TTS MECCG mods.
   - **Play MECCG (`.play` & `.playPBEM`):** Native format for online play.
@@ -35,8 +35,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | Double Click | Master List | Add card to the active deck tab |
 | Double Click | Any Deck Tab | Duplicate the clicked card in that tab |
 | Drag & Drop | Master List -> Tab | Add card to the target tab |
-| Right Click | Master List | Context menu: Copy to tab, view Cardnum attributes, assign custom tags |
-| Right Click | Deck Tab | Context menu: Copy, Move to another tab, Delete, view metadata |
+| Right Click | Master List | Context menu: Copy to tab, view Card Attributes, view Assigned Tags, assign custom tags |
+| Right Click | Deck Tab | Context menu: Copy, Move to another tab, Delete, view Card Attributes / Tags |
 | Right Click | Filter ComboBox | Context menu: Clear this filter slot or clear all filters |
 | Escape | Filter ComboBox | Reset focused filter ComboBox to blank |
 | Ctrl + N | Global | Start a new deck |
@@ -85,4 +85,3 @@ Full compiled HTML Help documentation is available in-app via **Help > Contents*
 ## Acknowledgments
 - Card data and artwork courtesy of the Cardnum Project (https://cardnum.net).
 - Middle-earth Collectible Card Game is originally (C) Iron Crown Enterprises and Tolkien Enterprises.
-```

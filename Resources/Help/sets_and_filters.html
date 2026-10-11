@@ -33,7 +33,7 @@
         </tr>
         <tr>
             <td>
-                <strong>Slots 1 &amp; 2:<br />Built-in Database Filters</strong>
+                <strong>Slots 1 &amp; 2:<br />Built-in Database Attributes</strong>
             </td>
             <td>
                 <strong>Cardnum Open Database:</strong> Canonical card statistics synchronized from <code>cardnum.net</code> and GitHub, representing published cards from Iron Crown Enterprises (I.C.E.) and Council of Elrond Dreamcards.
@@ -47,13 +47,13 @@
         </tr>
         <tr>
             <td>
-                <strong>Slots 3 &amp; 4:<br />Custom User Taxonomy</strong>
+                <strong>Slots 3 &amp; 4:<br />Custom User Taxonomy (Categories &amp; Tags)</strong>
             </td>
             <td>
-                <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom filter files (<code>.json</code>).
+                <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom tag files (<code>.json</code>).
             </td>
             <td>
-                <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete keys and values via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
+                <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete categories and tags via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
             </td>
             <td>
                 Fixed Drop-Down Selection list (strictly queries cards matching assigned tags).
@@ -83,14 +83,14 @@
         </li>
     </ul>
 
-    <h2>Cardnum Built-in Filters (Slots 1 &amp; 2)</h2>
+    <h2>Cardnum Built-in Attributes (Slots 1 &amp; 2)</h2>
     <p>
-        The two left-hand key-value selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
+        The two left-hand selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
     </p>
     <table>
         <tr>
-            <th>Attribute Key</th>
-            <th>Typical Filter Values</th>
+            <th>Attribute Name</th>
+            <th>Typical Values</th>
         </tr>
         <tr>
             <td><code>Primary</code></td>
@@ -136,10 +136,10 @@
         Open <strong>Filter &gt; Manage Custom Tags...</strong> to access the central tag management dialog. Here you can:
     </p>
     <ul>
-        <li><strong>Add Categories (Keys):</strong> Create new classification keys (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
-        <li><strong>Rename Categories or Values:</strong> Rename terms across your entire taxonomy; all tagged cards are updated automatically.</li>
-        <li><strong>Add Values:</strong> Add new tags under an existing category before or after assigning them.</li>
-        <li><strong>Delete Categories or Values:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
+        <li><strong>Add Categories:</strong> Create new classification categories (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
+        <li><strong>Rename Categories or Tags:</strong> Rename terms across your entire taxonomy; all tagged cards are updated automatically.</li>
+        <li><strong>Add Tags:</strong> Add new tags under an existing category.</li>
+        <li><strong>Delete Categories or Tags:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
     </ul>
 
     <h3>2. Assigning Custom Tags to Cards</h3>
@@ -148,30 +148,30 @@
     </p>
     <ul>
         <li>
-            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [Value]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned value; selecting a different value seamlessly updates and remaps the card.
+            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [Tag]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned tag; selecting a different tag seamlessly updates and remaps the card.
         </li>
         <li>
-            <strong>Create and Assign New Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [+ Add New Tag...]</strong>. This prompts for both category and value, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
+            <strong>Author and Assign New Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>. This prompts for both category and tag, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
         </li>
         <li>
-            <strong>Add New Value to Existing Category:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [+ Add Value...]</strong> to author a new value and assign it immediately.
+            <strong>Add New Tag to Existing Category:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [+ Add Tag...]</strong> to author a new tag and assign it immediately.
         </li>
     </ul>
 
     <h3>3. Removing Tags from Cards</h3>
     <ul>
         <li>
-            <strong>Unassign Tag from Single Card:</strong> Right-click the card and choose <strong>Delete Key Value &gt; [Category] &gt; [Value]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
+            <strong>Remove Tag from Single Card:</strong> Right-click the card and choose <strong>Remove Tag &gt; [Category] &gt; [Tag]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
         </li>
         <li>
-            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently remove a category or value across all cards in the catalog.
+            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently delete a category or tag across all cards in the catalog.
         </li>
     </ul>
 
-    <h3>4. Saving and Opening Custom Filter Sets</h3>
+    <h3>4. Saving and Loading Custom Tag Sets</h3>
     <ul>
-        <li><strong>Filter &gt; Save:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
-        <li><strong>Filter &gt; Open:</strong> Loads a previously saved custom filter set, restoring all keys, values, and card mappings.</li>
+        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
+        <li><strong>Filter &gt; Load Tag Set...:</strong> Loads a previously saved custom tag set, restoring all categories, tags, and card mappings.</li>
     </ul>
 
     <h2>Clearing and Resetting Filters</h2>
@@ -188,7 +188,7 @@
                 Keyboard: <kbd>Ctrl+R</kbd>
             </td>
             <td>
-                Instantly resets all four key-value pairs (Slots 1–4) to blank and refreshes the master card list.
+                Instantly resets all four filter slots (Slots 1–4) to blank and refreshes the master card list.
             </td>
         </tr>
         <tr>
@@ -199,7 +199,7 @@
             <td>
                 Opens a context menu with options to:
                 <ul>
-                    <li><strong>Clear This Filter:</strong> Resets both the Key and Value of that specific slot to blank.</li>
+                    <li><strong>Clear This Filter:</strong> Resets both the category/attribute and value of that specific slot to blank.</li>
                     <li><strong>Clear All Filters:</strong> Resets all four slots at once.</li>
                 </ul>
             </td>
@@ -210,7 +210,7 @@
                 <kbd>Escape</kbd>
             </td>
             <td>
-                When focused inside any Key or Value ComboBox, pressing <kbd>Escape</kbd> immediately resets that box to the blank (<code>""</code>) entry.
+                When focused inside any category or tag ComboBox, pressing <kbd>Escape</kbd> immediately resets that box to the blank (<code>""</code>) entry.
             </td>
         </tr>
         <tr>
@@ -219,7 +219,7 @@
                 Select the top blank entry (<code>""</code>)
             </td>
             <td>
-                Selecting the empty item at the top of any Key dropdown resets that slot and clears its paired Value list.
+                Selecting the empty item at the top of any category dropdown resets that slot and clears its paired tag list.
             </td>
         </tr>
     </table>

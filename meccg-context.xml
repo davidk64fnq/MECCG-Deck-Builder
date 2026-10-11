@@ -134,6 +134,14 @@ namespace MECCG_Deck_Builder.Properties {
             <td><strong>Custom Filters</strong></td>
             <td>Shows user-defined tags currently assigned to this card.</td>
         </tr>
+        <tr>
+            <td><strong>Add Key Value</strong></td>
+            <td>Assigns or reassigns a custom tag to this card (active tag is checkmarked), creates a new value, or authors a new category and tag.</td>
+        </tr>
+        <tr>
+            <td><strong>Delete Key Value</strong></td>
+            <td>Unassigns an assigned custom tag from this card (only visible if the card currently has custom tags assigned).</td>
+        </tr>
     </table>
 </body>
 </html>
@@ -504,13 +512,13 @@ namespace MECCG_Deck_Builder.Properties {
     </p>
     <ul>
         <li>
-            <strong>Assign Existing Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [Value]</strong>.
+            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [Value]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned value; selecting a different value seamlessly updates and remaps the card.
         </li>
         <li>
             <strong>Create and Assign New Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [+ Add New Tag...]</strong>. This prompts for both category and value, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
         </li>
         <li>
-            <strong>Add New Value to Existing Category:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [+ Add Value...]</strong>.
+            <strong>Add New Value to Existing Category:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [+ Add Value...]</strong> to author a new value and assign it immediately.
         </li>
     </ul>
 
@@ -520,7 +528,7 @@ namespace MECCG_Deck_Builder.Properties {
             <strong>Unassign Tag from Single Card:</strong> Right-click the card and choose <strong>Delete Key Value &gt; [Category] &gt; [Value]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
         </li>
         <li>
-            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> or <strong>Filter &gt; Delete Key</strong> to permanently remove a key or value across all cards in the catalog.
+            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently remove a category or value across all cards in the catalog.
         </li>
     </ul>
 
@@ -1014,6 +1022,8 @@ Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<
   - Converted filter ComboBoxes 3 & 4 to read-only `DropDownList`.
   - Added dedicated `ManageCustomTagsForm` (Filter > Manage Custom Tags...) for taxonomy authoring.
   - Added `AddTagDialog` and `PromptDialog` to card context menus for inline tag creation and assignment without wiping active filter selections.
+  - Seamless tag remapping: context menus always show categories, display checkmarks for active tags, and allow direct reassignment without manual deletion.
+  - Removed redundant runtime `Filter > Delete Key` menu.
 ]]>
   </file>
   <file path='.\Card.cs'>
@@ -3071,7 +3081,6 @@ namespace MECCG_Deck_Builder
         {
             ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
             var keyNames = _filterService.GetCustomKeyNames();
-            var cardKeys = _filterService.GetCardCustomKeyNames(card.Id);
 
             var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
 
@@ -3091,6 +3100,8 @@ namespace MECCG_Deck_Builder
             addMenu.DropDownItems.Add(addNewTagItem);
             addMenu.DropDownItems.Add(new ToolStripSeparator());
 
+            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
+
             foreach (string keyName in keyNames)
             {
                 if (string.IsNullOrWhiteSpace(keyName))
@@ -3098,44 +3109,44 @@ namespace MECCG_Deck_Builder
                     continue;
                 }
 
-                if (!cardKeys.Contains(keyName))
+                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
+
+                var keyItem = new ToolStripMenuItem(keyName);
+
+                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                addNewValueItem.Click += (s, ev) =>
                 {
-                    var keyItem = new ToolStripMenuItem(keyName);
-
-                    var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
-                    addNewValueItem.Click += (s, ev) =>
+                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    if (!string.IsNullOrWhiteSpace(val))
                     {
-                        string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
-                        if (!string.IsNullOrWhiteSpace(val))
-                        {
-                            _filterService.AddCustomKeyValue(keyName, val);
-                            _filterService.SetCardCustomTag(card.Id, keyName, val);
-                            RefreshFilterKeyDropdowns();
-                            UpdateFacetedFilters();
-                        }
-                    };
-                    keyItem.DropDownItems.Add(addNewValueItem);
-                    keyItem.DropDownItems.Add(new ToolStripSeparator());
-
-                    var values = _filterService.GetCustomKeyValues(keyName);
-                    var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-
-                    if (definedValues.Count > 0)
-                    {
-                        foreach (string val in definedValues)
-                        {
-                            var valItem = new ToolStripMenuItem(val);
-                            valItem.Click += (s, ev) =>
-                            {
-                                _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
-                                UpdateFacetedFilters();
-                            };
-                            keyItem.DropDownItems.Add(valItem);
-                        }
+                        _filterService.AddCustomKeyValue(keyName, val);
+                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        RefreshFilterKeyDropdowns();
+                        UpdateFacetedFilters();
                     }
+                };
+                keyItem.DropDownItems.Add(addNewValueItem);
+                keyItem.DropDownItems.Add(new ToolStripSeparator());
 
-                    addMenu.DropDownItems.Add(keyItem);
+                var values = _filterService.GetCustomKeyValues(keyName);
+                var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+
+                if (definedValues.Count > 0)
+                {
+                    foreach (string val in definedValues)
+                    {
+                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        valItem.Click += (s, ev) =>
+                        {
+                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            UpdateFacetedFilters();
+                        };
+                        keyItem.DropDownItems.Add(valItem);
+                    }
                 }
+
+                addMenu.DropDownItems.Add(keyItem);
             }
 
             if (addMenu.HasDropDownItems)
@@ -3516,7 +3527,6 @@ namespace MECCG_Deck_Builder
         {
             ContextMenuStripTabs.Items.RemoveByKey("Add Key Value");
             var keyNames = _filterService.GetCustomKeyNames();
-            var cardKeys = _filterService.GetCardCustomKeyNames(card.Id);
 
             var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
 
@@ -3536,6 +3546,8 @@ namespace MECCG_Deck_Builder
             addMenu.DropDownItems.Add(addNewTagItem);
             addMenu.DropDownItems.Add(new ToolStripSeparator());
 
+            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
+
             foreach (string keyName in keyNames)
             {
                 if (string.IsNullOrWhiteSpace(keyName))
@@ -3543,44 +3555,44 @@ namespace MECCG_Deck_Builder
                     continue;
                 }
 
-                if (!cardKeys.Contains(keyName))
+                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
+
+                var keyItem = new ToolStripMenuItem(keyName);
+
+                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                addNewValueItem.Click += (s, ev) =>
                 {
-                    var keyItem = new ToolStripMenuItem(keyName);
-
-                    var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
-                    addNewValueItem.Click += (s, ev) =>
+                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    if (!string.IsNullOrWhiteSpace(val))
                     {
-                        string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
-                        if (!string.IsNullOrWhiteSpace(val))
-                        {
-                            _filterService.AddCustomKeyValue(keyName, val);
-                            _filterService.SetCardCustomTag(card.Id, keyName, val);
-                            RefreshFilterKeyDropdowns();
-                            UpdateFacetedFilters();
-                        }
-                    };
-                    keyItem.DropDownItems.Add(addNewValueItem);
-                    keyItem.DropDownItems.Add(new ToolStripSeparator());
-
-                    var values = _filterService.GetCustomKeyValues(keyName);
-                    var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-
-                    if (definedValues.Count > 0)
-                    {
-                        foreach (string val in definedValues)
-                        {
-                            var valItem = new ToolStripMenuItem(val);
-                            valItem.Click += (s, ev) =>
-                            {
-                                _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
-                                UpdateFacetedFilters();
-                            };
-                            keyItem.DropDownItems.Add(valItem);
-                        }
+                        _filterService.AddCustomKeyValue(keyName, val);
+                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        RefreshFilterKeyDropdowns();
+                        UpdateFacetedFilters();
                     }
+                };
+                keyItem.DropDownItems.Add(addNewValueItem);
+                keyItem.DropDownItems.Add(new ToolStripSeparator());
 
-                    addMenu.DropDownItems.Add(keyItem);
+                var values = _filterService.GetCustomKeyValues(keyName);
+                var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+
+                if (definedValues.Count > 0)
+                {
+                    foreach (string val in definedValues)
+                    {
+                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        valItem.Click += (s, ev) =>
+                        {
+                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            UpdateFacetedFilters();
+                        };
+                        keyItem.DropDownItems.Add(valItem);
+                    }
                 }
+
+                addMenu.DropDownItems.Add(keyItem);
             }
 
             if (addMenu.HasDropDownItems)
@@ -3822,57 +3834,6 @@ namespace MECCG_Deck_Builder
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
             }
-        }
-
-        private void SetFilterMenuDeleteKeyNameValue_Click(object sender, EventArgs e)
-        {
-            var keyNames = _filterService.GetCustomKeyNames();
-            var delMenu = new ToolStripMenuItem("Delete Key") { Name = "Delete Key", Enabled = keyNames.Count > 0 };
-
-            foreach (string keyName in keyNames)
-            {
-                if (string.IsNullOrWhiteSpace(keyName)) continue;
-
-                var keyItem = new ToolStripMenuItem(keyName);
-                keyItem.Click += (s, ev) =>
-                {
-                    _filterService.DeleteCustomKeyName(keyName);
-
-                    if (string.Equals(ComboBoxKey3.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        ComboBoxKey3.SelectedIndex = 0;
-                        ComboBoxValue3.SelectedIndex = 0;
-                    }
-
-                    if (string.Equals(ComboBoxKey4.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        ComboBoxKey4.SelectedIndex = 0;
-                        ComboBoxValue4.SelectedIndex = 0;
-                    }
-
-                    RefreshFilterKeyDropdowns();
-                    UpdateFacetedFilters();
-                };
-
-                var values = _filterService.GetCustomKeyValues(keyName);
-                foreach (string val in values)
-                {
-                    if (!string.IsNullOrEmpty(val))
-                    {
-                        var valItem = new ToolStripMenuItem(val);
-                        valItem.Click += (s, ev) =>
-                        {
-                            _filterService.DeleteCustomKeyValue(keyName, val);
-                            UpdateFacetedFilters();
-                        };
-                        keyItem.DropDownItems.Add(valItem);
-                    }
-                }
-                delMenu.DropDownItems.Add(keyItem);
-            }
-
-            ToolStripMenuFilter.DropDownItems.RemoveByKey("Delete Key");
-            ToolStripMenuFilter.DropDownItems.Insert(1, delMenu);
         }
 
         #endregion
@@ -4885,7 +4846,7 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuToolsGetImages
             // 
             ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
-            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(169, 22);
+            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(180, 22);
             ToolStripMenuToolsGetImages.Text = "Download Images";
             ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
             // 
@@ -4899,14 +4860,14 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuSetSelectAll
             // 
             ToolStripMenuSetSelectAll.Name = "ToolStripMenuSetSelectAll";
-            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(122, 22);
+            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(180, 22);
             ToolStripMenuSetSelectAll.Text = "Select All";
             ToolStripMenuSetSelectAll.Click += ToolStripMenuSetSelectAll_Click;
             // 
             // ToolStripMenuSetClearAll
             // 
             ToolStripMenuSetClearAll.Name = "ToolStripMenuSetClearAll";
-            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(122, 22);
+            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(180, 22);
             ToolStripMenuSetClearAll.Text = "Clear All";
             ToolStripMenuSetClearAll.Click += ToolStripMenuSetClearAll_Click;
             // 
@@ -4916,36 +4877,35 @@ namespace MECCG_Deck_Builder
             ToolStripMenuFilter.Name = "ToolStripMenuFilter";
             ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
             ToolStripMenuFilter.Text = "&Filter";
-            ToolStripMenuFilter.Click += SetFilterMenuDeleteKeyNameValue_Click;
             // 
             // ToolStripMenuFilterManage
             // 
             ToolStripMenuFilterManage.Name = "ToolStripMenuFilterManage";
-            ToolStripMenuFilterManage.Size = new System.Drawing.Size(188, 22);
+            ToolStripMenuFilterManage.Size = new System.Drawing.Size(198, 22);
             ToolStripMenuFilterManage.Text = "&Manage Custom Tags...";
             ToolStripMenuFilterManage.Click += ToolStripMenuFilterManage_Click;
             // 
             // toolStripSeparator7
             // 
             toolStripSeparator7.Name = "toolStripSeparator7";
-            toolStripSeparator7.Size = new System.Drawing.Size(185, 6);
+            toolStripSeparator7.Size = new System.Drawing.Size(195, 6);
             // 
             // ToolStripMenuFilterOpen
             // 
             ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
-            ToolStripMenuFilterOpen.Size = new System.Drawing.Size(188, 22);
+            ToolStripMenuFilterOpen.Size = new System.Drawing.Size(198, 22);
             ToolStripMenuFilterOpen.Text = "Open";
             ToolStripMenuFilterOpen.Click += OpenFilterMenuItem_Click;
             // 
             // toolStripSeparator6
             // 
             toolStripSeparator6.Name = "toolStripSeparator6";
-            toolStripSeparator6.Size = new System.Drawing.Size(185, 6);
+            toolStripSeparator6.Size = new System.Drawing.Size(195, 6);
             // 
             // ToolStripMenuFilterSave
             // 
             ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
-            ToolStripMenuFilterSave.Size = new System.Drawing.Size(188, 22);
+            ToolStripMenuFilterSave.Size = new System.Drawing.Size(198, 22);
             ToolStripMenuFilterSave.Text = "Save";
             ToolStripMenuFilterSave.Click += SaveFilterMenuItem_Click;
             // 
@@ -4959,31 +4919,31 @@ namespace MECCG_Deck_Builder
             // contentsToolStripMenuItem
             // 
             contentsToolStripMenuItem.Name = "contentsToolStripMenuItem";
-            contentsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            contentsToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             contentsToolStripMenuItem.Text = "&Contents";
             contentsToolStripMenuItem.Click += ContentsToolStripMenuItem_Click;
             // 
             // indexToolStripMenuItem
             // 
             indexToolStripMenuItem.Name = "indexToolStripMenuItem";
-            indexToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            indexToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             indexToolStripMenuItem.Text = "&Index";
             // 
             // searchToolStripMenuItem
             // 
             searchToolStripMenuItem.Name = "searchToolStripMenuItem";
-            searchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            searchToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             searchToolStripMenuItem.Text = "&Search";
             // 
             // toolStripSeparator5
             // 
             toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            toolStripSeparator5.Size = new System.Drawing.Size(119, 6);
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            aboutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             aboutToolStripMenuItem.Text = "&About...";
             // 
             // ComboBoxKey4

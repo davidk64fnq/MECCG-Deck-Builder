@@ -241,11 +241,11 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuMasterCustomFilters(Card card)
         {
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
-            ContextMenuStripMaster.Items.RemoveByKey("Custom Filters");
+            ContextMenuStripMaster.Items.RemoveByKey("Assigned Tags");
 
             if (pairs.Count == 0) return;
 
-            var customMenu = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            var customMenu = new ToolStripMenuItem("Assigned Tags") { Name = "Assigned Tags" };
             int maxLen = pairs.Max(p => p.Key.Length);
 
             for (int i = 0; i < pairs.Count; i++)
@@ -259,12 +259,12 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuMasterAddKeyValue(Card card)
         {
-            ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
+            ContextMenuStripMaster.Items.RemoveByKey("Assign Tag");
             var keyNames = _filterService.GetCustomKeyNames();
 
-            var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+            var addMenu = new ToolStripMenuItem("Assign Tag") { Name = "Assign Tag" };
 
-            var addNewTagItem = new ToolStripMenuItem("+ Add New Tag...") { Font = new Font(Font, FontStyle.Bold) };
+            var addNewTagItem = new ToolStripMenuItem("+ Author New Tag...") { Font = new Font(Font, FontStyle.Bold) };
             addNewTagItem.Click += (s, ev) =>
             {
                 var result = AddTagDialog.Show(this, card.Name, _filterService);
@@ -293,10 +293,10 @@ namespace MECCG_Deck_Builder
 
                 var keyItem = new ToolStripMenuItem(keyName);
 
-                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
                 addNewValueItem.Click += (s, ev) =>
                 {
-                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    string val = PromptDialog.Show(this, $"Add Tag to '{keyName}'", $"Enter new tag for category '{keyName}':");
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
@@ -337,11 +337,11 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuMasterDeleteKeyValue(Card card)
         {
-            ContextMenuStripMaster.Items.RemoveByKey("Delete Key Value");
+            ContextMenuStripMaster.Items.RemoveByKey("Remove Tag");
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
             if (pairs.Count == 0) return;
 
-            var delMenu = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
@@ -687,11 +687,11 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuTabCustomFilters(Card card)
         {
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
-            ContextMenuStripTabs.Items.RemoveByKey("Custom Filters");
+            ContextMenuStripTabs.Items.RemoveByKey("Assigned Tags");
 
             if (pairs.Count == 0) return;
 
-            var customMenu = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            var customMenu = new ToolStripMenuItem("Assigned Tags") { Name = "Assigned Tags" };
             int maxLen = pairs.Max(p => p.Key.Length);
 
             for (int i = 0; i < pairs.Count; i++)
@@ -705,12 +705,12 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabAddKeyValue(Card card)
         {
-            ContextMenuStripTabs.Items.RemoveByKey("Add Key Value");
+            ContextMenuStripTabs.Items.RemoveByKey("Assign Tag");
             var keyNames = _filterService.GetCustomKeyNames();
 
-            var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+            var addMenu = new ToolStripMenuItem("Assign Tag") { Name = "Assign Tag" };
 
-            var addNewTagItem = new ToolStripMenuItem("+ Add New Tag...") { Font = new Font(Font, FontStyle.Bold) };
+            var addNewTagItem = new ToolStripMenuItem("+ Author New Tag...") { Font = new Font(Font, FontStyle.Bold) };
             addNewTagItem.Click += (s, ev) =>
             {
                 var result = AddTagDialog.Show(this, card.Name, _filterService);
@@ -739,10 +739,10 @@ namespace MECCG_Deck_Builder
 
                 var keyItem = new ToolStripMenuItem(keyName);
 
-                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
                 addNewValueItem.Click += (s, ev) =>
                 {
-                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    string val = PromptDialog.Show(this, $"Add Tag to '{keyName}'", $"Enter new tag for category '{keyName}':");
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
@@ -783,11 +783,11 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabDeleteKeyValue(Card card)
         {
-            ContextMenuStripTabs.Items.RemoveByKey("Delete Key Value");
+            ContextMenuStripTabs.Items.RemoveByKey("Remove Tag");
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
             if (pairs.Count == 0) return;
 
-            var delMenu = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
@@ -981,9 +981,9 @@ namespace MECCG_Deck_Builder
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Title = Constants.AppTitle,
+                Title = $"{Constants.AppTitle} - Load Custom Tag Set",
                 DefaultExt = "json",
-                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json"
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -1003,9 +1003,9 @@ namespace MECCG_Deck_Builder
         {
             using var saveFileDialog = new SaveFileDialog
             {
-                Title = Constants.AppTitle,
+                Title = $"{Constants.AppTitle} - Save Custom Tag Set",
                 DefaultExt = "json",
-                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json"
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
