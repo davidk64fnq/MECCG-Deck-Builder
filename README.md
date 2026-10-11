@@ -16,8 +16,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
 - **Dynamic Stats Summary:** Window title bar displays live card counts per section with dedicated character counts: `(Pool / Res [Characters] / Haz / Side / Site)`.
 - **Card Artwork Preview & Caching:** On-demand card artwork download from Cardnum with local disk caching (`METW/`, `MEDM/`, etc.) and an in-memory cache. ICE errata cards load corrected artwork automatically.
 - **Dual-Layer Filtering:**
-  - **Cardnum Built-in:** Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
-  - **Custom User Taxonomy:** Create custom tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`) and tag individual cards.
+  - **Cardnum Built-in (Slots 1 & 2):** Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
+  - **Custom User Taxonomy (Slots 3 & 4):** Filter by custom tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`). Author tags via the dedicated **Manage Custom Tags** dialog or right-click **Add Key Value > [+ Add New Tag...]** without disturbing active filter criteria.
 - **Multi-Platform Export Formats:**
   - **Tabletop Simulator (`.json`):** Generates ready-to-use deck files compatible with TTS MECCG mods.
   - **Play MECCG (`.play` & `.playPBEM`):** Native format for online play.
@@ -54,12 +54,16 @@ An offline-capable Windows desktop application for building, organizing, filteri
 
 ### Building from Source
 1. Clone the repository:
+   ```bash
    git clone https://github.com/davidk64fnq/MECCG-Deck-Builder.git
    cd MECCG-Deck-Builder
+   ```
 
 2. Restore packages and build:
+   ```bash
    dotnet restore
    dotnet build -c Release
+   ```
 
 3. Run the executable in `bin/Release/net8.0-windows/MECCG Deck Builder.exe`.
 
@@ -81,3 +85,4 @@ Full compiled HTML Help documentation is available in-app via **Help > Contents*
 ## Acknowledgments
 - Card data and artwork courtesy of the Cardnum Project (https://cardnum.net).
 - Middle-earth Collectible Card Game is originally (C) Iron Crown Enterprises and Tolkien Enterprises.
+```

@@ -139,6 +139,7 @@ namespace MECCG_Deck_Builder
         private static void SetKeyDropdownDataSource(ComboBox cb, IReadOnlyList<string> items)
         {
             string current = cb.Text.Trim();
+            cb.DataSource = null;
             cb.DataSource = items;
             int idx = -1;
             for (int i = 0; i < items.Count; i++)
@@ -260,9 +261,26 @@ namespace MECCG_Deck_Builder
         {
             ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
             var keyNames = _filterService.GetCustomKeyNames();
-            var cardKeys = _filterService.GetCardCustomKeyNames(card.Id);
 
             var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+
+            var addNewTagItem = new ToolStripMenuItem("+ Add New Tag...") { Font = new Font(Font, FontStyle.Bold) };
+            addNewTagItem.Click += (s, ev) =>
+            {
+                var result = AddTagDialog.Show(this, card.Name, _filterService);
+                if (result.HasValue)
+                {
+                    _filterService.AddCustomKeyName(result.Value.Key);
+                    _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
+                    _filterService.SetCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
+                    RefreshFilterKeyDropdowns();
+                    UpdateFacetedFilters();
+                }
+            };
+            addMenu.DropDownItems.Add(addNewTagItem);
+            addMenu.DropDownItems.Add(new ToolStripSeparator());
+
+            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
 
             foreach (string keyName in keyNames)
             {
@@ -271,32 +289,44 @@ namespace MECCG_Deck_Builder
                     continue;
                 }
 
-                if (!cardKeys.Contains(keyName))
+                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
+
+                var keyItem = new ToolStripMenuItem(keyName);
+
+                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                addNewValueItem.Click += (s, ev) =>
                 {
-                    var keyItem = new ToolStripMenuItem(keyName);
-                    var values = _filterService.GetCustomKeyValues(keyName);
-                    var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-
-                    if (definedValues.Count > 0)
+                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    if (!string.IsNullOrWhiteSpace(val))
                     {
-                        foreach (string val in definedValues)
+                        _filterService.AddCustomKeyValue(keyName, val);
+                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        RefreshFilterKeyDropdowns();
+                        UpdateFacetedFilters();
+                    }
+                };
+                keyItem.DropDownItems.Add(addNewValueItem);
+                keyItem.DropDownItems.Add(new ToolStripSeparator());
+
+                var values = _filterService.GetCustomKeyValues(keyName);
+                var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+
+                if (definedValues.Count > 0)
+                {
+                    foreach (string val in definedValues)
+                    {
+                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        valItem.Click += (s, ev) =>
                         {
-                            var valItem = new ToolStripMenuItem(val);
-                            valItem.Click += (s, ev) =>
-                            {
-                                _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
-                                UpdateFacetedFilters();
-                            };
-                            keyItem.DropDownItems.Add(valItem);
-                        }
+                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            UpdateFacetedFilters();
+                        };
+                        keyItem.DropDownItems.Add(valItem);
                     }
-                    else
-                    {
-                        keyItem.DropDownItems.Add(new ToolStripMenuItem("(No values defined)") { Enabled = false });
-                    }
-
-                    addMenu.DropDownItems.Add(keyItem);
                 }
+
+                addMenu.DropDownItems.Add(keyItem);
             }
 
             if (addMenu.HasDropDownItems)
@@ -628,6 +658,8 @@ namespace MECCG_Deck_Builder
 
             SetToolStripMenuTabCardnumFilters(card);
             SetToolStripMenuTabCustomFilters(card);
+            SetToolStripMenuTabAddKeyValue(card);
+            SetToolStripMenuTabDeleteKeyValue(card);
             ContextMenuStripTabs.Show(Cursor.Position);
         }
 
@@ -669,6 +701,107 @@ namespace MECCG_Deck_Builder
             }
 
             ContextMenuStripTabs.Items.Add(customMenu);
+        }
+
+        private void SetToolStripMenuTabAddKeyValue(Card card)
+        {
+            ContextMenuStripTabs.Items.RemoveByKey("Add Key Value");
+            var keyNames = _filterService.GetCustomKeyNames();
+
+            var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+
+            var addNewTagItem = new ToolStripMenuItem("+ Add New Tag...") { Font = new Font(Font, FontStyle.Bold) };
+            addNewTagItem.Click += (s, ev) =>
+            {
+                var result = AddTagDialog.Show(this, card.Name, _filterService);
+                if (result.HasValue)
+                {
+                    _filterService.AddCustomKeyName(result.Value.Key);
+                    _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
+                    _filterService.SetCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
+                    RefreshFilterKeyDropdowns();
+                    UpdateFacetedFilters();
+                }
+            };
+            addMenu.DropDownItems.Add(addNewTagItem);
+            addMenu.DropDownItems.Add(new ToolStripSeparator());
+
+            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
+
+            foreach (string keyName in keyNames)
+            {
+                if (string.IsNullOrWhiteSpace(keyName))
+                {
+                    continue;
+                }
+
+                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
+
+                var keyItem = new ToolStripMenuItem(keyName);
+
+                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                addNewValueItem.Click += (s, ev) =>
+                {
+                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    if (!string.IsNullOrWhiteSpace(val))
+                    {
+                        _filterService.AddCustomKeyValue(keyName, val);
+                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        RefreshFilterKeyDropdowns();
+                        UpdateFacetedFilters();
+                    }
+                };
+                keyItem.DropDownItems.Add(addNewValueItem);
+                keyItem.DropDownItems.Add(new ToolStripSeparator());
+
+                var values = _filterService.GetCustomKeyValues(keyName);
+                var definedValues = values.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+
+                if (definedValues.Count > 0)
+                {
+                    foreach (string val in definedValues)
+                    {
+                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        valItem.Click += (s, ev) =>
+                        {
+                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            UpdateFacetedFilters();
+                        };
+                        keyItem.DropDownItems.Add(valItem);
+                    }
+                }
+
+                addMenu.DropDownItems.Add(keyItem);
+            }
+
+            if (addMenu.HasDropDownItems)
+            {
+                ContextMenuStripTabs.Items.Add(addMenu);
+            }
+        }
+
+        private void SetToolStripMenuTabDeleteKeyValue(Card card)
+        {
+            ContextMenuStripTabs.Items.RemoveByKey("Delete Key Value");
+            var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
+            if (pairs.Count == 0) return;
+
+            var delMenu = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            foreach (var (key, value) in pairs)
+            {
+                var keyItem = new ToolStripMenuItem(key);
+                var valItem = new ToolStripMenuItem(value);
+                valItem.Click += (s, ev) =>
+                {
+                    _filterService.DeleteCardCustomTag(card.Id, key);
+                    UpdateFacetedFilters();
+                };
+                keyItem.DropDownItems.Add(valItem);
+                delMenu.DropDownItems.Add(keyItem);
+            }
+
+            ContextMenuStripTabs.Items.Add(delMenu);
         }
 
         private void ToolStripMenuTab_Click(object sender, EventArgs e)
@@ -836,6 +969,14 @@ namespace MECCG_Deck_Builder
 
         #region CUSTOM_FILTERS_OPEN_SAVE
 
+        private void ToolStripMenuFilterManage_Click(object sender, EventArgs e)
+        {
+            using var dlg = new ManageCustomTagsForm(_filterService);
+            dlg.ShowDialog(this);
+            RefreshFilterKeyDropdowns();
+            UpdateFacetedFilters();
+        }
+
         private void OpenFilterMenuItem_Click(object sender, EventArgs e)
         {
             using var openFileDialog = new OpenFileDialog
@@ -873,57 +1014,6 @@ namespace MECCG_Deck_Builder
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
             }
-        }
-
-        private void SetFilterMenuDeleteKeyNameValue_Click(object sender, EventArgs e)
-        {
-            var keyNames = _filterService.GetCustomKeyNames();
-            var delMenu = new ToolStripMenuItem("Delete Key") { Name = "Delete Key", Enabled = keyNames.Count > 0 };
-
-            foreach (string keyName in keyNames)
-            {
-                if (string.IsNullOrWhiteSpace(keyName)) continue;
-
-                var keyItem = new ToolStripMenuItem(keyName);
-                keyItem.Click += (s, ev) =>
-                {
-                    _filterService.DeleteCustomKeyName(keyName);
-
-                    if (string.Equals(ComboBoxKey3.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        ComboBoxKey3.SelectedIndex = 0;
-                        ComboBoxValue3.SelectedIndex = 0;
-                    }
-
-                    if (string.Equals(ComboBoxKey4.Text.Trim(), keyName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        ComboBoxKey4.SelectedIndex = 0;
-                        ComboBoxValue4.SelectedIndex = 0;
-                    }
-
-                    RefreshFilterKeyDropdowns();
-                    UpdateFacetedFilters();
-                };
-
-                var values = _filterService.GetCustomKeyValues(keyName);
-                foreach (string val in values)
-                {
-                    if (!string.IsNullOrEmpty(val))
-                    {
-                        var valItem = new ToolStripMenuItem(val);
-                        valItem.Click += (s, ev) =>
-                        {
-                            _filterService.DeleteCustomKeyValue(keyName, val);
-                            UpdateFacetedFilters();
-                        };
-                        keyItem.DropDownItems.Add(valItem);
-                    }
-                }
-                delMenu.DropDownItems.Add(keyItem);
-            }
-
-            ToolStripMenuFilter.DropDownItems.RemoveByKey("Delete Key");
-            ToolStripMenuFilter.DropDownItems.Insert(0, delMenu);
         }
 
         #endregion
@@ -965,8 +1055,10 @@ namespace MECCG_Deck_Builder
 
                         if (!availableValues.Exists(v => string.Equals(v, slot.CurrentValue, StringComparison.OrdinalIgnoreCase)))
                         {
-                            if (slot.ValueBox.DataSource is List<string> list && list.Count > 0)
+                            slot.ValueBox.DataSource = null;
+                            if (availableValues.Count > 0)
                             {
+                                slot.ValueBox.DataSource = availableValues;
                                 slot.ValueBox.SelectedIndex = 0;
                             }
                             else
@@ -987,6 +1079,7 @@ namespace MECCG_Deck_Builder
 
                     if (string.IsNullOrWhiteSpace(key))
                     {
+                        slot.ValueBox.DataSource = null;
                         slot.ValueBox.DataSource = new List<string> { "" };
                         slot.ValueBox.SelectedIndex = 0;
                         continue;
@@ -1004,6 +1097,7 @@ namespace MECCG_Deck_Builder
                         slot.Type,
                         key);
 
+                    slot.ValueBox.DataSource = null;
                     slot.ValueBox.DataSource = availableValues;
 
                     int matchIdx = availableValues.FindIndex(v => string.Equals(v, prevVal, StringComparison.OrdinalIgnoreCase));
@@ -1029,15 +1123,8 @@ namespace MECCG_Deck_Builder
                 try
                 {
                     var valueBox = _filterSlots[slotIndex].ValueBox;
-                    if (valueBox.Items.Count > 0)
-                    {
-                        valueBox.SelectedIndex = 0;
-                    }
-                    else
-                    {
-                        valueBox.SelectedIndex = -1;
-                        valueBox.Text = string.Empty;
-                    }
+                    valueBox.DataSource = null;
+                    valueBox.Items.Clear();
                 }
                 finally
                 {
@@ -1053,39 +1140,6 @@ namespace MECCG_Deck_Builder
             if (_isUpdatingFilters) return;
 
             UpdateFacetedFilters();
-        }
-
-        private void ComboBoxKeyNameHandleTextEntry(object sender, EventArgs e)
-        {
-            if (_isUpdatingFilters) return;
-
-            var cb = (ComboBox)sender;
-            string keyName = cb.Text.Trim();
-            if (!string.IsNullOrEmpty(keyName) && !cb.Items.Contains(keyName))
-            {
-                _filterService.AddCustomKeyName(keyName);
-                RefreshFilterKeyDropdowns();
-                cb.SelectedItem = keyName;
-
-                UpdateFacetedFilters();
-            }
-        }
-
-        private void ComboBoxKeyValueHandleTextEntry(object sender, EventArgs e)
-        {
-            if (_isUpdatingFilters) return;
-
-            var cb = (ComboBox)sender;
-            string val = cb.Text.Trim();
-            var keyCb = cb == ComboBoxValue3 ? ComboBoxKey3 : ComboBoxKey4;
-            string key = keyCb.Text.Trim();
-
-            if (!string.IsNullOrEmpty(key) && !string.IsNullOrEmpty(val))
-            {
-                _filterService.AddCustomKeyValue(key, val);
-
-                UpdateFacetedFilters();
-            }
         }
 
         private void AdjustWidthComboBox_DropDown(object sender, EventArgs e)
@@ -1147,19 +1201,6 @@ namespace MECCG_Deck_Builder
                 cb.SelectedIndex = 0;
                 e.Handled = true;
                 e.SuppressKeyPress = true;
-            }
-            else if (e.KeyCode == Keys.Enter && sender is ComboBox enterCb)
-            {
-                e.Handled = true;
-                e.SuppressKeyPress = true;
-                if (enterCb == ComboBoxKey3 || enterCb == ComboBoxKey4)
-                {
-                    ComboBoxKeyNameHandleTextEntry(enterCb, EventArgs.Empty);
-                }
-                else if (enterCb == ComboBoxValue3 || enterCb == ComboBoxValue4)
-                {
-                    ComboBoxKeyValueHandleTextEntry(enterCb, EventArgs.Empty);
-                }
             }
         }
 

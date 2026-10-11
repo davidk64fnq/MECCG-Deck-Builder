@@ -57,7 +57,7 @@ namespace MECCG_Deck_Builder
 
         public void AddCustomKeyValue(string keyName, string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(value))
             {
                 return;
             }
@@ -65,15 +65,77 @@ namespace MECCG_Deck_Builder
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index == -1)
             {
-                return;
+                AddCustomKeyName(keyName);
+                index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (!_customFilters[index].Contains(value, StringComparer.OrdinalIgnoreCase))
+            if (index != -1 && !_customFilters[index].Contains(value, StringComparer.OrdinalIgnoreCase))
             {
                 _customFilters[index].Add(value);
                 if (_customFilters[index].Count > 2)
                 {
                     _customFilters[index].Sort(1, _customFilters[index].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                }
+            }
+        }
+
+        public void RenameCustomKeyName(string oldKeyName, string newKeyName)
+        {
+            if (string.IsNullOrWhiteSpace(oldKeyName) || string.IsNullOrWhiteSpace(newKeyName) ||
+                string.Equals(oldKeyName, newKeyName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            int index = _customFilters.FindIndex(f => string.Equals(f[0], oldKeyName, StringComparison.OrdinalIgnoreCase));
+            if (index >= 0)
+            {
+                _customFilters[index][0] = newKeyName;
+                _customFilters.Sort((a, b) => string.Compare(a[0], b[0], StringComparison.Ordinal));
+            }
+
+            foreach (var tags in _cardCustomTags.Values)
+            {
+                if (tags.TryGetValue(oldKeyName, out string val))
+                {
+                    tags.Remove(oldKeyName);
+                    tags[newKeyName] = val;
+                }
+            }
+        }
+
+        public void RenameCustomKeyValue(string keyName, string oldValue, string newValue)
+        {
+            if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(oldValue) ||
+                string.IsNullOrWhiteSpace(newValue) || string.Equals(oldValue, newValue, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
+            if (index >= 0)
+            {
+                for (int i = 1; i < _customFilters[index].Count; i++)
+                {
+                    if (string.Equals(_customFilters[index][i], oldValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _customFilters[index][i] = newValue;
+                        break;
+                    }
+                }
+
+                if (_customFilters[index].Count > 2)
+                {
+                    _customFilters[index].Sort(1, _customFilters[index].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                }
+            }
+
+            foreach (var tags in _cardCustomTags.Values)
+            {
+                if (tags.TryGetValue(keyName, out string existingVal) &&
+                    string.Equals(existingVal, oldValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    tags[keyName] = newValue;
                 }
             }
         }
@@ -123,6 +185,11 @@ namespace MECCG_Deck_Builder
             }
 
             tags[keyName] = value ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                AddCustomKeyValue(keyName, value);
+            }
         }
 
         public void DeleteCardCustomTag(string cardId, string keyName)
@@ -279,15 +346,14 @@ namespace MECCG_Deck_Builder
         }
 
         public List<Card> Filter(
-    IEnumerable<Card> sourceCards,
-    ISet<string> selectedSets,
-    IReadOnlyList<FilterCriterion> criteria)
+            IEnumerable<Card> sourceCards,
+            ISet<string> selectedSets,
+            IReadOnlyList<FilterCriterion> criteria)
         {
             var result = new List<Card>();
 
             foreach (var card in sourceCards)
             {
-                // If a set filter collection is provided and does not contain this card's set, skip it
                 if (selectedSets != null && !selectedSets.Contains(card.Set))
                 {
                     continue;
@@ -306,11 +372,11 @@ namespace MECCG_Deck_Builder
         }
 
         public List<string> GetAvailableValues(
-    IEnumerable<Card> sourceCards,
-    ISet<string> selectedSets,
-    IReadOnlyList<FilterCriterion> otherCriteria,
-    FilterType targetType,
-    string targetKey)
+            IEnumerable<Card> sourceCards,
+            ISet<string> selectedSets,
+            IReadOnlyList<FilterCriterion> otherCriteria,
+            FilterType targetType,
+            string targetKey)
         {
             var result = new List<string> { "" };
 
@@ -321,9 +387,21 @@ namespace MECCG_Deck_Builder
 
             var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+            // For custom taxonomy filters, always include all values defined in the taxonomy for this key
+            if (targetType == FilterType.Custom)
+            {
+                var taxonomyValues = GetCustomKeyValues(targetKey);
+                foreach (var val in taxonomyValues)
+                {
+                    if (!string.IsNullOrWhiteSpace(val))
+                    {
+                        distinctValues.Add(val.Trim());
+                    }
+                }
+            }
+
             foreach (var card in sourceCards)
             {
-                // If a set filter collection is provided and does not contain this card's set, skip it
                 if (selectedSets != null && !selectedSets.Contains(card.Set))
                 {
                     continue;

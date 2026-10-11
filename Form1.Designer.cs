@@ -1,5 +1,4 @@
-﻿
-namespace MECCG_Deck_Builder
+﻿namespace MECCG_Deck_Builder
 {
     partial class Form1
     {
@@ -97,6 +96,8 @@ namespace MECCG_Deck_Builder
             ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuFilter = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuFilterManage = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuFilterOpen = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuFilterSave = new System.Windows.Forms.ToolStripMenuItem();
@@ -639,7 +640,7 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuTools
             // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsGetImages});
+            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsGetImages });
             ToolStripMenuTools.Name = "ToolStripMenuTools";
             ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
             ToolStripMenuTools.Text = "&Tools";
@@ -647,7 +648,7 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuToolsGetImages
             // 
             ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
-            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(169, 22);
+            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(180, 22);
             ToolStripMenuToolsGetImages.Text = "Download Images";
             ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
             // 
@@ -661,41 +662,52 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuSetSelectAll
             // 
             ToolStripMenuSetSelectAll.Name = "ToolStripMenuSetSelectAll";
-            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(122, 22);
+            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(180, 22);
             ToolStripMenuSetSelectAll.Text = "Select All";
             ToolStripMenuSetSelectAll.Click += ToolStripMenuSetSelectAll_Click;
             // 
             // ToolStripMenuSetClearAll
             // 
             ToolStripMenuSetClearAll.Name = "ToolStripMenuSetClearAll";
-            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(122, 22);
+            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(180, 22);
             ToolStripMenuSetClearAll.Text = "Clear All";
             ToolStripMenuSetClearAll.Click += ToolStripMenuSetClearAll_Click;
             // 
             // ToolStripMenuFilter
             // 
-            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterOpen, toolStripSeparator6, ToolStripMenuFilterSave });
+            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterManage, toolStripSeparator7, ToolStripMenuFilterOpen, toolStripSeparator6, ToolStripMenuFilterSave });
             ToolStripMenuFilter.Name = "ToolStripMenuFilter";
             ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
             ToolStripMenuFilter.Text = "&Filter";
-            ToolStripMenuFilter.Click += SetFilterMenuDeleteKeyNameValue_Click;
+            // 
+            // ToolStripMenuFilterManage
+            // 
+            ToolStripMenuFilterManage.Name = "ToolStripMenuFilterManage";
+            ToolStripMenuFilterManage.Size = new System.Drawing.Size(198, 22);
+            ToolStripMenuFilterManage.Text = "&Manage Custom Tags...";
+            ToolStripMenuFilterManage.Click += ToolStripMenuFilterManage_Click;
+            // 
+            // toolStripSeparator7
+            // 
+            toolStripSeparator7.Name = "toolStripSeparator7";
+            toolStripSeparator7.Size = new System.Drawing.Size(195, 6);
             // 
             // ToolStripMenuFilterOpen
             // 
             ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
-            ToolStripMenuFilterOpen.Size = new System.Drawing.Size(103, 22);
+            ToolStripMenuFilterOpen.Size = new System.Drawing.Size(198, 22);
             ToolStripMenuFilterOpen.Text = "Open";
             ToolStripMenuFilterOpen.Click += OpenFilterMenuItem_Click;
             // 
             // toolStripSeparator6
             // 
             toolStripSeparator6.Name = "toolStripSeparator6";
-            toolStripSeparator6.Size = new System.Drawing.Size(100, 6);
+            toolStripSeparator6.Size = new System.Drawing.Size(195, 6);
             // 
             // ToolStripMenuFilterSave
             // 
             ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
-            ToolStripMenuFilterSave.Size = new System.Drawing.Size(103, 22);
+            ToolStripMenuFilterSave.Size = new System.Drawing.Size(198, 22);
             ToolStripMenuFilterSave.Text = "Save";
             ToolStripMenuFilterSave.Click += SaveFilterMenuItem_Click;
             // 
@@ -709,56 +721,56 @@ namespace MECCG_Deck_Builder
             // contentsToolStripMenuItem
             // 
             contentsToolStripMenuItem.Name = "contentsToolStripMenuItem";
-            contentsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            contentsToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             contentsToolStripMenuItem.Text = "&Contents";
             contentsToolStripMenuItem.Click += ContentsToolStripMenuItem_Click;
             // 
             // indexToolStripMenuItem
             // 
             indexToolStripMenuItem.Name = "indexToolStripMenuItem";
-            indexToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            indexToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             indexToolStripMenuItem.Text = "&Index";
             // 
             // searchToolStripMenuItem
             // 
             searchToolStripMenuItem.Name = "searchToolStripMenuItem";
-            searchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            searchToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             searchToolStripMenuItem.Text = "&Search";
             // 
             // toolStripSeparator5
             // 
             toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new System.Drawing.Size(177, 6);
+            toolStripSeparator5.Size = new System.Drawing.Size(119, 6);
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            aboutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             aboutToolStripMenuItem.Text = "&About...";
             // 
             // ComboBoxKey4
             // 
             ComboBoxKey4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey4.FormattingEnabled = true;
             ComboBoxKey4.Location = new System.Drawing.Point(706, 581);
             ComboBoxKey4.Name = "ComboBoxKey4";
             ComboBoxKey4.Size = new System.Drawing.Size(206, 23);
             ComboBoxKey4.TabIndex = 19;
             ComboBoxKey4.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
-            ComboBoxKey4.Leave += ComboBoxKeyNameHandleTextEntry;
             // 
             // ComboBoxKey3
             // 
             ComboBoxKey3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey3.FormattingEnabled = true;
             ComboBoxKey3.Location = new System.Drawing.Point(476, 581);
             ComboBoxKey3.Name = "ComboBoxKey3";
             ComboBoxKey3.Size = new System.Drawing.Size(210, 23);
             ComboBoxKey3.TabIndex = 20;
             ComboBoxKey3.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
-            ComboBoxKey3.Leave += ComboBoxKeyNameHandleTextEntry;
             // 
             // ComboBoxKey2
             // 
@@ -814,6 +826,7 @@ namespace MECCG_Deck_Builder
             // 
             ComboBoxValue3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             ComboBoxValue3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxValue3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue3.FormattingEnabled = true;
             ComboBoxValue3.Location = new System.Drawing.Point(476, 610);
             ComboBoxValue3.Name = "ComboBoxValue3";
@@ -821,12 +834,12 @@ namespace MECCG_Deck_Builder
             ComboBoxValue3.TabIndex = 24;
             ComboBoxValue3.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue3.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
-            ComboBoxValue3.Leave += ComboBoxKeyValueHandleTextEntry;
             // 
             // ComboBoxValue4
             // 
             ComboBoxValue4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             ComboBoxValue4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxValue4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue4.FormattingEnabled = true;
             ComboBoxValue4.Location = new System.Drawing.Point(706, 610);
             ComboBoxValue4.Name = "ComboBoxValue4";
@@ -834,7 +847,6 @@ namespace MECCG_Deck_Builder
             ComboBoxValue4.TabIndex = 23;
             ComboBoxValue4.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue4.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
-            ComboBoxValue4.Leave += ComboBoxKeyValueHandleTextEntry;
             // 
             // Form1
             // 
@@ -948,6 +960,8 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ComboBox ComboBoxValue3;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
@@ -959,4 +973,3 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
     }
 }
-

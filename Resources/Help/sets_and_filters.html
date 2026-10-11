@@ -21,14 +21,14 @@
 
     <h2>Dual-Layer Filtering Architecture</h2>
     <p>
-        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. The filter bar is organized into two distinct layers:
+        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. All four slots function as <strong>read-only drop-down selectors</strong>, organized into two distinct layers:
     </p>
 
     <table>
         <tr>
             <th>Filter Layer</th>
             <th>Data Source</th>
-            <th>User Modifiability</th>
+            <th>Taxonomy Management</th>
             <th>Input Style</th>
         </tr>
         <tr>
@@ -39,10 +39,10 @@
                 <strong>Cardnum Open Database:</strong> Canonical card statistics synchronized from <code>cardnum.net</code> and GitHub, representing published cards from Iron Crown Enterprises (I.C.E.) and Council of Elrond Dreamcards.
             </td>
             <td>
-                <strong>Read-Only:</strong> Attributes and values are fixed. You cannot type into, edit, or delete items in these two slots.
+                <strong>Fixed Attributes:</strong> Rules-based properties (Primary, Alignment, Race, Skill, Stats) are immutable.
             </td>
             <td>
-                Fixed Drop-Down Selection list.
+                Fixed Drop-Down Selection list (pruned to active cards).
             </td>
         </tr>
         <tr>
@@ -50,13 +50,13 @@
                 <strong>Slots 3 &amp; 4:<br />Custom User Taxonomy</strong>
             </td>
             <td>
-                <strong>User-Defined:</strong> Managed locally in your deck builder session and saved to custom filter files (<code>.json</code>).
+                <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom filter files (<code>.json</code>).
             </td>
             <td>
-                <strong>Completely Alterable:</strong> You can invent new keys, type new values, assign them to cards via right-click, or delete them globally.
+                <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete keys and values via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
             </td>
             <td>
-                Editable Text ComboBox (type new entries directly or pick from existing values).
+                Fixed Drop-Down Selection list (strictly queries cards matching assigned tags).
             </td>
         </tr>
     </table>
@@ -70,10 +70,10 @@
             <strong>Context-Sensitive Value Pruning:</strong> The value dropdown for any slot only displays options present among cards that satisfy your active expansion sets and the other active filter slots. Selecting any choice from a dropdown is guaranteed to match at least one card, completely eliminating dead-end queries.
         </li>
         <li>
-            <strong>Order-Independent (Symmetric) Narrowing:</strong> You can choose filters in any order. For example, selecting <code>Skill</code> = <code>Diplomat</code> in Slot 2 first will automatically prune Slot 1's <code>Primary</code> dropdown down to only card types that feature diplomats (<em>Character</em> and <em>Ally</em>).
+            <strong>Order-Independent (Symmetric) Narrowing:</strong> You can choose filters in any order. For example, selecting <code>Skill</code> = <code>Diplomat</code> in Slot 2 first will automatically prune Slot 1's <code>Secondary</code> dropdown down to only card types that feature diplomats (<em>Ally</em>, <em>Avatar</em>, <em>Character</em> and <em>Short-event</em>).
         </li>
         <li>
-            <strong>Automatic Conflict Resolution:</strong> If an existing selection in Slot A becomes impossible due to a new choice in Slot B (e.g., you have <code>Race</code> = <code>Demon</code> selected in Slot 2 and subsequently change Slot 1 to <code>Primary</code> = <code>Character</code>), Slot 2 will automatically and silently reset to blank (<code>""</code>). This prevents empty result states while keeping Slot 2 ready for a valid selection.
+            <strong>Automatic Conflict Resolution:</strong> If an existing filter selection becomes impossible—such as deselecting an expansion in the <strong>Set</strong> menu or deleting a custom tag in the taxonomy manager—the invalid slot automatically and silently resets to blank (<code>""</code>).
         </li>
         <li>
             <strong>Cross-Layer Integration:</strong> Custom tags in Slots 3 &amp; 4 participate fully in faceting. Selecting a custom archetype (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code>) will prune the Cardnum dropdowns (Slots 1 &amp; 2) to only show primary types, races, and skills present on cards tagged with that archetype.
@@ -82,10 +82,6 @@
             <strong>Expansion Set Pruning:</strong> Checking or unchecking sets in the <strong>Set</strong> menu dynamically recalculates available filter values. If all expansions are deselected, the master list and card image preview are cleared.
         </li>
     </ul>
-
-    <div class="note">
-        <strong>Custom Taxonomy Text Entry Exemption:</strong> While the drop-down list in Slots 3 &amp; 4 is pruned to matching cards, you can still type brand-new keys and values directly into the editable text boxes to register new terms into your taxonomy before assigning them to cards.
-    </div>
 
     <h2>Cardnum Built-in Filters (Slots 1 &amp; 2)</h2>
     <p>
@@ -130,92 +126,55 @@
         <strong>Multi-Skill Search:</strong> When searching by <code>Skill</code>, cards with compound skills (such as <em>Warrior/Scout</em>) are indexed by both terms individually.
     </div>
 
-    <h2>Custom User Filters (Slots 3 &amp; 4)</h2>
+    <h2>Custom User Taxonomy (Slots 3 &amp; 4)</h2>
     <p>
-        The two right-hand slots allow you to create your own classification system to tag cards by playstyle, hazard package, or deck archetype (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code> or <code>Role</code> &rarr; <code>Scout Support</code>).
+        The two right-hand slots allow you to filter cards by your own classification system (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code> or <code>Role</code> &rarr; <code>Scout Support</code>). Authoring and managing tags is cleanly decoupled from filtering:
     </p>
 
-    <h3>1. Creating a New Custom Key</h3>
-    <ol>
-        <li>Click directly into the text box of <strong>ComboBoxKey3</strong> or <strong>ComboBoxKey4</strong>.</li>
-        <li>Type your new key name (e.g., <code>Strategy</code>) and press <kbd>Tab</kbd> or click away to commit.</li>
-    </ol>
-
-    <h3>2. Adding Values to a Key</h3>
-    <ol>
-        <li>Select or type the desired key in Key Slot 3 or 4.</li>
-        <li>Click into the corresponding <strong>Value3</strong> or <strong>Value4</strong> box.</li>
-        <li>Type a new value (e.g., <code>One Ring Victory</code>) and press <kbd>Tab</kbd> or click away to commit.</li>
-    </ol>
-
-    <h3>3. Assigning Custom Tags to Cards</h3>
-    <ol>
-        <li>Right-click any card in the Master List.</li>
-        <li>Navigate to <strong>Add Key Value &gt; [Your Key Name] &gt; [Your Value]</strong>.</li>
-        <li>The card is immediately associated with that tag. You can view all custom tags on a card by right-clicking it and inspecting the <strong>Custom Filters</strong> section.</li>
-    </ol>
-
-    <h3>4. Deleting Custom Keys and Values</h3>
+    <h3>1. Managing the Taxonomy (Filter &gt; Manage Custom Tags...)</h3>
     <p>
-        The application supports selective deletion at three distinct levels:
+        Open <strong>Filter &gt; Manage Custom Tags...</strong> to access the central tag management dialog. Here you can:
     </p>
+    <ul>
+        <li><strong>Add Categories (Keys):</strong> Create new classification keys (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
+        <li><strong>Rename Categories or Values:</strong> Rename terms across your entire taxonomy; all tagged cards are updated automatically.</li>
+        <li><strong>Add Values:</strong> Add new tags under an existing category before or after assigning them.</li>
+        <li><strong>Delete Categories or Values:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
+    </ul>
 
-    <table>
-        <tr>
-            <th>Operation</th>
-            <th>How to Perform</th>
-            <th>Scope &amp; Impact</th>
-        </tr>
-        <tr>
-            <td><strong>Delete Entire Key</strong><br /><em>(Key &amp; all associated values)</em></td>
-            <td>
-                Open <strong>Filter &gt; Delete Key</strong> and click directly on the <strong>Key Name</strong> (the parent menu item itself; do not expand the fly-out sub-menu).
-            </td>
-            <td>
-                Permanently deletes the key category, removes all of its associated values, strips that tag from every card in the database, and clears any active filter slots currently using that key.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Delete Single Key Value</strong><br /><em>(Individual leaf value)</em></td>
-            <td>
-                Open <strong>Filter &gt; Delete Key</strong>, hover over the Key Name to expand its fly-out sub-menu, and click the specific <strong>Value</strong>.
-            </td>
-            <td>
-                Deletes only that individual value from the key taxonomy and removes it from all cards tagged with it. The parent key and all other sibling values remain intact.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Unassign Tag from Single Card</strong></td>
-            <td>
-                Right-click the card in the Master List or Deck Tab, then select <strong>Delete Key Value &gt; [Key] &gt; [Value]</strong>.
-            </td>
-            <td>
-                Only removes the tag from that specific card. The key and value remain preserved in your taxonomy for use on other cards.
-            </td>
-        </tr>
-    </table>
+    <h3>2. Assigning Custom Tags to Cards</h3>
+    <p>
+        You can tag cards in the Master List or any Deck Tab using the context menu:
+    </p>
+    <ul>
+        <li>
+            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [Value]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned value; selecting a different value seamlessly updates and remaps the card.
+        </li>
+        <li>
+            <strong>Create and Assign New Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [+ Add New Tag...]</strong>. This prompts for both category and value, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
+        </li>
+        <li>
+            <strong>Add New Value to Existing Category:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [+ Add Value...]</strong> to author a new value and assign it immediately.
+        </li>
+    </ul>
 
-    <div class="warning">
-        <strong>Global Database Scope:</strong> Deleting a key or value via <code>Filter &gt; Delete Key</code> permanently removes it across the <strong>entire card database</strong>. This affects all cards and all expansions, including sets that are currently unchecked or hidden in the <strong>Set</strong> menu.
-        <br /><br />
-        If you only wish to remove a tag from specific cards without deleting the term from your taxonomy, right-click the card directly and use <code>Delete Key Value &gt; [Key] &gt; [Value]</code> instead.
-    </div>
+    <h3>3. Removing Tags from Cards</h3>
+    <ul>
+        <li>
+            <strong>Unassign Tag from Single Card:</strong> Right-click the card and choose <strong>Delete Key Value &gt; [Category] &gt; [Value]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
+        </li>
+        <li>
+            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently remove a category or value across all cards in the catalog.
+        </li>
+    </ul>
 
-    <div class="note">
-        <strong>Real-time Synchronization:</strong> Whenever a key or value is created or deleted, both custom filter slots (Slots 3 and 4) refresh their drop-down lists immediately in real time, even if both slots are currently configured to the same key. If a deleted item was actively selected, the slot automatically resets to blank.
-    </div>
-
-    <h3>5. Saving and Opening Custom Filter Sets</h3>
+    <h3>4. Saving and Opening Custom Filter Sets</h3>
     <ul>
         <li><strong>Filter &gt; Save:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
         <li><strong>Filter &gt; Open:</strong> Loads a previously saved custom filter set, restoring all keys, values, and card mappings.</li>
     </ul>
 
     <h2>Clearing and Resetting Filters</h2>
-    <p>
-        Filters can be deactivated individually or reset globally using several quick methods:
-    </p>
-
     <table>
         <tr>
             <th>Method</th>
