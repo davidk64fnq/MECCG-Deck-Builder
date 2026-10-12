@@ -21,19 +21,19 @@
 
     <h2>Dual-Layer Filtering Architecture</h2>
     <p>
-        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. All four slots function as <strong>read-only drop-down selectors</strong>, organized into two distinct layers:
+        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. The bottom panel is partitioned into two clear GroupBoxes, with each filter slot arranged as a vertical column pair:
     </p>
 
     <table>
         <tr>
-            <th>Filter Layer</th>
+            <th>Filter Box &amp; Slots</th>
             <th>Data Source</th>
             <th>Taxonomy Management</th>
-            <th>Input Style</th>
+            <th>Input Pairing</th>
         </tr>
         <tr>
             <td>
-                <strong>Slots 1 &amp; 2:<br />Built-in Database Attributes</strong>
+                <strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)
             </td>
             <td>
                 <strong>Cardnum Open Database:</strong> Canonical card statistics synchronized from <code>cardnum.net</code> and GitHub, representing published cards from Iron Crown Enterprises (I.C.E.) and Council of Elrond Dreamcards.
@@ -42,12 +42,12 @@
                 <strong>Fixed Attributes:</strong> Rules-based properties (Primary, Alignment, Race, Skill, Stats) are immutable.
             </td>
             <td>
-                Fixed Drop-Down Selection list (pruned to active cards).
+                Vertical pair: <strong>Attribute</strong> dropdown above <strong>Value</strong> dropdown.
             </td>
         </tr>
         <tr>
             <td>
-                <strong>Slots 3 &amp; 4:<br />Custom User Taxonomy (Categories &amp; Tags)</strong>
+                <strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)
             </td>
             <td>
                 <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom tag files (<code>.json</code>).
@@ -56,7 +56,7 @@
                 <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete categories and tags via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
             </td>
             <td>
-                Fixed Drop-Down Selection list (strictly queries cards matching assigned tags).
+                Vertical pair: <strong>Category</strong> dropdown above <strong>Tag</strong> dropdown.
             </td>
         </tr>
     </table>

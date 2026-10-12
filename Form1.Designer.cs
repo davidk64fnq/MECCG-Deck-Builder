@@ -107,13 +107,23 @@
             searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ComboBoxKey4 = new System.Windows.Forms.ComboBox();
-            ComboBoxKey3 = new System.Windows.Forms.ComboBox();
-            ComboBoxKey2 = new System.Windows.Forms.ComboBox();
+            GroupBoxCardAttributes = new System.Windows.Forms.GroupBox();
+            LblSlot1Key = new System.Windows.Forms.Label();
             ComboBoxKey1 = new System.Windows.Forms.ComboBox();
+            LblSlot1Value = new System.Windows.Forms.Label();
             ComboBoxValue1 = new System.Windows.Forms.ComboBox();
+            LblSlot2Key = new System.Windows.Forms.Label();
+            ComboBoxKey2 = new System.Windows.Forms.ComboBox();
+            LblSlot2Value = new System.Windows.Forms.Label();
             ComboBoxValue2 = new System.Windows.Forms.ComboBox();
+            GroupBoxCustomTags = new System.Windows.Forms.GroupBox();
+            LblSlot3Key = new System.Windows.Forms.Label();
+            ComboBoxKey3 = new System.Windows.Forms.ComboBox();
+            LblSlot3Value = new System.Windows.Forms.Label();
             ComboBoxValue3 = new System.Windows.Forms.ComboBox();
+            LblSlot4Key = new System.Windows.Forms.Label();
+            ComboBoxKey4 = new System.Windows.Forms.ComboBox();
+            LblSlot4Value = new System.Windows.Forms.Label();
             ComboBoxValue4 = new System.Windows.Forms.ComboBox();
             ContextMenuStripMaster.SuspendLayout();
             ContextMenuStripTabs.SuspendLayout();
@@ -125,6 +135,8 @@
             TabPageSideboard.SuspendLayout();
             TabPageSites.SuspendLayout();
             MenuStrip1.SuspendLayout();
+            GroupBoxCardAttributes.SuspendLayout();
+            GroupBoxCustomTags.SuspendLayout();
             SuspendLayout();
             // 
             // ListBoxMaster
@@ -134,7 +146,7 @@
             ListBoxMaster.ItemHeight = 15;
             ListBoxMaster.Location = new System.Drawing.Point(12, 37);
             ListBoxMaster.Name = "ListBoxMaster";
-            ListBoxMaster.Size = new System.Drawing.Size(210, 529);
+            ListBoxMaster.Size = new System.Drawing.Size(210, 505);
             ListBoxMaster.TabIndex = 0;
             ListBoxMaster.SelectedIndexChanged += ListBox_SelectedIndexChanged;
             ListBoxMaster.MouseDoubleClick += ListBoxCardList_MouseDoubleClick;
@@ -145,21 +157,21 @@
             // 
             ContextMenuStripMaster.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuMasterCardname, ToolStripMenuMasterCopyCard, ToolStripMenuMasterCardnumFilters });
             ContextMenuStripMaster.Name = "ContextMenuStripMaster";
-            ContextMenuStripMaster.Size = new System.Drawing.Size(181, 70);
+            ContextMenuStripMaster.Size = new System.Drawing.Size(155, 70);
             // 
             // ToolStripMenuMasterCardname
             // 
             ToolStripMenuMasterCardname.BackColor = System.Drawing.SystemColors.ActiveCaption;
             ToolStripMenuMasterCardname.ForeColor = System.Drawing.SystemColors.ControlText;
             ToolStripMenuMasterCardname.Name = "ToolStripMenuMasterCardname";
-            ToolStripMenuMasterCardname.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuMasterCardname.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuMasterCardname.Text = "toolStripMenuItem1";
             // 
             // ToolStripMenuMasterCopyCard
             // 
             ToolStripMenuMasterCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuMasterCopyToPool, ToolStripMenuMasterCopyToResource, ToolStripMenuMasterCopyToHazard, ToolStripMenuMasterCopyToSideboard, ToolStripMenuMasterCopyToSite });
             ToolStripMenuMasterCopyCard.Name = "ToolStripMenuMasterCopyCard";
-            ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuMasterCopyCard.Text = "Copy";
             // 
             // ToolStripMenuMasterCopyToPool
@@ -200,27 +212,27 @@
             // ToolStripMenuMasterCardnumFilters
             // 
             ToolStripMenuMasterCardnumFilters.Name = "ToolStripMenuMasterCardnumFilters";
-            ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuMasterCardnumFilters.Text = "Card Attributes";
             // 
             // ContextMenuStripTabs
             // 
             ContextMenuStripTabs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuTabCardname, ToolStripMenuTabCopyCard, ToolStripMenuTabMoveCard, ToolStripMenuTabDeleteCard, ToolStripMenuTabCardnumFilters });
             ContextMenuStripTabs.Name = "ContextMenuStripTabs";
-            ContextMenuStripTabs.Size = new System.Drawing.Size(181, 114);
+            ContextMenuStripTabs.Size = new System.Drawing.Size(155, 114);
             // 
             // ToolStripMenuTabCardname
             // 
             ToolStripMenuTabCardname.BackColor = System.Drawing.SystemColors.ActiveCaption;
             ToolStripMenuTabCardname.Name = "ToolStripMenuTabCardname";
-            ToolStripMenuTabCardname.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabCardname.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabCardname.Text = "toolStripMenuItem1";
             // 
             // ToolStripMenuTabCopyCard
             // 
             ToolStripMenuTabCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuTabCopyToPool, ToolStripMenuTabCopyToResource, ToolStripMenuTabCopyToHazard, ToolStripMenuTabCopyToSideboard, ToolStripMenuTabCopyToSite });
             ToolStripMenuTabCopyCard.Name = "ToolStripMenuTabCopyCard";
-            ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabCopyCard.Text = "Copy";
             // 
             // ToolStripMenuTabCopyToPool
@@ -262,7 +274,7 @@
             // 
             ToolStripMenuTabMoveCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuTabMoveToPool, ToolStripMenuTabMoveToResource, ToolStripMenuTabMoveToHazard, ToolStripMenuTabMoveToSideboard, ToolStripMenuTabMoveToSite });
             ToolStripMenuTabMoveCard.Name = "ToolStripMenuTabMoveCard";
-            ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabMoveCard.Text = "Move";
             // 
             // ToolStripMenuTabMoveToPool
@@ -303,21 +315,21 @@
             // ToolStripMenuTabDeleteCard
             // 
             ToolStripMenuTabDeleteCard.Name = "ToolStripMenuTabDeleteCard";
-            ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabDeleteCard.Text = "Delete";
             ToolStripMenuTabDeleteCard.Click += ToolStripMenuTab_Click;
             // 
             // ToolStripMenuTabCardnumFilters
             // 
             ToolStripMenuTabCardnumFilters.Name = "ToolStripMenuTabCardnumFilters";
-            ToolStripMenuTabCardnumFilters.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabCardnumFilters.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabCardnumFilters.Text = "Card Attributes";
             // 
             // PictureBoxCardImage
             // 
             PictureBoxCardImage.Location = new System.Drawing.Point(243, 37);
             PictureBoxCardImage.Name = "PictureBoxCardImage";
-            PictureBoxCardImage.Size = new System.Drawing.Size(443, 525);
+            PictureBoxCardImage.Size = new System.Drawing.Size(443, 505);
             PictureBoxCardImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             PictureBoxCardImage.TabIndex = 1;
             PictureBoxCardImage.TabStop = false;
@@ -330,7 +342,7 @@
             ListBoxPool.ItemHeight = 15;
             ListBoxPool.Location = new System.Drawing.Point(3, 3);
             ListBoxPool.Name = "ListBoxPool";
-            ListBoxPool.Size = new System.Drawing.Size(196, 495);
+            ListBoxPool.Size = new System.Drawing.Size(196, 471);
             ListBoxPool.Sorted = true;
             ListBoxPool.TabIndex = 4;
             ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -347,7 +359,7 @@
             ListBoxResources.ItemHeight = 15;
             ListBoxResources.Location = new System.Drawing.Point(3, 3);
             ListBoxResources.Name = "ListBoxResources";
-            ListBoxResources.Size = new System.Drawing.Size(196, 495);
+            ListBoxResources.Size = new System.Drawing.Size(196, 471);
             ListBoxResources.Sorted = true;
             ListBoxResources.TabIndex = 5;
             ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -364,7 +376,7 @@
             ListBoxHazards.ItemHeight = 15;
             ListBoxHazards.Location = new System.Drawing.Point(3, 3);
             ListBoxHazards.Name = "ListBoxHazards";
-            ListBoxHazards.Size = new System.Drawing.Size(196, 495);
+            ListBoxHazards.Size = new System.Drawing.Size(196, 471);
             ListBoxHazards.Sorted = true;
             ListBoxHazards.TabIndex = 6;
             ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -381,7 +393,7 @@
             ListBoxSideboard.ItemHeight = 15;
             ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
             ListBoxSideboard.Name = "ListBoxSideboard";
-            ListBoxSideboard.Size = new System.Drawing.Size(196, 495);
+            ListBoxSideboard.Size = new System.Drawing.Size(196, 471);
             ListBoxSideboard.Sorted = true;
             ListBoxSideboard.TabIndex = 7;
             ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -398,7 +410,7 @@
             ListBoxSites.ItemHeight = 15;
             ListBoxSites.Location = new System.Drawing.Point(3, 3);
             ListBoxSites.Name = "ListBoxSites";
-            ListBoxSites.Size = new System.Drawing.Size(196, 495);
+            ListBoxSites.Size = new System.Drawing.Size(196, 471);
             ListBoxSites.Sorted = true;
             ListBoxSites.TabIndex = 8;
             ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -418,9 +430,9 @@
             TabControlDeck.Location = new System.Drawing.Point(706, 37);
             TabControlDeck.Name = "TabControlDeck";
             TabControlDeck.SelectedIndex = 0;
-            TabControlDeck.Size = new System.Drawing.Size(210, 529);
+            TabControlDeck.Size = new System.Drawing.Size(210, 505);
             TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            TabControlDeck.TabIndex = 14;
+            TabControlDeck.TabIndex = 2;
             // 
             // TabPagePool
             // 
@@ -428,7 +440,7 @@
             TabPagePool.Location = new System.Drawing.Point(4, 24);
             TabPagePool.Name = "TabPagePool";
             TabPagePool.Padding = new System.Windows.Forms.Padding(3);
-            TabPagePool.Size = new System.Drawing.Size(202, 501);
+            TabPagePool.Size = new System.Drawing.Size(202, 477);
             TabPagePool.TabIndex = 0;
             TabPagePool.Text = "Pool";
             TabPagePool.UseVisualStyleBackColor = true;
@@ -439,7 +451,7 @@
             TabPageResources.Location = new System.Drawing.Point(4, 24);
             TabPageResources.Name = "TabPageResources";
             TabPageResources.Padding = new System.Windows.Forms.Padding(3);
-            TabPageResources.Size = new System.Drawing.Size(202, 501);
+            TabPageResources.Size = new System.Drawing.Size(202, 477);
             TabPageResources.TabIndex = 1;
             TabPageResources.Text = "Res";
             TabPageResources.UseVisualStyleBackColor = true;
@@ -450,7 +462,7 @@
             TabPageHazards.Location = new System.Drawing.Point(4, 24);
             TabPageHazards.Name = "TabPageHazards";
             TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
-            TabPageHazards.Size = new System.Drawing.Size(202, 501);
+            TabPageHazards.Size = new System.Drawing.Size(202, 477);
             TabPageHazards.TabIndex = 2;
             TabPageHazards.Text = "Haz";
             TabPageHazards.UseVisualStyleBackColor = true;
@@ -461,7 +473,7 @@
             TabPageSideboard.Location = new System.Drawing.Point(4, 24);
             TabPageSideboard.Name = "TabPageSideboard";
             TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSideboard.Size = new System.Drawing.Size(202, 501);
+            TabPageSideboard.Size = new System.Drawing.Size(202, 477);
             TabPageSideboard.TabIndex = 3;
             TabPageSideboard.Text = "Side";
             TabPageSideboard.UseVisualStyleBackColor = true;
@@ -472,7 +484,7 @@
             TabPageSites.Location = new System.Drawing.Point(4, 24);
             TabPageSites.Name = "TabPageSites";
             TabPageSites.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSites.Size = new System.Drawing.Size(202, 501);
+            TabPageSites.Size = new System.Drawing.Size(202, 477);
             TabPageSites.TabIndex = 4;
             TabPageSites.Text = "Site";
             TabPageSites.UseVisualStyleBackColor = true;
@@ -748,41 +760,30 @@
             aboutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             aboutToolStripMenuItem.Text = "&About...";
             // 
-            // ComboBoxKey4
+            // GroupBoxCardAttributes
             // 
-            ComboBoxKey4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            ComboBoxKey4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            ComboBoxKey4.FormattingEnabled = true;
-            ComboBoxKey4.Location = new System.Drawing.Point(706, 581);
-            ComboBoxKey4.Name = "ComboBoxKey4";
-            ComboBoxKey4.Size = new System.Drawing.Size(206, 23);
-            ComboBoxKey4.TabIndex = 19;
-            ComboBoxKey4.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            GroupBoxCardAttributes.Controls.Add(LblSlot1Key);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxKey1);
+            GroupBoxCardAttributes.Controls.Add(LblSlot1Value);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxValue1);
+            GroupBoxCardAttributes.Controls.Add(LblSlot2Key);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxKey2);
+            GroupBoxCardAttributes.Controls.Add(LblSlot2Value);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxValue2);
+            GroupBoxCardAttributes.Location = new System.Drawing.Point(12, 552);
+            GroupBoxCardAttributes.Name = "GroupBoxCardAttributes";
+            GroupBoxCardAttributes.Size = new System.Drawing.Size(444, 118);
+            GroupBoxCardAttributes.TabIndex = 3;
+            GroupBoxCardAttributes.TabStop = false;
+            GroupBoxCardAttributes.Text = "Card Attributes (Official Database)";
             // 
-            // ComboBoxKey3
+            // LblSlot1Key
             // 
-            ComboBoxKey3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            ComboBoxKey3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            ComboBoxKey3.FormattingEnabled = true;
-            ComboBoxKey3.Location = new System.Drawing.Point(476, 581);
-            ComboBoxKey3.Name = "ComboBoxKey3";
-            ComboBoxKey3.Size = new System.Drawing.Size(210, 23);
-            ComboBoxKey3.TabIndex = 20;
-            ComboBoxKey3.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
-            // 
-            // ComboBoxKey2
-            // 
-            ComboBoxKey2.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            ComboBoxKey2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            ComboBoxKey2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            ComboBoxKey2.FormattingEnabled = true;
-            ComboBoxKey2.Location = new System.Drawing.Point(243, 581);
-            ComboBoxKey2.Name = "ComboBoxKey2";
-            ComboBoxKey2.Size = new System.Drawing.Size(210, 23);
-            ComboBoxKey2.TabIndex = 21;
-            ComboBoxKey2.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            LblSlot1Key.Location = new System.Drawing.Point(12, 20);
+            LblSlot1Key.Name = "LblSlot1Key";
+            LblSlot1Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot1Key.TabIndex = 0;
+            LblSlot1Key.Text = "Attribute:";
             // 
             // ComboBoxKey1
             // 
@@ -790,11 +791,19 @@
             ComboBoxKey1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxKey1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey1.FormattingEnabled = true;
-            ComboBoxKey1.Location = new System.Drawing.Point(12, 581);
+            ComboBoxKey1.Location = new System.Drawing.Point(12, 37);
             ComboBoxKey1.Name = "ComboBoxKey1";
-            ComboBoxKey1.Size = new System.Drawing.Size(210, 23);
-            ComboBoxKey1.TabIndex = 22;
+            ComboBoxKey1.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey1.TabIndex = 1;
             ComboBoxKey1.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot1Value
+            // 
+            LblSlot1Value.Location = new System.Drawing.Point(12, 65);
+            LblSlot1Value.Name = "LblSlot1Value";
+            LblSlot1Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot1Value.TabIndex = 2;
+            LblSlot1Value.Text = "Value:";
             // 
             // ComboBoxValue1
             // 
@@ -802,12 +811,40 @@
             ComboBoxValue1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue1.FormattingEnabled = true;
-            ComboBoxValue1.Location = new System.Drawing.Point(12, 610);
+            ComboBoxValue1.Location = new System.Drawing.Point(12, 82);
             ComboBoxValue1.Name = "ComboBoxValue1";
-            ComboBoxValue1.Size = new System.Drawing.Size(210, 23);
-            ComboBoxValue1.TabIndex = 26;
+            ComboBoxValue1.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue1.TabIndex = 3;
             ComboBoxValue1.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue1.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot2Key
+            // 
+            LblSlot2Key.Location = new System.Drawing.Point(228, 20);
+            LblSlot2Key.Name = "LblSlot2Key";
+            LblSlot2Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot2Key.TabIndex = 4;
+            LblSlot2Key.Text = "Attribute:";
+            // 
+            // ComboBoxKey2
+            // 
+            ComboBoxKey2.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey2.FormattingEnabled = true;
+            ComboBoxKey2.Location = new System.Drawing.Point(228, 37);
+            ComboBoxKey2.Name = "ComboBoxKey2";
+            ComboBoxKey2.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey2.TabIndex = 5;
+            ComboBoxKey2.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot2Value
+            // 
+            LblSlot2Value.Location = new System.Drawing.Point(228, 65);
+            LblSlot2Value.Name = "LblSlot2Value";
+            LblSlot2Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot2Value.TabIndex = 6;
+            LblSlot2Value.Text = "Value:";
             // 
             // ComboBoxValue2
             // 
@@ -815,12 +852,57 @@
             ComboBoxValue2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue2.FormattingEnabled = true;
-            ComboBoxValue2.Location = new System.Drawing.Point(243, 610);
+            ComboBoxValue2.Location = new System.Drawing.Point(228, 82);
             ComboBoxValue2.Name = "ComboBoxValue2";
-            ComboBoxValue2.Size = new System.Drawing.Size(210, 23);
-            ComboBoxValue2.TabIndex = 25;
+            ComboBoxValue2.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue2.TabIndex = 7;
             ComboBoxValue2.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue2.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // GroupBoxCustomTags
+            // 
+            GroupBoxCustomTags.Controls.Add(LblSlot3Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey3);
+            GroupBoxCustomTags.Controls.Add(LblSlot3Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue3);
+            GroupBoxCustomTags.Controls.Add(LblSlot4Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey4);
+            GroupBoxCustomTags.Controls.Add(LblSlot4Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue4);
+            GroupBoxCustomTags.Location = new System.Drawing.Point(470, 552);
+            GroupBoxCustomTags.Name = "GroupBoxCustomTags";
+            GroupBoxCustomTags.Size = new System.Drawing.Size(444, 118);
+            GroupBoxCustomTags.TabIndex = 4;
+            GroupBoxCustomTags.TabStop = false;
+            GroupBoxCustomTags.Text = "Custom Tags (User Taxonomy)";
+            // 
+            // LblSlot3Key
+            // 
+            LblSlot3Key.Location = new System.Drawing.Point(12, 20);
+            LblSlot3Key.Name = "LblSlot3Key";
+            LblSlot3Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot3Key.TabIndex = 0;
+            LblSlot3Key.Text = "Category:";
+            // 
+            // ComboBoxKey3
+            // 
+            ComboBoxKey3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey3.FormattingEnabled = true;
+            ComboBoxKey3.Location = new System.Drawing.Point(12, 37);
+            ComboBoxKey3.Name = "ComboBoxKey3";
+            ComboBoxKey3.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey3.TabIndex = 1;
+            ComboBoxKey3.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot3Value
+            // 
+            LblSlot3Value.Location = new System.Drawing.Point(12, 65);
+            LblSlot3Value.Name = "LblSlot3Value";
+            LblSlot3Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot3Value.TabIndex = 2;
+            LblSlot3Value.Text = "Tag:";
             // 
             // ComboBoxValue3
             // 
@@ -828,12 +910,40 @@
             ComboBoxValue3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue3.FormattingEnabled = true;
-            ComboBoxValue3.Location = new System.Drawing.Point(476, 610);
+            ComboBoxValue3.Location = new System.Drawing.Point(12, 82);
             ComboBoxValue3.Name = "ComboBoxValue3";
-            ComboBoxValue3.Size = new System.Drawing.Size(210, 23);
-            ComboBoxValue3.TabIndex = 24;
+            ComboBoxValue3.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue3.TabIndex = 3;
             ComboBoxValue3.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue3.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot4Key
+            // 
+            LblSlot4Key.Location = new System.Drawing.Point(228, 20);
+            LblSlot4Key.Name = "LblSlot4Key";
+            LblSlot4Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot4Key.TabIndex = 4;
+            LblSlot4Key.Text = "Category:";
+            // 
+            // ComboBoxKey4
+            // 
+            ComboBoxKey4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey4.FormattingEnabled = true;
+            ComboBoxKey4.Location = new System.Drawing.Point(228, 37);
+            ComboBoxKey4.Name = "ComboBoxKey4";
+            ComboBoxKey4.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey4.TabIndex = 5;
+            ComboBoxKey4.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot4Value
+            // 
+            LblSlot4Value.Location = new System.Drawing.Point(228, 65);
+            LblSlot4Value.Name = "LblSlot4Value";
+            LblSlot4Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot4Value.TabIndex = 6;
+            LblSlot4Value.Text = "Tag:";
             // 
             // ComboBoxValue4
             // 
@@ -841,10 +951,10 @@
             ComboBoxValue4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue4.FormattingEnabled = true;
-            ComboBoxValue4.Location = new System.Drawing.Point(706, 610);
+            ComboBoxValue4.Location = new System.Drawing.Point(228, 82);
             ComboBoxValue4.Name = "ComboBoxValue4";
-            ComboBoxValue4.Size = new System.Drawing.Size(206, 23);
-            ComboBoxValue4.TabIndex = 23;
+            ComboBoxValue4.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue4.TabIndex = 7;
             ComboBoxValue4.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue4.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
             // 
@@ -852,15 +962,9 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(926, 647);
-            Controls.Add(ComboBoxValue1);
-            Controls.Add(ComboBoxValue2);
-            Controls.Add(ComboBoxValue3);
-            Controls.Add(ComboBoxValue4);
-            Controls.Add(ComboBoxKey1);
-            Controls.Add(ComboBoxKey2);
-            Controls.Add(ComboBoxKey3);
-            Controls.Add(ComboBoxKey4);
+            ClientSize = new System.Drawing.Size(926, 682);
+            Controls.Add(GroupBoxCardAttributes);
+            Controls.Add(GroupBoxCustomTags);
             Controls.Add(TabControlDeck);
             Controls.Add(PictureBoxCardImage);
             Controls.Add(ListBoxMaster);
@@ -879,6 +983,8 @@
             TabPageSites.ResumeLayout(false);
             MenuStrip1.ResumeLayout(false);
             MenuStrip1.PerformLayout();
+            GroupBoxCardAttributes.ResumeLayout(false);
+            GroupBoxCustomTags.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
 
@@ -951,13 +1057,23 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
-        private System.Windows.Forms.ComboBox ComboBoxKey4;
-        private System.Windows.Forms.ComboBox ComboBoxKey3;
-        private System.Windows.Forms.ComboBox ComboBoxKey2;
+        private System.Windows.Forms.GroupBox GroupBoxCardAttributes;
+        private System.Windows.Forms.Label LblSlot1Key;
         private System.Windows.Forms.ComboBox ComboBoxKey1;
+        private System.Windows.Forms.Label LblSlot1Value;
         private System.Windows.Forms.ComboBox ComboBoxValue1;
+        private System.Windows.Forms.Label LblSlot2Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey2;
+        private System.Windows.Forms.Label LblSlot2Value;
         private System.Windows.Forms.ComboBox ComboBoxValue2;
+        private System.Windows.Forms.GroupBox GroupBoxCustomTags;
+        private System.Windows.Forms.Label LblSlot3Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey3;
+        private System.Windows.Forms.Label LblSlot3Value;
         private System.Windows.Forms.ComboBox ComboBoxValue3;
+        private System.Windows.Forms.Label LblSlot4Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey4;
+        private System.Windows.Forms.Label LblSlot4Value;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;

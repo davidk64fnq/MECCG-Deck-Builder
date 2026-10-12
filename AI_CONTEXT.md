@@ -14,7 +14,7 @@
 
 ## Application Architecture & Core Files
 
-- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, 4 filter combo pairs, menus.
+- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, two-tier filter GroupBoxes, menus.
 - ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags.
 - AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
@@ -38,9 +38,11 @@
 ## Standardized Taxonomy & Filtering Vocabulary
 
 1. **Official Card Attributes (Filter Slots 1 & 2):**
-   - Canonical rules properties from the database: `Attribute` (e.g. *Race*, *Skill*) and `Value` (e.g. *Dúnadan*, *Warrior*).
+   - Housed inside `GroupBoxCardAttributes` ("Card Attributes (Official Database)").
+   - Canonical rules properties: `Attribute` (e.g. *Race*, *Skill*) and `Value` (e.g. *Dúnadan*, *Warrior*).
    - Inspected via context menu item: `Card Attributes`.
 2. **Custom User Taxonomy (Filter Slots 3 & 4):**
+   - Housed inside `GroupBoxCustomTags` ("Custom Tags (User Taxonomy)").
    - User-defined taxonomy: `Category` (e.g. *Archetype*, *Role*) and `Tag` (e.g. *Ring Destruction*, *Scout Support*).
    - Inspected via context menu item: `Assigned Tags`.
    - Card tagging actions: `Assign Tag` (with `+ Author New Tag...` and `+ Add Tag...`), `Remove Tag`.
@@ -53,32 +55,14 @@
 
 - [x] **v0.1.0 - Foundation & Documentation** (100% complete)
 - [x] **v0.2.0 - Modernization & Bug Fixes** (100% complete)
-- [x] **v0.3.0 - Domain Refactoring & Tag Decoupling** (100% complete)
-- [x] **v0.3.5 - UI & Documentation Vocabulary Standardization** (100% complete)
-- [ ] **v0.4.0 - Curated Filter Taxonomy** (Next)
+- [x] **v0.3.0 - Domain Refactoring & Architecture** (100% complete)
+- [x] **v0.4.0 - Curated Filter Taxonomy** (100% complete)
+  - Issue #12: Custom Filter Synchronization Across Slots, Deletion Cleanup, and Empty Key UX
+  - Issue #13: Implement Cascading Faceted Search Across All Filter Slots to Eliminate Zero-Result Queries
+  - Issue #14: Add Per-Slot and Global Filter Reset Capabilities with Keyboard Shortcuts and Context Menus
+  - Issue #15: Fix Empty Set Selection Bypass, Startup ComboBox Crash, and Preview Cleanup
+  - Issue #16: Decouple Custom Tag Authoring from Filter Bar (Dedicated Taxonomy Manager)
+  - Issue #17: Group filter panel into titled containers with slot labels and layer demarcation
+  - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
 - [ ] **v0.5.0 - Procedural Deck Generator**
 - [ ] **v1.0.0 - First Public Release**
-
-### Completed Milestones
-
-#### v0.1.0 - Foundation & Documentation
-- Issue #1: Integrated CHM help system, build verification, and repository documentation standards.
-
-#### v0.2.0 - Modernization & Bug Fixes
-- Issue #4: Card Filter Bug - Fixed loop indexing and case-insensitive dictionary safety.
-- Issue #5: Expansion Filter Values Missing - Populated filter values across all expansions and dreamcards.
-- Issue #6: Offline Fallback Packaging - Bundled offline fallback JSON datasets.
-- Issue #7: MemoryCache Disk Miss & GDI+ File Locks - Non-locking memory stream image loading.
-- Issue #8: Downloader GDI+ Leaks & Direct URLs - Fixed batch downloader resource handling.
-- Issue #9: Card ID Indexing Assumption & Exporter Safety - Secured dictionary lookups and exporter routines.
-- Issue #10: Async Network Operations & UI Freezing - Implemented non-blocking async operations with CancellationTokenSource race protection.
-
-#### v0.3.0 - Domain Refactoring & Tag Decoupling
-- Strongly-typed domain models (`Card`, `CardSet`, `Deck`, `DeckSectionType`).
-- Decoupled headless services (`CardCatalogService`, `CardFilterService`, `DeckExportService`).
-- Issue #16: Decoupled custom taxonomy authoring from catalog filtering.
-
-#### v0.3.5 - UI & Documentation Vocabulary Standardization
-- Standardized terminology across UI, context menus, dialogs, and CHM HTML documentation:
-  - Replaced programmer jargon (`Key`, `Value`, `Key Value`) with clean domain terms: `Category`, `Tag`, `Card Attributes`, `Assigned Tags`, `Assign Tag`, `Remove Tag`.
-  - Clarified file operations (`Load Tag Set...` / `Save Tag Set...`).
