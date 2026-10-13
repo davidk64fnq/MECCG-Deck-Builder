@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NaturalSort.Extension;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -6,7 +8,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 namespace MECCG_Deck_Builder
 {
@@ -272,7 +273,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.AddCustomKeyName(result.Value.Key);
                     _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
-                    _filterService.SetCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
+                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value); // Appends instead of overwriting
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -280,17 +281,11 @@ namespace MECCG_Deck_Builder
             addMenu.DropDownItems.Add(addNewTagItem);
             addMenu.DropDownItems.Add(new ToolStripSeparator());
 
-            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
-
             foreach (string keyName in keyNames)
             {
-                if (string.IsNullOrWhiteSpace(keyName))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(keyName)) continue;
 
-                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
-
+                var cardTags = _filterService.GetCardTagsForCategory(card.Id, keyName);
                 var keyItem = new ToolStripMenuItem(keyName);
 
                 var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
@@ -300,7 +295,7 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
-                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        _filterService.AppendCardCustomTag(card.Id, keyName, val); // Appends instead of overwriting
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
                     }
@@ -315,11 +310,13 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        // Check if this specific tag is currently active on the card
+                        bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
                         valItem.Click += (s, ev) =>
                         {
-                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            // Toggles the tag: adds if missing, removes if already checked
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -345,13 +342,18 @@ namespace MECCG_Deck_Builder
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
-                var valItem = new ToolStripMenuItem(value);
-                valItem.Click += (s, ev) =>
+                // Split multi-tags so each tag can be removed individually
+                var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var tag in tags)
                 {
-                    _filterService.DeleteCardCustomTag(card.Id, key);
-                    UpdateFacetedFilters();
-                };
-                keyItem.DropDownItems.Add(valItem);
+                    var valItem = new ToolStripMenuItem(tag);
+                    valItem.Click += (s, ev) =>
+                    {
+                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        UpdateFacetedFilters();
+                    };
+                    keyItem.DropDownItems.Add(valItem);
+                }
                 delMenu.DropDownItems.Add(keyItem);
             }
 
@@ -558,7 +560,7 @@ namespace MECCG_Deck_Builder
         {
             var section = _currentDeck.GetSection(sectionType);
             section.Add(card);
-            section.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+            section.Sort((a, b) => StringComparer.CurrentCultureIgnoreCase.WithNaturalSort().Compare(a.Name, b.Name));
 
             RefreshSectionListBox(sectionType);
             UpdateFormTitle();
@@ -718,7 +720,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.AddCustomKeyName(result.Value.Key);
                     _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
-                    _filterService.SetCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
+                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -726,17 +728,11 @@ namespace MECCG_Deck_Builder
             addMenu.DropDownItems.Add(addNewTagItem);
             addMenu.DropDownItems.Add(new ToolStripSeparator());
 
-            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
-
             foreach (string keyName in keyNames)
             {
-                if (string.IsNullOrWhiteSpace(keyName))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(keyName)) continue;
 
-                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
-
+                var cardTags = _filterService.GetCardTagsForCategory(card.Id, keyName);
                 var keyItem = new ToolStripMenuItem(keyName);
 
                 var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
@@ -746,7 +742,7 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
-                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        _filterService.AppendCardCustomTag(card.Id, keyName, val);
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
                     }
@@ -761,11 +757,13 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        // Check if this specific tag is already active on the card
+                        bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
                         valItem.Click += (s, ev) =>
                         {
-                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            // Toggles the tag on/off
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -791,13 +789,18 @@ namespace MECCG_Deck_Builder
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
-                var valItem = new ToolStripMenuItem(value);
-                valItem.Click += (s, ev) =>
+                // Split semicolon-delimited tags so each tag can be removed individually
+                var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var tag in tags)
                 {
-                    _filterService.DeleteCardCustomTag(card.Id, key);
-                    UpdateFacetedFilters();
-                };
-                keyItem.DropDownItems.Add(valItem);
+                    var valItem = new ToolStripMenuItem(tag);
+                    valItem.Click += (s, ev) =>
+                    {
+                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        UpdateFacetedFilters();
+                    };
+                    keyItem.DropDownItems.Add(valItem);
+                }
                 delMenu.DropDownItems.Add(keyItem);
             }
 
@@ -992,7 +995,7 @@ namespace MECCG_Deck_Builder
                 var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
                 if (dto != null)
                 {
-                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards);
+                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService); // Passed _catalogService
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -1010,7 +1013,7 @@ namespace MECCG_Deck_Builder
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var dto = OpenCloseFilter.FromFilterService(_filterService);
+                var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService); // Passed _catalogService
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
             }
@@ -1366,6 +1369,100 @@ namespace MECCG_Deck_Builder
             else
             {
                 MessageBox.Show($"Help file not found at:\n{helpFile}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        #endregion
+
+        #region TAXONOMY_TOOLS
+
+        private void ToolStripMenuToolsRunRules_Click(object sender, EventArgs e)
+        {
+            if (_masterCards.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "No cards are currently displayed in the Master List to evaluate.\n\nPlease select at least one expansion set or adjust your active filters.",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            using var dlg = new RunTaxonomyRulesDialog(_masterCards, _currentDeck.IncludedSets, _catalogService, _filterService);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                RefreshFilterKeyDropdowns();
+                UpdateFacetedFilters();
+            }
+        }
+
+        private void ToolStripMenuToolsExportCsv_Click(object sender, EventArgs e)
+        {
+            if (_masterCards.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "No cards are currently displayed in the Master List to export.\n\nPlease select at least one expansion set or adjust your active filters.",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            using var sfd = new SaveFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Export Taxonomy Draft (CSV)",
+                DefaultExt = "csv",
+                Filter = "CSV Spreadsheet (*.csv)|*.csv",
+                FileName = "Taxonomy_Draft.csv"
+            };
+
+            if (sfd.ShowDialog(this) == DialogResult.OK)
+            {
+                TaxonomyExtractionService.ExportTemplateDraftToCsv(_masterCards, sfd.FileName);
+
+                MessageBox.Show(this,
+                    $"Taxonomy draft template exported successfully to:\n{sfd.FileName}\n\n" +
+                    $"Cards exported: {_masterCards.Count} (matching your active set and filter criteria).\n\n" +
+                    "Workflow in Google Sheets or Excel:\n" +
+                    "1. Rename '[Insert Category Name]' to your category (e.g. 'Combat Role' or 'Faction Focus').\n" +
+                    "2. Add additional category columns if desired.\n" +
+                    "3. Enter tags for each card (use ';' for multiple tags).\n" +
+                    "4. Import back via Tools > Import Taxonomy from CSV...",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        }
+
+        private void ToolStripMenuToolsImportCsv_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Import Taxonomy from CSV",
+                DefaultExt = "csv",
+                Filter = "CSV Spreadsheet (*.csv)|*.csv|All Files (*.*)|*.*"
+            };
+
+            if (ofd.ShowDialog(this) == DialogResult.OK)
+            {
+                try
+                {
+                    var (cardsMatched, categoriesImported, tagsAssigned) =
+                        TaxonomyExtractionService.ImportFromCsv(ofd.FileName, _catalogService, _filterService);
+
+                    RefreshFilterKeyDropdowns();
+                    UpdateFacetedFilters();
+
+                    MessageBox.Show(this,
+                        $"Taxonomy imported successfully.\n\nCards matched: {cardsMatched}\nCategories updated: {categoriesImported}\nTags assigned: {tagsAssigned}",
+                        Constants.AppTitle,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Failed to import CSV taxonomy: {ex.Message}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 

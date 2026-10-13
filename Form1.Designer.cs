@@ -91,6 +91,11 @@
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsRunRules = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsExportCsv = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsImportCsv = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparatorTools = new System.Windows.Forms.ToolStripSeparator();
+            ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -652,10 +657,36 @@
             // 
             // ToolStripMenuTools
             // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsGetImages });
+            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsRunRules, ToolStripMenuToolsExportCsv, ToolStripMenuToolsImportCsv, toolStripSeparatorTools, ToolStripMenuToolsGetImages });
             ToolStripMenuTools.Name = "ToolStripMenuTools";
             ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
             ToolStripMenuTools.Text = "&Tools";
+            // 
+            // ToolStripMenuToolsRunRules
+            // 
+            ToolStripMenuToolsRunRules.Name = "ToolStripMenuToolsRunRules";
+            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsRunRules.Text = "Extract Taxonomy with Rules...";
+            ToolStripMenuToolsRunRules.Click += ToolStripMenuToolsRunRules_Click;
+            // 
+            // ToolStripMenuToolsExportCsv
+            // 
+            ToolStripMenuToolsExportCsv.Name = "ToolStripMenuToolsExportCsv";
+            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsExportCsv.Text = "Export Taxonomy Draft (CSV)...";
+            ToolStripMenuToolsExportCsv.Click += ToolStripMenuToolsExportCsv_Click;
+            // 
+            // ToolStripMenuToolsImportCsv
+            // 
+            ToolStripMenuToolsImportCsv.Name = "ToolStripMenuToolsImportCsv";
+            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsImportCsv.Text = "Import Taxonomy from CSV...";
+            ToolStripMenuToolsImportCsv.Click += ToolStripMenuToolsImportCsv_Click;
+            // 
+            // toolStripSeparatorTools
+            // 
+            toolStripSeparatorTools.Name = "toolStripSeparatorTools";
+            toolStripSeparatorTools.Size = new System.Drawing.Size(222, 6);
             // 
             // ToolStripMenuToolsGetImages
             // 
@@ -1027,6 +1058,10 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTools;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRunRules;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsExportCsv;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsImportCsv;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorTools;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;

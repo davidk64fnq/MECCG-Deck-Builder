@@ -174,6 +174,59 @@
         <li><strong>Filter &gt; Load Tag Set...:</strong> Loads a previously saved custom tag set, restoring all categories, tags, and card mappings.</li>
     </ul>
 
+    <h2>Automated Taxonomy & Spreadsheet Tools</h2>
+    <p>
+        In addition to authoring tags manually, the application provides an automated extraction engine and a round-trip CSV spreadsheet pipeline under the <strong>Tools</strong> menu:
+    </p>
+
+    <h3>1. Dynamic Entity Harvesting & Regex Rules (Tools &gt; Extract Taxonomy with Rules...)</h3>
+    <p>
+        Opens an extraction dialog scoped to cards currently visible in the Master List:
+    </p>
+    <ul>
+        <li>
+            <strong>Dynamic Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans the active sets in memory, extracts all matching entity titles, and searches your Master List cards for references to those entities.
+        </li>
+        <li>
+            <strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.
+        </li>
+        <li>
+            <strong>Custom Regex &amp; JSON Rule Files:</strong> Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> files.
+        </li>
+        <li>
+            <strong>Preview &amp; Apply:</strong> Review matches in the preview grid before choosing to either export a CSV draft or apply tags directly into your active taxonomy.
+        </li>
+    </ul>
+
+    <h3>2. Spreadsheet Collaboration (CSV Draft Export &amp; Import)</h3>
+    <p>
+        Enables collaborative review and mass editing in Google Sheets or Microsoft Excel:
+    </p>
+    <ul>
+        <li>
+            <strong>Export Taxonomy Draft (CSV):</strong> Exports a spreadsheet containing only cards matching your current set and filter slot criteria. Includes <code>Card Name</code>, <code>Set</code>, <code>Primary</code>, a template category column, and full <code>Card Text</code> for reference.
+        </li>
+        <li>
+            <strong>Multi-Tag Syntax:</strong> To assign multiple tags within the same category to a single card, separate them with a semicolon (<code>;</code>), for example: <code>Elf Factions; Iron Hill Dwarves</code>.
+        </li>
+        <li>
+            <strong>Import Taxonomy from CSV:</strong> Ingests reviewed spreadsheets directly into the Deck Builder. Columns are mapped automatically to categories, placeholder text is safely ignored, and tags are mapped to stable card identifiers (<code>FullCode</code>, <code>Name</code>, <code>Set</code>).
+        </li>
+    </ul>
+
+    <h3>3. Multi-Tag Assignment via Context Menus</h3>
+    <p>
+        Cards can hold multiple tags within the same custom category:
+    </p>
+    <ul>
+        <li>
+            <strong>Toggle On / Off:</strong> In the <strong>Assign Tag</strong> menu, currently assigned tags display a checkmark (<kbd>&#10003;</kbd>). Clicking an unchecked tag adds it; clicking a checked tag unchecks and removes it.
+        </li>
+        <li>
+            <strong>Granular Removal:</strong> The <strong>Remove Tag</strong> menu displays each assigned tag individually, allowing you to remove a specific tag without clearing the entire category.
+        </li>
+    </ul>
+
     <h2>Clearing and Resetting Filters</h2>
     <table>
         <tr>
@@ -223,5 +276,54 @@
             </td>
         </tr>
     </table>
+    <h2>Importing Custom Taxonomies via Spreadsheet (CSV)</h2>
+    <p>
+        To facilitate large-scale taxonomy creation, community sharing, and collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.
+    </p>
+
+    <h3>Spreadsheet Column Layout</h3>
+    <table>
+        <tr>
+            <th>Column Header</th>
+            <th>Required?</th>
+            <th>Description &amp; Behavior</th>
+        </tr>
+        <tr>
+            <td><code>Card Name</code></td>
+            <td><strong>Required</strong></td>
+            <td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in the catalog.</td>
+        </tr>
+        <tr>
+            <td><code>Set</code></td>
+            <td><strong>Required</strong></td>
+            <td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>, <code>MELE</code>) used to disambiguate reprint cards.</td>
+        </tr>
+        <tr>
+            <td><code>Primary</code></td>
+            <td>Optional</td>
+            <td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td>
+        </tr>
+        <tr>
+            <td><em>[Custom Category Columns]</em></td>
+            <td>Optional</td>
+            <td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>, <code>Hazard Archetype</code>) becomes a custom category. Cell contents are imported as tags.</td>
+        </tr>
+        <tr>
+            <td><code>Card Text</code></td>
+            <td>Optional</td>
+            <td>Full rules text provided for reference during spreadsheet verification. Ignored during import.</td>
+        </tr>
+    </table>
+
+    <div class="tip">
+        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category to a card, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
+    </div>
+
+    <h3>Step-by-Step Workflow</h3>
+    <ol>
+        <li><strong>Generate a Draft:</strong> Click <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong> (or use <strong>Tools &gt; Extract Taxonomy with Rules...</strong>) to extract faction bonuses or rule matches into a <code>.csv</code> file.</li>
+        <li><strong>Review in Google Sheets / Excel:</strong> Open the CSV, inspect extracted tags side-by-side with <code>Card Text</code>, adjust or author new category columns, and download as <em>Comma Separated Values (.csv)</em>.</li>
+        <li><strong>Ingest into Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
+    </ol>
 </body>
 </html>

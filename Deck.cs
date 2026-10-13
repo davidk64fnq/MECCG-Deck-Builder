@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NaturalSort.Extension;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,7 +44,7 @@ namespace MECCG_Deck_Builder
 
         public void SortSections()
         {
-            static int CompareCards(Card a, Card b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal);
+            static int CompareCards(Card a, Card b) => StringComparer.CurrentCultureIgnoreCase.WithNaturalSort().Compare(a.Name, b.Name);
 
             Pool.Sort(CompareCards);
             Resources.Sort(CompareCards);

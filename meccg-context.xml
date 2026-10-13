@@ -127,20 +127,20 @@ namespace MECCG_Deck_Builder.Properties {
             <td>Permanently removes this copy from the current tab.</td>
         </tr>
         <tr>
-            <td><strong>Cardnum Filters</strong></td>
+            <td><strong>Card Attributes</strong></td>
             <td>Displays a monospace readout of all official database attributes for this card.</td>
         </tr>
         <tr>
-            <td><strong>Custom Filters</strong></td>
+            <td><strong>Assigned Tags</strong></td>
             <td>Shows user-defined tags currently assigned to this card.</td>
         </tr>
         <tr>
-            <td><strong>Add Key Value</strong></td>
-            <td>Assigns or reassigns a custom tag to this card (active tag is checkmarked), creates a new value, or authors a new category and tag.</td>
+            <td><strong>Assign Tag</strong></td>
+            <td>Assigns or reassigns a custom tag to this card (active tag is checkmarked), creates a new tag in an existing category, or authors a new category and tag.</td>
         </tr>
         <tr>
-            <td><strong>Delete Key Value</strong></td>
-            <td>Unassigns an assigned custom tag from this card (only visible if the card currently has custom tags assigned).</td>
+            <td><strong>Remove Tag</strong></td>
+            <td>Removes an assigned custom tag from this card (only visible if the card currently has custom tags assigned; does not delete the tag from your taxonomy).</td>
         </tr>
     </table>
 </body>
@@ -284,7 +284,7 @@ namespace MECCG_Deck_Builder.Properties {
     <ul>
         <li><strong>Single-Click:</strong> Selects the card and loads its image into the central preview panel.</li>
         <li><strong>Double-Click:</strong> Immediately appends the card to the currently selected deck tab on the right.</li>
-        <li><strong>Right-Click:</strong> Opens the master context menu to copy the card into a specific deck tab, inspect its Cardnum metadata, or assign custom user tags.</li>
+        <li><strong>Right-Click:</strong> Opens the master context menu to copy the card into a specific deck tab, inspect its official Card Attributes, view Assigned Tags, or assign custom tags.</li>
         <li><strong>Drag &amp; Drop:</strong> Left-click and hold to drag the card title onto any deck listbox.</li>
     </ul>
 
@@ -335,21 +335,29 @@ namespace MECCG_Deck_Builder.Properties {
 
     <h2>4. Filter Bar (Bottom Panel)</h2>
     <p>
-        Located beneath the three main panes, four pairs of ComboBoxes provide fine-grained, <strong>context-sensitive faceted filtering</strong>. All eight ComboBoxes are <strong>read-only drop-down selection lists</strong> whose options dynamically prune based on active sets and the other three filter slots so you never encounter dead-end queries:
+        Located beneath the three main panes, the filter panel is organized into two distinct, titled group boxes that provide fine-grained, <strong>context-sensitive faceted filtering</strong>. Each filter slot operates as a clear vertical column pair, ensuring you immediately know which control selects the category/attribute and which selects the specific value or tag:
     </p>
     <ul>
         <li>
-            <strong>Left Slots 1 &amp; 2 — Official Database Attributes:</strong>
-            Populated automatically from the online <strong>Cardnum</strong> database (covering official I.C.E. releases and Council of Elrond Dreamcards). These are fixed game attributes (such as <em>Primary</em>, <em>Alignment</em>, <em>Race</em>, <em>Skill</em>, <em>Mind</em>, and <em>Prowess</em>).
+            <strong>Left Box — Card Attributes (Official Database):</strong>
+            Contains two slots (Slots 1 &amp; 2) for querying official card rules attributes synchronized from the <strong>Cardnum</strong> database.
+            <ul>
+                <li><strong>Top Dropdown (Attribute):</strong> Selects the rules attribute (e.g., <em>Primary</em>, <em>Alignment</em>, <em>Race</em>, <em>Skill</em>, <em>Mind</em>, <em>Prowess</em>).</li>
+                <li><strong>Bottom Dropdown (Value):</strong> Selects the specific value (e.g., <em>Character</em>, <em>Hero</em>, <em>Dúnadan</em>, <em>Warrior</em>).</li>
+            </ul>
         </li>
         <li>
-            <strong>Right Slots 3 &amp; 4 — Custom User Taxonomy:</strong>
-            Filter by user-defined categories and tags assigned to cards. To manage or author custom taxonomy terms, open <strong>Filter &gt; Manage Custom Tags...</strong> or right-click any card and select <strong>Add Key Value &gt; [+ Add New Tag...]</strong>.
+            <strong>Right Box — Custom Tags (User Taxonomy):</strong>
+            Contains two slots (Slots 3 &amp; 4) for querying your own classification categories and tags.
+            <ul>
+                <li><strong>Top Dropdown (Category):</strong> Selects your user-defined category (e.g., <em>Archetype</em>, <em>Role</em>, <em>Hazard Strategy</em>).</li>
+                <li><strong>Bottom Dropdown (Tag):</strong> Selects the specific custom tag (e.g., <em>Ring Destruction</em>, <em>Scout Support</em>, <em>Anti-Fly</em>).</li>
+            </ul>
         </li>
     </ul>
 
     <div class="tip">
-        <strong>Quick Filter Clearing:</strong> You can clear any filter box by pressing <kbd>Escape</kbd> while focused inside it, right-clicking any filter box to choose <em>Clear This Filter</em>, or pressing <kbd>Ctrl+R</kbd> (or selecting <strong>Filter &gt; Clear All Filters</strong>) to wipe all four filter pairs at once.
+        <strong>Quick Filter Clearing:</strong> You can clear any filter slot by pressing <kbd>Escape</kbd> while focused inside it, right-clicking any filter box to choose <em>Clear This Filter</em>, or pressing <kbd>Ctrl+R</kbd> (or selecting <strong>Filter &gt; Clear All Filters</strong>) to wipe all four filter pairs at once.
     </div>
 
     <h2>Dynamic Title Bar Summary</h2>
@@ -385,19 +393,19 @@ namespace MECCG_Deck_Builder.Properties {
 
     <h2>Dual-Layer Filtering Architecture</h2>
     <p>
-        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. All four slots function as <strong>read-only drop-down selectors</strong>, organized into two distinct layers:
+        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. The bottom panel is partitioned into two clear GroupBoxes, with each filter slot arranged as a vertical column pair:
     </p>
 
     <table>
         <tr>
-            <th>Filter Layer</th>
+            <th>Filter Box &amp; Slots</th>
             <th>Data Source</th>
             <th>Taxonomy Management</th>
-            <th>Input Style</th>
+            <th>Input Pairing</th>
         </tr>
         <tr>
             <td>
-                <strong>Slots 1 &amp; 2:<br />Built-in Database Filters</strong>
+                <strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)
             </td>
             <td>
                 <strong>Cardnum Open Database:</strong> Canonical card statistics synchronized from <code>cardnum.net</code> and GitHub, representing published cards from Iron Crown Enterprises (I.C.E.) and Council of Elrond Dreamcards.
@@ -406,21 +414,21 @@ namespace MECCG_Deck_Builder.Properties {
                 <strong>Fixed Attributes:</strong> Rules-based properties (Primary, Alignment, Race, Skill, Stats) are immutable.
             </td>
             <td>
-                Fixed Drop-Down Selection list (pruned to active cards).
+                Vertical pair: <strong>Attribute</strong> dropdown above <strong>Value</strong> dropdown.
             </td>
         </tr>
         <tr>
             <td>
-                <strong>Slots 3 &amp; 4:<br />Custom User Taxonomy</strong>
+                <strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)
             </td>
             <td>
-                <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom filter files (<code>.json</code>).
+                <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom tag files (<code>.json</code>).
             </td>
             <td>
-                <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete keys and values via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
+                <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete categories and tags via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
             </td>
             <td>
-                Fixed Drop-Down Selection list (strictly queries cards matching assigned tags).
+                Vertical pair: <strong>Category</strong> dropdown above <strong>Tag</strong> dropdown.
             </td>
         </tr>
     </table>
@@ -447,14 +455,14 @@ namespace MECCG_Deck_Builder.Properties {
         </li>
     </ul>
 
-    <h2>Cardnum Built-in Filters (Slots 1 &amp; 2)</h2>
+    <h2>Cardnum Built-in Attributes (Slots 1 &amp; 2)</h2>
     <p>
-        The two left-hand key-value selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
+        The two left-hand selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
     </p>
     <table>
         <tr>
-            <th>Attribute Key</th>
-            <th>Typical Filter Values</th>
+            <th>Attribute Name</th>
+            <th>Typical Values</th>
         </tr>
         <tr>
             <td><code>Primary</code></td>
@@ -500,10 +508,10 @@ namespace MECCG_Deck_Builder.Properties {
         Open <strong>Filter &gt; Manage Custom Tags...</strong> to access the central tag management dialog. Here you can:
     </p>
     <ul>
-        <li><strong>Add Categories (Keys):</strong> Create new classification keys (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
-        <li><strong>Rename Categories or Values:</strong> Rename terms across your entire taxonomy; all tagged cards are updated automatically.</li>
-        <li><strong>Add Values:</strong> Add new tags under an existing category before or after assigning them.</li>
-        <li><strong>Delete Categories or Values:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
+        <li><strong>Add Categories:</strong> Create new classification categories (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
+        <li><strong>Rename Categories or Tags:</strong> Rename terms across your entire taxonomy; all tagged cards are updated automatically.</li>
+        <li><strong>Add Tags:</strong> Add new tags under an existing category.</li>
+        <li><strong>Delete Categories or Tags:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
     </ul>
 
     <h3>2. Assigning Custom Tags to Cards</h3>
@@ -512,30 +520,30 @@ namespace MECCG_Deck_Builder.Properties {
     </p>
     <ul>
         <li>
-            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [Value]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned value; selecting a different value seamlessly updates and remaps the card.
+            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [Tag]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned tag; selecting a different tag seamlessly updates and remaps the card.
         </li>
         <li>
-            <strong>Create and Assign New Tag:</strong> Right-click a card and select <strong>Add Key Value &gt; [+ Add New Tag...]</strong>. This prompts for both category and value, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
+            <strong>Author and Assign New Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>. This prompts for both category and tag, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
         </li>
         <li>
-            <strong>Add New Value to Existing Category:</strong> Right-click a card and select <strong>Add Key Value &gt; [Category] &gt; [+ Add Value...]</strong> to author a new value and assign it immediately.
+            <strong>Add New Tag to Existing Category:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [+ Add Tag...]</strong> to author a new tag and assign it immediately.
         </li>
     </ul>
 
     <h3>3. Removing Tags from Cards</h3>
     <ul>
         <li>
-            <strong>Unassign Tag from Single Card:</strong> Right-click the card and choose <strong>Delete Key Value &gt; [Category] &gt; [Value]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
+            <strong>Remove Tag from Single Card:</strong> Right-click the card and choose <strong>Remove Tag &gt; [Category] &gt; [Tag]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
         </li>
         <li>
-            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently remove a category or value across all cards in the catalog.
+            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently delete a category or tag across all cards in the catalog.
         </li>
     </ul>
 
-    <h3>4. Saving and Opening Custom Filter Sets</h3>
+    <h3>4. Saving and Loading Custom Tag Sets</h3>
     <ul>
-        <li><strong>Filter &gt; Save:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
-        <li><strong>Filter &gt; Open:</strong> Loads a previously saved custom filter set, restoring all keys, values, and card mappings.</li>
+        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
+        <li><strong>Filter &gt; Load Tag Set...:</strong> Loads a previously saved custom tag set, restoring all categories, tags, and card mappings.</li>
     </ul>
 
     <h2>Clearing and Resetting Filters</h2>
@@ -552,7 +560,7 @@ namespace MECCG_Deck_Builder.Properties {
                 Keyboard: <kbd>Ctrl+R</kbd>
             </td>
             <td>
-                Instantly resets all four key-value pairs (Slots 1–4) to blank and refreshes the master card list.
+                Instantly resets all four filter slots (Slots 1–4) to blank and refreshes the master card list.
             </td>
         </tr>
         <tr>
@@ -563,7 +571,7 @@ namespace MECCG_Deck_Builder.Properties {
             <td>
                 Opens a context menu with options to:
                 <ul>
-                    <li><strong>Clear This Filter:</strong> Resets both the Key and Value of that specific slot to blank.</li>
+                    <li><strong>Clear This Filter:</strong> Resets both the category/attribute and value of that specific slot to blank.</li>
                     <li><strong>Clear All Filters:</strong> Resets all four slots at once.</li>
                 </ul>
             </td>
@@ -574,7 +582,7 @@ namespace MECCG_Deck_Builder.Properties {
                 <kbd>Escape</kbd>
             </td>
             <td>
-                When focused inside any Key or Value ComboBox, pressing <kbd>Escape</kbd> immediately resets that box to the blank (<code>""</code>) entry.
+                When focused inside any category or tag ComboBox, pressing <kbd>Escape</kbd> immediately resets that box to the blank (<code>""</code>) entry.
             </td>
         </tr>
         <tr>
@@ -583,7 +591,7 @@ namespace MECCG_Deck_Builder.Properties {
                 Select the top blank entry (<code>""</code>)
             </td>
             <td>
-                Selecting the empty item at the top of any Key dropdown resets that slot and clears its paired Value list.
+                Selecting the empty item at the top of any category dropdown resets that slot and clears its paired tag list.
             </td>
         </tr>
     </table>
@@ -807,7 +815,7 @@ namespace MECCG_Deck_Builder
 
             var lblKey = new Label
             {
-                Text = "Category (Key):",
+                Text = "Category:",
                 Location = new Point(12, 40),
                 Size = new Size(356, 16)
             };
@@ -823,7 +831,7 @@ namespace MECCG_Deck_Builder
 
             var lblValue = new Label
             {
-                Text = "Tag Value:",
+                Text = "Tag:",
                 Location = new Point(12, 90),
                 Size = new Size(356, 16)
             };
@@ -903,14 +911,14 @@ namespace MECCG_Deck_Builder
         {
             if (string.IsNullOrWhiteSpace(SelectedKey))
             {
-                MessageBox.Show(this, "Please enter or select a category (key).", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Please enter or select a category.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 _cmbKey.Focus();
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(SelectedValue))
             {
-                MessageBox.Show(this, "Please enter or select a tag value.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "Please enter or select a tag.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 _cmbValue.Focus();
                 return;
             }
@@ -949,8 +957,8 @@ namespace MECCG_Deck_Builder
 
 ## Application Architecture & Core Files
 
-- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, 4 filter combo pairs, menus.
-- ManageCustomTagsForm.cs: Dedicated modal dialog for creating, renaming, and deleting custom keys and values.
+- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, two-tier filter GroupBoxes, menus.
+- ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags.
 - AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
@@ -970,25 +978,19 @@ namespace MECCG_Deck_Builder
 
 ---
 
-## Critical Data Structures & Conventions
+## Standardized Taxonomy & Filtering Vocabulary
 
-### Card Representations
-1. Domain Representation (`Card`):
-   - Strongly-typed class containing all standard card properties and dynamic attribute lookup.
-2. Catalog Management (`CardCatalogService`):
-   - Enumerable `IReadOnlyList<Card>` and O(1) indexed `IReadOnlyDictionary<string, Card> CardsById`.
-
-### Deck Sections (Tabs)
-Five deck sections correspond to standard MECCG rules:
-1. Pool (`DeckSectionType.Pool`)
-2. Resources (`DeckSectionType.Resources`)
-3. Hazards (`DeckSectionType.Hazards`)
-4. Sideboard (`DeckSectionType.Sideboard`)
-5. Sites (`DeckSectionType.Sites`)
-
-### Title Bar Counting Format
-Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<Side>/<Site>)
-- Resource characters are dynamically counted by inspecting cards in Resources where Primary == "Character".
+1. **Official Card Attributes (Filter Slots 1 & 2):**
+   - Housed inside `GroupBoxCardAttributes` ("Card Attributes (Official Database)").
+   - Canonical rules properties: `Attribute` (e.g. *Race*, *Skill*) and `Value` (e.g. *Dúnadan*, *Warrior*).
+   - Inspected via context menu item: `Card Attributes`.
+2. **Custom User Taxonomy (Filter Slots 3 & 4):**
+   - Housed inside `GroupBoxCustomTags` ("Custom Tags (User Taxonomy)").
+   - User-defined taxonomy: `Category` (e.g. *Archetype*, *Role*) and `Tag` (e.g. *Ring Destruction*, *Scout Support*).
+   - Inspected via context menu item: `Assigned Tags`.
+   - Card tagging actions: `Assign Tag` (with `+ Author New Tag...` and `+ Add Tag...`), `Remove Tag`.
+   - Dedicated manager: `Filter > Manage Custom Tags...` (`Categories`, `Tags`, `Add...`, `Rename...`, `Delete`).
+   - Tag file persistence: `Filter > Load Tag Set...` and `Filter > Save Tag Set...`.
 
 ---
 
@@ -996,34 +998,17 @@ Title format: MECCG Deck Builder - "<Title>" (<Pool>/<Res>[<Characters>]/<Haz>/<
 
 - [x] **v0.1.0 - Foundation & Documentation** (100% complete)
 - [x] **v0.2.0 - Modernization & Bug Fixes** (100% complete)
-- [x] **v0.3.0 - Domain Refactoring & Tag Decoupling** (100% complete)
-- [ ] **v0.4.0 - Curated Filter Taxonomy** (Next)
+- [x] **v0.3.0 - Domain Refactoring & Architecture** (100% complete)
+- [x] **v0.4.0 - Curated Filter Taxonomy** (100% complete)
+  - Issue #12: Custom Filter Synchronization Across Slots, Deletion Cleanup, and Empty Key UX
+  - Issue #13: Implement Cascading Faceted Search Across All Filter Slots to Eliminate Zero-Result Queries
+  - Issue #14: Add Per-Slot and Global Filter Reset Capabilities with Keyboard Shortcuts and Context Menus
+  - Issue #15: Fix Empty Set Selection Bypass, Startup ComboBox Crash, and Preview Cleanup
+  - Issue #16: Decouple Custom Tag Authoring from Filter Bar (Dedicated Taxonomy Manager)
+  - Issue #17: Group filter panel into titled containers with slot labels and layer demarcation
+  - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
 - [ ] **v0.5.0 - Procedural Deck Generator**
 - [ ] **v1.0.0 - First Public Release**
-
-### Completed Milestones
-
-#### v0.1.0 - Foundation & Documentation
-- Issue #1: Integrated CHM help system, build verification, and repository documentation standards.
-
-#### v0.2.0 - Modernization & Bug Fixes
-- Issue #4: Card Filter Bug - Fixed loop indexing and case-insensitive dictionary safety.
-- Issue #5: Expansion Filter Values Missing - Populated filter values across all expansions and dreamcards.
-- Issue #6: Offline Fallback Packaging - Bundled offline fallback JSON datasets.
-- Issue #7: MemoryCache Disk Miss & GDI+ File Locks - Non-locking memory stream image loading.
-- Issue #8: Downloader GDI+ Leaks & Direct URLs - Fixed batch downloader resource handling.
-- Issue #9: Card ID Indexing Assumption & Exporter Safety - Secured dictionary lookups and exporter routines.
-- Issue #10: Async Network Operations & UI Freezing - Implemented non-blocking async operations with CancellationTokenSource race protection.
-
-#### v0.3.0 - Domain Refactoring & Tag Decoupling
-- Strongly-typed domain models (`Card`, `CardSet`, `Deck`, `DeckSectionType`).
-- Decoupled headless services (`CardCatalogService`, `CardFilterService`, `DeckExportService`).
-- Issue #16: Decoupled custom taxonomy authoring from catalog filtering:
-  - Converted filter ComboBoxes 3 & 4 to read-only `DropDownList`.
-  - Added dedicated `ManageCustomTagsForm` (Filter > Manage Custom Tags...) for taxonomy authoring.
-  - Added `AddTagDialog` and `PromptDialog` to card context menus for inline tag creation and assignment without wiping active filter selections.
-  - Seamless tag remapping: context menus always show categories, display checkmarks for active tags, and allow direct reassignment without manual deletion.
-  - Removed redundant runtime `Filter > Delete Key` menu.
 ]]>
   </file>
   <file path='.\Card.cs'>
@@ -3061,11 +3046,11 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuMasterCustomFilters(Card card)
         {
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
-            ContextMenuStripMaster.Items.RemoveByKey("Custom Filters");
+            ContextMenuStripMaster.Items.RemoveByKey("Assigned Tags");
 
             if (pairs.Count == 0) return;
 
-            var customMenu = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            var customMenu = new ToolStripMenuItem("Assigned Tags") { Name = "Assigned Tags" };
             int maxLen = pairs.Max(p => p.Key.Length);
 
             for (int i = 0; i < pairs.Count; i++)
@@ -3079,12 +3064,12 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuMasterAddKeyValue(Card card)
         {
-            ContextMenuStripMaster.Items.RemoveByKey("Add Key Value");
+            ContextMenuStripMaster.Items.RemoveByKey("Assign Tag");
             var keyNames = _filterService.GetCustomKeyNames();
 
-            var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+            var addMenu = new ToolStripMenuItem("Assign Tag") { Name = "Assign Tag" };
 
-            var addNewTagItem = new ToolStripMenuItem("+ Add New Tag...") { Font = new Font(Font, FontStyle.Bold) };
+            var addNewTagItem = new ToolStripMenuItem("+ Author New Tag...") { Font = new Font(Font, FontStyle.Bold) };
             addNewTagItem.Click += (s, ev) =>
             {
                 var result = AddTagDialog.Show(this, card.Name, _filterService);
@@ -3113,10 +3098,10 @@ namespace MECCG_Deck_Builder
 
                 var keyItem = new ToolStripMenuItem(keyName);
 
-                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
                 addNewValueItem.Click += (s, ev) =>
                 {
-                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    string val = PromptDialog.Show(this, $"Add Tag to '{keyName}'", $"Enter new tag for category '{keyName}':");
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
@@ -3157,11 +3142,11 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuMasterDeleteKeyValue(Card card)
         {
-            ContextMenuStripMaster.Items.RemoveByKey("Delete Key Value");
+            ContextMenuStripMaster.Items.RemoveByKey("Remove Tag");
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
             if (pairs.Count == 0) return;
 
-            var delMenu = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
@@ -3507,11 +3492,11 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuTabCustomFilters(Card card)
         {
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
-            ContextMenuStripTabs.Items.RemoveByKey("Custom Filters");
+            ContextMenuStripTabs.Items.RemoveByKey("Assigned Tags");
 
             if (pairs.Count == 0) return;
 
-            var customMenu = new ToolStripMenuItem("Custom Filters") { Name = "Custom Filters" };
+            var customMenu = new ToolStripMenuItem("Assigned Tags") { Name = "Assigned Tags" };
             int maxLen = pairs.Max(p => p.Key.Length);
 
             for (int i = 0; i < pairs.Count; i++)
@@ -3525,12 +3510,12 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabAddKeyValue(Card card)
         {
-            ContextMenuStripTabs.Items.RemoveByKey("Add Key Value");
+            ContextMenuStripTabs.Items.RemoveByKey("Assign Tag");
             var keyNames = _filterService.GetCustomKeyNames();
 
-            var addMenu = new ToolStripMenuItem("Add Key Value") { Name = "Add Key Value" };
+            var addMenu = new ToolStripMenuItem("Assign Tag") { Name = "Assign Tag" };
 
-            var addNewTagItem = new ToolStripMenuItem("+ Add New Tag...") { Font = new Font(Font, FontStyle.Bold) };
+            var addNewTagItem = new ToolStripMenuItem("+ Author New Tag...") { Font = new Font(Font, FontStyle.Bold) };
             addNewTagItem.Click += (s, ev) =>
             {
                 var result = AddTagDialog.Show(this, card.Name, _filterService);
@@ -3559,10 +3544,10 @@ namespace MECCG_Deck_Builder
 
                 var keyItem = new ToolStripMenuItem(keyName);
 
-                var addNewValueItem = new ToolStripMenuItem("+ Add Value...");
+                var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
                 addNewValueItem.Click += (s, ev) =>
                 {
-                    string val = PromptDialog.Show(this, $"Add Value to '{keyName}'", $"Enter new value for category '{keyName}':");
+                    string val = PromptDialog.Show(this, $"Add Tag to '{keyName}'", $"Enter new tag for category '{keyName}':");
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
@@ -3603,11 +3588,11 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabDeleteKeyValue(Card card)
         {
-            ContextMenuStripTabs.Items.RemoveByKey("Delete Key Value");
+            ContextMenuStripTabs.Items.RemoveByKey("Remove Tag");
             var pairs = _filterService.GetCardCustomFilterPairs(card.Id);
             if (pairs.Count == 0) return;
 
-            var delMenu = new ToolStripMenuItem("Delete Key Value") { Name = "Delete Key Value" };
+            var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
@@ -3801,9 +3786,9 @@ namespace MECCG_Deck_Builder
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Title = Constants.AppTitle,
+                Title = $"{Constants.AppTitle} - Load Custom Tag Set",
                 DefaultExt = "json",
-                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json"
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -3823,9 +3808,9 @@ namespace MECCG_Deck_Builder
         {
             using var saveFileDialog = new SaveFileDialog
             {
-                Title = Constants.AppTitle,
+                Title = $"{Constants.AppTitle} - Save Custom Tag Set",
                 DefaultExt = "json",
-                Filter = "MECCG Deck Builder Custom Filters (*.json)|*.json"
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -4305,13 +4290,23 @@ namespace MECCG_Deck_Builder
             searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ComboBoxKey4 = new System.Windows.Forms.ComboBox();
-            ComboBoxKey3 = new System.Windows.Forms.ComboBox();
-            ComboBoxKey2 = new System.Windows.Forms.ComboBox();
+            GroupBoxCardAttributes = new System.Windows.Forms.GroupBox();
+            LblSlot1Key = new System.Windows.Forms.Label();
             ComboBoxKey1 = new System.Windows.Forms.ComboBox();
+            LblSlot1Value = new System.Windows.Forms.Label();
             ComboBoxValue1 = new System.Windows.Forms.ComboBox();
+            LblSlot2Key = new System.Windows.Forms.Label();
+            ComboBoxKey2 = new System.Windows.Forms.ComboBox();
+            LblSlot2Value = new System.Windows.Forms.Label();
             ComboBoxValue2 = new System.Windows.Forms.ComboBox();
+            GroupBoxCustomTags = new System.Windows.Forms.GroupBox();
+            LblSlot3Key = new System.Windows.Forms.Label();
+            ComboBoxKey3 = new System.Windows.Forms.ComboBox();
+            LblSlot3Value = new System.Windows.Forms.Label();
             ComboBoxValue3 = new System.Windows.Forms.ComboBox();
+            LblSlot4Key = new System.Windows.Forms.Label();
+            ComboBoxKey4 = new System.Windows.Forms.ComboBox();
+            LblSlot4Value = new System.Windows.Forms.Label();
             ComboBoxValue4 = new System.Windows.Forms.ComboBox();
             ContextMenuStripMaster.SuspendLayout();
             ContextMenuStripTabs.SuspendLayout();
@@ -4323,6 +4318,8 @@ namespace MECCG_Deck_Builder
             TabPageSideboard.SuspendLayout();
             TabPageSites.SuspendLayout();
             MenuStrip1.SuspendLayout();
+            GroupBoxCardAttributes.SuspendLayout();
+            GroupBoxCustomTags.SuspendLayout();
             SuspendLayout();
             // 
             // ListBoxMaster
@@ -4332,7 +4329,7 @@ namespace MECCG_Deck_Builder
             ListBoxMaster.ItemHeight = 15;
             ListBoxMaster.Location = new System.Drawing.Point(12, 37);
             ListBoxMaster.Name = "ListBoxMaster";
-            ListBoxMaster.Size = new System.Drawing.Size(210, 529);
+            ListBoxMaster.Size = new System.Drawing.Size(210, 505);
             ListBoxMaster.TabIndex = 0;
             ListBoxMaster.SelectedIndexChanged += ListBox_SelectedIndexChanged;
             ListBoxMaster.MouseDoubleClick += ListBoxCardList_MouseDoubleClick;
@@ -4343,21 +4340,21 @@ namespace MECCG_Deck_Builder
             // 
             ContextMenuStripMaster.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuMasterCardname, ToolStripMenuMasterCopyCard, ToolStripMenuMasterCardnumFilters });
             ContextMenuStripMaster.Name = "ContextMenuStripMaster";
-            ContextMenuStripMaster.Size = new System.Drawing.Size(181, 70);
+            ContextMenuStripMaster.Size = new System.Drawing.Size(155, 70);
             // 
             // ToolStripMenuMasterCardname
             // 
             ToolStripMenuMasterCardname.BackColor = System.Drawing.SystemColors.ActiveCaption;
             ToolStripMenuMasterCardname.ForeColor = System.Drawing.SystemColors.ControlText;
             ToolStripMenuMasterCardname.Name = "ToolStripMenuMasterCardname";
-            ToolStripMenuMasterCardname.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuMasterCardname.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuMasterCardname.Text = "toolStripMenuItem1";
             // 
             // ToolStripMenuMasterCopyCard
             // 
             ToolStripMenuMasterCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuMasterCopyToPool, ToolStripMenuMasterCopyToResource, ToolStripMenuMasterCopyToHazard, ToolStripMenuMasterCopyToSideboard, ToolStripMenuMasterCopyToSite });
             ToolStripMenuMasterCopyCard.Name = "ToolStripMenuMasterCopyCard";
-            ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuMasterCopyCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuMasterCopyCard.Text = "Copy";
             // 
             // ToolStripMenuMasterCopyToPool
@@ -4398,27 +4395,27 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuMasterCardnumFilters
             // 
             ToolStripMenuMasterCardnumFilters.Name = "ToolStripMenuMasterCardnumFilters";
-            ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(180, 22);
-            ToolStripMenuMasterCardnumFilters.Text = "Cardnum Filters";
+            ToolStripMenuMasterCardnumFilters.Size = new System.Drawing.Size(154, 22);
+            ToolStripMenuMasterCardnumFilters.Text = "Card Attributes";
             // 
             // ContextMenuStripTabs
             // 
             ContextMenuStripTabs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuTabCardname, ToolStripMenuTabCopyCard, ToolStripMenuTabMoveCard, ToolStripMenuTabDeleteCard, ToolStripMenuTabCardnumFilters });
             ContextMenuStripTabs.Name = "ContextMenuStripTabs";
-            ContextMenuStripTabs.Size = new System.Drawing.Size(181, 114);
+            ContextMenuStripTabs.Size = new System.Drawing.Size(155, 114);
             // 
             // ToolStripMenuTabCardname
             // 
             ToolStripMenuTabCardname.BackColor = System.Drawing.SystemColors.ActiveCaption;
             ToolStripMenuTabCardname.Name = "ToolStripMenuTabCardname";
-            ToolStripMenuTabCardname.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabCardname.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabCardname.Text = "toolStripMenuItem1";
             // 
             // ToolStripMenuTabCopyCard
             // 
             ToolStripMenuTabCopyCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuTabCopyToPool, ToolStripMenuTabCopyToResource, ToolStripMenuTabCopyToHazard, ToolStripMenuTabCopyToSideboard, ToolStripMenuTabCopyToSite });
             ToolStripMenuTabCopyCard.Name = "ToolStripMenuTabCopyCard";
-            ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabCopyCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabCopyCard.Text = "Copy";
             // 
             // ToolStripMenuTabCopyToPool
@@ -4460,7 +4457,7 @@ namespace MECCG_Deck_Builder
             // 
             ToolStripMenuTabMoveCard.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuTabMoveToPool, ToolStripMenuTabMoveToResource, ToolStripMenuTabMoveToHazard, ToolStripMenuTabMoveToSideboard, ToolStripMenuTabMoveToSite });
             ToolStripMenuTabMoveCard.Name = "ToolStripMenuTabMoveCard";
-            ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabMoveCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabMoveCard.Text = "Move";
             // 
             // ToolStripMenuTabMoveToPool
@@ -4501,21 +4498,21 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuTabDeleteCard
             // 
             ToolStripMenuTabDeleteCard.Name = "ToolStripMenuTabDeleteCard";
-            ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuTabDeleteCard.Size = new System.Drawing.Size(154, 22);
             ToolStripMenuTabDeleteCard.Text = "Delete";
             ToolStripMenuTabDeleteCard.Click += ToolStripMenuTab_Click;
             // 
             // ToolStripMenuTabCardnumFilters
             // 
             ToolStripMenuTabCardnumFilters.Name = "ToolStripMenuTabCardnumFilters";
-            ToolStripMenuTabCardnumFilters.Size = new System.Drawing.Size(180, 22);
-            ToolStripMenuTabCardnumFilters.Text = "Cardnum Filters";
+            ToolStripMenuTabCardnumFilters.Size = new System.Drawing.Size(154, 22);
+            ToolStripMenuTabCardnumFilters.Text = "Card Attributes";
             // 
             // PictureBoxCardImage
             // 
             PictureBoxCardImage.Location = new System.Drawing.Point(243, 37);
             PictureBoxCardImage.Name = "PictureBoxCardImage";
-            PictureBoxCardImage.Size = new System.Drawing.Size(443, 525);
+            PictureBoxCardImage.Size = new System.Drawing.Size(443, 505);
             PictureBoxCardImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             PictureBoxCardImage.TabIndex = 1;
             PictureBoxCardImage.TabStop = false;
@@ -4528,7 +4525,7 @@ namespace MECCG_Deck_Builder
             ListBoxPool.ItemHeight = 15;
             ListBoxPool.Location = new System.Drawing.Point(3, 3);
             ListBoxPool.Name = "ListBoxPool";
-            ListBoxPool.Size = new System.Drawing.Size(196, 495);
+            ListBoxPool.Size = new System.Drawing.Size(196, 471);
             ListBoxPool.Sorted = true;
             ListBoxPool.TabIndex = 4;
             ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -4545,7 +4542,7 @@ namespace MECCG_Deck_Builder
             ListBoxResources.ItemHeight = 15;
             ListBoxResources.Location = new System.Drawing.Point(3, 3);
             ListBoxResources.Name = "ListBoxResources";
-            ListBoxResources.Size = new System.Drawing.Size(196, 495);
+            ListBoxResources.Size = new System.Drawing.Size(196, 471);
             ListBoxResources.Sorted = true;
             ListBoxResources.TabIndex = 5;
             ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -4562,7 +4559,7 @@ namespace MECCG_Deck_Builder
             ListBoxHazards.ItemHeight = 15;
             ListBoxHazards.Location = new System.Drawing.Point(3, 3);
             ListBoxHazards.Name = "ListBoxHazards";
-            ListBoxHazards.Size = new System.Drawing.Size(196, 495);
+            ListBoxHazards.Size = new System.Drawing.Size(196, 471);
             ListBoxHazards.Sorted = true;
             ListBoxHazards.TabIndex = 6;
             ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -4579,7 +4576,7 @@ namespace MECCG_Deck_Builder
             ListBoxSideboard.ItemHeight = 15;
             ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
             ListBoxSideboard.Name = "ListBoxSideboard";
-            ListBoxSideboard.Size = new System.Drawing.Size(196, 495);
+            ListBoxSideboard.Size = new System.Drawing.Size(196, 471);
             ListBoxSideboard.Sorted = true;
             ListBoxSideboard.TabIndex = 7;
             ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -4596,7 +4593,7 @@ namespace MECCG_Deck_Builder
             ListBoxSites.ItemHeight = 15;
             ListBoxSites.Location = new System.Drawing.Point(3, 3);
             ListBoxSites.Name = "ListBoxSites";
-            ListBoxSites.Size = new System.Drawing.Size(196, 495);
+            ListBoxSites.Size = new System.Drawing.Size(196, 471);
             ListBoxSites.Sorted = true;
             ListBoxSites.TabIndex = 8;
             ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
@@ -4616,9 +4613,9 @@ namespace MECCG_Deck_Builder
             TabControlDeck.Location = new System.Drawing.Point(706, 37);
             TabControlDeck.Name = "TabControlDeck";
             TabControlDeck.SelectedIndex = 0;
-            TabControlDeck.Size = new System.Drawing.Size(210, 529);
+            TabControlDeck.Size = new System.Drawing.Size(210, 505);
             TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            TabControlDeck.TabIndex = 14;
+            TabControlDeck.TabIndex = 2;
             // 
             // TabPagePool
             // 
@@ -4626,7 +4623,7 @@ namespace MECCG_Deck_Builder
             TabPagePool.Location = new System.Drawing.Point(4, 24);
             TabPagePool.Name = "TabPagePool";
             TabPagePool.Padding = new System.Windows.Forms.Padding(3);
-            TabPagePool.Size = new System.Drawing.Size(202, 501);
+            TabPagePool.Size = new System.Drawing.Size(202, 477);
             TabPagePool.TabIndex = 0;
             TabPagePool.Text = "Pool";
             TabPagePool.UseVisualStyleBackColor = true;
@@ -4637,7 +4634,7 @@ namespace MECCG_Deck_Builder
             TabPageResources.Location = new System.Drawing.Point(4, 24);
             TabPageResources.Name = "TabPageResources";
             TabPageResources.Padding = new System.Windows.Forms.Padding(3);
-            TabPageResources.Size = new System.Drawing.Size(202, 501);
+            TabPageResources.Size = new System.Drawing.Size(202, 477);
             TabPageResources.TabIndex = 1;
             TabPageResources.Text = "Res";
             TabPageResources.UseVisualStyleBackColor = true;
@@ -4648,7 +4645,7 @@ namespace MECCG_Deck_Builder
             TabPageHazards.Location = new System.Drawing.Point(4, 24);
             TabPageHazards.Name = "TabPageHazards";
             TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
-            TabPageHazards.Size = new System.Drawing.Size(202, 501);
+            TabPageHazards.Size = new System.Drawing.Size(202, 477);
             TabPageHazards.TabIndex = 2;
             TabPageHazards.Text = "Haz";
             TabPageHazards.UseVisualStyleBackColor = true;
@@ -4659,7 +4656,7 @@ namespace MECCG_Deck_Builder
             TabPageSideboard.Location = new System.Drawing.Point(4, 24);
             TabPageSideboard.Name = "TabPageSideboard";
             TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSideboard.Size = new System.Drawing.Size(202, 501);
+            TabPageSideboard.Size = new System.Drawing.Size(202, 477);
             TabPageSideboard.TabIndex = 3;
             TabPageSideboard.Text = "Side";
             TabPageSideboard.UseVisualStyleBackColor = true;
@@ -4670,7 +4667,7 @@ namespace MECCG_Deck_Builder
             TabPageSites.Location = new System.Drawing.Point(4, 24);
             TabPageSites.Name = "TabPageSites";
             TabPageSites.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSites.Size = new System.Drawing.Size(202, 501);
+            TabPageSites.Size = new System.Drawing.Size(202, 477);
             TabPageSites.TabIndex = 4;
             TabPageSites.Text = "Site";
             TabPageSites.UseVisualStyleBackColor = true;
@@ -4894,7 +4891,7 @@ namespace MECCG_Deck_Builder
             // 
             ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
             ToolStripMenuFilterOpen.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterOpen.Text = "Open";
+            ToolStripMenuFilterOpen.Text = "Load Tag Set...";
             ToolStripMenuFilterOpen.Click += OpenFilterMenuItem_Click;
             // 
             // toolStripSeparator6
@@ -4906,7 +4903,7 @@ namespace MECCG_Deck_Builder
             // 
             ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
             ToolStripMenuFilterSave.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterSave.Text = "Save";
+            ToolStripMenuFilterSave.Text = "Save Tag Set...";
             ToolStripMenuFilterSave.Click += SaveFilterMenuItem_Click;
             // 
             // helpToolStripMenuItem
@@ -4946,41 +4943,30 @@ namespace MECCG_Deck_Builder
             aboutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
             aboutToolStripMenuItem.Text = "&About...";
             // 
-            // ComboBoxKey4
+            // GroupBoxCardAttributes
             // 
-            ComboBoxKey4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            ComboBoxKey4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            ComboBoxKey4.FormattingEnabled = true;
-            ComboBoxKey4.Location = new System.Drawing.Point(706, 581);
-            ComboBoxKey4.Name = "ComboBoxKey4";
-            ComboBoxKey4.Size = new System.Drawing.Size(206, 23);
-            ComboBoxKey4.TabIndex = 19;
-            ComboBoxKey4.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            GroupBoxCardAttributes.Controls.Add(LblSlot1Key);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxKey1);
+            GroupBoxCardAttributes.Controls.Add(LblSlot1Value);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxValue1);
+            GroupBoxCardAttributes.Controls.Add(LblSlot2Key);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxKey2);
+            GroupBoxCardAttributes.Controls.Add(LblSlot2Value);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxValue2);
+            GroupBoxCardAttributes.Location = new System.Drawing.Point(12, 552);
+            GroupBoxCardAttributes.Name = "GroupBoxCardAttributes";
+            GroupBoxCardAttributes.Size = new System.Drawing.Size(444, 118);
+            GroupBoxCardAttributes.TabIndex = 3;
+            GroupBoxCardAttributes.TabStop = false;
+            GroupBoxCardAttributes.Text = "Card Attributes (Official Database)";
             // 
-            // ComboBoxKey3
+            // LblSlot1Key
             // 
-            ComboBoxKey3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            ComboBoxKey3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            ComboBoxKey3.FormattingEnabled = true;
-            ComboBoxKey3.Location = new System.Drawing.Point(476, 581);
-            ComboBoxKey3.Name = "ComboBoxKey3";
-            ComboBoxKey3.Size = new System.Drawing.Size(210, 23);
-            ComboBoxKey3.TabIndex = 20;
-            ComboBoxKey3.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
-            // 
-            // ComboBoxKey2
-            // 
-            ComboBoxKey2.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            ComboBoxKey2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            ComboBoxKey2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            ComboBoxKey2.FormattingEnabled = true;
-            ComboBoxKey2.Location = new System.Drawing.Point(243, 581);
-            ComboBoxKey2.Name = "ComboBoxKey2";
-            ComboBoxKey2.Size = new System.Drawing.Size(210, 23);
-            ComboBoxKey2.TabIndex = 21;
-            ComboBoxKey2.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            LblSlot1Key.Location = new System.Drawing.Point(12, 20);
+            LblSlot1Key.Name = "LblSlot1Key";
+            LblSlot1Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot1Key.TabIndex = 0;
+            LblSlot1Key.Text = "Attribute:";
             // 
             // ComboBoxKey1
             // 
@@ -4988,11 +4974,19 @@ namespace MECCG_Deck_Builder
             ComboBoxKey1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxKey1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey1.FormattingEnabled = true;
-            ComboBoxKey1.Location = new System.Drawing.Point(12, 581);
+            ComboBoxKey1.Location = new System.Drawing.Point(12, 37);
             ComboBoxKey1.Name = "ComboBoxKey1";
-            ComboBoxKey1.Size = new System.Drawing.Size(210, 23);
-            ComboBoxKey1.TabIndex = 22;
+            ComboBoxKey1.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey1.TabIndex = 1;
             ComboBoxKey1.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot1Value
+            // 
+            LblSlot1Value.Location = new System.Drawing.Point(12, 65);
+            LblSlot1Value.Name = "LblSlot1Value";
+            LblSlot1Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot1Value.TabIndex = 2;
+            LblSlot1Value.Text = "Value:";
             // 
             // ComboBoxValue1
             // 
@@ -5000,12 +4994,40 @@ namespace MECCG_Deck_Builder
             ComboBoxValue1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue1.FormattingEnabled = true;
-            ComboBoxValue1.Location = new System.Drawing.Point(12, 610);
+            ComboBoxValue1.Location = new System.Drawing.Point(12, 82);
             ComboBoxValue1.Name = "ComboBoxValue1";
-            ComboBoxValue1.Size = new System.Drawing.Size(210, 23);
-            ComboBoxValue1.TabIndex = 26;
+            ComboBoxValue1.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue1.TabIndex = 3;
             ComboBoxValue1.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue1.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot2Key
+            // 
+            LblSlot2Key.Location = new System.Drawing.Point(228, 20);
+            LblSlot2Key.Name = "LblSlot2Key";
+            LblSlot2Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot2Key.TabIndex = 4;
+            LblSlot2Key.Text = "Attribute:";
+            // 
+            // ComboBoxKey2
+            // 
+            ComboBoxKey2.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey2.FormattingEnabled = true;
+            ComboBoxKey2.Location = new System.Drawing.Point(228, 37);
+            ComboBoxKey2.Name = "ComboBoxKey2";
+            ComboBoxKey2.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey2.TabIndex = 5;
+            ComboBoxKey2.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot2Value
+            // 
+            LblSlot2Value.Location = new System.Drawing.Point(228, 65);
+            LblSlot2Value.Name = "LblSlot2Value";
+            LblSlot2Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot2Value.TabIndex = 6;
+            LblSlot2Value.Text = "Value:";
             // 
             // ComboBoxValue2
             // 
@@ -5013,12 +5035,57 @@ namespace MECCG_Deck_Builder
             ComboBoxValue2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue2.FormattingEnabled = true;
-            ComboBoxValue2.Location = new System.Drawing.Point(243, 610);
+            ComboBoxValue2.Location = new System.Drawing.Point(228, 82);
             ComboBoxValue2.Name = "ComboBoxValue2";
-            ComboBoxValue2.Size = new System.Drawing.Size(210, 23);
-            ComboBoxValue2.TabIndex = 25;
+            ComboBoxValue2.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue2.TabIndex = 7;
             ComboBoxValue2.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue2.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // GroupBoxCustomTags
+            // 
+            GroupBoxCustomTags.Controls.Add(LblSlot3Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey3);
+            GroupBoxCustomTags.Controls.Add(LblSlot3Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue3);
+            GroupBoxCustomTags.Controls.Add(LblSlot4Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey4);
+            GroupBoxCustomTags.Controls.Add(LblSlot4Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue4);
+            GroupBoxCustomTags.Location = new System.Drawing.Point(470, 552);
+            GroupBoxCustomTags.Name = "GroupBoxCustomTags";
+            GroupBoxCustomTags.Size = new System.Drawing.Size(444, 118);
+            GroupBoxCustomTags.TabIndex = 4;
+            GroupBoxCustomTags.TabStop = false;
+            GroupBoxCustomTags.Text = "Custom Tags (User Taxonomy)";
+            // 
+            // LblSlot3Key
+            // 
+            LblSlot3Key.Location = new System.Drawing.Point(12, 20);
+            LblSlot3Key.Name = "LblSlot3Key";
+            LblSlot3Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot3Key.TabIndex = 0;
+            LblSlot3Key.Text = "Category:";
+            // 
+            // ComboBoxKey3
+            // 
+            ComboBoxKey3.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey3.FormattingEnabled = true;
+            ComboBoxKey3.Location = new System.Drawing.Point(12, 37);
+            ComboBoxKey3.Name = "ComboBoxKey3";
+            ComboBoxKey3.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey3.TabIndex = 1;
+            ComboBoxKey3.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot3Value
+            // 
+            LblSlot3Value.Location = new System.Drawing.Point(12, 65);
+            LblSlot3Value.Name = "LblSlot3Value";
+            LblSlot3Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot3Value.TabIndex = 2;
+            LblSlot3Value.Text = "Tag:";
             // 
             // ComboBoxValue3
             // 
@@ -5026,12 +5093,40 @@ namespace MECCG_Deck_Builder
             ComboBoxValue3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue3.FormattingEnabled = true;
-            ComboBoxValue3.Location = new System.Drawing.Point(476, 610);
+            ComboBoxValue3.Location = new System.Drawing.Point(12, 82);
             ComboBoxValue3.Name = "ComboBoxValue3";
-            ComboBoxValue3.Size = new System.Drawing.Size(210, 23);
-            ComboBoxValue3.TabIndex = 24;
+            ComboBoxValue3.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue3.TabIndex = 3;
             ComboBoxValue3.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue3.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot4Key
+            // 
+            LblSlot4Key.Location = new System.Drawing.Point(228, 20);
+            LblSlot4Key.Name = "LblSlot4Key";
+            LblSlot4Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot4Key.TabIndex = 4;
+            LblSlot4Key.Text = "Category:";
+            // 
+            // ComboBoxKey4
+            // 
+            ComboBoxKey4.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey4.FormattingEnabled = true;
+            ComboBoxKey4.Location = new System.Drawing.Point(228, 37);
+            ComboBoxKey4.Name = "ComboBoxKey4";
+            ComboBoxKey4.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey4.TabIndex = 5;
+            ComboBoxKey4.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot4Value
+            // 
+            LblSlot4Value.Location = new System.Drawing.Point(228, 65);
+            LblSlot4Value.Name = "LblSlot4Value";
+            LblSlot4Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot4Value.TabIndex = 6;
+            LblSlot4Value.Text = "Tag:";
             // 
             // ComboBoxValue4
             // 
@@ -5039,10 +5134,10 @@ namespace MECCG_Deck_Builder
             ComboBoxValue4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue4.FormattingEnabled = true;
-            ComboBoxValue4.Location = new System.Drawing.Point(706, 610);
+            ComboBoxValue4.Location = new System.Drawing.Point(228, 82);
             ComboBoxValue4.Name = "ComboBoxValue4";
-            ComboBoxValue4.Size = new System.Drawing.Size(206, 23);
-            ComboBoxValue4.TabIndex = 23;
+            ComboBoxValue4.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue4.TabIndex = 7;
             ComboBoxValue4.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue4.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
             // 
@@ -5050,15 +5145,9 @@ namespace MECCG_Deck_Builder
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(926, 647);
-            Controls.Add(ComboBoxValue1);
-            Controls.Add(ComboBoxValue2);
-            Controls.Add(ComboBoxValue3);
-            Controls.Add(ComboBoxValue4);
-            Controls.Add(ComboBoxKey1);
-            Controls.Add(ComboBoxKey2);
-            Controls.Add(ComboBoxKey3);
-            Controls.Add(ComboBoxKey4);
+            ClientSize = new System.Drawing.Size(926, 682);
+            Controls.Add(GroupBoxCardAttributes);
+            Controls.Add(GroupBoxCustomTags);
             Controls.Add(TabControlDeck);
             Controls.Add(PictureBoxCardImage);
             Controls.Add(ListBoxMaster);
@@ -5077,6 +5166,8 @@ namespace MECCG_Deck_Builder
             TabPageSites.ResumeLayout(false);
             MenuStrip1.ResumeLayout(false);
             MenuStrip1.PerformLayout();
+            GroupBoxCardAttributes.ResumeLayout(false);
+            GroupBoxCustomTags.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
 
@@ -5149,13 +5240,23 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
-        private System.Windows.Forms.ComboBox ComboBoxKey4;
-        private System.Windows.Forms.ComboBox ComboBoxKey3;
-        private System.Windows.Forms.ComboBox ComboBoxKey2;
+        private System.Windows.Forms.GroupBox GroupBoxCardAttributes;
+        private System.Windows.Forms.Label LblSlot1Key;
         private System.Windows.Forms.ComboBox ComboBoxKey1;
+        private System.Windows.Forms.Label LblSlot1Value;
         private System.Windows.Forms.ComboBox ComboBoxValue1;
+        private System.Windows.Forms.Label LblSlot2Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey2;
+        private System.Windows.Forms.Label LblSlot2Value;
         private System.Windows.Forms.ComboBox ComboBoxValue2;
+        private System.Windows.Forms.GroupBox GroupBoxCustomTags;
+        private System.Windows.Forms.Label LblSlot3Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey3;
+        private System.Windows.Forms.Label LblSlot3Value;
         private System.Windows.Forms.ComboBox ComboBoxValue3;
+        private System.Windows.Forms.Label LblSlot4Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey4;
+        private System.Windows.Forms.Label LblSlot4Value;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
@@ -5209,7 +5310,7 @@ namespace MECCG_Deck_Builder
 
             var grpKeys = new GroupBox
             {
-                Text = "Categories (Keys)",
+                Text = "Categories",
                 Location = new Point(12, 12),
                 Size = new Size(245, 330)
             };
@@ -5224,7 +5325,7 @@ namespace MECCG_Deck_Builder
 
             _btnAddKey = new Button
             {
-                Text = "Add Key...",
+                Text = "Add...",
                 Location = new Point(10, 260),
                 Size = new Size(70, 26)
             };
@@ -5252,7 +5353,7 @@ namespace MECCG_Deck_Builder
 
             var grpValues = new GroupBox
             {
-                Text = "Values",
+                Text = "Tags",
                 Location = new Point(275, 12),
                 Size = new Size(245, 330)
             };
@@ -5267,7 +5368,7 @@ namespace MECCG_Deck_Builder
 
             _btnAddValue = new Button
             {
-                Text = "Add Value...",
+                Text = "Add...",
                 Location = new Point(10, 260),
                 Size = new Size(78, 26),
                 Enabled = false
@@ -5296,7 +5397,7 @@ namespace MECCG_Deck_Builder
 
             var lblNote = new Label
             {
-                Text = "Note: Deleting a key or value removes that tag from all assigned cards.",
+                Text = "Note: Deleting a category or tag removes it from all cards across the catalog.",
                 Location = new Point(12, 355),
                 Size = new Size(410, 30),
                 ForeColor = Color.DimGray
@@ -5409,7 +5510,7 @@ namespace MECCG_Deck_Builder
 
         private void BtnAddKey_Click(object sender, EventArgs e)
         {
-            string newKey = PromptDialog.Show(this, "Add New Category", "Enter custom category (key) name:");
+            string newKey = PromptDialog.Show(this, "Add New Category", "Enter category name:");
             if (string.IsNullOrWhiteSpace(newKey)) return;
 
             newKey = newKey.Trim();
@@ -5434,7 +5535,7 @@ namespace MECCG_Deck_Builder
             if (_listBoxKeys.SelectedItem is not string currentKey) return;
 
             var res = MessageBox.Show(this,
-                $"Are you sure you want to delete the category '{currentKey}' and all its values?\n\nThis will remove this tag from all cards across the database.",
+                $"Are you sure you want to delete the category '{currentKey}' and all its tags?\n\nThis will remove this category from all cards across the catalog.",
                 "Delete Category",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
@@ -5450,7 +5551,7 @@ namespace MECCG_Deck_Builder
         {
             if (_listBoxKeys.SelectedItem is not string currentKey) return;
 
-            string newVal = PromptDialog.Show(this, "Add Value", $"Enter new value for category '{currentKey}':");
+            string newVal = PromptDialog.Show(this, "Add New Tag", $"Enter new tag for category '{currentKey}':");
             if (string.IsNullOrWhiteSpace(newVal)) return;
 
             newVal = newVal.Trim();
@@ -5463,7 +5564,7 @@ namespace MECCG_Deck_Builder
             if (_listBoxKeys.SelectedItem is not string currentKey ||
                 _listBoxValues.SelectedItem is not string currentVal) return;
 
-            string renamedVal = PromptDialog.Show(this, "Rename Value", $"Enter new name for value '{currentVal}':", currentVal);
+            string renamedVal = PromptDialog.Show(this, "Rename Tag", $"Enter new name for tag '{currentVal}':", currentVal);
             if (string.IsNullOrWhiteSpace(renamedVal) || string.Equals(renamedVal, currentVal, StringComparison.OrdinalIgnoreCase)) return;
 
             renamedVal = renamedVal.Trim();
@@ -5477,8 +5578,8 @@ namespace MECCG_Deck_Builder
                 _listBoxValues.SelectedItem is not string currentVal) return;
 
             var res = MessageBox.Show(this,
-                $"Are you sure you want to delete the value '{currentVal}' from category '{currentKey}'?\n\nThis will remove this tag value from all cards tagged with it.",
-                "Delete Value",
+                $"Are you sure you want to delete the tag '{currentVal}' from category '{currentKey}'?\n\nThis will remove this tag from all cards tagged with it.",
+                "Delete Tag",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
@@ -5785,8 +5886,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
 - **Dynamic Stats Summary:** Window title bar displays live card counts per section with dedicated character counts: `(Pool / Res [Characters] / Haz / Side / Site)`.
 - **Card Artwork Preview & Caching:** On-demand card artwork download from Cardnum with local disk caching (`METW/`, `MEDM/`, etc.) and an in-memory cache. ICE errata cards load corrected artwork automatically.
 - **Dual-Layer Filtering:**
-  - **Cardnum Built-in (Slots 1 & 2):** Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
-  - **Custom User Taxonomy (Slots 3 & 4):** Filter by custom tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`). Author tags via the dedicated **Manage Custom Tags** dialog or right-click **Add Key Value > [+ Add New Tag...]** without disturbing active filter criteria.
+  - **Official Card Attributes (Slots 1 & 2):** Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
+  - **Custom User Taxonomy (Slots 3 & 4):** Filter by custom categories and tags (e.g., `Archetype` -> `Ring Destruction`, `Role` -> `Scout Support`). Author tags via the dedicated **Manage Custom Tags** dialog or right-click **Assign Tag > [+ Author New Tag...]** without disturbing active filter criteria.
 - **Multi-Platform Export Formats:**
   - **Tabletop Simulator (`.json`):** Generates ready-to-use deck files compatible with TTS MECCG mods.
   - **Play MECCG (`.play` & `.playPBEM`):** Native format for online play.
@@ -5804,8 +5905,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | Double Click | Master List | Add card to the active deck tab |
 | Double Click | Any Deck Tab | Duplicate the clicked card in that tab |
 | Drag & Drop | Master List -> Tab | Add card to the target tab |
-| Right Click | Master List | Context menu: Copy to tab, view Cardnum attributes, assign custom tags |
-| Right Click | Deck Tab | Context menu: Copy, Move to another tab, Delete, view metadata |
+| Right Click | Master List | Context menu: Copy to tab, view Card Attributes, view Assigned Tags, assign custom tags |
+| Right Click | Deck Tab | Context menu: Copy, Move to another tab, Delete, view Card Attributes / Tags |
 | Right Click | Filter ComboBox | Context menu: Clear this filter slot or clear all filters |
 | Escape | Filter ComboBox | Reset focused filter ComboBox to blank |
 | Ctrl + N | Global | Start a new deck |
@@ -5854,8 +5955,6 @@ Full compiled HTML Help documentation is available in-app via **Help > Contents*
 ## Acknowledgments
 - Card data and artwork courtesy of the Cardnum Project (https://cardnum.net).
 - Middle-earth Collectible Card Game is originally (C) Iron Crown Enterprises and Tolkien Enterprises.
-```
-
 ]]>
   </file>
 </project>
