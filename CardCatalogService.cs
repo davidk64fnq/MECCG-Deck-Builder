@@ -16,7 +16,7 @@ namespace MECCG_Deck_Builder
         public static readonly string[] FilterKeys =
         [
             "Primary", "Alignment", "Artist", "Skill", "MPs", "Mind", "Direct", "Prowess", "Body",
-            "Corruption", "Home", "Unique", "Secondary", "Race", "Site", "Region", "Playable", "GoldRing", "GreaterItem",
+            "Corruption", "Home", "Unique", "Secondary", "Race", "Subrace", "Site", "Region", "Playable", "GoldRing", "GreaterItem",
             "MajorItem", "MinorItem", "Information", "Palantiri", "Scroll", "Hoard", "Haven", "Strikes", "Specific"
         ];
 
@@ -195,6 +195,28 @@ namespace MECCG_Deck_Builder
 
                     string imageName = raw.Ice_errata == true ? $"ice-{raw.ImageName}" : raw.ImageName;
 
+                    // Normalize Tolkien lore sub-races to canonical game races
+                    string rawRace = raw.Race ?? string.Empty;
+                    string canonicalRace = rawRace;
+                    string subrace = string.Empty; // Defaults to empty for all cards
+
+                    if (rawRace.EndsWith("Elf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        canonicalRace = "Elf";
+                        if (!string.Equals(rawRace, "Elf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            subrace = rawRace; // Only "Silvan Elf", "Noldo Elf", "Sinda Elf", "Nando Elf"
+                        }
+                    }
+                    else if (rawRace.EndsWith("Dwarf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        canonicalRace = "Dwarf";
+                        if (!string.Equals(rawRace, "Dwarf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            subrace = rawRace; // Only "Longbeard Dwarf", "Firebeard Dwarf", etc.
+                        }
+                    }
+
                     var card = new Card
                     {
                         Id = (idCounter++).ToString(),
@@ -216,7 +238,8 @@ namespace MECCG_Deck_Builder
                         Home = raw.Home ?? string.Empty,
                         Unique = raw.Unique ?? string.Empty,
                         Secondary = raw.Secondary ?? string.Empty,
-                        Race = raw.Race ?? string.Empty,
+                        Race = canonicalRace,
+                        Subrace = subrace,
                         Site = raw.Site ?? string.Empty,
                         Region = raw.Region ?? string.Empty,
                         Playable = raw.Playable ?? string.Empty,

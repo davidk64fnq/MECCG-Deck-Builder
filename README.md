@@ -24,6 +24,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - **Cardnum Deck (`.cnum`):** Standard `1 <Code>` listing format.
   - **Archive Breakdown (`.archive`):** Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - **Plain Text (`.txt`):** Formatted deck listing.
+- **Procedural Deck Generator:** Generate complete decks from JSON rule files with attribute/tag queries, copy limits, tiered variety-first duplication, and random branching choices (`RandomChoice`). Re-run instant variations with <kbd>F5</kbd>.
+- **Relational Taxonomy Extraction:** Cross-reference card attributes across entities (such as mapping Character `Home` to Site `Region`) to produce automatic multi-tags.
 
 ---
 
@@ -43,6 +45,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | Ctrl + O | Global | Open saved deck (`.json`) |
 | Ctrl + S | Global | Export deck dialog |
 | Ctrl + R | Global | Clear all active filter slots |
+| F5 | Global | Re-run last used deck generation rules file |
 
 ---
 

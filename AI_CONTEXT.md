@@ -32,6 +32,10 @@
 - OpenCloseFilter.cs: DTO used for serializing/deserializing .json custom filter sets.
 - Messages.cs: Centralized message box text helper.
 - Program.cs: WinForms entry point; registers Windows-1252 code page provider.
+- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, and execution logs.
+- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, and branching choice groups.
+- `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
+- `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
 
 ---
 
@@ -65,4 +69,5 @@
   - Issue #17: Group filter panel into titled containers with slot labels and layer demarcation
   - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
 - [ ] **v0.5.0 - Procedural Deck Generator**
+  - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
 - [ ] **v1.0.0 - First Public Release**

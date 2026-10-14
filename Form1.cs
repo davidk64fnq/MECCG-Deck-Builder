@@ -40,6 +40,7 @@ namespace MECCG_Deck_Builder
         private int _selectedTabIndex;
         private CancellationTokenSource _imageLoadCts;
         private Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
+        private string _lastDeckRulesFilePath;
 
         internal Form1()
         {
@@ -251,7 +252,9 @@ namespace MECCG_Deck_Builder
 
             for (int i = 0; i < pairs.Count; i++)
             {
-                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value}";
+                string escapedKey = pairs[i].Key.Replace("&", "&&");
+                string escapedVal = pairs[i].Value.Replace("&", "&&");
+                string line = $"{escapedKey.PadRight(maxLen + 3)}{escapedVal}";
                 customMenu.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
             }
 
@@ -310,13 +313,16 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        // Check if this specific tag is currently active on the card
                         bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
+                        var valItem = new ToolStripMenuItem(val.Replace("&", "&&"))
+                        {
+                            Checked = isChecked,
+                            Tag = val
+                        };
                         valItem.Click += (s, ev) =>
                         {
-                            // Toggles the tag: adds if missing, removes if already checked
-                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
+                            string tagToToggle = ((ToolStripMenuItem)s).Tag?.ToString() ?? val;
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, tagToToggle);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -341,15 +347,15 @@ namespace MECCG_Deck_Builder
             var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
-                var keyItem = new ToolStripMenuItem(key);
-                // Split multi-tags so each tag can be removed individually
+                var keyItem = new ToolStripMenuItem(key.Replace("&", "&&"));
                 var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var tag in tags)
                 {
-                    var valItem = new ToolStripMenuItem(tag);
+                    var valItem = new ToolStripMenuItem(tag.Replace("&", "&&")) { Tag = tag };
                     valItem.Click += (s, ev) =>
                     {
-                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        string tagToRemove = ((ToolStripMenuItem)s).Tag?.ToString() ?? tag;
+                        _filterService.RemoveCardCustomTag(card.Id, key, tagToRemove);
                         UpdateFacetedFilters();
                     };
                     keyItem.DropDownItems.Add(valItem);
@@ -698,7 +704,9 @@ namespace MECCG_Deck_Builder
 
             for (int i = 0; i < pairs.Count; i++)
             {
-                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value}";
+                string escapedKey = pairs[i].Key.Replace("&", "&&");
+                string escapedVal = pairs[i].Value.Replace("&", "&&");
+                string line = $"{escapedKey.PadRight(maxLen + 3)}{escapedVal}";
                 customMenu.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
             }
 
@@ -757,13 +765,16 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        // Check if this specific tag is already active on the card
                         bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
+                        var valItem = new ToolStripMenuItem(val.Replace("&", "&&"))
+                        {
+                            Checked = isChecked,
+                            Tag = val
+                        };
                         valItem.Click += (s, ev) =>
                         {
-                            // Toggles the tag on/off
-                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
+                            string tagToToggle = ((ToolStripMenuItem)s).Tag?.ToString() ?? val;
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, tagToToggle);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -788,15 +799,15 @@ namespace MECCG_Deck_Builder
             var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
-                var keyItem = new ToolStripMenuItem(key);
-                // Split semicolon-delimited tags so each tag can be removed individually
+                var keyItem = new ToolStripMenuItem(key.Replace("&", "&&"));
                 var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var tag in tags)
                 {
-                    var valItem = new ToolStripMenuItem(tag);
+                    var valItem = new ToolStripMenuItem(tag.Replace("&", "&&")) { Tag = tag };
                     valItem.Click += (s, ev) =>
                     {
-                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        string tagToRemove = ((ToolStripMenuItem)s).Tag?.ToString() ?? tag;
+                        _filterService.RemoveCardCustomTag(card.Id, key, tagToRemove);
                         UpdateFacetedFilters();
                     };
                     keyItem.DropDownItems.Add(valItem);
@@ -1370,6 +1381,152 @@ namespace MECCG_Deck_Builder
             {
                 MessageBox.Show($"Help file not found at:\n{helpFile}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void ToolStripMenuToolsGenerateDeck_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Select Deck Rules File",
+                DefaultExt = "json",
+                Filter = "MECCG Deck Rules (*.json)|*.json|All Files (*.*)|*.*"
+            };
+
+            if (ofd.ShowDialog(this) == DialogResult.OK)
+            {
+                RunDeckGeneration(ofd.FileName);
+            }
+        }
+
+        private void ToolStripMenuToolsRerunDeckGen_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_lastDeckRulesFilePath) && File.Exists(_lastDeckRulesFilePath))
+            {
+                RunDeckGeneration(_lastDeckRulesFilePath);
+            }
+            else
+            {
+                // If not run yet in this session, open file picker
+                ToolStripMenuToolsGenerateDeck_Click(sender, e);
+            }
+        }
+
+        private void RunDeckGeneration(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+            {
+                MessageBox.Show(this, "The specified deck rules file could not be found.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DeckGenerationRuleSet ruleSet;
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                ruleSet = DeckGenerationService.LoadRuleSetFromJson(json);
+
+                if (ruleSet == null || ruleSet.Rules == null || ruleSet.Rules.Count == 0)
+                {
+                    MessageBox.Show(this, "The selected rules file contains no rules.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Failed to load deck rules file:\n{ex.Message}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Run generation engine
+            var result = DeckGenerationService.GenerateDeck(
+                _catalogService.Cards,
+                _currentDeck.IncludedSets,
+                _filterService,
+                ruleSet);
+
+            if (!result.Success)
+            {
+                MessageBox.Show(this, $"Deck generation failed: {result.ErrorMessage}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Save path for F5 re-runs and enable menu item
+            _lastDeckRulesFilePath = filePath;
+            ToolStripMenuToolsRerunDeckGen.Enabled = true;
+            ToolStripMenuToolsRerunDeckGen.Text = $"Re-run Rules ({Path.GetFileName(filePath)})";
+
+            // Transfer generated deck to current deck
+            _currentDeck.Clear();
+            _currentDeck.Title = result.Deck.Title;
+
+            foreach (var s in result.Deck.IncludedSets)
+            {
+                _currentDeck.IncludedSets.Add(s);
+            }
+
+            _currentDeck.Pool.AddRange(result.Deck.Pool);
+            _currentDeck.Resources.AddRange(result.Deck.Resources);
+            _currentDeck.Hazards.AddRange(result.Deck.Hazards);
+            _currentDeck.Sideboard.AddRange(result.Deck.Sideboard);
+            _currentDeck.Sites.AddRange(result.Deck.Sites);
+
+            // Sync Set menu checkboxes if any sets were added by the rules
+            _isUpdatingFilters = true;
+            try
+            {
+                foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                {
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
+                    {
+                        setItem.Checked = _currentDeck.IncludedSets.Contains(tag);
+                    }
+                }
+            }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
+
+            // Reset filter controls so user can freely inspect master list
+            ResetAllFilters();
+
+            // Refresh deck tabs and window title
+            foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
+            {
+                RefreshSectionListBox(sectionType);
+            }
+            UpdateFormTitle();
+
+            // Display summary
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"Deck \"{_currentDeck.Title}\" generated successfully!\n");
+            sb.AppendLine($"Pool: {_currentDeck.Pool.Count}");
+            sb.AppendLine($"Resources: {_currentDeck.Resources.Count} ({_currentDeck.CountCharactersInResources()} Characters)");
+            sb.AppendLine($"Hazards: {_currentDeck.Hazards.Count}");
+            sb.AppendLine($"Sideboard: {_currentDeck.Sideboard.Count}");
+            sb.AppendLine($"Sites: {_currentDeck.Sites.Count}");
+
+            var branches = result.Logs.Where(l => l.RuleName.StartsWith("[Branch Selected]")).ToList();
+            if (branches.Count > 0)
+            {
+                sb.AppendLine("\nRandom Choices:");
+                foreach (var b in branches)
+                {
+                    sb.AppendLine($" • {b.RuleName.Replace("[Branch Selected] ", "")}");
+                }
+            }
+
+            var shortfalls = result.Logs.Where(l => l.IsShortfall).ToList();
+            if (shortfalls.Count > 0)
+            {
+                sb.AppendLine("\nNotice - Insufficient matching cards:");
+                foreach (var sf in shortfalls)
+                {
+                    sb.AppendLine($" • {sf.RuleName} ({sf.Section}): added {sf.AddedCount} of {sf.RequestedCount}");
+                }
+            }
+
+            MessageBox.Show(this, sb.ToString(), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion

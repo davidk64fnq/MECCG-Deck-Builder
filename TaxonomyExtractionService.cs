@@ -206,6 +206,119 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
+        #region RELATIONAL_EXTRACTION
+
+        /// <summary>
+        /// Cross-references an attribute on target cards (e.g. Character 'Home') 
+        /// against matching catalog entities (e.g. Site 'Name') to extract a secondary 
+        /// attribute (e.g. Site 'Region') as a custom tag.
+        /// </summary>
+        public static ExtractionResult ExecuteRelationalExtraction(
+            IEnumerable<Card> targetCards,
+            IEnumerable<Card> catalogCards,
+            string sourceAttribute,
+            string lookupAttribute,
+            string lookupValue,
+            string targetAttribute,
+            string categoryName)
+        {
+            var result = new ExtractionResult();
+            if (targetCards == null || catalogCards == null ||
+                string.IsNullOrWhiteSpace(sourceAttribute) || string.IsNullOrWhiteSpace(targetAttribute))
+            {
+                return result;
+            }
+
+            string category = string.IsNullOrWhiteSpace(categoryName) ? "Relational Tags" : categoryName.Trim();
+
+            // 1. Build lookup dictionary from catalog entities (e.g. Primary = Site)
+            var lookupCards = catalogCards;
+            if (!string.IsNullOrWhiteSpace(lookupAttribute) && !string.IsNullOrWhiteSpace(lookupValue))
+            {
+                lookupCards = lookupCards.Where(c => string.Equals(c.GetAttribute(lookupAttribute), lookupValue.Trim(), StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"])
+            var lookupMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var card in lookupCards)
+            {
+                string entityName = card.Name?.Trim();
+                string targetVal = card.GetAttribute(targetAttribute)?.Trim();
+
+                if (string.IsNullOrEmpty(entityName) || string.IsNullOrEmpty(targetVal))
+                {
+                    continue;
+                }
+
+                if (!lookupMap.TryGetValue(entityName, out var set))
+                {
+                    set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    lookupMap[entityName] = set;
+                }
+                set.Add(targetVal);
+            }
+
+            if (lookupMap.Count == 0)
+            {
+                return result;
+            }
+
+            var knownNames = lookupMap.Keys.OrderByDescending(k => k.Length).ToList();
+
+            // 2. Cross-reference target cards
+            foreach (var card in targetCards)
+            {
+                string sourceVal = card.GetAttribute(sourceAttribute);
+                if (string.IsNullOrWhiteSpace(sourceVal))
+                {
+                    continue;
+                }
+
+                bool matched = false;
+
+                // Split on common list delimiters (commas, semicolons, slashes)
+                var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var part in parts)
+                {
+                    // Also handle " or " and " and "
+                    var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    foreach (var sub in subParts)
+                    {
+                        if (lookupMap.TryGetValue(sub, out var targets))
+                        {
+                            foreach (var t in targets)
+                            {
+                                result.AddTag(card.Id, category, t);
+                                matched = true;
+                            }
+                        }
+                    }
+                }
+
+                // If no exact token match, search known names with regex word boundaries (e.g. "Haven: Rivendell")
+                if (!matched)
+                {
+                    foreach (var name in knownNames)
+                    {
+                        if (Regex.IsMatch(sourceVal, $@"\b{Regex.Escape(name)}\b", RegexOptions.IgnoreCase))
+                        {
+                            if (lookupMap.TryGetValue(name, out var targets))
+                            {
+                                foreach (var t in targets)
+                                {
+                                    result.AddTag(card.Id, category, t);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        #endregion
+
         #region CSV_EXPORT_AND_IMPORT
 
         public static void ExportTemplateDraftToCsv(IReadOnlyList<Card> cards, string filePath)

@@ -27,6 +27,7 @@ namespace MECCG_Deck_Builder
         public string Unique { get; init; } = string.Empty;
         public string Secondary { get; init; } = string.Empty;
         public string Race { get; init; } = string.Empty;
+        public string Subrace { get; init; } = string.Empty;
         public string Site { get; init; } = string.Empty;
         public string Region { get; init; } = string.Empty;
         public string Playable { get; init; } = string.Empty;
@@ -94,6 +95,7 @@ namespace MECCG_Deck_Builder
                 "unique" => Unique,
                 "secondary" => Secondary,
                 "race" => Race,
+                "subrace" => Subrace,
                 "site" => Site,
                 "region" => Region,
                 "playable" => Playable,

@@ -546,6 +546,59 @@ namespace MECCG_Deck_Builder.Properties {
         <li><strong>Filter &gt; Load Tag Set...:</strong> Loads a previously saved custom tag set, restoring all categories, tags, and card mappings.</li>
     </ul>
 
+    <h2>Automated Taxonomy & Spreadsheet Tools</h2>
+    <p>
+        In addition to authoring tags manually, the application provides an automated extraction engine and a round-trip CSV spreadsheet pipeline under the <strong>Tools</strong> menu:
+    </p>
+
+    <h3>1. Dynamic Entity Harvesting & Regex Rules (Tools &gt; Extract Taxonomy with Rules...)</h3>
+    <p>
+        Opens an extraction dialog scoped to cards currently visible in the Master List:
+    </p>
+    <ul>
+        <li>
+            <strong>Dynamic Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans the active sets in memory, extracts all matching entity titles, and searches your Master List cards for references to those entities.
+        </li>
+        <li>
+            <strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.
+        </li>
+        <li>
+            <strong>Custom Regex &amp; JSON Rule Files:</strong> Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> files.
+        </li>
+        <li>
+            <strong>Preview &amp; Apply:</strong> Review matches in the preview grid before choosing to either export a CSV draft or apply tags directly into your active taxonomy.
+        </li>
+    </ul>
+
+    <h3>2. Spreadsheet Collaboration (CSV Draft Export &amp; Import)</h3>
+    <p>
+        Enables collaborative review and mass editing in Google Sheets or Microsoft Excel:
+    </p>
+    <ul>
+        <li>
+            <strong>Export Taxonomy Draft (CSV):</strong> Exports a spreadsheet containing only cards matching your current set and filter slot criteria. Includes <code>Card Name</code>, <code>Set</code>, <code>Primary</code>, a template category column, and full <code>Card Text</code> for reference.
+        </li>
+        <li>
+            <strong>Multi-Tag Syntax:</strong> To assign multiple tags within the same category to a single card, separate them with a semicolon (<code>;</code>), for example: <code>Elf Factions; Iron Hill Dwarves</code>.
+        </li>
+        <li>
+            <strong>Import Taxonomy from CSV:</strong> Ingests reviewed spreadsheets directly into the Deck Builder. Columns are mapped automatically to categories, placeholder text is safely ignored, and tags are mapped to stable card identifiers (<code>FullCode</code>, <code>Name</code>, <code>Set</code>).
+        </li>
+    </ul>
+
+    <h3>3. Multi-Tag Assignment via Context Menus</h3>
+    <p>
+        Cards can hold multiple tags within the same custom category:
+    </p>
+    <ul>
+        <li>
+            <strong>Toggle On / Off:</strong> In the <strong>Assign Tag</strong> menu, currently assigned tags display a checkmark (<kbd>&#10003;</kbd>). Clicking an unchecked tag adds it; clicking a checked tag unchecks and removes it.
+        </li>
+        <li>
+            <strong>Granular Removal:</strong> The <strong>Remove Tag</strong> menu displays each assigned tag individually, allowing you to remove a specific tag without clearing the entire category.
+        </li>
+    </ul>
+
     <h2>Clearing and Resetting Filters</h2>
     <table>
         <tr>
@@ -595,6 +648,55 @@ namespace MECCG_Deck_Builder.Properties {
             </td>
         </tr>
     </table>
+    <h2>Importing Custom Taxonomies via Spreadsheet (CSV)</h2>
+    <p>
+        To facilitate large-scale taxonomy creation, community sharing, and collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.
+    </p>
+
+    <h3>Spreadsheet Column Layout</h3>
+    <table>
+        <tr>
+            <th>Column Header</th>
+            <th>Required?</th>
+            <th>Description &amp; Behavior</th>
+        </tr>
+        <tr>
+            <td><code>Card Name</code></td>
+            <td><strong>Required</strong></td>
+            <td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in the catalog.</td>
+        </tr>
+        <tr>
+            <td><code>Set</code></td>
+            <td><strong>Required</strong></td>
+            <td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>, <code>MELE</code>) used to disambiguate reprint cards.</td>
+        </tr>
+        <tr>
+            <td><code>Primary</code></td>
+            <td>Optional</td>
+            <td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td>
+        </tr>
+        <tr>
+            <td><em>[Custom Category Columns]</em></td>
+            <td>Optional</td>
+            <td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>, <code>Hazard Archetype</code>) becomes a custom category. Cell contents are imported as tags.</td>
+        </tr>
+        <tr>
+            <td><code>Card Text</code></td>
+            <td>Optional</td>
+            <td>Full rules text provided for reference during spreadsheet verification. Ignored during import.</td>
+        </tr>
+    </table>
+
+    <div class="tip">
+        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category to a card, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
+    </div>
+
+    <h3>Step-by-Step Workflow</h3>
+    <ol>
+        <li><strong>Generate a Draft:</strong> Click <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong> (or use <strong>Tools &gt; Extract Taxonomy with Rules...</strong>) to extract faction bonuses or rule matches into a <code>.csv</code> file.</li>
+        <li><strong>Review in Google Sheets / Excel:</strong> Open the CSV, inspect extracted tags side-by-side with <code>Card Text</code>, adjust or author new category columns, and download as <em>Comma Separated Values (.csv)</em>.</li>
+        <li><strong>Ingest into Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
+    </ol>
 </body>
 </html>
 ]]>
@@ -1668,7 +1770,10 @@ namespace MECCG_Deck_Builder
             return [];
         }
 
-        public void LoadCustomFilters(List<List<string>> filters, List<SortedDictionary<string, string>> cardMappings)
+        public void LoadCustomFilters(
+            List<List<string>> filters,
+            List<SortedDictionary<string, string>> cardMappings,
+            CardCatalogService catalog = null)
         {
             _customFilters.Clear();
             _cardCustomTags.Clear();
@@ -1681,23 +1786,143 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            if (cardMappings != null)
+            if (cardMappings == null) return;
+
+            foreach (var dict in cardMappings)
             {
-                foreach (var dict in cardMappings)
+                string resolvedCardId = null;
+
+                // 1. Try matching by fullCode
+                if (catalog != null && dict.TryGetValue("fullCode", out string fullCode) && !string.IsNullOrWhiteSpace(fullCode))
                 {
-                    if (dict.TryGetValue("id", out string cardId))
+                    var card = catalog.Cards.FirstOrDefault(c => string.Equals(c.FullCode, fullCode.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (card != null) resolvedCardId = card.Id;
+                }
+
+                // 2. Try matching by name and set
+                if (resolvedCardId == null && catalog != null &&
+                    dict.TryGetValue("name", out string name) && !string.IsNullOrWhiteSpace(name) &&
+                    dict.TryGetValue("set", out string set) && !string.IsNullOrWhiteSpace(set))
+                {
+                    var card = catalog.Cards.FirstOrDefault(c =>
+                        string.Equals(c.Name, name.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(c.Set, set.Trim(), StringComparison.OrdinalIgnoreCase));
+                    if (card != null) resolvedCardId = card.Id;
+                }
+
+                // 3. Backwards-compatibility fallback: legacy runtime 'id'
+                if (resolvedCardId == null && dict.TryGetValue("id", out string legacyId))
+                {
+                    resolvedCardId = legacyId;
+                }
+
+                if (string.IsNullOrEmpty(resolvedCardId)) continue;
+
+                var tags = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var kvp in dict)
+                {
+                    // Exclude metadata keys so they don't become custom tags
+                    if (string.Equals(kvp.Key, "id", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(kvp.Key, "name", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(kvp.Key, "set", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(kvp.Key, "fullCode", StringComparison.OrdinalIgnoreCase))
                     {
-                        var tags = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                        foreach (var kvp in dict)
+                        continue;
+                    }
+
+                    tags[kvp.Key] = kvp.Value;
+                }
+
+                _cardCustomTags[resolvedCardId] = tags;
+            }
+        }
+
+        public void AppendCardCustomTag(string cardId, string keyName, string value)
+        {
+            if (string.IsNullOrEmpty(cardId) || string.IsNullOrEmpty(keyName) || string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            if (!_cardCustomTags.TryGetValue(cardId, out var tags))
+            {
+                tags = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                _cardCustomTags[cardId] = tags;
+            }
+
+            if (tags.TryGetValue(keyName, out string existing) && !string.IsNullOrWhiteSpace(existing))
+            {
+                var existingList = existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                if (!existingList.Contains(value.Trim(), StringComparer.OrdinalIgnoreCase))
+                {
+                    existingList.Add(value.Trim());
+                    tags[keyName] = string.Join("; ", existingList);
+                }
+            }
+            else
+            {
+                tags[keyName] = value.Trim();
+            }
+
+            AddCustomKeyValue(keyName, value.Trim());
+        }
+
+        public List<string> GetCardTagsForCategory(string cardId, string keyName)
+        {
+            if (_cardCustomTags.TryGetValue(cardId, out var tags) &&
+                tags.TryGetValue(keyName, out string val) &&
+                !string.IsNullOrWhiteSpace(val))
+            {
+                return [.. val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+            }
+            return [];
+        }
+
+        public void RemoveCardCustomTag(string cardId, string keyName, string tagValue)
+        {
+            if (string.IsNullOrEmpty(cardId) || string.IsNullOrEmpty(keyName) || string.IsNullOrWhiteSpace(tagValue))
+            {
+                return;
+            }
+
+            if (_cardCustomTags.TryGetValue(cardId, out var tags) &&
+                tags.TryGetValue(keyName, out string existing) &&
+                !string.IsNullOrWhiteSpace(existing))
+            {
+                var list = existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                if (list.RemoveAll(t => string.Equals(t, tagValue.Trim(), StringComparison.OrdinalIgnoreCase)) > 0)
+                {
+                    if (list.Count > 0)
+                    {
+                        tags[keyName] = string.Join("; ", list);
+                    }
+                    else
+                    {
+                        tags.Remove(keyName);
+                        if (tags.Count == 0)
                         {
-                            if (!string.Equals(kvp.Key, "id", StringComparison.OrdinalIgnoreCase))
-                            {
-                                tags[kvp.Key] = kvp.Value;
-                            }
+                            _cardCustomTags.Remove(cardId);
                         }
-                        _cardCustomTags[cardId] = tags;
                     }
                 }
+            }
+        }
+
+        public void ToggleCardCustomTag(string cardId, string keyName, string tagValue)
+        {
+            if (string.IsNullOrEmpty(cardId) || string.IsNullOrEmpty(keyName) || string.IsNullOrWhiteSpace(tagValue))
+            {
+                return;
+            }
+
+            var currentTags = GetCardTagsForCategory(cardId, keyName);
+            if (currentTags.Contains(tagValue.Trim(), StringComparer.OrdinalIgnoreCase))
+            {
+                RemoveCardCustomTag(cardId, keyName, tagValue);
+            }
+            else
+            {
+                AppendCardCustomTag(cardId, keyName, tagValue);
             }
         }
 
@@ -1751,7 +1976,18 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            return string.Equals(tagVal.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase);
+            if (string.Equals(tagVal.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (tagVal.Contains(';'))
+            {
+                var split = tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return split.Any(s => string.Equals(s, value.Trim(), StringComparison.OrdinalIgnoreCase));
+            }
+
+            return false;
         }
 
         public bool MatchesCriteria(Card card, IReadOnlyList<FilterCriterion> criteria)
@@ -1809,7 +2045,7 @@ namespace MECCG_Deck_Builder
                 result.Add(card);
             }
 
-            result.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+            result.Sort((a, b) => StringComparer.CurrentCultureIgnoreCase.WithNaturalSort().Compare(a.Name, b.Name));
             return result;
         }
 
@@ -1881,7 +2117,17 @@ namespace MECCG_Deck_Builder
                         tags.TryGetValue(targetKey, out string tagVal) &&
                         !string.IsNullOrWhiteSpace(tagVal))
                     {
-                        distinctValues.Add(tagVal.Trim());
+                        if (tagVal.Contains(';'))
+                        {
+                            foreach (var part in tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                            {
+                                distinctValues.Add(part);
+                            }
+                        }
+                        else
+                        {
+                            distinctValues.Add(tagVal.Trim());
+                        }
                     }
                 }
             }
@@ -2373,6 +2619,7 @@ namespace MECCG_Deck_Builder
   </file>
   <file path='.\Deck.cs'>
 <![CDATA[
+using NaturalSort.Extension;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -2418,7 +2665,7 @@ namespace MECCG_Deck_Builder
 
         public void SortSections()
         {
-            static int CompareCards(Card a, Card b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal);
+            static int CompareCards(Card a, Card b) => StringComparer.CurrentCultureIgnoreCase.WithNaturalSort().Compare(a.Name, b.Name);
 
             Pool.Sort(CompareCards);
             Resources.Sort(CompareCards);
@@ -2803,6 +3050,8 @@ namespace MECCG_Deck_Builder
   </file>
   <file path='.\Form1.cs'>
 <![CDATA[
+using NaturalSort.Extension;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -2811,7 +3060,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 namespace MECCG_Deck_Builder
 {
@@ -3077,7 +3325,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.AddCustomKeyName(result.Value.Key);
                     _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
-                    _filterService.SetCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
+                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value); // Appends instead of overwriting
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -3085,17 +3333,11 @@ namespace MECCG_Deck_Builder
             addMenu.DropDownItems.Add(addNewTagItem);
             addMenu.DropDownItems.Add(new ToolStripSeparator());
 
-            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
-
             foreach (string keyName in keyNames)
             {
-                if (string.IsNullOrWhiteSpace(keyName))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(keyName)) continue;
 
-                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
-
+                var cardTags = _filterService.GetCardTagsForCategory(card.Id, keyName);
                 var keyItem = new ToolStripMenuItem(keyName);
 
                 var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
@@ -3105,7 +3347,7 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
-                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        _filterService.AppendCardCustomTag(card.Id, keyName, val); // Appends instead of overwriting
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
                     }
@@ -3120,11 +3362,13 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        // Check if this specific tag is currently active on the card
+                        bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
                         valItem.Click += (s, ev) =>
                         {
-                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            // Toggles the tag: adds if missing, removes if already checked
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -3150,13 +3394,18 @@ namespace MECCG_Deck_Builder
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
-                var valItem = new ToolStripMenuItem(value);
-                valItem.Click += (s, ev) =>
+                // Split multi-tags so each tag can be removed individually
+                var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var tag in tags)
                 {
-                    _filterService.DeleteCardCustomTag(card.Id, key);
-                    UpdateFacetedFilters();
-                };
-                keyItem.DropDownItems.Add(valItem);
+                    var valItem = new ToolStripMenuItem(tag);
+                    valItem.Click += (s, ev) =>
+                    {
+                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        UpdateFacetedFilters();
+                    };
+                    keyItem.DropDownItems.Add(valItem);
+                }
                 delMenu.DropDownItems.Add(keyItem);
             }
 
@@ -3363,7 +3612,7 @@ namespace MECCG_Deck_Builder
         {
             var section = _currentDeck.GetSection(sectionType);
             section.Add(card);
-            section.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.Ordinal));
+            section.Sort((a, b) => StringComparer.CurrentCultureIgnoreCase.WithNaturalSort().Compare(a.Name, b.Name));
 
             RefreshSectionListBox(sectionType);
             UpdateFormTitle();
@@ -3523,7 +3772,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.AddCustomKeyName(result.Value.Key);
                     _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
-                    _filterService.SetCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
+                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -3531,17 +3780,11 @@ namespace MECCG_Deck_Builder
             addMenu.DropDownItems.Add(addNewTagItem);
             addMenu.DropDownItems.Add(new ToolStripSeparator());
 
-            bool hasTags = _filterService.CardCustomTags.TryGetValue(card.Id, out var cardTags);
-
             foreach (string keyName in keyNames)
             {
-                if (string.IsNullOrWhiteSpace(keyName))
-                {
-                    continue;
-                }
+                if (string.IsNullOrWhiteSpace(keyName)) continue;
 
-                string currentVal = (hasTags && cardTags.TryGetValue(keyName, out string cv)) ? cv : null;
-
+                var cardTags = _filterService.GetCardTagsForCategory(card.Id, keyName);
                 var keyItem = new ToolStripMenuItem(keyName);
 
                 var addNewValueItem = new ToolStripMenuItem("+ Add Tag...");
@@ -3551,7 +3794,7 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
-                        _filterService.SetCardCustomTag(card.Id, keyName, val);
+                        _filterService.AppendCardCustomTag(card.Id, keyName, val);
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
                     }
@@ -3566,11 +3809,13 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        bool isCurrent = string.Equals(val, currentVal, StringComparison.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isCurrent };
+                        // Check if this specific tag is already active on the card
+                        bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
+                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
                         valItem.Click += (s, ev) =>
                         {
-                            _filterService.SetCardCustomTag(card.Id, keyName, valItem.Text);
+                            // Toggles the tag on/off
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -3596,13 +3841,18 @@ namespace MECCG_Deck_Builder
             foreach (var (key, value) in pairs)
             {
                 var keyItem = new ToolStripMenuItem(key);
-                var valItem = new ToolStripMenuItem(value);
-                valItem.Click += (s, ev) =>
+                // Split semicolon-delimited tags so each tag can be removed individually
+                var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var tag in tags)
                 {
-                    _filterService.DeleteCardCustomTag(card.Id, key);
-                    UpdateFacetedFilters();
-                };
-                keyItem.DropDownItems.Add(valItem);
+                    var valItem = new ToolStripMenuItem(tag);
+                    valItem.Click += (s, ev) =>
+                    {
+                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        UpdateFacetedFilters();
+                    };
+                    keyItem.DropDownItems.Add(valItem);
+                }
                 delMenu.DropDownItems.Add(keyItem);
             }
 
@@ -3797,7 +4047,7 @@ namespace MECCG_Deck_Builder
                 var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
                 if (dto != null)
                 {
-                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards);
+                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService); // Passed _catalogService
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -3815,7 +4065,7 @@ namespace MECCG_Deck_Builder
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var dto = OpenCloseFilter.FromFilterService(_filterService);
+                var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService); // Passed _catalogService
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
             }
@@ -4175,6 +4425,100 @@ namespace MECCG_Deck_Builder
         }
 
         #endregion
+
+        #region TAXONOMY_TOOLS
+
+        private void ToolStripMenuToolsRunRules_Click(object sender, EventArgs e)
+        {
+            if (_masterCards.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "No cards are currently displayed in the Master List to evaluate.\n\nPlease select at least one expansion set or adjust your active filters.",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            using var dlg = new RunTaxonomyRulesDialog(_masterCards, _currentDeck.IncludedSets, _catalogService, _filterService);
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                RefreshFilterKeyDropdowns();
+                UpdateFacetedFilters();
+            }
+        }
+
+        private void ToolStripMenuToolsExportCsv_Click(object sender, EventArgs e)
+        {
+            if (_masterCards.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "No cards are currently displayed in the Master List to export.\n\nPlease select at least one expansion set or adjust your active filters.",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            using var sfd = new SaveFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Export Taxonomy Draft (CSV)",
+                DefaultExt = "csv",
+                Filter = "CSV Spreadsheet (*.csv)|*.csv",
+                FileName = "Taxonomy_Draft.csv"
+            };
+
+            if (sfd.ShowDialog(this) == DialogResult.OK)
+            {
+                TaxonomyExtractionService.ExportTemplateDraftToCsv(_masterCards, sfd.FileName);
+
+                MessageBox.Show(this,
+                    $"Taxonomy draft template exported successfully to:\n{sfd.FileName}\n\n" +
+                    $"Cards exported: {_masterCards.Count} (matching your active set and filter criteria).\n\n" +
+                    "Workflow in Google Sheets or Excel:\n" +
+                    "1. Rename '[Insert Category Name]' to your category (e.g. 'Combat Role' or 'Faction Focus').\n" +
+                    "2. Add additional category columns if desired.\n" +
+                    "3. Enter tags for each card (use ';' for multiple tags).\n" +
+                    "4. Import back via Tools > Import Taxonomy from CSV...",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        }
+
+        private void ToolStripMenuToolsImportCsv_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Import Taxonomy from CSV",
+                DefaultExt = "csv",
+                Filter = "CSV Spreadsheet (*.csv)|*.csv|All Files (*.*)|*.*"
+            };
+
+            if (ofd.ShowDialog(this) == DialogResult.OK)
+            {
+                try
+                {
+                    var (cardsMatched, categoriesImported, tagsAssigned) =
+                        TaxonomyExtractionService.ImportFromCsv(ofd.FileName, _catalogService, _filterService);
+
+                    RefreshFilterKeyDropdowns();
+                    UpdateFacetedFilters();
+
+                    MessageBox.Show(this,
+                        $"Taxonomy imported successfully.\n\nCards matched: {cardsMatched}\nCategories updated: {categoriesImported}\nTags assigned: {tagsAssigned}",
+                        Constants.AppTitle,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Failed to import CSV taxonomy: {ex.Message}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        #endregion
     }
 }
 ]]>
@@ -4274,6 +4618,11 @@ namespace MECCG_Deck_Builder
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsRunRules = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsExportCsv = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsImportCsv = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparatorTools = new System.Windows.Forms.ToolStripSeparator();
+            ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -4835,10 +5184,36 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuTools
             // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsGetImages });
+            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsRunRules, ToolStripMenuToolsExportCsv, ToolStripMenuToolsImportCsv, toolStripSeparatorTools, ToolStripMenuToolsGetImages });
             ToolStripMenuTools.Name = "ToolStripMenuTools";
             ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
             ToolStripMenuTools.Text = "&Tools";
+            // 
+            // ToolStripMenuToolsRunRules
+            // 
+            ToolStripMenuToolsRunRules.Name = "ToolStripMenuToolsRunRules";
+            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsRunRules.Text = "Extract Taxonomy with Rules...";
+            ToolStripMenuToolsRunRules.Click += ToolStripMenuToolsRunRules_Click;
+            // 
+            // ToolStripMenuToolsExportCsv
+            // 
+            ToolStripMenuToolsExportCsv.Name = "ToolStripMenuToolsExportCsv";
+            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsExportCsv.Text = "Export Taxonomy Draft (CSV)...";
+            ToolStripMenuToolsExportCsv.Click += ToolStripMenuToolsExportCsv_Click;
+            // 
+            // ToolStripMenuToolsImportCsv
+            // 
+            ToolStripMenuToolsImportCsv.Name = "ToolStripMenuToolsImportCsv";
+            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsImportCsv.Text = "Import Taxonomy from CSV...";
+            ToolStripMenuToolsImportCsv.Click += ToolStripMenuToolsImportCsv_Click;
+            // 
+            // toolStripSeparatorTools
+            // 
+            toolStripSeparatorTools.Name = "toolStripSeparatorTools";
+            toolStripSeparatorTools.Size = new System.Drawing.Size(222, 6);
             // 
             // ToolStripMenuToolsGetImages
             // 
@@ -5210,6 +5585,10 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTools;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRunRules;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsExportCsv;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsImportCsv;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorTools;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
@@ -5736,7 +6115,7 @@ namespace MECCG_Deck_Builder
         public List<SortedDictionary<string, string>> Cards { get; set; } = [];
         public List<List<string>> Filters { get; set; } = [];
 
-        public static OpenCloseFilter FromFilterService(CardFilterService filterService)
+        public static OpenCloseFilter FromFilterService(CardFilterService filterService, CardCatalogService catalog)
         {
             var dto = new OpenCloseFilter();
 
@@ -5747,14 +6126,25 @@ namespace MECCG_Deck_Builder
 
             foreach (var (cardId, tags) in filterService.CardCustomTags)
             {
-                var dict = new SortedDictionary<string, string>
+                var dict = new SortedDictionary<string, string>();
+                var card = catalog?.GetCardById(cardId);
+
+                if (card != null)
                 {
-                    ["id"] = cardId
-                };
+                    dict["name"] = card.Name;
+                    dict["set"] = card.Set;
+                    if (!string.IsNullOrEmpty(card.FullCode))
+                    {
+                        dict["fullCode"] = card.FullCode;
+                    }
+                }
+                dict["id"] = cardId; // Retained for backwards compatibility
+
                 foreach (var (k, v) in tags)
                 {
                     dict[k] = v;
                 }
+
                 dto.Cards.Add(dict);
             }
 
@@ -5955,6 +6345,917 @@ Full compiled HTML Help documentation is available in-app via **Help > Contents*
 ## Acknowledgments
 - Card data and artwork courtesy of the Cardnum Project (https://cardnum.net).
 - Middle-earth Collectible Card Game is originally (C) Iron Crown Enterprises and Tolkien Enterprises.
+]]>
+  </file>
+  <file path='.\RunTaxonomyRulesDialog.cs'>
+<![CDATA[
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+
+namespace MECCG_Deck_Builder
+{
+    public sealed class RunTaxonomyRulesDialog : Form
+    {
+        private readonly IReadOnlyList<Card> _targetCards;
+        private readonly ISet<string> _activeSets;
+        private readonly CardCatalogService _catalog;
+        private readonly CardFilterService _filterService;
+
+        // Mode 1: Dynamic Entity Harvest
+        private readonly RadioButton _rbHarvest;
+        private readonly TextBox _txtHarvestCategory;
+        private readonly ComboBox _cmbHarvestAttribute;
+        private readonly ComboBox _cmbHarvestValue;
+
+        // Mode 2: Quick Regex
+        private readonly RadioButton _rbQuick;
+        private readonly TextBox _txtRegexCategory;
+        private readonly TextBox _txtRegexTag;
+        private readonly TextBox _txtRegexPattern;
+
+        // Mode 3: File
+        private readonly RadioButton _rbFile;
+        private readonly TextBox _txtFilePath;
+        private readonly Button _btnBrowseFile;
+
+        // Shared controls
+        private readonly ListView _lstPreview;
+        private readonly Button _btnTest;
+        private readonly Button _btnExportCsv;
+        private readonly Button _btnApply;
+        private readonly Button _btnClose;
+        private List<TaxonomyRule> _loadedRules = [];
+
+        public RunTaxonomyRulesDialog(
+            IReadOnlyList<Card> targetCards,
+            ISet<string> activeSets,
+            CardCatalogService catalog,
+            CardFilterService filterService)
+        {
+            _targetCards = targetCards ?? throw new ArgumentNullException(nameof(targetCards));
+            _activeSets = activeSets ?? new HashSet<string>();
+            _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
+            _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
+
+            Text = $"Extract Taxonomy with Rules ({_targetCards.Count} cards in Master List)";
+            ClientSize = new Size(720, 570);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            StartPosition = FormStartPosition.CenterParent;
+            ShowInTaskbar = false;
+            Font = new Font("Segoe UI", 9.0f);
+
+            var grpSource = new GroupBox
+            {
+                Text = "Extraction Rule Source",
+                Location = new Point(12, 12),
+                Size = new Size(696, 210)
+            };
+
+            // 1. Dynamic Entity Harvest
+            _rbHarvest = new RadioButton
+            {
+                Text = "Dynamic Entity Harvest (from Catalog):",
+                Location = new Point(12, 22),
+                Size = new Size(260, 20),
+                Checked = true,
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
+            };
+            _rbHarvest.CheckedChanged += RuleSource_Changed;
+
+            var lblHCategory = new Label { Text = "Target Category:", Location = new Point(32, 48), Size = new Size(100, 18) };
+            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(135, 45), Size = new Size(160, 23) };
+
+            var lblHAttr = new Label { Text = "Attribute:", Location = new Point(305, 48), Size = new Size(60, 18) };
+            _cmbHarvestAttribute = new ComboBox
+            {
+                Location = new Point(365, 45),
+                Size = new Size(130, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            _cmbHarvestAttribute.SelectedIndexChanged += CmbHarvestAttribute_SelectedIndexChanged;
+
+            var lblHVal = new Label { Text = "Value:", Location = new Point(505, 48), Size = new Size(42, 18) };
+            _cmbHarvestValue = new ComboBox
+            {
+                Location = new Point(547, 45),
+                Size = new Size(135, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+
+            // 2. Custom Regex Expression
+            _rbQuick = new RadioButton
+            {
+                Text = "Custom Regex Expression:",
+                Location = new Point(12, 80),
+                Size = new Size(220, 20),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
+            };
+            _rbQuick.CheckedChanged += RuleSource_Changed;
+
+            var lblQCategory = new Label { Text = "Category:", Location = new Point(32, 105), Size = new Size(65, 18) };
+            _txtRegexCategory = new TextBox { Text = "Custom Trait", Location = new Point(97, 102), Size = new Size(150, 23), Enabled = false };
+
+            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(255, 105), Size = new Size(68, 18) };
+            _txtRegexTag = new TextBox { Text = "$1", Location = new Point(325, 102), Size = new Size(130, 23), Enabled = false };
+
+            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(465, 105), Size = new Size(50, 18) };
+            _txtRegexPattern = new TextBox { Text = @"(?i)Dwarf factions?", Location = new Point(515, 102), Size = new Size(167, 23), Enabled = false };
+
+            // 3. Load File
+            _rbFile = new RadioButton
+            {
+                Text = "Load Rules from File (.json):",
+                Location = new Point(12, 137),
+                Size = new Size(220, 20),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
+            };
+            _rbFile.CheckedChanged += RuleSource_Changed;
+
+            _txtFilePath = new TextBox
+            {
+                Location = new Point(32, 162),
+                Size = new Size(550, 23),
+                ReadOnly = true,
+                Enabled = false
+            };
+
+            _btnBrowseFile = new Button
+            {
+                Text = "Browse...",
+                Location = new Point(590, 161),
+                Size = new Size(92, 25),
+                Enabled = false
+            };
+            _btnBrowseFile.Click += BtnBrowseFile_Click;
+
+            grpSource.Controls.AddRange([
+                _rbHarvest, lblHCategory, _txtHarvestCategory, lblHAttr, _cmbHarvestAttribute, lblHVal, _cmbHarvestValue,
+                _rbQuick, lblQCategory, _txtRegexCategory, lblQTag, _txtRegexTag, lblQPattern, _txtRegexPattern,
+                _rbFile, _txtFilePath, _btnBrowseFile
+            ]);
+
+            // Preview & actions
+            _btnTest = new Button
+            {
+                Text = "Test / Preview Matches",
+                Location = new Point(12, 228),
+                Size = new Size(160, 28)
+            };
+            _btnTest.Click += BtnTest_Click;
+
+            var lblScopeHint = new Label
+            {
+                Text = $"Scanning {_targetCards.Count} card(s) currently visible in the Master List.",
+                Location = new Point(180, 233),
+                Size = new Size(520, 20),
+                ForeColor = Color.DimGray
+            };
+
+            _lstPreview = new ListView
+            {
+                Location = new Point(12, 262),
+                Size = new Size(696, 250),
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true
+            };
+            _lstPreview.Columns.Add("Card Name", 230);
+            _lstPreview.Columns.Add("Set", 60);
+            _lstPreview.Columns.Add("Category", 150);
+            _lstPreview.Columns.Add("Extracted Tag", 230);
+
+            _btnExportCsv = new Button
+            {
+                Text = "Export to CSV...",
+                Location = new Point(330, 525),
+                Size = new Size(130, 30)
+            };
+            _btnExportCsv.Click += BtnExportCsv_Click;
+
+            _btnApply = new Button
+            {
+                Text = "Apply Tags to Catalog",
+                Location = new Point(470, 525),
+                Size = new Size(150, 30)
+            };
+            _btnApply.Click += BtnApply_Click;
+
+            _btnClose = new Button
+            {
+                Text = "Close",
+                Location = new Point(628, 525),
+                Size = new Size(80, 30),
+                DialogResult = DialogResult.Cancel
+            };
+
+            Controls.AddRange([grpSource, _btnTest, lblScopeHint, _lstPreview, _btnExportCsv, _btnApply, _btnClose]);
+            CancelButton = _btnClose;
+
+            PopulateHarvestAttributes();
+        }
+
+        private void PopulateHarvestAttributes()
+        {
+            _cmbHarvestAttribute.Items.Clear();
+            var keys = _catalog.GetFilterKeys();
+            foreach (var k in keys)
+            {
+                if (!string.IsNullOrWhiteSpace(k))
+                {
+                    _cmbHarvestAttribute.Items.Add(k);
+                }
+            }
+
+            int defaultIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
+            if (defaultIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultIdx;
+            else if (_cmbHarvestAttribute.Items.Count > 0) _cmbHarvestAttribute.SelectedIndex = 0;
+        }
+
+        private void CmbHarvestAttribute_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string attr = _cmbHarvestAttribute.SelectedItem?.ToString() ?? string.Empty;
+            _cmbHarvestValue.Items.Clear();
+            if (string.IsNullOrWhiteSpace(attr)) return;
+
+            var values = _catalog.GetFilterValues(attr);
+            foreach (var v in values)
+            {
+                if (!string.IsNullOrWhiteSpace(v))
+                {
+                    _cmbHarvestValue.Items.Add(v);
+                }
+            }
+
+            int defaultIdx = _cmbHarvestValue.FindStringExact("Faction");
+            if (defaultIdx >= 0) _cmbHarvestValue.SelectedIndex = defaultIdx;
+            else if (_cmbHarvestValue.Items.Count > 0) _cmbHarvestValue.SelectedIndex = 0;
+        }
+
+        private void RuleSource_Changed(object sender, EventArgs e)
+        {
+            bool isHarvest = _rbHarvest.Checked;
+            _txtHarvestCategory.Enabled = isHarvest;
+            _cmbHarvestAttribute.Enabled = isHarvest;
+            _cmbHarvestValue.Enabled = isHarvest;
+
+            bool isQuick = _rbQuick.Checked;
+            _txtRegexCategory.Enabled = isQuick;
+            _txtRegexTag.Enabled = isQuick;
+            _txtRegexPattern.Enabled = isQuick;
+
+            bool isFile = _rbFile.Checked;
+            _txtFilePath.Enabled = isFile;
+            _btnBrowseFile.Enabled = isFile;
+        }
+
+        private void BtnBrowseFile_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = "Open Taxonomy Rules File",
+                Filter = "JSON Rules (*.json)|*.json|All Files (*.*)|*.*"
+            };
+
+            if (ofd.ShowDialog(this) == DialogResult.OK)
+            {
+                try
+                {
+                    string json = File.ReadAllText(ofd.FileName);
+                    _loadedRules = TaxonomyExtractionService.LoadRulesFromJson(json);
+                    _txtFilePath.Text = ofd.FileName;
+                    MessageBox.Show(this, $"Loaded {_loadedRules.Count} rule(s) successfully.", "Rules Loaded", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Failed to load rule file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private List<TaxonomyRule> GetActiveRules()
+        {
+            if (_rbHarvest.Checked)
+            {
+                string attr = _cmbHarvestAttribute.SelectedItem?.ToString() ?? string.Empty;
+                string val = _cmbHarvestValue.SelectedItem?.ToString() ?? string.Empty;
+                string cat = _txtHarvestCategory.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(attr) || string.IsNullOrWhiteSpace(val))
+                {
+                    return [];
+                }
+
+                var harvestedNames = TaxonomyExtractionService.HarvestEntityNames(_catalog.Cards, _activeSets, attr, val);
+                if (harvestedNames.Count == 0)
+                {
+                    MessageBox.Show(this, $"No cards in the catalog matched {attr} = '{val}' to harvest.", "Harvest Empty", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return [];
+                }
+
+                var rule = TaxonomyExtractionService.BuildEntityHarvestRule(harvestedNames, cat);
+                return rule != null ? [rule] : [];
+            }
+
+            if (_rbQuick.Checked)
+            {
+                return [
+                    new TaxonomyRule
+                    {
+                        Category = _txtRegexCategory.Text.Trim(),
+                        Pattern = _txtRegexPattern.Text.Trim(),
+                        TagTemplate = _txtRegexTag.Text.Trim()
+                    }
+                ];
+            }
+
+            return _loadedRules;
+        }
+
+        private void BtnTest_Click(object sender, EventArgs e)
+        {
+            var rules = GetActiveRules();
+            if (rules.Count == 0)
+            {
+                MessageBox.Show(this, "No active rules to evaluate.", "Test Rules", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _lstPreview.BeginUpdate();
+            _lstPreview.Items.Clear();
+
+            var result = TaxonomyExtractionService.ExecuteRules(_targetCards, rules);
+
+            foreach (var (cardId, catDict) in result.Matches)
+            {
+                var card = _catalog.GetCardById(cardId);
+                if (card == null) continue;
+
+                foreach (var (cat, tags) in catDict)
+                {
+                    var item = new ListViewItem(card.Name);
+                    item.SubItems.Add(card.Set);
+                    item.SubItems.Add(cat);
+                    item.SubItems.Add(string.Join("; ", tags));
+                    _lstPreview.Items.Add(item);
+                }
+            }
+
+            _lstPreview.EndUpdate();
+
+            if (_lstPreview.Items.Count == 0)
+            {
+                MessageBox.Show(this, $"No cards in the current Master List ({_targetCards.Count} cards) matched the rule criteria.", "Test Preview", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void BtnExportCsv_Click(object sender, EventArgs e)
+        {
+            var rules = GetActiveRules();
+            if (rules.Count == 0)
+            {
+                MessageBox.Show(this, "No active rules to evaluate.", "Export CSV", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var sfd = new SaveFileDialog
+            {
+                Title = "Export Extraction Draft (CSV)",
+                Filter = "CSV Spreadsheet (*.csv)|*.csv",
+                DefaultExt = "csv",
+                FileName = "Entity_Extraction_Draft.csv"
+            };
+
+            if (sfd.ShowDialog(this) == DialogResult.OK)
+            {
+                var result = TaxonomyExtractionService.ExecuteRules(_targetCards, rules);
+                TaxonomyExtractionService.ExportDraftToCsv(_targetCards, result, sfd.FileName);
+                MessageBox.Show(this, $"Extraction draft exported successfully to:\n{sfd.FileName}\n\nMatched {result.Matches.Count} card(s) out of {_targetCards.Count} in scope.", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void BtnApply_Click(object sender, EventArgs e)
+        {
+            var rules = GetActiveRules();
+            if (rules.Count == 0)
+            {
+                MessageBox.Show(this, "No active rules to evaluate.", "Apply Tags", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var (cardsTagged, tagsAssigned) = TaxonomyExtractionService.ApplyRulesDirectly(_targetCards, rules, _filterService);
+            MessageBox.Show(this, $"Applied {tagsAssigned} tag assignment(s) across {cardsTagged} card(s) into your catalog taxonomy.", "Tags Applied", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            DialogResult = DialogResult.OK;
+        }
+    }
+}
+]]>
+  </file>
+  <file path='.\TaxonomyExtractionService.cs'>
+<![CDATA[
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+
+namespace MECCG_Deck_Builder
+{
+    public sealed class TaxonomyRule
+    {
+        public string Category { get; set; } = string.Empty;
+        public string Pattern { get; set; } = string.Empty;
+        public string TagTemplate { get; set; } = string.Empty;
+        public string FilterPrimary { get; set; } = string.Empty;
+        public string FilterSecondary { get; set; } = string.Empty;
+        public string FilterSet { get; set; } = string.Empty;
+    }
+
+    public sealed class ExtractionResult
+    {
+        // cardId -> (Category -> Set of unique tags)
+        public Dictionary<string, Dictionary<string, HashSet<string>>> Matches { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        public void AddTag(string cardId, string category, string tag)
+        {
+            if (string.IsNullOrWhiteSpace(cardId) || string.IsNullOrWhiteSpace(category) || string.IsNullOrWhiteSpace(tag))
+            {
+                return;
+            }
+
+            if (!Matches.TryGetValue(cardId, out var catDict))
+            {
+                catDict = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+                Matches[cardId] = catDict;
+            }
+
+            if (!catDict.TryGetValue(category, out var tagSet))
+            {
+                tagSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                catDict[category] = tagSet;
+            }
+
+            tagSet.Add(tag.Trim());
+        }
+
+        public IReadOnlyList<string> GetAllCategories()
+        {
+            var categories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var catDict in Matches.Values)
+            {
+                foreach (var cat in catDict.Keys)
+                {
+                    categories.Add(cat);
+                }
+            }
+            var list = categories.ToList();
+            list.Sort(StringComparer.OrdinalIgnoreCase);
+            return list;
+        }
+
+        public string GetFormattedTags(string cardId, string category)
+        {
+            if (Matches.TryGetValue(cardId, out var catDict) &&
+                catDict.TryGetValue(category, out var tagSet) &&
+                tagSet.Count > 0)
+            {
+                return string.Join("; ", tagSet.OrderBy(t => t, StringComparer.OrdinalIgnoreCase));
+            }
+            return string.Empty;
+        }
+    }
+
+    public static class TaxonomyExtractionService
+    {
+        #region DYNAMIC_ENTITY_HARVESTING
+
+        /// <summary>
+        /// Queries the catalog cards for any attribute = value pair across the selected sets,
+        /// returning a distinct list of harvested card titles.
+        /// </summary>
+        public static List<string> HarvestEntityNames(
+            IEnumerable<Card> catalogCards,
+            ISet<string> selectedSets,
+            string attributeKey,
+            string attributeValue)
+        {
+            if (catalogCards == null || string.IsNullOrWhiteSpace(attributeKey) || string.IsNullOrWhiteSpace(attributeValue))
+            {
+                return [];
+            }
+
+            return [.. catalogCards
+                .Where(c => (selectedSets == null || selectedSets.Count == 0 || selectedSets.Contains(c.Set)) &&
+                            string.Equals(c.GetAttribute(attributeKey), attributeValue, StringComparison.OrdinalIgnoreCase))
+                .Select(c => c.Name.Trim())
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)];
+        }
+
+        /// <summary>
+        /// Builds a unified Regex rule matching any of the harvested entity names using capture group $1.
+        /// </summary>
+        public static TaxonomyRule BuildEntityHarvestRule(IEnumerable<string> entityNames, string categoryName)
+        {
+            var validNames = entityNames?.Where(n => !string.IsNullOrWhiteSpace(n)).ToList() ?? [];
+            if (validNames.Count == 0)
+            {
+                return null;
+            }
+
+            string escapedNames = string.Join("|", validNames.Select(Regex.Escape));
+            string pattern = $@"(?i)\b({escapedNames})\b";
+
+            return new TaxonomyRule
+            {
+                Category = string.IsNullOrWhiteSpace(categoryName) ? "Harvested Tags" : categoryName.Trim(),
+                Pattern = pattern,
+                TagTemplate = "$1"
+            };
+        }
+
+        #endregion
+
+        #region EXECUTION
+
+        public static ExtractionResult ExecuteRules(IEnumerable<Card> cards, IEnumerable<TaxonomyRule> rules)
+        {
+            var result = new ExtractionResult();
+            if (cards == null || rules == null) return result;
+
+            var compiledRules = new List<(TaxonomyRule Rule, Regex CompiledRegex)>();
+            foreach (var rule in rules)
+            {
+                if (string.IsNullOrWhiteSpace(rule.Pattern) || string.IsNullOrWhiteSpace(rule.Category))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var regex = new Regex(rule.Pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                    compiledRules.Add((rule, regex));
+                }
+                catch
+                {
+                    // Skip malformed regex gracefully
+                }
+            }
+
+            foreach (var card in cards)
+            {
+                if (string.IsNullOrWhiteSpace(card.Text)) continue;
+
+                // Strip flavor quotes so we only evaluate active rules text
+                string rulesText = StripFlavorText(card.Text);
+
+                foreach (var (rule, regex) in compiledRules)
+                {
+                    // (primary/secondary/set checks...)
+
+                    var matches = regex.Matches(rulesText); // Use rulesText instead of card.Text
+                    foreach (Match match in matches)
+                    {
+                        if (match.Success)
+                        {
+                            string tag = !string.IsNullOrWhiteSpace(rule.TagTemplate)
+                                ? (rule.TagTemplate.Contains('$') ? match.Result(rule.TagTemplate) : rule.TagTemplate)
+                                : match.Value;
+
+                            result.AddTag(card.Id, rule.Category, tag);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static (int CardsTagged, int TagsAssigned) ApplyRulesDirectly(
+            IEnumerable<Card> cards,
+            IEnumerable<TaxonomyRule> rules,
+            CardFilterService filterService)
+        {
+            var result = ExecuteRules(cards, rules);
+            int cardsTagged = result.Matches.Count;
+            int tagsAssigned = 0;
+
+            foreach (var (cardId, catDict) in result.Matches)
+            {
+                foreach (var (category, tagSet) in catDict)
+                {
+                    filterService.AddCustomKeyName(category);
+                    foreach (var tag in tagSet)
+                    {
+                        filterService.AppendCardCustomTag(cardId, category, tag);
+                        tagsAssigned++;
+                    }
+                }
+            }
+
+            return (cardsTagged, tagsAssigned);
+        }
+
+        #endregion
+
+        #region CSV_EXPORT_AND_IMPORT
+
+        public static void ExportTemplateDraftToCsv(IReadOnlyList<Card> cards, string filePath)
+        {
+            if (cards == null || cards.Count == 0) return;
+
+            var sb = new StringBuilder();
+            sb.AppendLine("Card Name,Set,Primary,[Insert Category Name],Card Text");
+
+            for (int i = 0; i < cards.Count; i++)
+            {
+                var card = cards[i];
+                string tagHint = (i == 0) ? "[Insert tag (separate multiple tags with semicolon)]" : string.Empty;
+
+                sb.Append(EscapeCsv(card.Name)).Append(',');
+                sb.Append(EscapeCsv(card.Set)).Append(',');
+                sb.Append(EscapeCsv(card.Primary)).Append(',');
+                sb.Append(EscapeCsv(tagHint)).Append(',');
+                sb.AppendLine(EscapeCsv(card.Text));
+            }
+
+            File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+        }
+
+        public static void ExportDraftToCsv(
+            IEnumerable<Card> cards,
+            ExtractionResult result,
+            string filePath,
+            IEnumerable<string> categories = null)
+        {
+            var categoryList = categories?.ToList() ?? [.. result.GetAllCategories()];
+            var sb = new StringBuilder();
+
+            sb.Append("Card Name,Set,Primary");
+            foreach (var cat in categoryList)
+            {
+                sb.Append(',').Append(EscapeCsv(cat));
+            }
+            sb.AppendLine(",Card Text");
+
+            foreach (var card in cards.OrderBy(c => c.Name, StringComparer.Ordinal))
+            {
+                sb.Append(EscapeCsv(card.Name)).Append(',');
+                sb.Append(EscapeCsv(card.Set)).Append(',');
+                sb.Append(EscapeCsv(card.Primary));
+
+                foreach (var cat in categoryList)
+                {
+                    string tags = result.GetFormattedTags(card.Id, cat);
+                    sb.Append(',').Append(EscapeCsv(tags));
+                }
+
+                sb.Append(',').AppendLine(EscapeCsv(card.Text));
+            }
+
+            File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+        }
+
+        public static (int CardsMatched, int CategoriesImported, int TagsAssigned) ImportFromCsv(
+            string filePath,
+            CardCatalogService catalog,
+            CardFilterService filterService)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("The specified CSV file was not found.", filePath);
+            }
+
+            using var reader = new StreamReader(filePath, Encoding.UTF8);
+            var records = ParseCsv(reader);
+
+            if (records.Count < 2)
+            {
+                return (0, 0, 0);
+            }
+
+            var header = records[0];
+            int nameIndex = -1;
+            int setIndex = -1;
+            var categoryColumnIndices = new List<(int Index, string CategoryName)>();
+
+            for (int i = 0; i < header.Count; i++)
+            {
+                string col = header[i].Trim();
+                if (string.Equals(col, "Card Name", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(col, "Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    nameIndex = i;
+                }
+                else if (string.Equals(col, "Set", StringComparison.OrdinalIgnoreCase))
+                {
+                    setIndex = i;
+                }
+                else if (string.Equals(col, "Primary", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(col, "Card Text", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(col, "Text", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(col, "Id", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Skip fixed/reference columns
+                }
+                else if (!string.IsNullOrWhiteSpace(col))
+                {
+                    if (col.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue; // Skip placeholder template header if left untouched
+                    }
+                    categoryColumnIndices.Add((i, col));
+                }
+            }
+
+            if (nameIndex == -1 || setIndex == -1)
+            {
+                throw new InvalidOperationException("CSV must contain 'Card Name' and 'Set' columns.");
+            }
+
+            int cardsMatched = 0;
+            int tagsAssigned = 0;
+            var categoriesImportedSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            for (int r = 1; r < records.Count; r++)
+            {
+                var row = records[r];
+                if (row.Count <= Math.Max(nameIndex, setIndex)) continue;
+
+                string cardName = row[nameIndex].Trim();
+                string setCode = row[setIndex].Trim();
+
+                if (string.IsNullOrEmpty(cardName)) continue;
+
+                var card = catalog.Cards.FirstOrDefault(c =>
+                    string.Equals(c.Name, cardName, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(c.Set, setCode, StringComparison.OrdinalIgnoreCase))
+                    ?? catalog.Cards.FirstOrDefault(c => string.Equals(c.Name, cardName, StringComparison.OrdinalIgnoreCase));
+
+                if (card == null) continue;
+
+                cardsMatched++;
+
+                foreach (var (colIdx, catName) in categoryColumnIndices)
+                {
+                    if (colIdx >= row.Count) continue;
+
+                    string cellValue = row[colIdx].Trim();
+                    if (string.IsNullOrWhiteSpace(cellValue)) continue;
+
+                    // Skip instructional hint if left untouched
+                    if (cellValue.Contains("[Insert", StringComparison.OrdinalIgnoreCase) ||
+                        (cellValue.StartsWith('[') && cellValue.EndsWith(']')))
+                    {
+                        continue;
+                    }
+
+                    filterService.AddCustomKeyName(catName);
+                    categoriesImportedSet.Add(catName);
+
+                    var tags = cellValue.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    foreach (var tag in tags)
+                    {
+                        if (string.IsNullOrWhiteSpace(tag)) continue;
+                        if (tag.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase)) continue;
+
+                        filterService.AppendCardCustomTag(card.Id, catName, tag);
+                        tagsAssigned++;
+                    }
+                }
+            }
+
+            return (cardsMatched, categoriesImportedSet.Count, tagsAssigned);
+        }
+
+        #endregion
+
+        #region HELPERS_AND_PARSER
+
+        public static string SaveRulesToJson(IEnumerable<TaxonomyRule> rules) =>
+            JsonConvert.SerializeObject(rules, Formatting.Indented);
+
+        public static List<TaxonomyRule> LoadRulesFromJson(string json) =>
+            JsonConvert.DeserializeObject<List<TaxonomyRule>>(json) ?? [];
+
+        private static string EscapeCsv(string field)
+        {
+            if (string.IsNullOrEmpty(field)) return string.Empty;
+            if (field.Contains(',') || field.Contains('"') || field.Contains('\r') || field.Contains('\n'))
+            {
+                return $"\"{field.Replace("\"", "\"\"")}\"";
+            }
+            return field;
+        }
+
+        public static List<List<string>> ParseCsv(TextReader reader)
+        {
+            var records = new List<List<string>>();
+            var currentRecord = new List<string>();
+            var currentField = new StringBuilder();
+            bool inQuotes = false;
+            int nextChar;
+
+            while ((nextChar = reader.Read()) != -1)
+            {
+                char c = (char)nextChar;
+
+                if (inQuotes)
+                {
+                    if (c == '"')
+                    {
+                        if (reader.Peek() == '"')
+                        {
+                            reader.Read();
+                            currentField.Append('"');
+                        }
+                        else
+                        {
+                            inQuotes = false;
+                        }
+                    }
+                    else
+                    {
+                        currentField.Append(c);
+                    }
+                }
+                else
+                {
+                    if (c == '"')
+                    {
+                        inQuotes = true;
+                    }
+                    else if (c == ',')
+                    {
+                        currentRecord.Add(currentField.ToString());
+                        currentField.Clear();
+                    }
+                    else if (c == '\r')
+                    {
+                        if (reader.Peek() == '\n')
+                        {
+                            reader.Read();
+                        }
+                        currentRecord.Add(currentField.ToString());
+                        currentField.Clear();
+                        records.Add(currentRecord);
+                        currentRecord = [];
+                    }
+                    else if (c == '\n')
+                    {
+                        currentRecord.Add(currentField.ToString());
+                        currentField.Clear();
+                        records.Add(currentRecord);
+                        currentRecord = [];
+                    }
+                    else
+                    {
+                        currentField.Append(c);
+                    }
+                }
+            }
+
+            if (currentField.Length > 0 || currentRecord.Count > 0)
+            {
+                currentRecord.Add(currentField.ToString());
+                records.Add(currentRecord);
+            }
+
+            return records;
+        }
+
+#pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
+        private static readonly Regex FlavorQuotesRegex = new(@"[""“\u201C][^""”\u201D]*[""”\u201D]", RegexOptions.Compiled);
+        private static readonly Regex FlavorAttributionRegex = new(@"[—–-]\s*(?:LotR|Hobbit|The Hobbit|Silmarillion)[^\r\n]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+#pragma warning restore SYSLIB1045
+
+        /// <summary>
+        /// Strips Tolkien flavor quotes ("..." or “...”) and book attributions (—LotR) 
+        /// so entity harvesting only matches functional gameplay rules text.
+        /// </summary>
+        public static string StripFlavorText(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+
+            // Remove everything between quotation marks ("..." or “...”)
+            string cleaned = FlavorQuotesRegex.Replace(text, " ");
+
+            // Remove trailing book citations like —LotRIV or —Hobbit
+            cleaned = FlavorAttributionRegex.Replace(cleaned, " ");
+
+            return cleaned.Trim();
+        }
+
+        #endregion
+    }
+}
 ]]>
   </file>
 </project>

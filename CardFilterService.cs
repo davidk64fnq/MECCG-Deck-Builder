@@ -506,11 +506,11 @@ namespace MECCG_Deck_Builder
         }
 
         public List<string> GetAvailableValues(
-            IEnumerable<Card> sourceCards,
-            ISet<string> selectedSets,
-            IReadOnlyList<FilterCriterion> otherCriteria,
-            FilterType targetType,
-            string targetKey)
+    IEnumerable<Card> sourceCards,
+    ISet<string> selectedSets,
+    IReadOnlyList<FilterCriterion> otherCriteria,
+    FilterType targetType,
+    string targetKey)
         {
             var result = new List<string> { "" };
 
@@ -521,19 +521,7 @@ namespace MECCG_Deck_Builder
 
             var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // For custom taxonomy filters, always include all values defined in the taxonomy for this key
-            if (targetType == FilterType.Custom)
-            {
-                var taxonomyValues = GetCustomKeyValues(targetKey);
-                foreach (var val in taxonomyValues)
-                {
-                    if (!string.IsNullOrWhiteSpace(val))
-                    {
-                        distinctValues.Add(val.Trim());
-                    }
-                }
-            }
-
+            // Scan only cards matching active sets and criteria
             foreach (var card in sourceCards)
             {
                 if (selectedSets != null && !selectedSets.Contains(card.Set))

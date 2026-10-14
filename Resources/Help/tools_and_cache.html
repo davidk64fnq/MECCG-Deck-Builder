@@ -43,5 +43,29 @@
         <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch. If offline or unavailable, it seamlessly falls back to the bundled local <code>cards-dc.json</code> file.</li>
         <li><strong>Sets:</strong> Automatically attempts to download the latest expansion set metadata. If offline, it reads the bundled local <code>sets-dc.json</code> file.</li>
     </ul>
+
+    <h2>Procedural Deck Generation (Tools &gt; Generate Deck from Rules... / F5)</h2>
+    <p>
+        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates.
+    </p>
+    <ul>
+        <li><strong>Symmetric Filtering:</strong> Rules can query official card attributes (<code>Primary</code>, <code>Race</code>, <code>Skill</code>) and custom taxonomy tags (<code>Faction Focus</code>, <code>Home Region</code>).</li>
+        <li><strong>Multi-Value &quot;OR&quot; Syntax:</strong> Semicolon-delimited values (e.g. <code>"Secondary": "Major Item; Minor Item"</code>) match cards satisfying any of the listed options.</li>
+        <li><strong>Copy Limits &amp; Uniqueness:</strong> Strictly enforces game legality: maximum 1 copy for unique cards and maximum 3 copies for non-unique cards across the entire deck.</li>
+        <li><strong>Tiered Variety-First Distribution:</strong> To maximize card variety, the engine exhausts all 0-copy (unused) cards before assigning 2nd copies, and all 2-copy cards before assigning 3rd copies.</li>
+        <li><strong>Branching Choice Groups (<code>RandomChoice</code>):</strong> Author multiple deck archetypes (e.g., Dwarf Company vs. Elf Company, or Nazg&ucirc;l vs. Dragon hazards) in a single rule file with weighted random selection and dynamic title overrides.</li>
+        <li><strong>Instant Re-run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> to re-run the last used rules file directly from disk without re-opening file dialogs.</li>
+    </ul>
+
+    <h2>Relational Attribute Lookup (Cross-Card Join)</h2>
+    <p>
+        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this mode enables 2-step relational tagging between linked entities:
+    </p>
+    <ul>
+        <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
+        <li><strong>Lookup Entity:</strong> Matches corresponding cards in the catalog (e.g. <code>Primary = Site</code>).</li>
+        <li><strong>Extract Field:</strong> Reads the destination attribute (e.g. Site <code>Region</code>) and writes it into a custom category (e.g. <code>Home Region</code>).</li>
+        <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
+    </ul>
 </body>
 </html>

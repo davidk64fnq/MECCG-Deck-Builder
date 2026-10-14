@@ -91,11 +91,13 @@
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsGenerateDeck = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparatorDeckGen = new System.Windows.Forms.ToolStripSeparator();
+            ToolStripMenuToolsRerunDeckGen = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsRunRules = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsExportCsv = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsImportCsv = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparatorTools = new System.Windows.Forms.ToolStripSeparator();
-            ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -657,41 +659,71 @@
             // 
             // ToolStripMenuTools
             // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsRunRules, ToolStripMenuToolsExportCsv, ToolStripMenuToolsImportCsv, toolStripSeparatorTools, ToolStripMenuToolsGetImages });
+            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                ToolStripMenuToolsGenerateDeck,
+                ToolStripMenuToolsRerunDeckGen,
+                toolStripSeparatorDeckGen,
+                ToolStripMenuToolsRunRules,
+                ToolStripMenuToolsExportCsv,
+                ToolStripMenuToolsImportCsv,
+                toolStripSeparatorTools,
+                ToolStripMenuToolsGetImages
+            }); 
             ToolStripMenuTools.Name = "ToolStripMenuTools";
             ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
             ToolStripMenuTools.Text = "&Tools";
             // 
+            // ToolStripMenuToolsGenerateDeck
+            // 
+            ToolStripMenuToolsGenerateDeck.Name = "ToolStripMenuToolsGenerateDeck";
+            ToolStripMenuToolsGenerateDeck.Size = new System.Drawing.Size(232, 22);
+            ToolStripMenuToolsGenerateDeck.Text = "Generate Deck from Rules...";
+            ToolStripMenuToolsGenerateDeck.Click += ToolStripMenuToolsGenerateDeck_Click;
+            // 
+            // ToolStripMenuToolsRerunDeckGen
+            // 
+            ToolStripMenuToolsRerunDeckGen.Name = "ToolStripMenuToolsRerunDeckGen";
+            ToolStripMenuToolsRerunDeckGen.Size = new System.Drawing.Size(232, 22);
+            ToolStripMenuToolsRerunDeckGen.Text = "Re-run Deck Rules";
+            ToolStripMenuToolsRerunDeckGen.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            ToolStripMenuToolsRerunDeckGen.Enabled = false;
+            ToolStripMenuToolsRerunDeckGen.Click += ToolStripMenuToolsRerunDeckGen_Click;
+            // 
+            // toolStripSeparatorDeckGen
+            // 
+            toolStripSeparatorDeckGen.Name = "toolStripSeparatorDeckGen";
+            toolStripSeparatorDeckGen.Size = new System.Drawing.Size(229, 6);
+            // 
             // ToolStripMenuToolsRunRules
             // 
             ToolStripMenuToolsRunRules.Name = "ToolStripMenuToolsRunRules";
-            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsRunRules.Text = "Extract Taxonomy with Rules...";
             ToolStripMenuToolsRunRules.Click += ToolStripMenuToolsRunRules_Click;
             // 
             // ToolStripMenuToolsExportCsv
             // 
             ToolStripMenuToolsExportCsv.Name = "ToolStripMenuToolsExportCsv";
-            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsExportCsv.Text = "Export Taxonomy Draft (CSV)...";
             ToolStripMenuToolsExportCsv.Click += ToolStripMenuToolsExportCsv_Click;
             // 
             // ToolStripMenuToolsImportCsv
             // 
             ToolStripMenuToolsImportCsv.Name = "ToolStripMenuToolsImportCsv";
-            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsImportCsv.Text = "Import Taxonomy from CSV...";
             ToolStripMenuToolsImportCsv.Click += ToolStripMenuToolsImportCsv_Click;
             // 
             // toolStripSeparatorTools
             // 
             toolStripSeparatorTools.Name = "toolStripSeparatorTools";
-            toolStripSeparatorTools.Size = new System.Drawing.Size(222, 6);
+            toolStripSeparatorTools.Size = new System.Drawing.Size(229, 6);
             // 
             // ToolStripMenuToolsGetImages
             // 
             ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
-            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsGetImages.Text = "Download Images";
             ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
             // 
@@ -705,14 +737,14 @@
             // ToolStripMenuSetSelectAll
             // 
             ToolStripMenuSetSelectAll.Name = "ToolStripMenuSetSelectAll";
-            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(122, 22);
             ToolStripMenuSetSelectAll.Text = "Select All";
             ToolStripMenuSetSelectAll.Click += ToolStripMenuSetSelectAll_Click;
             // 
             // ToolStripMenuSetClearAll
             // 
             ToolStripMenuSetClearAll.Name = "ToolStripMenuSetClearAll";
-            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(122, 22);
             ToolStripMenuSetClearAll.Text = "Clear All";
             ToolStripMenuSetClearAll.Click += ToolStripMenuSetClearAll_Click;
             // 
@@ -1058,10 +1090,22 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTools;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGenerateDeck;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorDeckGen;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRunRules;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsExportCsv;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsImportCsv;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparatorTools;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
@@ -1070,7 +1114,6 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip ContextMenuStripTabs;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyCard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToPool;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToResource;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToHazard;
@@ -1091,7 +1134,6 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSideboard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
         private System.Windows.Forms.GroupBox GroupBoxCardAttributes;
         private System.Windows.Forms.Label LblSlot1Key;
         private System.Windows.Forms.ComboBox ComboBoxKey1;
@@ -1110,17 +1152,10 @@
         private System.Windows.Forms.ComboBox ComboBoxKey4;
         private System.Windows.Forms.Label LblSlot4Value;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardnumFilters;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRerunDeckGen;
     }
 }
