@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CSV Spreadsheet Pipeline</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; CSV Pipeline</div>
+    <h1>CSV Spreadsheet Pipeline</h1>
+    <p>To facilitate large-scale taxonomy authoring or collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.</p>
+
+    <h2>Spreadsheet Column Layout</h2>
+    <table>
+        <tr>
+            <th>Column Header</th>
+            <th>Required?</th>
+            <th>Description &amp; Behavior</th>
+        </tr>
+        <tr><td><code>Card Name</code></td><td><strong>Required</strong></td><td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in catalog.</td></tr>
+        <tr><td><code>Set</code></td><td><strong>Required</strong></td><td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>) used to disambiguate reprint cards.</td></tr>
+        <tr><td><code>Primary</code></td><td>Optional</td><td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td></tr>
+        <tr><td><em>[Custom Category Columns]</em></td><td>Optional</td><td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>) becomes a custom category. Cell contents are imported as tags.</td></tr>
+        <tr><td><code>Card Text</code></td><td>Optional</td><td>Full rules text provided for reference during editing. Ignored during import.</td></tr>
+    </table>
+
+    <div class="tip">
+        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category to a card, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
+    </div>
+
+    <h2>Step-by-Step Workflow</h2>
+    <ol>
+        <li><strong>Scope the Master List:</strong> Select your desired expansion sets and set filter criteria so that only target cards appear in the Master List.</li>
+        <li><strong>Export Draft:</strong> Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
+        <li><strong>Edit in Excel / Google Sheets:</strong> Add custom category headers, enter tags into cells, and download as a CSV file.</li>
+        <li><strong>Import to Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
+    </ol>
+</body>
+</html>

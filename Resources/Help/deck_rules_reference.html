@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Deck Rules JSON Schema Reference</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_generation_engine.html">Procedural Deck Generator</a> &gt; Rules JSON Schema Reference</div>
+
+    <h1>Deck Rules JSON Schema Reference</h1>
+    <p>
+        Procedural deck generation templates are declarative JSON files loaded via <strong>Tools &gt; Generate Deck from Rules...</strong> (or re-run instantly with <kbd>F5</kbd>). This reference details all JSON schema elements, properties, data types, default values, and token interpolation rules.
+    </p>
+
+    <!-- ROOT OBJECT -->
+    <h2 id="root-object">1. Root Object (<code>DeckGenerationRuleSet</code>)</h2>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>DeckTitle</code></td>
+            <td>string</td>
+            <td><code>"Generated Deck"</code></td>
+            <td>Default title assigned to the deck. Can be dynamically overridden by a branch choice at runtime.</td>
+        </tr>
+        <tr>
+            <td><code>RuleSetType</code></td>
+            <td>string</td>
+            <td><code>"SequentialRules"</code></td>
+            <td>Execution strategy identifier (reserved for future execution engines).</td>
+        </tr>
+        <tr>
+            <td><code>Version</code></td>
+            <td>string</td>
+            <td><code>"1.0"</code></td>
+            <td>Schema version indicator.</td>
+        </tr>
+        <tr>
+            <td><code>Rules</code></td>
+            <td>array of objects</td>
+            <td><code>[]</code></td>
+            <td>An ordered list of <code>DeckGenerationRule</code> objects evaluated sequentially from top to bottom.</td>
+        </tr>
+    </table>
+
+    <!-- RULE OBJECT -->
+    <h2 id="rule-object">2. Rule Object (<code>DeckGenerationRule</code>)</h2>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>RuleType</code></td>
+            <td>string</td>
+            <td><code>"FilterQuery"</code></td>
+            <td>
+                Rule mode:
+                <ul>
+                    <li><code>"FilterQuery"</code>: Standard query that samples matching cards.</li>
+                    <li><code>"RandomChoice"</code> (or <code>"Choice"</code> / <code>"OneOf"</code>): Evaluates a weighted random branch from <code>Choices</code>.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Name</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>Descriptive name displayed in generation logs and shortfall notices.</td>
+        </tr>
+        <tr>
+            <td><code>Section</code></td>
+            <td>string</td>
+            <td><code>"Resources"</code></td>
+            <td>
+                Target deck partition: <code>"Pool"</code>, <code>"Resources"</code>, <code>"Hazards"</code>, <code>"Sideboard"</code>, or <code>"Sites"</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Count</code></td>
+            <td>integer</td>
+            <td><code>1</code></td>
+            <td>The exact number of card copies requested by this rule.</td>
+        </tr>
+        <tr>
+            <td><code>SaveAs</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>
+                Captures cards successfully selected by this rule into an in-memory variable (e.g. <code>"Leader"</code> or <code>"Scout"</code>). Subsequent rules can interpolate their attributes or tags using <code>{VariableName.Property}</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Sets</code></td>
+            <td>array of strings</td>
+            <td><code>[]</code></td>
+            <td>
+                Restricts sampling to specific expansion set codes (e.g. <code>["METW", "MEDM"]</code>). If omitted, defaults to the sets currently checked in the app's <strong>Set</strong> menu.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Attributes</code></td>
+            <td>object (key-value)</td>
+            <td><code>{}</code></td>
+            <td>
+                Dictionary of official Cardnum rules criteria (e.g. <code>"Primary"</code>, <code>"Race"</code>, <code>"Skill"</code>, <code>"Name"</code>). Supports semicolon <code>OR</code> syntax and variable interpolation.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Tags</code></td>
+            <td>object (key-value)</td>
+            <td><code>{}</code></td>
+            <td>
+                Dictionary of custom user taxonomy criteria (e.g. <code>"Archetype": "Ring Destruction"</code>). Supports semicolon <code>OR</code> syntax and variable interpolation.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Fallback</code></td>
+            <td>object</td>
+            <td><code>null</code></td>
+            <td>
+                A nested <code>DeckGenerationRule</code> executed automatically if this rule fails to fulfill its requested <code>Count</code> (due to missing tags, zero matching candidates, or deck uniqueness limits). Inherits the parent's target <code>Section</code> if unspecified.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Choices</code></td>
+            <td>array of objects</td>
+            <td><code>[]</code></td>
+            <td>Used when <code>RuleType</code> is <code>"RandomChoice"</code>. Contains weighted branches.</td>
+        </tr>
+    </table>
+
+    <!-- CHOICE OBJECT -->
+    <h2 id="choice-object">3. Branch Choice Object (<code>DeckGenerationChoice</code>)</h2>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>Name</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>Branch label recorded in the execution log (e.g. <code>"Dwarf Company"</code>).</td>
+        </tr>
+        <tr>
+            <td><code>DeckTitle</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>Optional deck title override applied if this branch is selected.</td>
+        </tr>
+        <tr>
+            <td><code>Weight</code></td>
+            <td>integer</td>
+            <td><code>1</code></td>
+            <td>
+                Relative lottery weight. Selection probability equals $\frac{\text{Weight}}{\sum \text{Weights}}$.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Rules</code></td>
+            <td>array of objects</td>
+            <td><code>[]</code></td>
+            <td>The list of sub-rules executed sequentially if this branch wins the roll.</td>
+        </tr>
+    </table>
+
+    <!-- QUERY & INTERPOLATION -->
+    <h2 id="query-syntax">4. Query &amp; Placeholder Interpolation Rules</h2>
+
+    <h3>A. Semicolon Multi-Value OR Logic</h3>
+    <p>
+        Any string inside <code>Attributes</code> or <code>Tags</code> can contain multiple semicolon-delimited values. A card matches if it satisfies <strong>any</strong> of the values:
+    </p>
+    <pre><code>"Attributes": {
+  "Skill": "Warrior; Scout",
+  "Secondary": "Major Item; Minor Item"
+}</code></pre>
+
+    <h3>B. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
+    <p>
+        When a rule captures a card via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query that card's properties using bracketed tokens:
+    </p>
+    <table>
+        <tr>
+            <th>Token Syntax</th>
+            <th>Target Source</th>
+            <th>Example</th>
+            <th>Resolved Output</th>
+        </tr>
+        <tr>
+            <td><code>{Variable.AttributeName}</code></td>
+            <td>Official Card Attribute</td>
+            <td><code>{Leader.Home}</code></td>
+            <td><code>"Rivendell"</code></td>
+        </tr>
+        <tr>
+            <td><code>{Variable.Race}</code></td>
+            <td>Official Card Attribute</td>
+            <td><code>{Leader.Race}</code></td>
+            <td><code>"Elf"</code></td>
+        </tr>
+        <tr>
+            <td><code>{Variable.Tag:CategoryName}</code></td>
+            <td>Custom User Taxonomy Tag</td>
+            <td><code>{Leader.Tag:Faction Bonus}</code></td>
+            <td><code>"Wood-elves; Silvan Elves"</code></td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Unmet Dependency Handling:</strong> If a token references a tag or property that is absent on the captured card, it resolves to an empty string (<code>""</code>). The rule recognizes that the requirement was not met and adds 0 cards, cleanly handing execution over to the <code>Fallback</code> rule without crashing.
+    </div>
+
+    <!-- NATIVE DECK JSON DISTINCTION -->
+    <h2 id="native-vs-rules">5. Native Save Files (.json) vs. Rule Templates (.json)</h2>
+    <p>
+        Both deck save files and procedural rule sets share the <code>.json</code> extension, but serve distinct roles:
+    </p>
+    <ul>
+        <li>
+            <strong>Deck Save Files (File &gt; Save / Open):</strong> Store an assembled <em>deck instance</em>. Root keys: <code>CurrentDeckTitle</code>, <code>SetList</code>, <code>PoolList</code>, <code>ResourceList</code>, <code>HazardList</code>, <code>SideboardList</code>, and <code>SiteList</code>.
+        </li>
+        <li>
+            <strong>Rule Templates (Tools &gt; Generate Deck):</strong> Declarative instructions used to generate random decks on demand. Root keys: <code>DeckTitle</code>, <code>RuleSetType</code>, and <code>Rules</code>.
+        </li>
+    </ul>
+</body>
+</html>

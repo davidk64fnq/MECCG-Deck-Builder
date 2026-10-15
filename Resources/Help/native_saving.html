@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Saving Native Decks (.json)</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Building &amp; Formats</a> &gt; Saving Native Decks</div>
+    <h1>Saving Native Decks (.json)</h1>
+
+    <h2>Native Save Files (.json)</h2>
+    <p>
+        Use <strong>File &gt; Save</strong> (<kbd>Ctrl+S</kbd>) or <strong>File &gt; Open</strong> (<kbd>Ctrl+O</kbd>) to store and load complete deck configurations in native JSON format.
+    </p>
+
+    <h2>What is Preserved</h2>
+    <ul>
+        <li><strong>Deck Title:</strong> Derived from the saved file name or procedural template title.</li>
+        <li><strong>Active Expansion Sets:</strong> The exact selection of sets used when building the deck.</li>
+        <li><strong>Section Contents:</strong> The complete card contents across all 5 deck partitions (Pool, Resources, Hazards, Sideboard, Sites).</li>
+    </ul>
+
+    <h2>Save File JSON Structure</h2>
+    <p>
+        Native deck save files store an assembled deck instance using simple card records <code>[Name, ImageName, Set, Id]</code>:
+    </p>
+    <pre><code>{
+  "CurrentDeckTitle": "Ring Hunter",
+  "SetList": [ "METW", "MEDM" ],
+  "PoolList": [
+    [ "Adrazar", "metw_adrazar.jpg", "METW", "0" ]
+  ],
+  "ResourceList": [],
+  "HazardList": [],
+  "SideboardList": [],
+  "SiteList": []
+}</code></pre>
+
+    <div class="note">
+        <strong>Rule Templates vs. Save Files:</strong> Native deck files represent <em>saved decks</em>. If you want to author generative rule files that create randomized decks from queries, see <a href="deck_rules_reference.html">Deck Rules JSON Schema Reference</a>.
+    </div>
+</body>
+</html>

@@ -217,7 +217,12 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuMasterCardnumFilters(Card card)
         {
             ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
-            var pairs = new List<(string Key, string Value)>();
+            var pairs = new List<(string Key, string Value)>
+            {
+                ("Name", card.Name),
+                ("Set", card.Set),
+                ("FullCode", card.FullCode)
+            };
 
             foreach (string key in CardCatalogService.FilterKeys)
             {
@@ -673,13 +678,21 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabCardnumFilters(Card card)
         {
-            ToolStripMenuTabCardnumFilters.DropDownItems.Clear();
-            var pairs = new List<(string Key, string Value)>();
+            ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
+            var pairs = new List<(string Key, string Value)>
+            {
+                ("Name", card.Name),
+                ("Set", card.Set),
+                ("FullCode", card.FullCode)
+            };
 
             foreach (string key in CardCatalogService.FilterKeys)
             {
                 string val = card.GetAttribute(key);
-                if (!string.IsNullOrEmpty(val)) pairs.Add((key, val));
+                if (!string.IsNullOrEmpty(val))
+                {
+                    pairs.Add((key, val));
+                }
             }
 
             if (pairs.Count == 0) return;

@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Official Card Attributes Reference</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; Official Attributes Reference</div>
+
+    <h1>Official Card Attributes Reference</h1>
+    <p>
+        Every card in the catalog carries official rules attributes synchronized from the Cardnum open database. These keys can be filtered via UI Slots 1 &amp; 2, queried in procedural deck rules, or inspected in the right-click <strong>Card Attributes</strong> monospace view.
+    </p>
+
+    <h2 id="identifiers">1. Core Identifiers &amp; Metadata</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Type</th>
+            <th>Example Values</th>
+            <th>Notes</th>
+        </tr>
+        <tr>
+            <td><code>Name</code></td>
+            <td>string</td>
+            <td><code>"Wood-elves"</code>, <code>"Rivendell"</code>, <code>"Glamdring"</code></td>
+            <td>Exact English card title. Queryable in deck generation rules and cross-card token lookups.</td>
+        </tr>
+        <tr>
+            <td><code>Set</code></td>
+            <td>string</td>
+            <td><code>"METW"</code>, <code>"MEDM"</code>, <code>"MELE"</code>, <code>"MEBA"</code></td>
+            <td>Canonical 4-letter expansion set code.</td>
+        </tr>
+        <tr>
+            <td><code>FullCode</code></td>
+            <td>string</td>
+            <td><code>"Wood-elves (TW)"</code>, <code>"Adrazar (LE)"</code></td>
+            <td>Set-disambiguated title used by Cardnum and Play MECCG.</td>
+        </tr>
+        <tr>
+            <td><code>Text</code></td>
+            <td>string</td>
+            <td>Rules text printed on the face of the card.</td>
+            <td>Evaluated by automated taxonomy regex harvesting.</td>
+        </tr>
+    </table>
+
+    <h2 id="classification">2. Classification &amp; Alignment</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Values</th>
+        </tr>
+        <tr>
+            <td><code>Primary</code></td>
+            <td><code>Character</code>, <code>Resource</code>, <code>Hazard</code>, <code>Site</code>, <code>Region</code></td>
+        </tr>
+        <tr>
+            <td><code>Secondary</code></td>
+            <td><code>Ally</code>, <code>Faction</code>, <code>Creature</code>, <code>Short-event</code>, <code>Long-event</code>, <code>Permanent-event</code>, <code>Minor Item</code>, <code>Major Item</code>, <code>Greater Item</code>, <code>Gold Ring Item</code>, <code>Special Item</code></td>
+        </tr>
+        <tr>
+            <td><code>Alignment</code></td>
+            <td><code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, <code>Neutral</code></td>
+        </tr>
+        <tr>
+            <td><code>Unique</code></td>
+            <td><code>Unique</code>, <code>Non-unique</code></td>
+        </tr>
+    </table>
+
+    <h2 id="character-stats">3. Character &amp; Creature Statistics</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Values &amp; Lore Normalization</th>
+        </tr>
+        <tr>
+            <td><code>Race</code></td>
+            <td>
+                <code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Dragon</code>, etc.<br />
+                <em>Note: Lore sub-races are canonically normalized to Elf and Dwarf for clean queries.</em>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Subrace</code></td>
+            <td>Preserves original Tolkien sub-races: <code>Silvan Elf</code>, <code>Noldo Elf</code>, <code>Longbeard Dwarf</code>, etc.</td>
+        </tr>
+        <tr>
+            <td><code>Skill</code></td>
+            <td><code>Warrior</code>, <code>Scout</code>, <code>Ranger</code>, <code>Sage</code>, <code>Diplomat</code>. Compound skills (e.g. <em>Warrior/Scout</em>) are indexed individually.</td>
+        </tr>
+        <tr>
+            <td><code>Mind</code>, <code>Direct</code>, <code>Prowess</code>, <code>Body</code>, <code>Corruption</code>, <code>MPs</code></td>
+            <td>Numeric gameplay stats and victory points.</td>
+        </tr>
+        <tr>
+            <td><code>Home</code></td>
+            <td>Designated home sites for characters (e.g. <code>"Rivendell"</code>, <code>"Bree"</code>).</td>
+        </tr>
+    </table>
+
+    <h2 id="site-movement">4. Sites &amp; Movement</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Values</th>
+        </tr>
+        <tr>
+            <td><code>Site</code></td>
+            <td><code>Free-hold</code>, <code>Border-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Shadow-hold</code>, <code>Dark-hold</code>, <code>Haven</code></td>
+        </tr>
+        <tr>
+            <td><code>Region</code></td>
+            <td>Geographic territory (e.g. <code>Arthedain</code>, <code>Rhudaur</code>, <code>Gorgoroth</code>).</td>
+        </tr>
+        <tr>
+            <td><code>Playable</code>, <code>Hoard</code>, <code>Haven</code></td>
+            <td>Site item-playability flags and nearest haven designations.</td>
+        </tr>
+    </table>
+</body>
+</html>

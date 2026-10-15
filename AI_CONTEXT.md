@@ -8,7 +8,7 @@
   - Card Data: cards-dc.json (synced from GitHub rezwits/cardnum/fdata/cards-dc.json with local fallback).
   - Set Data: sets-dc.json (synced from GitHub rezwits/cardnum/fdata/sets-dc.json with local fallback).
   - Images: https://cardnum.net/img/cards/{set}/{imageName} (with planned PlayMECCG mirror fallback).
-- Help File: MECCG_Deck_Builder.chm (compiled via Microsoft HTML Help Workshop).
+- Help File: `MECCG_Deck_Builder.chm` (compiled via Microsoft HTML Help Workshop across 14 modular topic files in a 5-folder `.hhc` hierarchy).
 
 ---
 
@@ -32,8 +32,8 @@
 - OpenCloseFilter.cs: DTO used for serializing/deserializing .json custom filter sets.
 - Messages.cs: Centralized message box text helper.
 - Program.cs: WinForms entry point; registers Windows-1252 code page provider.
-- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, and execution logs.
-- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, and branching choice groups.
+- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, variable captures (`SaveAs`), and automated shortfall fallbacks (`Fallback`).
+- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Tag:Cat}`), and fallback routing.
 - `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
 - `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
 
@@ -70,4 +70,5 @@
   - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
 - [ ] **v0.5.0 - Procedural Deck Generator**
   - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
+  - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
 - [ ] **v1.0.0 - First Public Release**

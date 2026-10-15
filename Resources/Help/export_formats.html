@@ -2,25 +2,13 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Saving &amp; Exporting</title>
+    <title>Multi-Platform Export Formats</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Saving &amp; Exporting</div>
-    <h1>Saving &amp; Export Formats</h1>
-
-    <h2>Native Deck Files (.json)</h2>
-    <p>
-        Use <strong>File &gt; Save</strong> or <strong>File &gt; Open</strong> (<kbd>Ctrl+O</kbd>) to store and load complete deck configurations in native JSON format. This preserves:
-    </p>
-    <ul>
-        <li>The full contents of all 5 tabs (Pool, Resources, Hazards, Sideboard, Sites).</li>
-        <li>Active set selections.</li>
-        <li>Deck title.</li>
-    </ul>
-
-    <h2>Export Options (File &gt; Export / Ctrl+S)</h2>
-    <p>Choose <strong>File &gt; Export</strong> to open the export dialog and select from the dropdown filter:</p>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Building &amp; Formats</a> &gt; Export Formats</div>
+    <h1>Multi-Platform Export Formats</h1>
+    <p>Select <strong>File &gt; Export</strong> to open the export dialog and choose from the supported formats:</p>
 
     <table>
         <tr>
@@ -32,14 +20,14 @@
             <td><strong>Tabletop Simulator</strong></td>
             <td><code>.json</code></td>
             <td>
-                Generates five JSON deck files (one for each section: <code>_pool.json</code>, <code>_resource.json</code>, <code>_hazard.json</code>, <code>_sideboard.json</code>, <code>_site.json</code>) ready to be dropped into Tabletop Simulator's <code>Saved Objects</code> folder.
+                Generates five JSON deck files (one for each section: <code>_pool.json</code>, <code>_resource.json</code>, <code>_hazard.json</code>, <code>_sideboard.json</code>, <code>_site.json</code>) formatted for Tabletop Simulator's <code>Saved Objects</code> folder with cloud image links.
             </td>
         </tr>
         <tr>
             <td><strong>Play MECCG</strong></td>
             <td><code>.play</code></td>
             <td>
-                Standard export for the online <em>Play MECCG</em> client. Formats cards with parenthetical subtitle convention (e.g. <code>Adrazar (TW)</code>) using Windows-1252 ANSI encoding.
+                Standard export for the online <em>Play MECCG</em> client. Formats cards with parenthetical subtitle conventions (e.g. <code>Adrazar (TW)</code>) using Windows-1252 ANSI encoding.
             </td>
         </tr>
         <tr>

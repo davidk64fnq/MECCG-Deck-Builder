@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Procedural Deck Generation Engine</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Procedural Deck Generator &gt; Generator Engine</div>
+    <h1>Procedural Deck Generation Engine</h1>
+    <p>
+        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates (via <strong>Tools &gt; Generate Deck from Rules...</strong> or <kbd>F5</kbd>).
+    </p>
+
+    <h2>Core Generation Mechanics</h2>
+    <ul>
+        <li><strong>Symmetric Filtering:</strong> Rules can query official card attributes (<code>Primary</code>, <code>Race</code>, <code>Skill</code>, <code>Name</code>) and custom user taxonomy tags (<code>Faction Focus</code>, <code>Home Region</code>).</li>
+        <li><strong>Strict Legality &amp; Copy Limits:</strong> Automatically enforces game limits: maximum 1 copy for unique cards and maximum 3 copies for non-unique cards across the entire deck.</li>
+        <li><strong>Tiered Variety-First Distribution:</strong> To maximize card variety, the engine exhausts all 0-copy (unused) cards before assigning 2nd copies, and all 2-copy cards before assigning 3rd copies.</li>
+        <li><strong>Branching Archetypes (<code>RandomChoice</code>):</strong> Author multiple company archetypes or hazard strategies in a single file with weighted random selection and dynamic title overrides.</li>
+        <li><strong>Instant Re-Run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> (<strong>Tools &gt; Re-run Deck Rules</strong>) to immediately re-run the last used rules file directly from disk without re-opening file dialogs.</li>
+    </ul>
+
+    <h2>Documentation Topics</h2>
+    <ul>
+        <li><a href="deck_rules_reference.html"><strong>Deck Rules JSON Schema Reference:</strong></a> Complete technical reference for all rule properties, variables, and tokens.</li>
+        <li><a href="worked_example_factions.html"><strong>Worked Example: Dynamic Faction Recruitment:</strong></a> Step-by-step tutorial demonstrating variable capture, targeted faction recruiting, and fallbacks.</li>
+    </ul>
+</body>
+</html>

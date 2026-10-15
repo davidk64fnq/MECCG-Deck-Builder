@@ -1,0 +1,283 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Worked Example: Dynamic Faction Recruitment</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_generation_engine.html">Procedural Deck Generator</a> &gt; Worked Example: Dynamic Factions</div>
+    <h1>Worked Example: Dynamic Faction Recruitment</h1>
+
+    <p>
+        This end-to-end tutorial demonstrates how several advanced features of <strong>MECCG Deck Builder</strong> work together to solve a complex deck construction problem:
+    </p>
+
+    <!-- STEP 0: THE GOAL -->
+    <h2>1. The Goal: Context-Aware Deck Archetypes</h2>
+    <p>
+        In MECCG, leaders often possess direct influence (DI) bonuses against specific factions (for example, <em>Thranduil</em> receives +2 DI against the <em>Wood-elves</em>, and <em>D&aacute;in II</em> receives +2 DI against the <em>Iron Hill Dwarves</em>).
+    </p>
+    <p>
+        We want to create an automated deck generator rule set that:
+    </p>
+    <ol>
+        <li>Randomly selects a company archetype (e.g. <strong>Dwarf Company</strong> vs. <strong>Elf Company</strong>).</li>
+        <li>Selects an appropriate starting diplomat leader for that company and captures them in memory.</li>
+        <li><strong>Dynamically recruits the specific faction</strong> our leader specializes in influencing.</li>
+        <li><strong>Gracefully falls back:</strong> If the randomly chosen leader has no faction influence bonus, the generator must automatically fall back to recruiting any faction matching that leader's race.</li>
+    </ol>
+
+    <!-- STEP 1: SCOPING THE MASTER LIST & AUTO-TAGGING -->
+    <h2>2. Step 1: Scoping the Master List &amp; Auto-Tagging Faction Bonuses</h2>
+    <p>
+        The extraction engine operates <strong>strictly on the cards currently visible in the Master List</strong>. The cards in this list are determined by two factors:
+    </p>
+    <ul>
+        <li><strong>Active Expansions:</strong> Checked sets in the top <strong>Set</strong> menu.</li>
+        <li><strong>Active Filters:</strong> The four filter slot pairs at the bottom of the window.</li>
+    </ul>
+
+    <p>
+        Since we only want to evaluate and tag characters for direct influence bonuses, we narrow the Master List before opening the tool:
+    </p>
+
+    <h3>A. Scope the Master List to Characters</h3>
+    <ol>
+        <li>Click <strong>Set</strong> in the top menu and ensure your desired expansions are checked (e.g. <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>).</li>
+        <li>
+            In <strong>Filter Slot 1</strong> (bottom left):
+            <ul>
+                <li>Set the top dropdown (<strong>Attribute</strong>) to <code>Primary</code>.</li>
+                <li>Set the bottom dropdown (<strong>Value</strong>) to <code>Character</code>.</li>
+            </ul>
+        </li>
+        <li>Leave Slots 2, 3, and 4 blank (or press <kbd>Ctrl+R</kbd> before setting Slot 1). The Master List now displays only characters from your selected sets.</li>
+    </ol>
+
+    <h3>B. Run the Dynamic Entity Harvest</h3>
+    <ol>
+        <li>Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>.</li>
+        <li>Note the dialog title and scope hint banner confirming: <em>"Scanning [X] card(s) currently visible in the Master List."</em></li>
+        <li>Select the <strong>Dynamic Entity Harvest (from Catalog Text)</strong> radio button.</li>
+        <li>
+            Configure the extraction fields:
+            <ul>
+                <li><strong>Target Category:</strong> Enter <code>Faction Bonus</code>.</li>
+                <li><strong>Attribute:</strong> Select <code>Secondary</code>.</li>
+                <li><strong>Value:</strong> Select <code>Faction</code>.</li>
+            </ul>
+        </li>
+        <li>
+            Click <strong>Test / Preview Matches</strong>. The engine performs a two-step query:
+            <ul>
+                <li>It scans all active catalog sets in memory to harvest published faction titles (e.g. <em>Wood-elves</em>, <em>Iron Hill Dwarves</em>, <em>Riders of Rohan</em>).</li>
+                <li>It strips all Tolkien flavor quotes from your scoped characters' rules text and flags every character whose active gameplay rules reference one of those factions (e.g. <em>"+2 direct influence against Wood-elves"</em>).</li>
+            </ul>
+        </li>
+        <li>Click <strong>Apply Tags to Catalog</strong>. Your characters are now permanently assigned structured tags in your session taxonomy (e.g. <em>Thranduil</em> &rarr; <code>Faction Bonus: Wood-elves</code>, <em>D&aacute;in II</em> &rarr; <code>Faction Bonus: Iron Hill Dwarves</code>).</li>
+    </ol>
+
+    <div class="tip">
+        <strong>Faceted Filter Verification:</strong> Once applied, you can immediately test these tags in the main window: reset Slot 1, select <strong>Category</strong> = <code>Faction Bonus</code> in Slot 3, and watch the <strong>Tag</strong> dropdown populate with all harvested factions!
+    </div>
+
+    <!-- STEP 2: UNDERSTANDING KEY CONCEPTS -->
+    <h2>3. Key Generation Concepts Explained</h2>
+
+    <h3>A. Archetype Branching (<code>RandomChoice</code>)</h3>
+    <p>
+        The <code>RandomChoice</code> rule type rolls weighted random branches at runtime. Each branch can define its own unique sub-rules and automatically update the deck title (e.g., <em>"Hero Elves of the Woodland Realm"</em>).
+    </p>
+
+    <h3>B. Runtime Variable Capture (<code>SaveAs</code>)</h3>
+    <p>
+        Adding <code>"SaveAs": "Leader"</code> to a rule captures whichever character is randomly sampled into a temporary execution context. Subsequent rules can reference that card's properties using <code>{Leader.Attribute}</code> or <code>{Leader.Tag:Category}</code>.
+    </p>
+
+    <h3>C. Direct Card Title Access (<code>Name</code>)</h3>
+    <p>
+        In the application interface, the filter dropdowns and context menus list official <em>game rules statistics</em> (such as <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>). However, inside the rules engine, <strong><code>Name</code> is a fully queryable attribute</strong>. Querying <code>"Name": "{Leader.Tag:Faction Bonus}"</code> matches the faction card whose title equals the leader's tagged bonus.
+    </p>
+
+    <h3>D. Token Interpolation &amp; Multi-Value OR Matching</h3>
+    <p>
+        If a character possesses bonuses for multiple factions (e.g. <code>Wood-elves; Silvan Elves</code>), the token resolves to a semicolon-delimited string. The engine automatically evaluates this as an <strong>OR</strong> query, matching either faction.
+    </p>
+
+    <h3>E. Automated Shortfall Fallbacks (<code>Fallback</code>)</h3>
+    <p>
+        If the leader has no faction bonus tag, or if that faction is unique and already at its deck limit, the primary rule experiences a shortfall (0 of 1 added). Instead of halting or leaving an incomplete deck, the engine detects the shortfall and immediately executes the nested <code>Fallback</code> rule for the remaining count.
+    </p>
+
+    <!-- STEP 3: THE JSON RULE TEMPLATE -->
+    <h2>4. Step 2: The Complete Rule Set (JSON)</h2>
+    <p>
+        Save the following JSON into a file named <code>Hero_Faction_Rules.json</code>:
+    </p>
+
+    <pre><code>{
+  "DeckTitle": "Hero Faction Theme Deck",
+  "RuleSetType": "SequentialRules",
+  "Version": "1.0",
+  "Rules": [
+    {
+      "RuleType": "RandomChoice",
+      "Name": "Starting Company Archetype",
+      "Choices": [
+        {
+          "Name": "Dwarf Company",
+          "DeckTitle": "Hero Dwarves of the Iron Hills",
+          "Weight": 1,
+          "Rules": [
+            {
+              "Name": "Starting Dwarf Leader",
+              "SaveAs": "Leader",
+              "Section": "Pool",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Dwarf",
+                "Skill": "Diplomat; Warrior"
+              }
+            },
+            {
+              "Name": "Dwarf Company Members",
+              "Section": "Pool",
+              "Count": 4,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Dwarf"
+              }
+            },
+            {
+              "Name": "Leader's Associated Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Name": "{Leader.Tag:Faction Bonus}"
+              },
+              "Fallback": {
+                "Name": "Fallback Dwarf Faction",
+                "Attributes": {
+                  "Primary": "Resource",
+                  "Secondary": "Faction",
+                  "Race": "{Leader.Race}"
+                }
+              }
+            },
+            {
+              "Name": "Secondary Dwarf Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Race": "Dwarf"
+              }
+            }
+          ]
+        },
+        {
+          "Name": "Elf Company",
+          "DeckTitle": "Hero Elves of the Woodland Realm",
+          "Weight": 1,
+          "Rules": [
+            {
+              "Name": "Starting Elf Leader",
+              "SaveAs": "Leader",
+              "Section": "Pool",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Elf",
+                "Skill": "Sage; Diplomat"
+              }
+            },
+            {
+              "Name": "Elf Company Members",
+              "Section": "Pool",
+              "Count": 4,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Elf"
+              }
+            },
+            {
+              "Name": "Leader's Associated Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Name": "{Leader.Tag:Faction Bonus}"
+              },
+              "Fallback": {
+                "Name": "Fallback Elf Faction",
+                "Attributes": {
+                  "Primary": "Resource",
+                  "Secondary": "Faction",
+                  "Race": "{Leader.Race}"
+                }
+              }
+            },
+            {
+              "Name": "Secondary Elf Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Race": "Elf"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Standard Resource Items",
+      "Section": "Resources",
+      "Count": 8,
+      "Attributes": {
+        "Primary": "Resource",
+        "Secondary": "Major Item; Minor Item"
+      }
+    },
+    {
+      "Name": "Hazard Creatures",
+      "Section": "Hazards",
+      "Count": 15,
+      "Attributes": {
+        "Primary": "Hazard",
+        "Secondary": "Creature"
+      }
+    },
+    {
+      "Name": "Movement Sites",
+      "Section": "Sites",
+      "Count": 15,
+      "Attributes": {
+        "Primary": "Site"
+      }
+    }
+  ]
+}</code></pre>
+
+    <!-- STEP 4: EXECUTION & VERIFICATION -->
+    <h2>5. Step 3: Running and Verifying the Deck</h2>
+    <ol>
+        <li>Click <strong>Tools &gt; Generate Deck from Rules...</strong> and pick <code>Hero_Faction_Rules.json</code>.</li>
+        <li>
+            Inspect the generation summary dialog:
+            <ul>
+                <li><strong>Scenario A (Leader has Tag):</strong> If the generator selects <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
+                <li><strong>Scenario B (Leader has no Tag):</strong> If the generator selects a leader with no bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic dwarf faction (such as <em>Blue Mountain Dwarves</em>).</li>
+            </ul>
+        </li>
+        <li>Press <kbd>F5</kbd> (<strong>Tools &gt; Re-run Deck Rules</strong>) to generate instant variations with new leader, faction, item, and hazard combinations.</li>
+    </ol>
+</body>
+</html>

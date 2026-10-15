@@ -118,3 +118,24 @@ code, kbd {
         .nav-bar a:hover {
             text-decoration: underline;
         }
+
+pre {
+    background-color: #F7FAFC;
+    border: 1px solid #CBD5E0;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 12px 0 16px 0;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 9pt;
+    line-height: 1.45;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+    pre code {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        font-family: inherit;
+        font-size: inherit;
+    }

@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Card Artwork Cache &amp; Downloader</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Tools &amp; Technical Architecture &gt; Artwork Cache &amp; Downloader</div>
+    <h1>Card Artwork Cache &amp; Downloader</h1>
+
+    <h2>Card Artwork Cache System</h2>
+    <p>The application employs a high-performance two-tier caching architecture:</p>
+    <ol>
+        <li><strong>Memory Cache:</strong> An in-memory cache holding up to 10,000 active Bitmaps for instant display when clicking or navigating.</li>
+        <li>
+            <strong>Local Disk Cache:</strong> Checks for card images on disk under local set folders (e.g., <code>METW/metw_adrazar.jpg</code>).
+            <ul>
+                <li>If found locally, the image loads immediately with zero network latency.</li>
+                <li>If missing, it downloads asynchronously from Cardnum, saves a copy to disk, and loads it into memory.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h2>Batch Image Downloader</h2>
+    <p>To pre-cache card artwork for tournament or offline use:</p>
+    <ol>
+        <li>Enable all sets you want cached in the <strong>Set</strong> menu.</li>
+        <li>Reset filters (<kbd>Ctrl+R</kbd>) so all cards appear in the Master List.</li>
+        <li>Select <strong>Tools &gt; Download Images</strong>.</li>
+    </ol>
+    <div class="note">
+        <strong>Background Download:</strong> The batch downloader runs asynchronously with real-time progress reported in the window title bar, keeping the application responsive.
+    </div>
+
+    <h2>Offline Data Fallbacks</h2>
+    <ul>
+        <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch, falling back to local <code>cards-dc.json</code> if offline.</li>
+        <li><strong>Sets:</strong> Attempts to download set metadata on launch, falling back to local <code>sets-dc.json</code> if offline.</li>
+    </ul>
+</body>
+</html>

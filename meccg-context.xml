@@ -497,6 +497,9 @@ namespace MECCG_Deck_Builder.Properties {
     <div class="tip">
         <strong>Multi-Skill Search:</strong> When searching by <code>Skill</code>, cards with compound skills (such as <em>Warrior/Scout</em>) are indexed by both terms individually.
     </div>
+    <div class="tip">
+        <strong>Canonical Race Normalization:</strong> Tolkien sub-races in the catalog (such as <em>Silvan Elf</em>, <em>Noldo Elf</em>, <em>Longbeard Dwarf</em>, and <em>Firebeard Dwarf</em>) are canonically normalized to <code>Elf</code> and <code>Dwarf</code>. This ensures consistent filtering in Slot 2 and clean queries in deck generation rules, while the original detailed lore is preserved in the card attributes under <code>Subrace</code>.
+    </div>
 
     <h2>Custom User Taxonomy (Slots 3 &amp; 4)</h2>
     <p>
@@ -873,6 +876,30 @@ code, kbd {
         <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch. If offline or unavailable, it seamlessly falls back to the bundled local <code>cards-dc.json</code> file.</li>
         <li><strong>Sets:</strong> Automatically attempts to download the latest expansion set metadata. If offline, it reads the bundled local <code>sets-dc.json</code> file.</li>
     </ul>
+
+    <h2>Procedural Deck Generation (Tools &gt; Generate Deck from Rules... / F5)</h2>
+    <p>
+        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates.
+    </p>
+    <ul>
+        <li><strong>Symmetric Filtering:</strong> Rules can query official card attributes (<code>Primary</code>, <code>Race</code>, <code>Skill</code>) and custom taxonomy tags (<code>Faction Focus</code>, <code>Home Region</code>).</li>
+        <li><strong>Multi-Value &quot;OR&quot; Syntax:</strong> Semicolon-delimited values (e.g. <code>"Secondary": "Major Item; Minor Item"</code>) match cards satisfying any of the listed options.</li>
+        <li><strong>Copy Limits &amp; Uniqueness:</strong> Strictly enforces game legality: maximum 1 copy for unique cards and maximum 3 copies for non-unique cards across the entire deck.</li>
+        <li><strong>Tiered Variety-First Distribution:</strong> To maximize card variety, the engine exhausts all 0-copy (unused) cards before assigning 2nd copies, and all 2-copy cards before assigning 3rd copies.</li>
+        <li><strong>Branching Choice Groups (<code>RandomChoice</code>):</strong> Author multiple deck archetypes (e.g., Dwarf Company vs. Elf Company, or Nazg&ucirc;l vs. Dragon hazards) in a single rule file with weighted random selection and dynamic title overrides.</li>
+        <li><strong>Instant Re-run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> to re-run the last used rules file directly from disk without re-opening file dialogs.</li>
+    </ul>
+
+    <h2>Relational Attribute Lookup (Cross-Card Join)</h2>
+    <p>
+        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this mode enables 2-step relational tagging between linked entities:
+    </p>
+    <ul>
+        <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
+        <li><strong>Lookup Entity:</strong> Matches corresponding cards in the catalog (e.g. <code>Primary = Site</code>).</li>
+        <li><strong>Extract Field:</strong> Reads the destination attribute (e.g. Site <code>Region</code>) and writes it into a custom category (e.g. <code>Home Region</code>).</li>
+        <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
+    </ul>
 </body>
 </html>
 ]]>
@@ -1077,6 +1104,10 @@ namespace MECCG_Deck_Builder
 - OpenCloseFilter.cs: DTO used for serializing/deserializing .json custom filter sets.
 - Messages.cs: Centralized message box text helper.
 - Program.cs: WinForms entry point; registers Windows-1252 code page provider.
+- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, and execution logs.
+- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, and branching choice groups.
+- `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
+- `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
 
 ---
 
@@ -1110,6 +1141,7 @@ namespace MECCG_Deck_Builder
   - Issue #17: Group filter panel into titled containers with slot labels and layer demarcation
   - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
 - [ ] **v0.5.0 - Procedural Deck Generator**
+  - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
 - [ ] **v1.0.0 - First Public Release**
 ]]>
   </file>
@@ -1144,6 +1176,7 @@ namespace MECCG_Deck_Builder
         public string Unique { get; init; } = string.Empty;
         public string Secondary { get; init; } = string.Empty;
         public string Race { get; init; } = string.Empty;
+        public string Subrace { get; init; } = string.Empty;
         public string Site { get; init; } = string.Empty;
         public string Region { get; init; } = string.Empty;
         public string Playable { get; init; } = string.Empty;
@@ -1211,6 +1244,7 @@ namespace MECCG_Deck_Builder
                 "unique" => Unique,
                 "secondary" => Secondary,
                 "race" => Race,
+                "subrace" => Subrace,
                 "site" => Site,
                 "region" => Region,
                 "playable" => Playable,
@@ -1260,7 +1294,7 @@ namespace MECCG_Deck_Builder
         public static readonly string[] FilterKeys =
         [
             "Primary", "Alignment", "Artist", "Skill", "MPs", "Mind", "Direct", "Prowess", "Body",
-            "Corruption", "Home", "Unique", "Secondary", "Race", "Site", "Region", "Playable", "GoldRing", "GreaterItem",
+            "Corruption", "Home", "Unique", "Secondary", "Race", "Subrace", "Site", "Region", "Playable", "GoldRing", "GreaterItem",
             "MajorItem", "MinorItem", "Information", "Palantiri", "Scroll", "Hoard", "Haven", "Strikes", "Specific"
         ];
 
@@ -1439,6 +1473,28 @@ namespace MECCG_Deck_Builder
 
                     string imageName = raw.Ice_errata == true ? $"ice-{raw.ImageName}" : raw.ImageName;
 
+                    // Normalize Tolkien lore sub-races to canonical game races
+                    string rawRace = raw.Race ?? string.Empty;
+                    string canonicalRace = rawRace;
+                    string subrace = string.Empty; // Defaults to empty for all cards
+
+                    if (rawRace.EndsWith("Elf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        canonicalRace = "Elf";
+                        if (!string.Equals(rawRace, "Elf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            subrace = rawRace; // Only "Silvan Elf", "Noldo Elf", "Sinda Elf", "Nando Elf"
+                        }
+                    }
+                    else if (rawRace.EndsWith("Dwarf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        canonicalRace = "Dwarf";
+                        if (!string.Equals(rawRace, "Dwarf", StringComparison.OrdinalIgnoreCase))
+                        {
+                            subrace = rawRace; // Only "Longbeard Dwarf", "Firebeard Dwarf", etc.
+                        }
+                    }
+
                     var card = new Card
                     {
                         Id = (idCounter++).ToString(),
@@ -1460,7 +1516,8 @@ namespace MECCG_Deck_Builder
                         Home = raw.Home ?? string.Empty,
                         Unique = raw.Unique ?? string.Empty,
                         Secondary = raw.Secondary ?? string.Empty,
-                        Race = raw.Race ?? string.Empty,
+                        Race = canonicalRace,
+                        Subrace = subrace,
                         Site = raw.Site ?? string.Empty,
                         Region = raw.Region ?? string.Empty,
                         Playable = raw.Playable ?? string.Empty,
@@ -2050,11 +2107,11 @@ namespace MECCG_Deck_Builder
         }
 
         public List<string> GetAvailableValues(
-            IEnumerable<Card> sourceCards,
-            ISet<string> selectedSets,
-            IReadOnlyList<FilterCriterion> otherCriteria,
-            FilterType targetType,
-            string targetKey)
+    IEnumerable<Card> sourceCards,
+    ISet<string> selectedSets,
+    IReadOnlyList<FilterCriterion> otherCriteria,
+    FilterType targetType,
+    string targetKey)
         {
             var result = new List<string> { "" };
 
@@ -2065,19 +2122,7 @@ namespace MECCG_Deck_Builder
 
             var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // For custom taxonomy filters, always include all values defined in the taxonomy for this key
-            if (targetType == FilterType.Custom)
-            {
-                var taxonomyValues = GetCustomKeyValues(targetKey);
-                foreach (var val in taxonomyValues)
-                {
-                    if (!string.IsNullOrWhiteSpace(val))
-                    {
-                        distinctValues.Add(val.Trim());
-                    }
-                }
-            }
-
+            // Scan only cards matching active sets and criteria
             foreach (var card in sourceCards)
             {
                 if (selectedSets != null && !selectedSets.Contains(card.Set))
@@ -3016,6 +3061,295 @@ namespace MECCG_Deck_Builder
 }
 ]]>
   </file>
+  <file path='.\DeckGenerationRule.cs'>
+<![CDATA[
+using System;
+using System.Collections.Generic;
+
+namespace MECCG_Deck_Builder
+{
+    public sealed class DeckGenerationRuleSet
+    {
+        public string DeckTitle { get; set; } = "Generated Deck";
+        public string RuleSetType { get; set; } = "SequentialRules";
+        public string Version { get; set; } = "1.0";
+        public List<DeckGenerationRule> Rules { get; set; } = [];
+    }
+
+    public sealed class DeckGenerationChoice
+    {
+        public string Name { get; set; } = string.Empty;
+        public string DeckTitle { get; set; } = string.Empty;
+        public int Weight { get; set; } = 1;
+        public List<DeckGenerationRule> Rules { get; set; } = [];
+    }
+
+    public sealed class DeckGenerationRule
+    {
+        public string RuleType { get; set; } = "FilterQuery";
+        public string Name { get; set; } = string.Empty;
+        public string Section { get; set; } = "Resources";
+        public int Count { get; set; } = 1;
+        public List<string> Sets { get; set; } = [];
+        public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> Tags { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+        // Sub-choices for RuleType == "RandomChoice" / "Choice" / "OneOf"
+        public List<DeckGenerationChoice> Choices { get; set; } = [];
+    }
+
+    public sealed class DeckRuleExecutionLog
+    {
+        public string RuleName { get; init; } = string.Empty;
+        public string Section { get; init; } = string.Empty;
+        public int RequestedCount { get; init; }
+        public int AddedCount { get; init; }
+        public bool IsShortfall => AddedCount < RequestedCount;
+    }
+
+    public sealed class DeckGenerationResult
+    {
+        public Deck Deck { get; init; } = new();
+        public List<DeckRuleExecutionLog> Logs { get; init; } = [];
+        public bool Success { get; init; }
+        public string ErrorMessage { get; init; } = string.Empty;
+    }
+}
+]]>
+  </file>
+  <file path='.\DeckGenerationService.cs'>
+<![CDATA[
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+
+namespace MECCG_Deck_Builder
+{
+    public static class DeckGenerationService
+    {
+        public static DeckGenerationRuleSet LoadRuleSetFromJson(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return null;
+            return JsonConvert.DeserializeObject<DeckGenerationRuleSet>(json);
+        }
+
+        public static string SaveRuleSetToJson(DeckGenerationRuleSet ruleSet)
+        {
+            return JsonConvert.SerializeObject(ruleSet, Formatting.Indented);
+        }
+
+        public static DeckGenerationResult GenerateDeck(
+            IEnumerable<Card> catalogCards,
+            ISet<string> defaultSets,
+            CardFilterService filterService,
+            DeckGenerationRuleSet ruleSet)
+        {
+            if (ruleSet == null || ruleSet.Rules == null || ruleSet.Rules.Count == 0)
+            {
+                return new DeckGenerationResult
+                {
+                    Success = false,
+                    ErrorMessage = "The rule set contains no rules."
+                };
+            }
+
+            var deck = new Deck
+            {
+                Title = !string.IsNullOrWhiteSpace(ruleSet.DeckTitle) ? ruleSet.DeckTitle : "Generated Deck"
+            };
+
+            var cardCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var logs = new List<DeckRuleExecutionLog>();
+            var allCards = catalogCards?.ToList() ?? [];
+
+            foreach (var rule in ruleSet.Rules)
+            {
+                ExecuteRule(rule, deck, cardCountsByName, logs, allCards, defaultSets, filterService);
+            }
+
+            deck.SortSections();
+
+            return new DeckGenerationResult
+            {
+                Deck = deck,
+                Logs = logs,
+                Success = true
+            };
+        }
+
+        private static void ExecuteRule(
+            DeckGenerationRule rule,
+            Deck deck,
+            Dictionary<string, int> cardCountsByName,
+            List<DeckRuleExecutionLog> logs,
+            IReadOnlyList<Card> allCards,
+            ISet<string> defaultSets,
+            CardFilterService filterService)
+        {
+            if (rule == null) return;
+
+            // Handle RandomChoice / ChoiceGroup ("OR" branches)
+            if (IsChoiceRule(rule))
+            {
+                var validChoices = rule.Choices?.Where(c => c != null && c.Rules != null && c.Rules.Count > 0).ToList() ?? [];
+                if (validChoices.Count == 0) return;
+
+                // Weighted random selection (default weight is 1)
+                int totalWeight = validChoices.Sum(c => Math.Max(1, c.Weight));
+                int roll = Random.Shared.Next(totalWeight);
+                int cumulative = 0;
+                DeckGenerationChoice chosen = validChoices[0];
+
+                foreach (var c in validChoices)
+                {
+                    cumulative += Math.Max(1, c.Weight);
+                    if (roll < cumulative)
+                    {
+                        chosen = c;
+                        break;
+                    }
+                }
+
+                // If choice provides a specific deck title, apply it
+                if (!string.IsNullOrWhiteSpace(chosen.DeckTitle))
+                {
+                    deck.Title = chosen.DeckTitle;
+                }
+
+                logs.Add(new DeckRuleExecutionLog
+                {
+                    RuleName = $"[Branch Selected] {rule.Name} -> '{chosen.Name}'",
+                    Section = "-",
+                    RequestedCount = 0,
+                    AddedCount = 0
+                });
+
+                // Execute the chosen branch's sub-rules
+                foreach (var subRule in chosen.Rules)
+                {
+                    ExecuteRule(subRule, deck, cardCountsByName, logs, allCards, defaultSets, filterService);
+                }
+                return;
+            }
+
+            // Standard FilterQuery Rule
+            if (rule.Count <= 0) return;
+
+            if (!Enum.TryParse<DeckSectionType>(rule.Section, true, out var sectionType))
+            {
+                sectionType = DeckSectionType.Resources;
+            }
+
+            ISet<string> ruleSets = (rule.Sets != null && rule.Sets.Count > 0)
+                ? new HashSet<string>(rule.Sets, StringComparer.OrdinalIgnoreCase)
+                : defaultSets;
+
+            // 1. Filter candidates
+            var candidates = allCards.Where(c =>
+            {
+                if (ruleSets != null && ruleSets.Count > 0 && !ruleSets.Contains(c.Set))
+                {
+                    return false;
+                }
+
+                if (rule.Attributes != null)
+                {
+                    foreach (var (attrKey, attrVal) in rule.Attributes)
+                    {
+                        if (!string.IsNullOrWhiteSpace(attrKey) && !string.IsNullOrWhiteSpace(attrVal))
+                        {
+                            var allowedValues = attrVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            if (!allowedValues.Any(v => CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                if (rule.Tags != null && filterService != null)
+                {
+                    foreach (var (tagKey, tagVal) in rule.Tags)
+                    {
+                        if (!string.IsNullOrWhiteSpace(tagKey) && !string.IsNullOrWhiteSpace(tagVal))
+                        {
+                            var allowedTags = tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            if (!allowedTags.Any(t => filterService.MatchesCustomCriterion(c.Id, tagKey, t)))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }).ToList();
+
+            // 2. Sample candidates with tiered variety-first duplication
+            int addedForThisRule = 0;
+            var targetSection = deck.GetSection(sectionType);
+
+            while (addedForThisRule < rule.Count)
+            {
+                var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                if (available.Count == 0) break;
+
+                int minCount = available.Min(c => cardCountsByName.GetValueOrDefault(c.Name, 0));
+
+                var tierGroups = available
+                    .Where(c => cardCountsByName.GetValueOrDefault(c.Name, 0) == minCount)
+                    .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (tierGroups.Count == 0) break;
+
+                int groupIndex = Random.Shared.Next(tierGroups.Count);
+                var matchingReprints = tierGroups[groupIndex].ToList();
+                var selectedCard = matchingReprints[Random.Shared.Next(matchingReprints.Count)];
+
+                targetSection.Add(selectedCard);
+                deck.IncludedSets.Add(selectedCard.Set);
+
+                int currentCount = cardCountsByName.GetValueOrDefault(selectedCard.Name, 0) + 1;
+                cardCountsByName[selectedCard.Name] = currentCount;
+                addedForThisRule++;
+            }
+
+            logs.Add(new DeckRuleExecutionLog
+            {
+                RuleName = !string.IsNullOrWhiteSpace(rule.Name) ? rule.Name : $"Rule {logs.Count + 1}",
+                Section = sectionType.ToString(),
+                RequestedCount = rule.Count,
+                AddedCount = addedForThisRule
+            });
+        }
+
+        private static bool IsChoiceRule(DeckGenerationRule rule)
+        {
+            if (rule == null) return false;
+            return string.Equals(rule.RuleType, "RandomChoice", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(rule.RuleType, "Choice", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(rule.RuleType, "OneOf", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(rule.RuleType, "Or", StringComparison.OrdinalIgnoreCase) ||
+                   (rule.Choices != null && rule.Choices.Count > 0);
+        }
+
+        private static bool CanAddCard(Card card, Dictionary<string, int> cardCountsByName)
+        {
+            int currentCount = cardCountsByName.GetValueOrDefault(card.Name, 0);
+            int maxAllowed = IsUniqueCard(card) ? 1 : 3;
+            return currentCount < maxAllowed;
+        }
+
+        private static bool IsUniqueCard(Card card)
+        {
+            return string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+}
+]]>
+  </file>
   <file path='.\DeckSectionType.cs'>
 <![CDATA[
 namespace MECCG_Deck_Builder
@@ -3092,6 +3426,7 @@ namespace MECCG_Deck_Builder
         private int _selectedTabIndex;
         private CancellationTokenSource _imageLoadCts;
         private Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
+        private string _lastDeckRulesFilePath;
 
         internal Form1()
         {
@@ -3303,7 +3638,9 @@ namespace MECCG_Deck_Builder
 
             for (int i = 0; i < pairs.Count; i++)
             {
-                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value}";
+                string escapedKey = pairs[i].Key.Replace("&", "&&");
+                string escapedVal = pairs[i].Value.Replace("&", "&&");
+                string line = $"{escapedKey.PadRight(maxLen + 3)}{escapedVal}";
                 customMenu.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
             }
 
@@ -3362,13 +3699,16 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        // Check if this specific tag is currently active on the card
                         bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
+                        var valItem = new ToolStripMenuItem(val.Replace("&", "&&"))
+                        {
+                            Checked = isChecked,
+                            Tag = val
+                        };
                         valItem.Click += (s, ev) =>
                         {
-                            // Toggles the tag: adds if missing, removes if already checked
-                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
+                            string tagToToggle = ((ToolStripMenuItem)s).Tag?.ToString() ?? val;
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, tagToToggle);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -3393,15 +3733,15 @@ namespace MECCG_Deck_Builder
             var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
-                var keyItem = new ToolStripMenuItem(key);
-                // Split multi-tags so each tag can be removed individually
+                var keyItem = new ToolStripMenuItem(key.Replace("&", "&&"));
                 var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var tag in tags)
                 {
-                    var valItem = new ToolStripMenuItem(tag);
+                    var valItem = new ToolStripMenuItem(tag.Replace("&", "&&")) { Tag = tag };
                     valItem.Click += (s, ev) =>
                     {
-                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        string tagToRemove = ((ToolStripMenuItem)s).Tag?.ToString() ?? tag;
+                        _filterService.RemoveCardCustomTag(card.Id, key, tagToRemove);
                         UpdateFacetedFilters();
                     };
                     keyItem.DropDownItems.Add(valItem);
@@ -3750,7 +4090,9 @@ namespace MECCG_Deck_Builder
 
             for (int i = 0; i < pairs.Count; i++)
             {
-                string line = $"{pairs[i].Key.PadRight(maxLen + 3)}{pairs[i].Value}";
+                string escapedKey = pairs[i].Key.Replace("&", "&&");
+                string escapedVal = pairs[i].Value.Replace("&", "&&");
+                string line = $"{escapedKey.PadRight(maxLen + 3)}{escapedVal}";
                 customMenu.DropDownItems.Add(new ToolStripMenuItem(line) { Font = new Font("Consolas", 8.0f) });
             }
 
@@ -3809,13 +4151,16 @@ namespace MECCG_Deck_Builder
                 {
                     foreach (string val in definedValues)
                     {
-                        // Check if this specific tag is already active on the card
                         bool isChecked = cardTags.Contains(val, StringComparer.OrdinalIgnoreCase);
-                        var valItem = new ToolStripMenuItem(val) { Checked = isChecked };
+                        var valItem = new ToolStripMenuItem(val.Replace("&", "&&"))
+                        {
+                            Checked = isChecked,
+                            Tag = val
+                        };
                         valItem.Click += (s, ev) =>
                         {
-                            // Toggles the tag on/off
-                            _filterService.ToggleCardCustomTag(card.Id, keyName, valItem.Text);
+                            string tagToToggle = ((ToolStripMenuItem)s).Tag?.ToString() ?? val;
+                            _filterService.ToggleCardCustomTag(card.Id, keyName, tagToToggle);
                             UpdateFacetedFilters();
                         };
                         keyItem.DropDownItems.Add(valItem);
@@ -3840,15 +4185,15 @@ namespace MECCG_Deck_Builder
             var delMenu = new ToolStripMenuItem("Remove Tag") { Name = "Remove Tag" };
             foreach (var (key, value) in pairs)
             {
-                var keyItem = new ToolStripMenuItem(key);
-                // Split semicolon-delimited tags so each tag can be removed individually
+                var keyItem = new ToolStripMenuItem(key.Replace("&", "&&"));
                 var tags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var tag in tags)
                 {
-                    var valItem = new ToolStripMenuItem(tag);
+                    var valItem = new ToolStripMenuItem(tag.Replace("&", "&&")) { Tag = tag };
                     valItem.Click += (s, ev) =>
                     {
-                        _filterService.RemoveCardCustomTag(card.Id, key, valItem.Text);
+                        string tagToRemove = ((ToolStripMenuItem)s).Tag?.ToString() ?? tag;
+                        _filterService.RemoveCardCustomTag(card.Id, key, tagToRemove);
                         UpdateFacetedFilters();
                     };
                     keyItem.DropDownItems.Add(valItem);
@@ -4424,6 +4769,152 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void ToolStripMenuToolsGenerateDeck_Click(object sender, EventArgs e)
+        {
+            using var ofd = new OpenFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Select Deck Rules File",
+                DefaultExt = "json",
+                Filter = "MECCG Deck Rules (*.json)|*.json|All Files (*.*)|*.*"
+            };
+
+            if (ofd.ShowDialog(this) == DialogResult.OK)
+            {
+                RunDeckGeneration(ofd.FileName);
+            }
+        }
+
+        private void ToolStripMenuToolsRerunDeckGen_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_lastDeckRulesFilePath) && File.Exists(_lastDeckRulesFilePath))
+            {
+                RunDeckGeneration(_lastDeckRulesFilePath);
+            }
+            else
+            {
+                // If not run yet in this session, open file picker
+                ToolStripMenuToolsGenerateDeck_Click(sender, e);
+            }
+        }
+
+        private void RunDeckGeneration(string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+            {
+                MessageBox.Show(this, "The specified deck rules file could not be found.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DeckGenerationRuleSet ruleSet;
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                ruleSet = DeckGenerationService.LoadRuleSetFromJson(json);
+
+                if (ruleSet == null || ruleSet.Rules == null || ruleSet.Rules.Count == 0)
+                {
+                    MessageBox.Show(this, "The selected rules file contains no rules.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, $"Failed to load deck rules file:\n{ex.Message}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Run generation engine
+            var result = DeckGenerationService.GenerateDeck(
+                _catalogService.Cards,
+                _currentDeck.IncludedSets,
+                _filterService,
+                ruleSet);
+
+            if (!result.Success)
+            {
+                MessageBox.Show(this, $"Deck generation failed: {result.ErrorMessage}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // Save path for F5 re-runs and enable menu item
+            _lastDeckRulesFilePath = filePath;
+            ToolStripMenuToolsRerunDeckGen.Enabled = true;
+            ToolStripMenuToolsRerunDeckGen.Text = $"Re-run Rules ({Path.GetFileName(filePath)})";
+
+            // Transfer generated deck to current deck
+            _currentDeck.Clear();
+            _currentDeck.Title = result.Deck.Title;
+
+            foreach (var s in result.Deck.IncludedSets)
+            {
+                _currentDeck.IncludedSets.Add(s);
+            }
+
+            _currentDeck.Pool.AddRange(result.Deck.Pool);
+            _currentDeck.Resources.AddRange(result.Deck.Resources);
+            _currentDeck.Hazards.AddRange(result.Deck.Hazards);
+            _currentDeck.Sideboard.AddRange(result.Deck.Sideboard);
+            _currentDeck.Sites.AddRange(result.Deck.Sites);
+
+            // Sync Set menu checkboxes if any sets were added by the rules
+            _isUpdatingFilters = true;
+            try
+            {
+                foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                {
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
+                    {
+                        setItem.Checked = _currentDeck.IncludedSets.Contains(tag);
+                    }
+                }
+            }
+            finally
+            {
+                _isUpdatingFilters = false;
+            }
+
+            // Reset filter controls so user can freely inspect master list
+            ResetAllFilters();
+
+            // Refresh deck tabs and window title
+            foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
+            {
+                RefreshSectionListBox(sectionType);
+            }
+            UpdateFormTitle();
+
+            // Display summary
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"Deck \"{_currentDeck.Title}\" generated successfully!\n");
+            sb.AppendLine($"Pool: {_currentDeck.Pool.Count}");
+            sb.AppendLine($"Resources: {_currentDeck.Resources.Count} ({_currentDeck.CountCharactersInResources()} Characters)");
+            sb.AppendLine($"Hazards: {_currentDeck.Hazards.Count}");
+            sb.AppendLine($"Sideboard: {_currentDeck.Sideboard.Count}");
+            sb.AppendLine($"Sites: {_currentDeck.Sites.Count}");
+
+            var branches = result.Logs.Where(l => l.RuleName.StartsWith("[Branch Selected]")).ToList();
+            if (branches.Count > 0)
+            {
+                sb.AppendLine("\nRandom Choices:");
+                foreach (var b in branches)
+                {
+                    sb.AppendLine($" • {b.RuleName.Replace("[Branch Selected] ", "")}");
+                }
+            }
+
+            var shortfalls = result.Logs.Where(l => l.IsShortfall).ToList();
+            if (shortfalls.Count > 0)
+            {
+                sb.AppendLine("\nNotice - Insufficient matching cards:");
+                foreach (var sf in shortfalls)
+                {
+                    sb.AppendLine($" • {sf.RuleName} ({sf.Section}): added {sf.AddedCount} of {sf.RequestedCount}");
+                }
+            }
+
+            MessageBox.Show(this, sb.ToString(), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         #endregion
 
         #region TAXONOMY_TOOLS
@@ -4618,11 +5109,13 @@ namespace MECCG_Deck_Builder
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsGenerateDeck = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparatorDeckGen = new System.Windows.Forms.ToolStripSeparator();
+            ToolStripMenuToolsRerunDeckGen = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsRunRules = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsExportCsv = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsImportCsv = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparatorTools = new System.Windows.Forms.ToolStripSeparator();
-            ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
@@ -5184,41 +5677,71 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuTools
             // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuToolsRunRules, ToolStripMenuToolsExportCsv, ToolStripMenuToolsImportCsv, toolStripSeparatorTools, ToolStripMenuToolsGetImages });
+            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                ToolStripMenuToolsGenerateDeck,
+                ToolStripMenuToolsRerunDeckGen,
+                toolStripSeparatorDeckGen,
+                ToolStripMenuToolsRunRules,
+                ToolStripMenuToolsExportCsv,
+                ToolStripMenuToolsImportCsv,
+                toolStripSeparatorTools,
+                ToolStripMenuToolsGetImages
+            }); 
             ToolStripMenuTools.Name = "ToolStripMenuTools";
             ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
             ToolStripMenuTools.Text = "&Tools";
             // 
+            // ToolStripMenuToolsGenerateDeck
+            // 
+            ToolStripMenuToolsGenerateDeck.Name = "ToolStripMenuToolsGenerateDeck";
+            ToolStripMenuToolsGenerateDeck.Size = new System.Drawing.Size(232, 22);
+            ToolStripMenuToolsGenerateDeck.Text = "Generate Deck from Rules...";
+            ToolStripMenuToolsGenerateDeck.Click += ToolStripMenuToolsGenerateDeck_Click;
+            // 
+            // ToolStripMenuToolsRerunDeckGen
+            // 
+            ToolStripMenuToolsRerunDeckGen.Name = "ToolStripMenuToolsRerunDeckGen";
+            ToolStripMenuToolsRerunDeckGen.Size = new System.Drawing.Size(232, 22);
+            ToolStripMenuToolsRerunDeckGen.Text = "Re-run Deck Rules";
+            ToolStripMenuToolsRerunDeckGen.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            ToolStripMenuToolsRerunDeckGen.Enabled = false;
+            ToolStripMenuToolsRerunDeckGen.Click += ToolStripMenuToolsRerunDeckGen_Click;
+            // 
+            // toolStripSeparatorDeckGen
+            // 
+            toolStripSeparatorDeckGen.Name = "toolStripSeparatorDeckGen";
+            toolStripSeparatorDeckGen.Size = new System.Drawing.Size(229, 6);
+            // 
             // ToolStripMenuToolsRunRules
             // 
             ToolStripMenuToolsRunRules.Name = "ToolStripMenuToolsRunRules";
-            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsRunRules.Text = "Extract Taxonomy with Rules...";
             ToolStripMenuToolsRunRules.Click += ToolStripMenuToolsRunRules_Click;
             // 
             // ToolStripMenuToolsExportCsv
             // 
             ToolStripMenuToolsExportCsv.Name = "ToolStripMenuToolsExportCsv";
-            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsExportCsv.Text = "Export Taxonomy Draft (CSV)...";
             ToolStripMenuToolsExportCsv.Click += ToolStripMenuToolsExportCsv_Click;
             // 
             // ToolStripMenuToolsImportCsv
             // 
             ToolStripMenuToolsImportCsv.Name = "ToolStripMenuToolsImportCsv";
-            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(225, 22);
+            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsImportCsv.Text = "Import Taxonomy from CSV...";
             ToolStripMenuToolsImportCsv.Click += ToolStripMenuToolsImportCsv_Click;
             // 
             // toolStripSeparatorTools
             // 
             toolStripSeparatorTools.Name = "toolStripSeparatorTools";
-            toolStripSeparatorTools.Size = new System.Drawing.Size(222, 6);
+            toolStripSeparatorTools.Size = new System.Drawing.Size(229, 6);
             // 
             // ToolStripMenuToolsGetImages
             // 
             ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
-            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(232, 22);
             ToolStripMenuToolsGetImages.Text = "Download Images";
             ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
             // 
@@ -5232,14 +5755,14 @@ namespace MECCG_Deck_Builder
             // ToolStripMenuSetSelectAll
             // 
             ToolStripMenuSetSelectAll.Name = "ToolStripMenuSetSelectAll";
-            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(122, 22);
             ToolStripMenuSetSelectAll.Text = "Select All";
             ToolStripMenuSetSelectAll.Click += ToolStripMenuSetSelectAll_Click;
             // 
             // ToolStripMenuSetClearAll
             // 
             ToolStripMenuSetClearAll.Name = "ToolStripMenuSetClearAll";
-            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(180, 22);
+            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(122, 22);
             ToolStripMenuSetClearAll.Text = "Clear All";
             ToolStripMenuSetClearAll.Click += ToolStripMenuSetClearAll_Click;
             // 
@@ -5585,10 +6108,22 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTools;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGenerateDeck;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorDeckGen;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRunRules;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsExportCsv;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsImportCsv;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparatorTools;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
@@ -5597,7 +6132,6 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip ContextMenuStripTabs;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyCard;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToPool;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToResource;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToHazard;
@@ -5618,7 +6152,6 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSideboard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
         private System.Windows.Forms.GroupBox GroupBoxCardAttributes;
         private System.Windows.Forms.Label LblSlot1Key;
         private System.Windows.Forms.ComboBox ComboBoxKey1;
@@ -5637,18 +6170,11 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ComboBox ComboBoxKey4;
         private System.Windows.Forms.Label LblSlot4Value;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardnumFilters;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRerunDeckGen;
     }
 }
 ]]>
@@ -6284,6 +6810,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - **Cardnum Deck (`.cnum`):** Standard `1 <Code>` listing format.
   - **Archive Breakdown (`.archive`):** Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - **Plain Text (`.txt`):** Formatted deck listing.
+- **Procedural Deck Generator:** Generate complete decks from JSON rule files with attribute/tag queries, copy limits, tiered variety-first duplication, and random branching choices (`RandomChoice`). Re-run instant variations with <kbd>F5</kbd>.
+- **Relational Taxonomy Extraction:** Cross-reference card attributes across entities (such as mapping Character `Home` to Site `Region`) to produce automatic multi-tags.
 
 ---
 
@@ -6303,6 +6831,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | Ctrl + O | Global | Open saved deck (`.json`) |
 | Ctrl + S | Global | Export deck dialog |
 | Ctrl + R | Global | Clear all active filter slots |
+| F5 | Global | Re-run last used deck generation rules file |
 
 ---
 
@@ -6353,6 +6882,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MECCG_Deck_Builder
@@ -6370,13 +6900,20 @@ namespace MECCG_Deck_Builder
         private readonly ComboBox _cmbHarvestAttribute;
         private readonly ComboBox _cmbHarvestValue;
 
-        // Mode 2: Quick Regex
+        // Mode 2: Relational Attribute Lookup (Cross-Card Join)
+        private readonly RadioButton _rbRelational;
+        private readonly TextBox _txtRelCategory;
+        private readonly ComboBox _cmbRelSourceAttr;
+        private readonly ComboBox _cmbRelLookupVal;
+        private readonly ComboBox _cmbRelTargetAttr;
+
+        // Mode 3: Quick Regex
         private readonly RadioButton _rbQuick;
         private readonly TextBox _txtRegexCategory;
         private readonly TextBox _txtRegexTag;
         private readonly TextBox _txtRegexPattern;
 
-        // Mode 3: File
+        // Mode 4: File
         private readonly RadioButton _rbFile;
         private readonly TextBox _txtFilePath;
         private readonly Button _btnBrowseFile;
@@ -6401,7 +6938,7 @@ namespace MECCG_Deck_Builder
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
 
             Text = $"Extract Taxonomy with Rules ({_targetCards.Count} cards in Master List)";
-            ClientSize = new Size(720, 570);
+            ClientSize = new Size(720, 630);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -6413,64 +6950,104 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Extraction Rule Source",
                 Location = new Point(12, 12),
-                Size = new Size(696, 210)
+                Size = new Size(696, 270)
             };
 
             // 1. Dynamic Entity Harvest
             _rbHarvest = new RadioButton
             {
-                Text = "Dynamic Entity Harvest (from Catalog):",
-                Location = new Point(12, 22),
-                Size = new Size(260, 20),
+                Text = "Dynamic Entity Harvest (from Catalog Text):",
+                Location = new Point(12, 20),
+                Size = new Size(290, 20),
                 Checked = true,
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbHarvest.CheckedChanged += RuleSource_Changed;
 
-            var lblHCategory = new Label { Text = "Target Category:", Location = new Point(32, 48), Size = new Size(100, 18) };
-            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(135, 45), Size = new Size(160, 23) };
+            var lblHCategory = new Label { Text = "Target Category:", Location = new Point(32, 44), Size = new Size(100, 18) };
+            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(135, 41), Size = new Size(160, 23) };
 
-            var lblHAttr = new Label { Text = "Attribute:", Location = new Point(305, 48), Size = new Size(60, 18) };
+            var lblHAttr = new Label { Text = "Attribute:", Location = new Point(305, 44), Size = new Size(60, 18) };
             _cmbHarvestAttribute = new ComboBox
             {
-                Location = new Point(365, 45),
+                Location = new Point(365, 41),
                 Size = new Size(130, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbHarvestAttribute.SelectedIndexChanged += CmbHarvestAttribute_SelectedIndexChanged;
 
-            var lblHVal = new Label { Text = "Value:", Location = new Point(505, 48), Size = new Size(42, 18) };
+            var lblHVal = new Label { Text = "Value:", Location = new Point(505, 44), Size = new Size(42, 18) };
             _cmbHarvestValue = new ComboBox
             {
-                Location = new Point(547, 45),
+                Location = new Point(547, 41),
                 Size = new Size(135, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
 
-            // 2. Custom Regex Expression
+            // 2. Relational Attribute Lookup (Cross-Card Join)
+            _rbRelational = new RadioButton
+            {
+                Text = "Relational Attribute Lookup (Cross-Card Join):",
+                Location = new Point(12, 72),
+                Size = new Size(330, 20),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
+            };
+            _rbRelational.CheckedChanged += RuleSource_Changed;
+
+            var lblRelCategory = new Label { Text = "Target Category:", Location = new Point(32, 96), Size = new Size(100, 18) };
+            _txtRelCategory = new TextBox { Text = "Home Region", Location = new Point(135, 93), Size = new Size(160, 23), Enabled = false };
+
+            var lblRelSource = new Label { Text = "Source Field:", Location = new Point(305, 96), Size = new Size(76, 18) };
+            _cmbRelSourceAttr = new ComboBox
+            {
+                Location = new Point(381, 93),
+                Size = new Size(114, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = false
+            };
+
+            var lblRelLookup = new Label { Text = "Lookup Entity:", Location = new Point(505, 96), Size = new Size(85, 18) };
+            _cmbRelLookupVal = new ComboBox
+            {
+                Location = new Point(590, 93),
+                Size = new Size(92, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = false
+            };
+
+            var lblRelTarget = new Label { Text = "Extract Field:", Location = new Point(305, 124), Size = new Size(76, 18) };
+            _cmbRelTargetAttr = new ComboBox
+            {
+                Location = new Point(381, 121),
+                Size = new Size(114, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = false
+            };
+
+            // 3. Custom Regex Expression
             _rbQuick = new RadioButton
             {
                 Text = "Custom Regex Expression:",
-                Location = new Point(12, 80),
+                Location = new Point(12, 150),
                 Size = new Size(220, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbQuick.CheckedChanged += RuleSource_Changed;
 
-            var lblQCategory = new Label { Text = "Category:", Location = new Point(32, 105), Size = new Size(65, 18) };
-            _txtRegexCategory = new TextBox { Text = "Custom Trait", Location = new Point(97, 102), Size = new Size(150, 23), Enabled = false };
+            var lblQCategory = new Label { Text = "Category:", Location = new Point(32, 174), Size = new Size(65, 18) };
+            _txtRegexCategory = new TextBox { Text = "Custom Trait", Location = new Point(97, 171), Size = new Size(150, 23), Enabled = false };
 
-            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(255, 105), Size = new Size(68, 18) };
-            _txtRegexTag = new TextBox { Text = "$1", Location = new Point(325, 102), Size = new Size(130, 23), Enabled = false };
+            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(255, 174), Size = new Size(68, 18) };
+            _txtRegexTag = new TextBox { Text = "$1", Location = new Point(325, 171), Size = new Size(130, 23), Enabled = false };
 
-            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(465, 105), Size = new Size(50, 18) };
-            _txtRegexPattern = new TextBox { Text = @"(?i)Dwarf factions?", Location = new Point(515, 102), Size = new Size(167, 23), Enabled = false };
+            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(465, 174), Size = new Size(50, 18) };
+            _txtRegexPattern = new TextBox { Text = @"(?i)Dwarf factions?", Location = new Point(515, 171), Size = new Size(167, 23), Enabled = false };
 
-            // 3. Load File
+            // 4. Load File
             _rbFile = new RadioButton
             {
                 Text = "Load Rules from File (.json):",
-                Location = new Point(12, 137),
+                Location = new Point(12, 204),
                 Size = new Size(220, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
@@ -6478,7 +7055,7 @@ namespace MECCG_Deck_Builder
 
             _txtFilePath = new TextBox
             {
-                Location = new Point(32, 162),
+                Location = new Point(32, 228),
                 Size = new Size(550, 23),
                 ReadOnly = true,
                 Enabled = false
@@ -6487,7 +7064,7 @@ namespace MECCG_Deck_Builder
             _btnBrowseFile = new Button
             {
                 Text = "Browse...",
-                Location = new Point(590, 161),
+                Location = new Point(590, 227),
                 Size = new Size(92, 25),
                 Enabled = false
             };
@@ -6495,6 +7072,7 @@ namespace MECCG_Deck_Builder
 
             grpSource.Controls.AddRange([
                 _rbHarvest, lblHCategory, _txtHarvestCategory, lblHAttr, _cmbHarvestAttribute, lblHVal, _cmbHarvestValue,
+                _rbRelational, lblRelCategory, _txtRelCategory, lblRelSource, _cmbRelSourceAttr, lblRelLookup, _cmbRelLookupVal, lblRelTarget, _cmbRelTargetAttr,
                 _rbQuick, lblQCategory, _txtRegexCategory, lblQTag, _txtRegexTag, lblQPattern, _txtRegexPattern,
                 _rbFile, _txtFilePath, _btnBrowseFile
             ]);
@@ -6503,7 +7081,7 @@ namespace MECCG_Deck_Builder
             _btnTest = new Button
             {
                 Text = "Test / Preview Matches",
-                Location = new Point(12, 228),
+                Location = new Point(12, 290),
                 Size = new Size(160, 28)
             };
             _btnTest.Click += BtnTest_Click;
@@ -6511,14 +7089,14 @@ namespace MECCG_Deck_Builder
             var lblScopeHint = new Label
             {
                 Text = $"Scanning {_targetCards.Count} card(s) currently visible in the Master List.",
-                Location = new Point(180, 233),
+                Location = new Point(180, 295),
                 Size = new Size(520, 20),
                 ForeColor = Color.DimGray
             };
 
             _lstPreview = new ListView
             {
-                Location = new Point(12, 262),
+                Location = new Point(12, 326),
                 Size = new Size(696, 250),
                 View = View.Details,
                 FullRowSelect = true,
@@ -6532,7 +7110,7 @@ namespace MECCG_Deck_Builder
             _btnExportCsv = new Button
             {
                 Text = "Export to CSV...",
-                Location = new Point(330, 525),
+                Location = new Point(330, 588),
                 Size = new Size(130, 30)
             };
             _btnExportCsv.Click += BtnExportCsv_Click;
@@ -6540,7 +7118,7 @@ namespace MECCG_Deck_Builder
             _btnApply = new Button
             {
                 Text = "Apply Tags to Catalog",
-                Location = new Point(470, 525),
+                Location = new Point(470, 588),
                 Size = new Size(150, 30)
             };
             _btnApply.Click += BtnApply_Click;
@@ -6548,7 +7126,7 @@ namespace MECCG_Deck_Builder
             _btnClose = new Button
             {
                 Text = "Close",
-                Location = new Point(628, 525),
+                Location = new Point(628, 588),
                 Size = new Size(80, 30),
                 DialogResult = DialogResult.Cancel
             };
@@ -6556,24 +7134,35 @@ namespace MECCG_Deck_Builder
             Controls.AddRange([grpSource, _btnTest, lblScopeHint, _lstPreview, _btnExportCsv, _btnApply, _btnClose]);
             CancelButton = _btnClose;
 
-            PopulateHarvestAttributes();
+            PopulateDropdowns();
         }
 
-        private void PopulateHarvestAttributes()
+        private void PopulateDropdowns()
         {
+            // Populate harvest keys
             _cmbHarvestAttribute.Items.Clear();
-            var keys = _catalog.GetFilterKeys();
+            var keys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
             foreach (var k in keys)
             {
-                if (!string.IsNullOrWhiteSpace(k))
-                {
-                    _cmbHarvestAttribute.Items.Add(k);
-                }
+                _cmbHarvestAttribute.Items.Add(k);
+                _cmbRelSourceAttr.Items.Add(k);
+                _cmbRelTargetAttr.Items.Add(k);
             }
 
-            int defaultIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
-            if (defaultIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultIdx;
-            else if (_cmbHarvestAttribute.Items.Count > 0) _cmbHarvestAttribute.SelectedIndex = 0;
+            int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
+            if (defaultHarvestIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx;
+
+            // Relational Source defaults to "Home"
+            int homeIdx = _cmbRelSourceAttr.FindStringExact("Home");
+            _cmbRelSourceAttr.SelectedIndex = homeIdx >= 0 ? homeIdx : 0;
+
+            // Relational Target defaults to "Region"
+            int regionIdx = _cmbRelTargetAttr.FindStringExact("Region");
+            _cmbRelTargetAttr.SelectedIndex = regionIdx >= 0 ? regionIdx : 0;
+
+            // Relational Lookup values
+            _cmbRelLookupVal.Items.AddRange(["Site", "Region", "Character", "Item", "Hazard"]);
+            _cmbRelLookupVal.SelectedIndex = 0;
         }
 
         private void CmbHarvestAttribute_SelectedIndexChanged(object sender, EventArgs e)
@@ -6602,6 +7191,12 @@ namespace MECCG_Deck_Builder
             _txtHarvestCategory.Enabled = isHarvest;
             _cmbHarvestAttribute.Enabled = isHarvest;
             _cmbHarvestValue.Enabled = isHarvest;
+
+            bool isRelational = _rbRelational.Checked;
+            _txtRelCategory.Enabled = isRelational;
+            _cmbRelSourceAttr.Enabled = isRelational;
+            _cmbRelLookupVal.Enabled = isRelational;
+            _cmbRelTargetAttr.Enabled = isRelational;
 
             bool isQuick = _rbQuick.Checked;
             _txtRegexCategory.Enabled = isQuick;
@@ -6637,6 +7232,31 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private ExtractionResult RunExtraction()
+        {
+            if (_rbRelational.Checked)
+            {
+                string sourceAttr = _cmbRelSourceAttr.SelectedItem?.ToString() ?? "Home";
+                string lookupVal = _cmbRelLookupVal.SelectedItem?.ToString() ?? "Site";
+                string targetAttr = _cmbRelTargetAttr.SelectedItem?.ToString() ?? "Region";
+                string category = _txtRelCategory.Text.Trim();
+
+                return TaxonomyExtractionService.ExecuteRelationalExtraction(
+                    _targetCards,
+                    _catalog.Cards,
+                    sourceAttr,
+                    "Primary",
+                    lookupVal,
+                    targetAttr,
+                    category);
+            }
+
+            var rules = GetActiveRules();
+            if (rules.Count == 0) return null;
+
+            return TaxonomyExtractionService.ExecuteRules(_targetCards, rules);
+        }
+
         private List<TaxonomyRule> GetActiveRules()
         {
             if (_rbHarvest.Checked)
@@ -6645,10 +7265,7 @@ namespace MECCG_Deck_Builder
                 string val = _cmbHarvestValue.SelectedItem?.ToString() ?? string.Empty;
                 string cat = _txtHarvestCategory.Text.Trim();
 
-                if (string.IsNullOrWhiteSpace(attr) || string.IsNullOrWhiteSpace(val))
-                {
-                    return [];
-                }
+                if (string.IsNullOrWhiteSpace(attr) || string.IsNullOrWhiteSpace(val)) return [];
 
                 var harvestedNames = TaxonomyExtractionService.HarvestEntityNames(_catalog.Cards, _activeSets, attr, val);
                 if (harvestedNames.Count == 0)
@@ -6678,8 +7295,8 @@ namespace MECCG_Deck_Builder
 
         private void BtnTest_Click(object sender, EventArgs e)
         {
-            var rules = GetActiveRules();
-            if (rules.Count == 0)
+            var result = RunExtraction();
+            if (result == null)
             {
                 MessageBox.Show(this, "No active rules to evaluate.", "Test Rules", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -6687,8 +7304,6 @@ namespace MECCG_Deck_Builder
 
             _lstPreview.BeginUpdate();
             _lstPreview.Items.Clear();
-
-            var result = TaxonomyExtractionService.ExecuteRules(_targetCards, rules);
 
             foreach (var (cardId, catDict) in result.Matches)
             {
@@ -6709,16 +7324,16 @@ namespace MECCG_Deck_Builder
 
             if (_lstPreview.Items.Count == 0)
             {
-                MessageBox.Show(this, $"No cards in the current Master List ({_targetCards.Count} cards) matched the rule criteria.", "Test Preview", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, $"No cards in the current Master List ({_targetCards.Count} cards) matched the criteria.", "Test Preview", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void BtnExportCsv_Click(object sender, EventArgs e)
         {
-            var rules = GetActiveRules();
-            if (rules.Count == 0)
+            var result = RunExtraction();
+            if (result == null || result.Matches.Count == 0)
             {
-                MessageBox.Show(this, "No active rules to evaluate.", "Export CSV", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "No matching results to export.", "Export CSV", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -6727,12 +7342,11 @@ namespace MECCG_Deck_Builder
                 Title = "Export Extraction Draft (CSV)",
                 Filter = "CSV Spreadsheet (*.csv)|*.csv",
                 DefaultExt = "csv",
-                FileName = "Entity_Extraction_Draft.csv"
+                FileName = "Relational_Extraction_Draft.csv"
             };
 
             if (sfd.ShowDialog(this) == DialogResult.OK)
             {
-                var result = TaxonomyExtractionService.ExecuteRules(_targetCards, rules);
                 TaxonomyExtractionService.ExportDraftToCsv(_targetCards, result, sfd.FileName);
                 MessageBox.Show(this, $"Extraction draft exported successfully to:\n{sfd.FileName}\n\nMatched {result.Matches.Count} card(s) out of {_targetCards.Count} in scope.", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -6740,14 +7354,29 @@ namespace MECCG_Deck_Builder
 
         private void BtnApply_Click(object sender, EventArgs e)
         {
-            var rules = GetActiveRules();
-            if (rules.Count == 0)
+            var result = RunExtraction();
+            if (result == null || result.Matches.Count == 0)
             {
-                MessageBox.Show(this, "No active rules to evaluate.", "Apply Tags", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "No matches to apply.", "Apply Tags", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var (cardsTagged, tagsAssigned) = TaxonomyExtractionService.ApplyRulesDirectly(_targetCards, rules, _filterService);
+            int cardsTagged = result.Matches.Count;
+            int tagsAssigned = 0;
+
+            foreach (var (cardId, catDict) in result.Matches)
+            {
+                foreach (var (category, tagSet) in catDict)
+                {
+                    _filterService.AddCustomKeyName(category);
+                    foreach (var tag in tagSet)
+                    {
+                        _filterService.AppendCardCustomTag(cardId, category, tag);
+                        tagsAssigned++;
+                    }
+                }
+            }
+
             MessageBox.Show(this, $"Applied {tagsAssigned} tag assignment(s) across {cardsTagged} card(s) into your catalog taxonomy.", "Tags Applied", MessageBoxButtons.OK, MessageBoxIcon.Information);
             DialogResult = DialogResult.OK;
         }
@@ -6961,6 +7590,119 @@ namespace MECCG_Deck_Builder
             }
 
             return (cardsTagged, tagsAssigned);
+        }
+
+        #endregion
+
+        #region RELATIONAL_EXTRACTION
+
+        /// <summary>
+        /// Cross-references an attribute on target cards (e.g. Character 'Home') 
+        /// against matching catalog entities (e.g. Site 'Name') to extract a secondary 
+        /// attribute (e.g. Site 'Region') as a custom tag.
+        /// </summary>
+        public static ExtractionResult ExecuteRelationalExtraction(
+            IEnumerable<Card> targetCards,
+            IEnumerable<Card> catalogCards,
+            string sourceAttribute,
+            string lookupAttribute,
+            string lookupValue,
+            string targetAttribute,
+            string categoryName)
+        {
+            var result = new ExtractionResult();
+            if (targetCards == null || catalogCards == null ||
+                string.IsNullOrWhiteSpace(sourceAttribute) || string.IsNullOrWhiteSpace(targetAttribute))
+            {
+                return result;
+            }
+
+            string category = string.IsNullOrWhiteSpace(categoryName) ? "Relational Tags" : categoryName.Trim();
+
+            // 1. Build lookup dictionary from catalog entities (e.g. Primary = Site)
+            var lookupCards = catalogCards;
+            if (!string.IsNullOrWhiteSpace(lookupAttribute) && !string.IsNullOrWhiteSpace(lookupValue))
+            {
+                lookupCards = lookupCards.Where(c => string.Equals(c.GetAttribute(lookupAttribute), lookupValue.Trim(), StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"])
+            var lookupMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var card in lookupCards)
+            {
+                string entityName = card.Name?.Trim();
+                string targetVal = card.GetAttribute(targetAttribute)?.Trim();
+
+                if (string.IsNullOrEmpty(entityName) || string.IsNullOrEmpty(targetVal))
+                {
+                    continue;
+                }
+
+                if (!lookupMap.TryGetValue(entityName, out var set))
+                {
+                    set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    lookupMap[entityName] = set;
+                }
+                set.Add(targetVal);
+            }
+
+            if (lookupMap.Count == 0)
+            {
+                return result;
+            }
+
+            var knownNames = lookupMap.Keys.OrderByDescending(k => k.Length).ToList();
+
+            // 2. Cross-reference target cards
+            foreach (var card in targetCards)
+            {
+                string sourceVal = card.GetAttribute(sourceAttribute);
+                if (string.IsNullOrWhiteSpace(sourceVal))
+                {
+                    continue;
+                }
+
+                bool matched = false;
+
+                // Split on common list delimiters (commas, semicolons, slashes)
+                var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var part in parts)
+                {
+                    // Also handle " or " and " and "
+                    var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    foreach (var sub in subParts)
+                    {
+                        if (lookupMap.TryGetValue(sub, out var targets))
+                        {
+                            foreach (var t in targets)
+                            {
+                                result.AddTag(card.Id, category, t);
+                                matched = true;
+                            }
+                        }
+                    }
+                }
+
+                // If no exact token match, search known names with regex word boundaries (e.g. "Haven: Rivendell")
+                if (!matched)
+                {
+                    foreach (var name in knownNames)
+                    {
+                        if (Regex.IsMatch(sourceVal, $@"\b{Regex.Escape(name)}\b", RegexOptions.IgnoreCase))
+                        {
+                            if (lookupMap.TryGetValue(name, out var targets))
+                            {
+                                foreach (var t in targets)
+                                {
+                                    result.AddTag(card.Id, category, t);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
         #endregion

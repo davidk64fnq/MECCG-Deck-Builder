@@ -2,99 +2,53 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Interface Walkthrough</title>
+    <title>User Interface Walkthrough</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Interface Walkthrough</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="index.html">Welcome &amp; Getting Started</a> &gt; Interface Walkthrough</div>
     <h1>User Interface Walkthrough</h1>
     <p>The application interface is divided into four main functional zones:</p>
 
     <h2>1. Master Card List (Left Pane)</h2>
-    <p>
-        The left listbox displays all available cards matching your selected sets and active filter criteria, sorted alphabetically.
-    </p>
+    <p>Displays all cards matching your active expansion sets and filter criteria, sorted alphabetically.</p>
     <ul>
-        <li><strong>Single-Click:</strong> Selects the card and loads its image into the central preview panel.</li>
-        <li><strong>Double-Click:</strong> Immediately appends the card to the currently selected deck tab on the right.</li>
-        <li><strong>Right-Click:</strong> Opens the master context menu to copy the card into a specific deck tab, inspect its official Card Attributes, view Assigned Tags, or assign custom tags.</li>
-        <li><strong>Drag &amp; Drop:</strong> Left-click and hold to drag the card title onto any deck listbox.</li>
+        <li><strong>Single-Click:</strong> Selects the card and loads its artwork into the preview panel.</li>
+        <li><strong>Double-Click:</strong> Appends the card to the currently selected deck tab on the right.</li>
+        <li><strong>Right-Click:</strong> Opens the master context menu to copy cards, inspect attributes, view tags, or assign custom tags.</li>
+        <li><strong>Drag &amp; Drop:</strong> Left-click and drag the card title onto any deck listbox.</li>
     </ul>
 
     <h2>2. Card Image Preview (Center Pane)</h2>
-    <p>
-        Displays a high-resolution preview of the selected card. Images are downloaded automatically from <code>cardnum.net</code> upon first selection and saved into a local folder named after the card set (e.g., <code>METW/</code>, <code>MEDM/</code>).
-    </p>
+    <p>Displays high-resolution card artwork downloaded on demand from <code>cardnum.net</code> and cached locally in set folders (e.g., <code>METW/</code>, <code>MEDM/</code>).</p>
     <div class="note">
         <strong>Errata Notice:</strong> Cards flagged with ICE errata automatically load their corrected image counterpart prefixed with <code>ice-</code>.
     </div>
 
     <h2>3. Deck Tabs (Right Pane)</h2>
-    <p>
-        The right pane features five tabbed lists representing standard MECCG deck sections:
-    </p>
+    <p>Five tabbed lists representing standard MECCG deck partitions:</p>
     <table>
         <tr>
             <th>Tab</th>
             <th>Name</th>
             <th>Description</th>
         </tr>
-        <tr>
-            <td><code>Pool</code></td>
-            <td>Starting Pool</td>
-            <td>Characters, starting items, and starter resources.</td>
-        </tr>
-        <tr>
-            <td><code>Res</code></td>
-            <td>Resources</td>
-            <td>Resource events, allies, factions, and playable items.</td>
-        </tr>
-        <tr>
-            <td><code>Haz</code></td>
-            <td>Hazards</td>
-            <td>Creatures, hazard events, and corruption cards.</td>
-        </tr>
-        <tr>
-            <td><code>Side</code></td>
-            <td>Sideboard</td>
-            <td>Reserve cards accessible during the game.</td>
-        </tr>
-        <tr>
-            <td><code>Site</code></td>
-            <td>Sites</td>
-            <td>Site cards and region movement paths.</td>
-        </tr>
+        <tr><td><code>Pool</code></td><td>Starting Pool</td><td>Characters, starting items, and starter resources.</td></tr>
+        <tr><td><code>Res</code></td><td>Resources</td><td>Resource events, allies, factions, and playable items.</td></tr>
+        <tr><td><code>Haz</code></td><td>Hazards</td><td>Creatures, hazard events, and corruption cards.</td></tr>
+        <tr><td><code>Side</code></td><td>Sideboard</td><td>Reserve cards accessible during the game.</td></tr>
+        <tr><td><code>Site</code></td><td>Sites</td><td>Site cards and movement region paths.</td></tr>
     </table>
 
     <h2>4. Filter Bar (Bottom Panel)</h2>
-    <p>
-        Located beneath the three main panes, the filter panel is organized into two distinct, titled group boxes that provide fine-grained, <strong>context-sensitive faceted filtering</strong>. Each filter slot operates as a clear vertical column pair, ensuring you immediately know which control selects the category/attribute and which selects the specific value or tag:
-    </p>
+    <p>Organized into two titled GroupBoxes providing context-sensitive faceted filtering:</p>
     <ul>
-        <li>
-            <strong>Left Box — Card Attributes (Official Database):</strong>
-            Contains two slots (Slots 1 &amp; 2) for querying official card rules attributes synchronized from the <strong>Cardnum</strong> database.
-            <ul>
-                <li><strong>Top Dropdown (Attribute):</strong> Selects the rules attribute (e.g., <em>Primary</em>, <em>Alignment</em>, <em>Race</em>, <em>Skill</em>, <em>Mind</em>, <em>Prowess</em>).</li>
-                <li><strong>Bottom Dropdown (Value):</strong> Selects the specific value (e.g., <em>Character</em>, <em>Hero</em>, <em>Dúnadan</em>, <em>Warrior</em>).</li>
-            </ul>
-        </li>
-        <li>
-            <strong>Right Box — Custom Tags (User Taxonomy):</strong>
-            Contains two slots (Slots 3 &amp; 4) for querying your own classification categories and tags.
-            <ul>
-                <li><strong>Top Dropdown (Category):</strong> Selects your user-defined category (e.g., <em>Archetype</em>, <em>Role</em>, <em>Hazard Strategy</em>).</li>
-                <li><strong>Bottom Dropdown (Tag):</strong> Selects the specific custom tag (e.g., <em>Ring Destruction</em>, <em>Scout Support</em>, <em>Anti-Fly</em>).</li>
-            </ul>
-        </li>
+        <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1 &amp; 2 query official Cardnum rules properties (Attribute above Value).</li>
+        <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 3 &amp; 4 query your custom classification taxonomy (Category above Tag).</li>
     </ul>
 
-    <div class="tip">
-        <strong>Quick Filter Clearing:</strong> You can clear any filter slot by pressing <kbd>Escape</kbd> while focused inside it, right-clicking any filter box to choose <em>Clear This Filter</em>, or pressing <kbd>Ctrl+R</kbd> (or selecting <strong>Filter &gt; Clear All Filters</strong>) to wipe all four filter pairs at once.
-    </div>
-
     <h2>Dynamic Title Bar Summary</h2>
-    <p>The window title updates automatically to reflect deck statistics:</p>
+    <p>The window title updates automatically to reflect live deck statistics:</p>
     <p><code>MECCG Deck Builder - "[Deck Title]" (Pool/Res[Characters]/Haz/Side/Site)</code></p>
     <p>For example: <code>MECCG Deck Builder - "Ring Hunter" (5/30[4]/30/20/12)</code> indicates 5 pool cards, 30 resource cards (including 4 characters), 30 hazards, 20 sideboard cards, and 12 sites.</p>
 </body>

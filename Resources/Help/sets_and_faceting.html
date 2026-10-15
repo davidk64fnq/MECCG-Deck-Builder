@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sets &amp; Faceted Filtering</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Catalog Filtering &amp; Taxonomy &gt; Sets &amp; Faceted Filtering</div>
+    <h1>Sets &amp; Faceted Filtering</h1>
+
+    <h2>Managing Expansion Sets</h2>
+    <p>Click the <strong>Set</strong> menu in the top bar to choose which expansions are active in the Master List:</p>
+    <ul>
+        <li><strong>Select All:</strong> Enables all official sets and Dreamcard expansions.</li>
+        <li><strong>Clear All:</strong> Deselects all expansions.</li>
+        <li><strong>Individual Sets:</strong> Check or uncheck individual expansions (e.g., <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or Dreamcard sets).</li>
+    </ul>
+
+    <h2>Dual-Layer Filtering Architecture</h2>
+    <p>Located beneath the main workspace, four vertical column pairs of ComboBoxes provide fine-grained catalog search:</p>
+    <table>
+        <tr>
+            <th>Filter GroupBox</th>
+            <th>Data Source</th>
+            <th>Behavior</th>
+        </tr>
+        <tr>
+            <td><strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)</td>
+            <td><strong>Cardnum Database:</strong> Canonical rules statistics (Primary, Alignment, Race, Skill, Mind, Prowess).</td>
+            <td>Fixed, read-only rules attributes. See <a href="attributes_reference.html">Official Attributes Reference</a>.</td>
+        </tr>
+        <tr>
+            <td><strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)</td>
+            <td><strong>User Taxonomy:</strong> Custom categories and tags managed locally.</td>
+            <td>Editable classification categories. See <a href="custom_taxonomy.html">Custom Taxonomy &amp; Tag Management</a>.</td>
+        </tr>
+    </table>
+
+    <h2>Cascading Faceted Search &amp; Conflict Resolution</h2>
+    <ul>
+        <li><strong>Context-Sensitive Value Pruning:</strong> Every dropdown automatically prunes options to show only values present among cards satisfying your active expansion sets and other active filter slots, completely eliminating zero-result queries.</li>
+        <li><strong>Order-Independent Narrowing:</strong> Filters can be selected in any sequence. Selecting <code>Skill = Diplomat</code> in Slot 2 prunes Slot 1's <code>Secondary</code> dropdown down to card types featuring diplomats.</li>
+        <li><strong>Automatic Conflict Resolution:</strong> If an active selection becomes impossible (e.g., deselecting an expansion set), the invalid slot automatically resets to blank (<code>""</code>).</li>
+    </ul>
+
+    <h2>Clearing and Resetting Filters</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Shortcut / Gesture</th>
+            <th>Behavior</th>
+        </tr>
+        <tr>
+            <td><strong>Global Reset</strong></td>
+            <td><strong>Filter &gt; Clear All Filters</strong> / <kbd>Ctrl+R</kbd></td>
+            <td>Resets all 4 filter slots to blank instantly.</td>
+        </tr>
+        <tr>
+            <td><strong>Slot Context Menu</strong></td>
+            <td>Right-Click any filter ComboBox</td>
+            <td>Provides options to clear that specific slot or clear all slots.</td>
+        </tr>
+        <tr>
+            <td><strong>Quick Keyboard Reset</strong></td>
+            <td><kbd>Escape</kbd></td>
+            <td>Resets focused filter ComboBox to blank (<code>""</code>).</td>
+        </tr>
+    </table>
+</body>
+</html>

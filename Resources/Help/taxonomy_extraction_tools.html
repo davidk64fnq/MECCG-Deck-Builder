@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Taxonomy Extraction Tools</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="image_cache.html">Tools &amp; Technical Architecture</a> &gt; Taxonomy Extraction Tools</div>
+    <h1>Taxonomy Extraction Tools</h1>
+    <p>Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to cards currently visible in your Master List.</p>
+
+    <h2>1. Dynamic Entity Harvesting (from Catalog Text)</h2>
+    <ul>
+        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans active sets in memory, extracts all matching entity titles, and searches your scoped Master List cards for references to those entities.</li>
+        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.</li>
+    </ul>
+
+    <h2>2. Relational Attribute Lookup (Cross-Card Join)</h2>
+    <p>Enables 2-step relational tagging between linked entities:</p>
+    <ul>
+        <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
+        <li><strong>Lookup Entity:</strong> Matches corresponding cards in the catalog (e.g. <code>Primary = Site</code>).</li>
+        <li><strong>Extract Field:</strong> Reads the destination attribute (e.g. Site <code>Region</code>) and writes it into a custom category (e.g. <code>Home Region</code>).</li>
+        <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
+    </ul>
+
+    <h2>3. Custom Regex &amp; JSON Rule Files</h2>
+    <p>Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> rule files.</p>
+</body>
+</html>
