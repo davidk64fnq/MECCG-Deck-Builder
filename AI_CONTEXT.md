@@ -36,6 +36,7 @@
 - `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Tag:Cat}`), and fallback routing.
 - `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
 - `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
+- UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 
 ---
 
@@ -72,4 +73,5 @@
   - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
   - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
   - Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
+- Issue #24: Persist expansion set selection and extraction regex parameters across sessions
 - [ ] **v1.0.0 - First Public Release**

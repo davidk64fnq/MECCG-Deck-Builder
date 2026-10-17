@@ -117,6 +117,8 @@ namespace MECCG_Deck_Builder
                     }
                 };
 
+                var savedSets = new HashSet<string>(UserSettingsService.Current.SelectedSets ?? [], StringComparer.OrdinalIgnoreCase);
+
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
                     var set = _catalogService.Sets[i];
@@ -126,12 +128,30 @@ namespace MECCG_Deck_Builder
                         CheckOnClick = true
                     };
                     menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
-                    if (i == 0)
+
+                    // Restore saved set state; if no saved sets exist yet, default to first set (METW)
+                    bool shouldCheck = savedSets.Count > 0
+                        ? savedSets.Contains(set.Code)
+                        : (i == 0);
+
+                    if (shouldCheck)
                     {
                         menuItem.Checked = true;
                         _currentDeck.IncludedSets.Add(set.Code);
                     }
+
                     ToolStripMenuSet.DropDownItems.Add(menuItem);
+                }
+
+                // Fallback guarantee: if saved codes didn't match any catalog set, select the first set
+                if (_currentDeck.IncludedSets.Count == 0 && _catalogService.Sets.Count > 0)
+                {
+                    var firstSet = _catalogService.Sets[0];
+                    if (ToolStripMenuSet.DropDownItems.Count > 2 && ToolStripMenuSet.DropDownItems[2] is ToolStripMenuItem firstItem)
+                    {
+                        firstItem.Checked = true;
+                    }
+                    _currentDeck.IncludedSets.Add(firstSet.Code);
                 }
             }
             finally
@@ -151,6 +171,12 @@ namespace MECCG_Deck_Builder
 
             ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
             ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
+        }
+
+        private void PersistSelectedSets()
+        {
+            UserSettingsService.Current.SelectedSets = [.. _currentDeck.IncludedSets];
+            UserSettingsService.SaveSettings();
         }
 
         private void RefreshFilterKeyDropdowns()
@@ -496,6 +522,7 @@ namespace MECCG_Deck_Builder
                 _currentDeck.IncludedSets.Remove(setCode);
             }
 
+            PersistSelectedSets();
             UpdateFacetedFilters();
         }
 
@@ -521,6 +548,7 @@ namespace MECCG_Deck_Builder
                 _isUpdatingFilters = false;
             }
 
+            PersistSelectedSets();
             UpdateFacetedFilters();
         }
 
@@ -546,6 +574,7 @@ namespace MECCG_Deck_Builder
                 _isUpdatingFilters = false;
             }
 
+            PersistSelectedSets();
             UpdateFacetedFilters();
         }
 
@@ -981,6 +1010,7 @@ namespace MECCG_Deck_Builder
                     RefreshSectionListBox(sectionType);
                 }
 
+                PersistSelectedSets();
                 UpdateFacetedFilters();
                 UpdateFormTitle();
             }
@@ -1084,7 +1114,7 @@ namespace MECCG_Deck_Builder
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Title = $"{Constants.AppTitle} - Merge Custom Tag Set",
+                Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session", 
                 DefaultExt = "json",
                 Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
@@ -1599,6 +1629,7 @@ namespace MECCG_Deck_Builder
             {
                 _isUpdatingFilters = false;
             }
+            PersistSelectedSets();
 
             // Reset filter controls so user can freely inspect master list
             ResetAllFilters();

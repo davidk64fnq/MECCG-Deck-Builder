@@ -26,6 +26,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - **Plain Text (`.txt`):** Formatted deck listing.
 - **Procedural Deck Generator:** Generate complete decks from JSON rule files with attribute/tag queries, copy limits, tiered variety-first duplication, and random branching choices (`RandomChoice`). Features runtime variable capture (`SaveAs`), dynamic cross-card token queries (e.g. `{Leader.Tag:Faction Bonus}`, `{Leader.Home}`), and automated shortfall fallbacks (`Fallback`). Re-run instant variations with <kbd>F5</kbd>.
 - **Relational Taxonomy Extraction:** Cross-reference card attributes across entities (such as mapping Character `Home` to Site `Region`) to produce automatic multi-tags.
+- **Session Persistence:** Remembers your active expansion set selection across application restarts and preserves your last-used taxonomy extraction mode, regular expressions, and tag categories for iterative tagging workflows.
 
 ---
 

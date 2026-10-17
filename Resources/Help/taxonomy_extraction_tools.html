@@ -34,6 +34,10 @@
     <p>
         Mode 3 allows you to test and execute arbitrary .NET regular expressions against the rules text of cards currently in scope. It provides three configurable fields:
     </p>
+
+    <div class="tip">
+        <strong>Iterative Workflow Persistence:</strong> The application automatically saves your last active extraction mode along with the Category, Tag Name, and Pattern fields. When reopening this dialog, your previous regex pattern and tag definitions are pre-filled so you can make quick minor variations without copying from external scratchpads.
+    </div>
     <table>
         <tr>
             <th>Field</th>
@@ -114,7 +118,7 @@
     <ol>
         <li>Click <strong>Test / Preview Matches</strong>. The preview table populates with all 15 characters, showing each will receive the 7 surface Dark-holds in their tag.</li>
         <li>Click <strong>Apply Tags to Catalog</strong>. All 15 cards are tagged simultaneously in memory.</li>
-        <li>Select <strong>Filter &gt; Save Tag Set...</strong> (or <strong>Filter &gt; Merge Tag Set...</strong>) to persist your new mappings to <code>Rules_Support_Tags.json</code>.</li>
+        <li>Select <strong>Filter &gt; Save Tag Set...</strong> to persist your new mappings by overwriting <code>Rules_Support_Tags.json</code>.</li>
     </ol>
 
     <!-- SECTION 5: JSON BATCH FILES -->

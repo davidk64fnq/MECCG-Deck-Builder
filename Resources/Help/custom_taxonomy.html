@@ -27,11 +27,58 @@
     </ul>
 
     <h2>3. Saving, Loading &amp; Merging Custom Tag Sets</h2>
+    <p>
+        The application differentiates between <strong>source files</strong> (read-only files pulled into memory) and <strong>destination files</strong> (files written to your hard drive):
+    </p>
+
+    <table>
+        <tr>
+            <th>Menu Action</th>
+            <th>File Role</th>
+            <th>Behavior in Active Session (Memory)</th>
+            <th>Effect on Disk</th>
+        </tr>
+        <tr>
+            <td><strong>Filter &gt; Load Tag Set...</strong></td>
+            <td><strong>Source</strong></td>
+            <td><strong>Wipe &amp; Replace:</strong> Clears all active categories and tags in memory, then loads the selected file fresh.</td>
+            <td>Read-only (file on disk is not modified).</td>
+        </tr>
+        <tr>
+            <td><strong>Filter &gt; Merge Tag Set...</strong></td>
+            <td><strong>Source</strong></td>
+            <td><strong>Append &amp; Combine:</strong> Reads the selected file and folds its categories and tags into your active memory without erasing what is already open.</td>
+            <td>Read-only (file on disk is not modified).</td>
+        </tr>
+        <tr>
+            <td><strong>Filter &gt; Save Tag Set...</strong></td>
+            <td><strong>Destination</strong></td>
+            <td>None (active taxonomy in memory remains unchanged).</td>
+            <td><strong>Write / Export:</strong> Serializes all categories and tag assignments currently in memory out to the chosen <code>.json</code> file.</td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Automatic Baseline Loading:</strong>
+        On startup, the application automatically loads <code>Rules_Support_Tags.json</code> (if present in the program folder) as the baseline taxonomy into memory. Because memory is already populated on launch, you never need to load or merge this baseline file manually.
+    </div>
+
+    <h3>Understanding "Merge Tag Set..." (Worked Example)</h3>
+    <p>
+        Suppose you receive a specialized tag set from another player called <code>Hazard_Packages.json</code> (which tags cards with custom labels like <code>Hazard Archetype: Nazgûl Rush</code>):
+    </p>
     <ul>
-        <li><strong>Automatic Baseline Loading:</strong> On startup, the application automatically loads <code>Rules_Support_Tags.json</code> (if present in the program folder) as the baseline taxonomy, ensuring canonical rules tags like <code>Resolved Site</code> and <code>Faction Bonus</code> are active immediately.</li>
-        <li><strong>Filter &gt; Merge Tag Set...:</strong> Non-destructively merges a tag set into your active taxonomy. New categories and card assignments are appended without erasing existing tags.</li>
-        <li><strong>Filter &gt; Load Tag Set...:</strong> Clears the current taxonomy session and replaces it entirely with the selected <code>.json</code> file.</li>
-        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your complete active taxonomy and all card assignments to a portable <code>.json</code> file.</li>
+        <li>
+            <strong>If you used "Load Tag Set...":</strong> The program would wipe out your baseline rules tags (<code>Resolved Site</code>, <code>Faction Bonus</code>) and replace them with the hazard file. The deck generator would no longer know how to resolve starting sites or recruit faction bonuses.
+        </li>
+        <li>
+            <strong>When you use "Merge Tag Set...":</strong> The program reads <code>Hazard_Packages.json</code> as a <em>source</em>. It keeps all of your existing rules tags and appends the hazard tags right alongside them. If a card already has tags in a category, new tags are safely appended with a semicolon separator (e.g., <code>Orcs; Trolls</code>).
+        </li>
     </ul>
+
+    <div class="tip">
+        <strong>How to Persist Combined or Extracted Tags:</strong>
+        Whenever you merge an external file or extract new tags using the Extraction Tools, those changes live only in your running session (active memory). To make them permanent for future application launches, select <strong>Filter &gt; Save Tag Set...</strong>, select <code>Rules_Support_Tags.json</code>, and confirm overwrite.
+    </div>
 </body>
 </html>

@@ -81,117 +81,353 @@ namespace MECCG_Deck_Builder.Properties {
 
     <h1>Official Card Attributes Reference</h1>
     <p>
-        Every card in the catalog carries official rules attributes synchronized from the Cardnum open database. These keys can be filtered via UI Slots 1 &amp; 2, queried in procedural deck rules, or inspected in the right-click <strong>Card Attributes</strong> monospace view.
+        Every card in the catalog carries official rules attributes synchronized directly from the Cardnum open database. Depending on the attribute, values can be filtered in the lower panel (Slots 1 &amp; 2), queried in procedural deck rules, or inspected in the right-click <strong>Card Attributes</strong> monospace view.
     </p>
 
-    <h2 id="identifiers">1. Core Identifiers &amp; Metadata</h2>
+    <div class="note">
+        <strong>Illustrative Values Notice:</strong> The values listed throughout this reference are <strong>representative examples</strong> drawn from the seven official Iron Crown Enterprises (I.C.E.) expansion sets (<em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>Against the Shadow</em>, <em>The White Hand</em>, and <em>The Balrog</em>). They are not intended to be exhaustive closed lists. Because Cardnum syncs open community data, you will also encounter specialized traits, set-specific havens (e.g. <code>Wizardhaven</code>), and composite shorthand codes (e.g. <code>B</code>, <code>B F</code>) in the dropdowns.
+    </div>
+
+    <!-- SECTION 1: BASIC CARD INFORMATION -->
+    <h2 id="basic-info">1. Basic Card Information</h2>
+    <p>
+        These core properties identify each card and provide its gameplay text. They are displayed in the right-click <strong>Card Attributes</strong> monospace readout or controlled through dedicated application menus, rather than the filter slot dropdowns:
+    </p>
+
     <table>
         <tr>
-            <th>Key</th>
-            <th>Type</th>
-            <th>Example Values</th>
-            <th>Notes</th>
+            <th>Attribute</th>
+            <th>Description &amp; Purpose</th>
+            <th>Visibility &amp; Usage</th>
+            <th>Illustrative Examples</th>
         </tr>
         <tr>
             <td><code>Name</code></td>
-            <td>string</td>
-            <td><code>"Wood-elves"</code>, <code>"Rivendell"</code>, <code>"Glamdring"</code></td>
-            <td>Exact English card title. Queryable in deck generation rules and cross-card token lookups.</td>
+            <td>The exact printed English title of the card. Excluded from filter dropdowns to prevent cluttering lists with hundreds of individual card titles.</td>
+            <td>
+                <ul>
+                    <li>Displayed at the top of the right-click <strong>Card Attributes</strong> readout.</li>
+                    <li>Fully queryable in procedural deck generation rules (e.g., <code>"Name": "{Leader.Tag:Faction Bonus}"</code>).</li>
+                </ul>
+            </td>
+            <td><code>"Wood-elves"</code>, <code>"Rivendell"</code>, <code>"Glamdring"</code>, <code>"Adrazar"</code></td>
         </tr>
         <tr>
             <td><code>Set</code></td>
-            <td>string</td>
-            <td><code>"METW"</code>, <code>"MEDM"</code>, <code>"MELE"</code>, <code>"MEBA"</code></td>
-            <td>Canonical 4-letter expansion set code.</td>
+            <td>The canonical 4-letter expansion set code indicating the release containing this printing.</td>
+            <td>
+                <ul>
+                    <li>Displayed in the right-click <strong>Card Attributes</strong> readout.</li>
+                    <li>Filtered globally via the top <strong>Set</strong> menu checkboxes (not via filter dropdown slots).</li>
+                    <li>Targeted in procedural rules via the <code>"Sets"</code> array.</li>
+                </ul>
+            </td>
+            <td><code>"METW"</code>, <code>"METD"</code>, <code>"MEDM"</code>, <code>"MELE"</code>, <code>"MEAS"</code>, <code>"MEWH"</code>, <code>"MEBA"</code></td>
         </tr>
         <tr>
             <td><code>FullCode</code></td>
-            <td>string</td>
-            <td><code>"Wood-elves (TW)"</code>, <code>"Adrazar (LE)"</code></td>
-            <td>Set-disambiguated title used by Cardnum and Play MECCG.</td>
+            <td>The set-disambiguated title format used by Cardnum and the Play MECCG online client.</td>
+            <td>
+                <ul>
+                    <li>Displayed in the right-click <strong>Card Attributes</strong> readout.</li>
+                    <li>Used when exporting decks to <code>.cnum</code> and <code>.play</code> formats.</li>
+                </ul>
+            </td>
+            <td><code>"Wood-elves (TW)"</code>, <code>"Adrazar (LE)"</code>, <code>"D&aacute;in II (TD)"</code></td>
         </tr>
         <tr>
             <td><code>Text</code></td>
-            <td>string</td>
-            <td>Rules text printed on the face of the card.</td>
-            <td>Evaluated by automated taxonomy regex harvesting.</td>
+            <td>The complete gameplay rules text printed on the face of the card.</td>
+            <td>
+                <ul>
+                    <li>Visible on the card artwork in the preview pane.</li>
+                    <li>Scanned by the automated regex engine in <strong>Tools &gt; Extract Taxonomy with Rules...</strong> (with Tolkien book flavor quotes automatically stripped).</li>
+                    <li>Omitted from both the filter dropdowns and the right-click monospace readout.</li>
+                </ul>
+            </td>
+            <td><em>Full printed card rules text.</em></td>
         </tr>
     </table>
 
-    <h2 id="classification">2. Classification &amp; Alignment</h2>
+    <!-- SECTION 2: THE 29 DUAL-SURFACE ATTRIBUTES -->
+    <h2 id="dual-surface-attributes">2. Official Gameplay Attributes (Dropdown Slots 1 &amp; 2)</h2>
+    <p>
+        The following 29 attributes represent official rules criteria. All 29 appear in alphabetical order in the <strong>Attribute</strong> dropdowns of <strong>Filter Slots 1 &amp; 2</strong>. In the right-click <strong>Card Attributes</strong> menu, any of these attributes that carry a non-empty value on the selected card are displayed in the monospace readout.
+    </p>
+
+    <div class="note" id="stat-modifiers-note">
+        <strong>Stat Modifiers &amp; Parentheses Notation:</strong>
+        Plain values represent direct, unconditional modifiers to the attribute itself (e.g., <code>-1 body</code> or flat armor bonuses). Values enclosed in parentheses (e.g., <code>(1)</code> or <code>(-1)</code>) denote <strong>conditional modifiers</strong> (such as bonuses restricted to a specific character or class like <em>Warrior only</em>, or temporary combat effects) as well as <strong>direct dice roll adjustments</strong> (such as <code>+1 to body checks</code>).<br />
+        <em>Attribute Polarity:</em> Modifiers reflect net impact on the stat total—most notably in <code>Corruption</code>, where character resistance bonuses (e.g. <code>+2</code> printed on Hobbits) are indexed as negative numbers (<code>-2</code>) because they reduce the character's net corruption burden.
+    </div>
+
     <table>
         <tr>
-            <th>Key</th>
-            <th>Values</th>
-        </tr>
-        <tr>
-            <td><code>Primary</code></td>
-            <td><code>Character</code>, <code>Resource</code>, <code>Hazard</code>, <code>Site</code>, <code>Region</code></td>
-        </tr>
-        <tr>
-            <td><code>Secondary</code></td>
-            <td><code>Ally</code>, <code>Faction</code>, <code>Creature</code>, <code>Short-event</code>, <code>Long-event</code>, <code>Permanent-event</code>, <code>Minor Item</code>, <code>Major Item</code>, <code>Greater Item</code>, <code>Gold Ring Item</code>, <code>Special Item</code></td>
+            <th>Attribute</th>
+            <th>Purpose &amp; Description</th>
+            <th>Illustrative Values &amp; Notes (7 Sets)</th>
         </tr>
         <tr>
             <td><code>Alignment</code></td>
-            <td><code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, <code>Neutral</code></td>
-        </tr>
-        <tr>
-            <td><code>Unique</code></td>
-            <td><code>Unique</code>, <code>Non-unique</code></td>
-        </tr>
-    </table>
-
-    <h2 id="character-stats">3. Character &amp; Creature Statistics</h2>
-    <table>
-        <tr>
-            <th>Key</th>
-            <th>Values &amp; Lore Normalization</th>
-        </tr>
-        <tr>
-            <td><code>Race</code></td>
             <td>
-                <code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Dragon</code>, etc.<br />
-                <em>Note: Lore sub-races are canonically normalized to Elf and Dwarf for clean queries.</em>
+                Card loyalty, alignment framework, and player faction:
+                <ul>
+                    <li><strong>Standard Alignments:</strong> <code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, and <code>Neutral</code>.</li>
+                    <li><strong><code>Fallen/Lord</code>:</strong> Stage resource cards from <em>The White Hand</em> playable by both Fallen-wizards and Fallen-wizards pursuing Ring-lord strategies (e.g., <em>A Merrier World</em>, <em>Deep Mines</em>).</li>
+                    <li><strong><code>Dual</code>:</strong> Crossover cards legal in both Hero and Minion decks with dual-use rules (e.g., <em>Beasts of the Wood</em>, <em>Deadly Dart</em>).</li>
+                </ul>
+            </td>
+            <td><code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, <code>Neutral</code>, <code>Fallen/Lord</code>, <code>Dual</code></td>
+        </tr>
+        <tr>
+            <td><code>Artist</code></td>
+            <td>The illustrator credited for the card artwork. Useful for finding cards by specific Tolkien illustrators.</td>
+            <td><code>Angus McBride</code>, <code>Liz Danforth</code>, <code>Quinton Hoover</code>, <code>Rob Alexander</code>, <code>Ted Nasmith</code>, etc.</td>
+        </tr>
+        <tr>
+            <td><code>Body</code></td>
+            <td>The defensive resilience rating for characters and creatures. An attack roll exceeding this stat wounds or defeats the card.</td>
+            <td>Base ratings: <code>1</code> to <code>12</code> (or <code>-</code>).<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+        </tr>
+        <tr>
+            <td><code>Corruption</code></td>
+            <td>
+                The corruption points (CP) an item/hazard inflicts, or a character's inherent resistance modifier.<br />
+                <em>Note on Sign Inversion:</em> In Cardnum, positive numbers represent corruption <strong>burden</strong> (e.g. <code>1</code>, <code>2</code> CP), while negative numbers represent corruption <strong>resistance</strong> (e.g. Hobbits with printed <code>+2</code> or <code>+4</code> bonuses are indexed as <code>-2</code> and <code>-4</code> because they reduce the net corruption threat).
+            </td>
+            <td>
+                <code>1</code>, <code>2</code>, <code>3</code> (Item/Hazard CP burden)<br />
+                <code>-2</code>, <code>-4</code> (Character resistance, e.g. Hobbits, Frodo)<br />
+                <code>(1)</code>, <code>(-2)</code> (Conditional/event modifiers)
             </td>
         </tr>
         <tr>
-            <td><code>Subrace</code></td>
-            <td>Preserves original Tolkien sub-races: <code>Silvan Elf</code>, <code>Noldo Elf</code>, <code>Longbeard Dwarf</code>, etc.</td>
+            <td><code>Direct</code></td>
+            <td>Direct Influence (DI) points used by characters to control followers or recruit factions.</td>
+            <td>Base ratings: <code>0</code> to <code>12</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
         </tr>
         <tr>
-            <td><code>Skill</code></td>
-            <td><code>Warrior</code>, <code>Scout</code>, <code>Ranger</code>, <code>Sage</code>, <code>Diplomat</code>. Compound skills (e.g. <em>Warrior/Scout</em>) are indexed individually.</td>
+            <td><code>GoldRing</code></td>
+            <td>Site item-playability flag indicating whether a Gold Ring item may be tested or played at this site.</td>
+            <td><code>yes</code>, or blank.</td>
         </tr>
         <tr>
-            <td><code>Mind</code>, <code>Direct</code>, <code>Prowess</code>, <code>Body</code>, <code>Corruption</code>, <code>MPs</code></td>
-            <td>Numeric gameplay stats and victory points.</td>
+            <td><code>GreaterItem</code></td>
+            <td>
+                Site item-playability flag indicating whether a Greater Item may be played at this site.<br />
+                <em>Exceptions &amp; Quirks:</em>
+                <ul>
+                    <li><strong>Minion Bag End (MELE):</strong> Indexed as <code>yes</code>, but printed text uniquely restricts it to a <strong>Hero greater item only</strong> (representing minion companies looting Hobbit heirlooms).</li>
+                    <li><strong>Lossadan Cairn (both versions):</strong> Although the card face prints &ldquo;greater* (* &mdash; Palant&iacute;ri only)&rdquo;, Cardnum leaves <code>GreaterItem</code> <strong>blank</strong> and indexes it under <code>Palantiri: yes</code> instead, preventing false matches when searching for general Greater Item sites.</li>
+                </ul>
+            </td>
+            <td><code>yes</code>, or blank.</td>
+        </tr>
+        <tr>
+            <td><code>Haven</code></td>
+            <td>
+                Performs double duty in the database depending on the site classification:
+                <ul>
+                    <li><strong>Surface Sites:</strong> Identifies the nearest standard haven (or designates the site itself as a haven).</li>
+                    <li><strong>Under-deeps Sites:</strong> Cardnum repurposes this field to record the card's <strong>Adjacent Surface Site</strong>, regardless of the passage movement difficulty (e.g., <em>Barad-d&ucirc;r [0]</em>, <em>Iron Hill Dwarf-hold [13]</em>, or <em>Any site in Ud&ucirc;n [0]</em>). Deep sites with non-standard or variable surface access (such as <em>Ancient Deep-hold</em>) are cataloged as <code>Special</code>.</li>
+                </ul>
+            </td>
+            <td>
+                <strong>Surface Havens:</strong> <code>Rivendell</code>, <code>L&oacute;rien</code>, <code>Grey Havens</code>, <code>Edhellond</code>, <code>Carn D&ucirc;m</code>, <code>Dol Guldur</code><br />
+                <strong>Under-deeps Entrances:</strong> <code>Barad-d&ucirc;r</code>, <code>Iron Hill Dwarf-hold</code>, <code>Any site in Ud&ucirc;n</code>, <code>Special</code>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Hoard</code></td>
+            <td>
+                Site flag indicating that items designated as &ldquo;Hoard item&rdquo; may be played at this site. In Cardnum, all sites tagged <code>yes</code> fall into one of three rules categories:
+                <ul>
+                    <li><strong>Dragon Lairs:</strong> Sites featuring a <em>Dragon</em> automatic-attack (e.g., <em>Dancing Spire</em>, <em>The Lonely Mountain</em>, <em>Gold Hill</em>), which automatically contain a hoard under official game rules despite not printing the word on the card face.</li>
+                    <li><strong>Explicit Hoards:</strong> Sites that explicitly state &ldquo;Contains a hoard&rdquo; in their special rules text (e.g., <em>Framsburg</em>, <em>Shelob's Lair</em>).</li>
+                    <li><strong>Conditional Hoard Play:</strong> Sites whose rules text specifically allows playing a hoard item under special conditions (e.g., <em>Hermit's Hill</em>).</li>
+                </ul>
+            </td>
+            <td><code>yes</code>, or blank.</td>
         </tr>
         <tr>
             <td><code>Home</code></td>
-            <td>Designated home sites for characters (e.g. <code>"Rivendell"</code>, <code>"Bree"</code>).</td>
-        </tr>
-    </table>
-
-    <h2 id="site-movement">4. Sites &amp; Movement</h2>
-    <table>
-        <tr>
-            <th>Key</th>
-            <th>Values</th>
+            <td>Designated starting, recruiting, or healing site(s) for character cards. Multiple homes are split and indexed individually.</td>
+            <td><code>Rivendell</code>, <code>Bree</code>, <code>Edoras</code>, <code>L&oacute;rien</code>, <code>Pelargir</code>, <code>Woodland Realm</code>, etc.</td>
         </tr>
         <tr>
-            <td><code>Site</code></td>
-            <td><code>Free-hold</code>, <code>Border-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Shadow-hold</code>, <code>Dark-hold</code>, <code>Haven</code></td>
+            <td><code>Information</code></td>
+            <td>Site flag indicating whether Information resource events or cards may be played at this site.</td>
+            <td><code>Y</code>, specific requirements, or blank.</td>
+        </tr>
+        <tr>
+            <td><code>MajorItem</code></td>
+            <td>Site item-playability flag indicating whether a Major Item may be played at this site.</td>
+            <td><code>Y</code>, conditions, or blank.</td>
+        </tr>
+        <tr>
+            <td><code>Mind</code></td>
+            <td>The general influence required to maintain a character in a company, or the threshold resistance against corruption checks.</td>
+            <td>Base ratings: <code>1</code> to <code>10</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+        </tr>
+        <tr>
+            <td><code>MinorItem</code></td>
+            <td>Site item-playability flag indicating whether a Minor Item may be played at this site.</td>
+            <td><code>Y</code>, conditions, or blank.</td>
+        </tr>
+        <tr>
+            <td><code>MPs</code></td>
+            <td>Marshalling points (victory points) awarded by the card upon scoring or eliminating it.</td>
+            <td>Numeric victory point values (e.g. <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, <code>5</code>), negative point values (e.g. <code>-1</code>, <code>-2</code>), or <code>None</code>.</td>
+        </tr>
+        <tr>
+            <td><code>Palantiri</code></td>
+            <td>
+                Site flag indicating whether a Palant&iacute;r item may be played at this site.<br />
+                <em>Note:</em> Both Hero and Minion printings of <em>Lossadan Cairn</em> are indexed here as <code>yes</code> because their printed &ldquo;greater*&rdquo; slot is strictly restricted to Palant&iacute;ri.
+            </td>
+            <td><code>yes</code>, or blank.</td>
+        </tr>
+        <tr>
+            <td><code>Playable</code></td>
+            <td>Summary item playability field on site cards detailing what items or special cards may be stored or played there.</td>
+            <td>Summary strings (e.g. <code>Minor</code>, <code>Major</code>, <code>Greater</code>, <code>Gold Ring</code>).</td>
+        </tr>
+        <tr>
+            <td><code>Prowess</code></td>
+            <td>The combat offensive rating (base combat strength roll) for characters and creatures.</td>
+            <td>Base ratings: <code>0</code> to <code>19</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+        </tr>
+        <tr>
+            <td><code>Primary</code></td>
+            <td>The top-level rules classification governing when and where the card enters play.</td>
+            <td><code>Character</code>, <code>Resource</code>, <code>Hazard</code>, <code>Site</code>, <code>Region</code></td>
+        </tr>
+        <tr>
+            <td><code>Race</code></td>
+            <td>Character, creature, or faction species. Lore sub-races are canonically normalized to clean game types (e.g. <em>Silvan Elf</em> &rarr; <code>Elf</code>, <em>Longbeard Dwarf</em> &rarr; <code>Dwarf</code>).</td>
+            <td><code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Dragon</code>, <code>Nazg&ucirc;l</code>, <code>Ent</code>, <code>Undead</code>, <code>Maia</code>, etc.</td>
         </tr>
         <tr>
             <td><code>Region</code></td>
-            <td>Geographic territory (e.g. <code>Arthedain</code>, <code>Rhudaur</code>, <code>Gorgoroth</code>).</td>
+            <td>The geographic territory where a site is located, or the specific territory represented by a region movement card.</td>
+            <td><code>Arthedain</code>, <code>Rhudaur</code>, <code>Gorgoroth</code>, <code>Anduin Vales</code>, <code>Cardolan</code>, <code>Anorien</code>, etc.</td>
         </tr>
         <tr>
-            <td><code>Playable</code>, <code>Hoard</code>, <code>Haven</code></td>
-            <td>Site item-playability flags and nearest haven designations.</td>
+            <td><code>Scroll</code></td>
+            <td>Site flag indicating whether Scroll items (e.g. <em>Scroll of Isildur</em>) may be played at this site.</td>
+            <td><code>Y</code>, conditions, or blank.</td>
+        </tr>
+        <tr>
+            <td><code>Secondary</code></td>
+            <td>Specific functional card subtype or category defining rules timing and deck partitioning.</td>
+            <td><code>Ally</code>, <code>Faction</code>, <code>Creature</code>, <code>Short-event</code>, <code>Long-event</code>, <code>Permanent-event</code>, <code>Minor Item</code>, <code>Major Item</code>, <code>Greater Item</code>, <code>Gold Ring Item</code>, <code>Special Item</code></td>
+        </tr>
+        <tr>
+            <td><code>Site</code></td>
+            <td>The structural hold type or classification of a site card.</td>
+            <td><code>Free-hold</code>, <code>Border-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Shadow-hold</code>, <code>Dark-hold</code>, <code>Haven</code>, <code>Wizardhaven</code>, plus database shorthand codes (<code>B</code>, <code>B F</code>, <code>B R</code>).</td>
+        </tr>
+        <tr>
+            <td><code>Skill</code></td>
+            <td>Character classes and creature tactical abilities. Compound skills (e.g. <em>Warrior/Scout</em>) are split on whitespace and indexed as individual values. Creature traits stored in this Cardnum field are also filterable here.</td>
+            <td>
+                <strong>Character Skills:</strong> <code>Warrior</code>, <code>Scout</code>, <code>Ranger</code>, <code>Sage</code>, <code>Diplomat</code><br />
+                <strong>Creature/Hazard Traits:</strong> <code>Flying</code>, <code>Ringwraith</code>, <code>Undead</code>, <code>Drake</code>, <code>Giant</code>, etc.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Specific</code></td>
+            <td>Designates unique cards, rings, or quest objectives specifically playable only at this site.</td>
+            <td>Named cards (e.g. <code>The One Ring</code>, <code>Iron Crown</code>) or special quest requirements.</td>
+        </tr>
+        <tr>
+            <td><code>Strikes</code></td>
+            <td>The number of individual combat strikes delivered by a creature hazard against an opposing company.</td>
+            <td>Base ratings: <code>0</code> to <code>6</code> and <code>15</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+        </tr>
+        <tr>
+            <td><code>Subrace</code></td>
+            <td>Preserves specific Tolkien sub-races split during catalog normalization for deep lore queries. Blank for non-Elf and non-Dwarf cards.</td>
+            <td><code>Silvan Elf</code>, <code>Noldo Elf</code>, <code>Sinda Elf</code>, <code>Longbeard Dwarf</code>, <code>Firebeard Dwarf</code>, etc.</td>
+        </tr>
+        <tr>
+            <td><code>Unique</code></td>
+            <td>The uniqueness status governing copy limits in deck building (1 copy for unique cards, up to 3 for non-unique).</td>
+            <td><code>Unique</code>, <code>Non-unique</code> (or blank).</td>
         </tr>
     </table>
+
+    <!-- SECTION 3: DATA PROVENANCE & DATABASE DISCREPANCIES -->
+    <h2 id="provenance">3. Data Provenance &amp; Database Discrepancies</h2>
+    <p>
+        Understanding how card data is modeled and synchronized helps explain unexpected query results, avoid lost edits, and ensure your procedural deck rules remain robust:
+    </p>
+
+    <h3>A. Cardnum Open Database Synchronization &amp; Modeling Quirks</h3>
+    <p>
+        The catalog synchronizes on application startup from the community-maintained <strong>Cardnum</strong> repository (<code>cards-dc.json</code>). Because Cardnum was compiled from disparate community databases over many years, several attributes reflect historical database modeling decisions rather than literal transcriptions of printed card text:
+    </p>
+    <ul>
+        <li>
+            <strong>The Corruption Polarity Inversion (Hobbit Resistance):</strong>
+            On character cards, the oval in the lower-right corner displays a bonus to corruption check rolls (for example, <em>Folco Boffin</em>, <em>Merry</em>, <em>Pippin</em>, and <em>Robin Smallburrow</em> all literally display <strong><code>+2</code></strong>, while <em>Frodo</em> displays <strong><code>+4</code></strong>). However, Cardnum unifies the <code>Corruption</code> field across all card types to represent <em>net corruption burden</em>:
+            <ul>
+                <li>Items and hazards that inflict corruption points (CP) are positive (e.g. <code>1</code>, <code>2</code>, <code>3</code> CP).</li>
+                <li>Character resistance bonuses that reduce the risk of corruption are indexed as <strong>negative values</strong> (e.g. <code>-2</code> for Hobbits, <code>-4</code> for Frodo) because mathematically, +2 to the check roll equals -2 to the net corruption burden.</li>
+                <li>To find corruption-resistant characters, filter for negative values like <code>-2</code> rather than <code>+2</code>.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Parenthesized Values:</strong>
+            Values in parentheses (such as <code>(1)</code> or <code>(-1)</code>) indicate conditional modifiers (e.g., <em>Warrior only</em> on <em>Valiant Sword</em>, or <em>Éowyn only</em> on <em>Helm of Her Secrecy</em>) or direct dice roll check adjustments (such as +1 to body check rolls on <em>Stabbing Tongue of Fire</em>, indexed as <code>(-1)</code> body).
+        </li>
+        <li>
+            <strong>Creature Traits in Skills:</strong>
+            Cardnum stores hazard tactical traits (such as <code>Flying</code>, <code>Ringwraith</code>, <code>Undead</code>, or <code>Drake</code>) in the <code>Skill</code> field alongside character classes (<em>Warrior</em>, <em>Scout</em>, etc.).
+        </li>
+        <li>
+            <strong>Shorthand Codes:</strong>
+            Site cards occasionally feature legacy shorthand classifications, such as <code>B</code> (Border-hold), <code>B F</code> (Border-hold/Free-hold), or <code>Wizardhaven</code> (Fallen-wizard havens from <em>The White Hand</em>).
+        </li>
+    </ul>
+
+    <h3>B. Why Local File Edits Do Not Persist</h3>
+    <p>
+        Users sometimes attempt to correct database typos or sign inversions by manually editing their local copy of <code>cards-dc.json</code> in a text editor.
+    </p>
+    <div class="warning">
+        <strong>Automatic Overwrite Notice:</strong> Every time MECCG Deck Builder launches with an active internet connection, it checks the GitHub master repository and re-downloads the latest master definitions, immediately overwriting your local <code>cards-dc.json</code> file. Any manual changes made directly to that file will be lost.
+    </div>
+
+    <h3>C. Recommended Workaround: Custom Categories &amp; Tags</h3>
+    <p>
+        The cleanest, permanent way to handle missing or unintuitive official attributes is to create local taxonomy tags:
+    </p>
+    <ol>
+        <li>Right-click the card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong> (or open <strong>Filter &gt; Manage Custom Tags...</strong>).</li>
+        <li>Enter your preferred category and tag (for example, <code>Corruption Resistance: +2</code>, <code>Combat Role: Scout Support</code>, or <code>Skill Fix: Sage</code>).</li>
+        <li>Filter by these terms using <strong>Custom Tags (Slots 3 &amp; 4)</strong> in the filter bar.</li>
+        <li>Back up your assignments at any time via <strong>Filter &gt; Save Tag Set...</strong> so they can be preserved or shared across machines.</li>
+    </ol>
+
+    <h3>D. Authoring Robust Procedural Deck Rules</h3>
+    <p>
+        Because upstream open databases are maintained by community volunteers and could experience structural updates (or transition to alternative mirrors such as Play MECCG), author your procedural generation JSON templates defensively:
+    </p>
+    <ul>
+        <li>
+            <strong>Use Semicolon OR Logic:</strong>
+            Match multiple related variations where appropriate (e.g., <code>"Skill": "Diplomat; Sage"</code> or <code>"Corruption": "-2; -4"</code>).
+        </li>
+        <li>
+            <strong>Query Custom Tags When Appropriate:</strong>
+            If a strategy relies on roles or classifications that Cardnum represents inconsistently, tag the cards yourself and query your user taxonomy using <code>"Tags": { "Archetype": "Ring Destruction" }</code> instead of relying solely on <code>"Attributes"</code>.
+        </li>
+        <li>
+            <strong>Always Provide Fallbacks:</strong>
+            Attach a nested <code>Fallback</code> rule to any query that depends on specific database strings. If an upstream attribute value shifts, the engine will detect the shortfall and execute the fallback automatically, ensuring your deck remains complete and legal.
+        </li>
+    </ul>
 </body>
 </html>
 ]]>
@@ -226,11 +462,60 @@ namespace MECCG_Deck_Builder.Properties {
         <li><strong>Granular Removal:</strong> The <strong>Remove Tag</strong> menu displays each assigned tag individually, allowing removal without wiping the category.</li>
     </ul>
 
-    <h2>3. Saving &amp; Loading Custom Tag Sets</h2>
+    <h2>3. Saving, Loading &amp; Merging Custom Tag Sets</h2>
+    <p>
+        The application differentiates between <strong>source files</strong> (read-only files pulled into memory) and <strong>destination files</strong> (files written to your hard drive):
+    </p>
+
+    <table>
+        <tr>
+            <th>Menu Action</th>
+            <th>File Role</th>
+            <th>Behavior in Active Session (Memory)</th>
+            <th>Effect on Disk</th>
+        </tr>
+        <tr>
+            <td><strong>Filter &gt; Load Tag Set...</strong></td>
+            <td><strong>Source</strong></td>
+            <td><strong>Wipe &amp; Replace:</strong> Clears all active categories and tags in memory, then loads the selected file fresh.</td>
+            <td>Read-only (file on disk is not modified).</td>
+        </tr>
+        <tr>
+            <td><strong>Filter &gt; Merge Tag Set...</strong></td>
+            <td><strong>Source</strong></td>
+            <td><strong>Append &amp; Combine:</strong> Reads the selected file and folds its categories and tags into your active memory without erasing what is already open.</td>
+            <td>Read-only (file on disk is not modified).</td>
+        </tr>
+        <tr>
+            <td><strong>Filter &gt; Save Tag Set...</strong></td>
+            <td><strong>Destination</strong></td>
+            <td>None (active taxonomy in memory remains unchanged).</td>
+            <td><strong>Write / Export:</strong> Serializes all categories and tag assignments currently in memory out to the chosen <code>.json</code> file.</td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Automatic Baseline Loading:</strong>
+        On startup, the application automatically loads <code>Rules_Support_Tags.json</code> (if present in the program folder) as the baseline taxonomy into memory. Because memory is already populated on launch, you never need to load or merge this baseline file manually.
+    </div>
+
+    <h3>Understanding "Merge Tag Set..." (Worked Example)</h3>
+    <p>
+        Suppose you receive a specialized tag set from another player called <code>Hazard_Packages.json</code> (which tags cards with custom labels like <code>Hazard Archetype: Nazgûl Rush</code>):
+    </p>
     <ul>
-        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your custom taxonomy and all card assignments to a <code>.json</code> file.</li>
-        <li><strong>Filter &gt; Load Tag Set...:</strong> Restores a previously saved custom tag set file.</li>
+        <li>
+            <strong>If you used "Load Tag Set...":</strong> The program would wipe out your baseline rules tags (<code>Resolved Site</code>, <code>Faction Bonus</code>) and replace them with the hazard file. The deck generator would no longer know how to resolve starting sites or recruit faction bonuses.
+        </li>
+        <li>
+            <strong>When you use "Merge Tag Set...":</strong> The program reads <code>Hazard_Packages.json</code> as a <em>source</em>. It keeps all of your existing rules tags and appends the hazard tags right alongside them. If a card already has tags in a category, new tags are safely appended with a semicolon separator (e.g., <code>Orcs; Trolls</code>).
+        </li>
     </ul>
+
+    <div class="tip">
+        <strong>How to Persist Combined or Extracted Tags:</strong>
+        Whenever you merge an external file or extract new tags using the Extraction Tools, those changes live only in your running session (active memory). To make them permanent for future application launches, select <strong>Filter &gt; Save Tag Set...</strong>, select <code>Rules_Support_Tags.json</code>, and confirm overwrite.
+    </div>
 </body>
 </html>
 ]]>
@@ -263,6 +548,7 @@ namespace MECCG_Deck_Builder.Properties {
     <h2>Documentation Topics</h2>
     <ul>
         <li><a href="deck_rules_reference.html"><strong>Deck Rules JSON Schema Reference:</strong></a> Complete technical reference for all rule properties, variables, and tokens.</li>
+        <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Canonical site and faction resolutions powering generic rule templates.</li>
         <li><a href="worked_example_factions.html"><strong>Worked Example: Dynamic Faction Recruitment:</strong></a> Step-by-step tutorial demonstrating variable capture, targeted faction recruiting, and fallbacks.</li>
     </ul>
 </body>
@@ -823,6 +1109,251 @@ namespace MECCG_Deck_Builder.Properties {
 </html>
 ]]>
   </file>
+  <file path='.\Resources\Help\rules_support_tags.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Companion Rules Tag Set Reference</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_generation_engine.html">Procedural Deck Generator</a> &gt; Companion Rules Tags</div>
+
+    <h1>Companion Rules Tag Set Reference</h1>
+    <p>
+        MECCG Deck Builder includes a companion taxonomy file (<strong><code>Rules_Support_Tags.json</code></strong>) that loads automatically on startup (or via <strong>Filter &gt; Load/Merge Tag Set...</strong>).
+    </p>
+    <p>
+        Its primary purpose is to enrich the catalog with objective rules data that Cardnum lacks as structured columns—bridging descriptive rules text (such as <em>&ldquo;Any Dark-hold&rdquo;</em>), character recruiting bonuses, and site automatic-attack classifications so they can be queried by the procedural deck generation engine.
+    </p>
+
+    <div class="tip">
+        <strong>Viewing Tagged Cards In-App:</strong> Rather than consulting a static manual list, you can view the live list of cards tagged in this file at any time right inside the application: in <strong>Filter Slot 3</strong> (bottom panel), select <strong>Category:</strong> <code>Resolved Site</code>, <code>Faction Bonus</code>, or <code>Automatic Attack</code>. The Master List will immediately display all matching cards from your active sets.
+    </div>
+
+    <!-- SECTION 1: RESOLVED SITE -->
+    <h2 id="resolved-site">1. Category: <code>Resolved Site</code></h2>
+    <p>
+        Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).
+    </p>
+    <p>
+        For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites). These fall into three primary archetypes:
+    </p>
+
+    <table>
+        <tr>
+            <th>Resolution Archetype</th>
+            <th>Printed Rule Pattern</th>
+            <th>Representative Cards</th>
+            <th>Resolved Tag Value(s)</th>
+            <th>How It Works in Deck Rules</th>
+        </tr>
+        <tr>
+            <td><strong>Hold Type / Site Classification</strong></td>
+            <td>
+                <code>Home Site: Any Dark-hold</code><br />
+                <code>Home Site: Any Haven</code><br />
+                <code>Home Site: Any Free-hold</code>
+            </td>
+            <td>
+                Minion Orcs &amp; Trolls (<em>Doeth</em>, <em>Orc Captain</em>, <em>Troll Lout</em>, etc.), <em>Gandalf</em>
+            </td>
+            <td>
+                Semicolon list of surface sites matching that hold type (e.g. <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code> or <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code>).
+            </td>
+            <td>
+                Translates a category classification into concrete surface site titles. When sampled by the engine, one site from the list is chosen at random.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Geographic Territory</strong></td>
+            <td>
+                <code>Adjacent Sites: Any site in &Ucirc;d&ucirc;n (0)</code><br />
+                <code>Home Site: Any site in &Ucirc;d&ucirc;n</code><br />
+                <code>Home Site: Any site in Imlad Morgul</code>
+            </td>
+            <td>
+                <em>The Under-galleries</em>, <em>Dwar of Waw</em>, <em>The Witch-king</em>
+            </td>
+            <td>
+                <code>Cirith Gorgor</code><br />
+                <code>Minas Morgul</code>
+            </td>
+            <td>
+                Resolves regional descriptions to the specific surface hold(s) located within that territory (e.g., <em>Cirith Gorgor</em> is the sole surface hold in the &Ucirc;d&ucirc;n region).
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Complex Conditional Criteria</strong></td>
+            <td>
+                <code>Home Site: Any non-"Dragon's lair" Ruins &amp; Lairs in a Wilderness</code><br />
+                <code>Home Site: Any non-Under-deeps Ruins &amp; Lairs</code>
+            </td>
+            <td>
+                <em>Alatar</em>, Stone Trolls (<em>T&ocirc;ma</em>, <em>Brat</em>, <em>Wluag</em>)
+            </td>
+            <td>
+                Semicolon list of eligible canonical sites (e.g. <code>Dr&uacute;adan Forest; Hermit's Hill; Woodmen-town; Cameth Brin; Dunnish Clan-hold; Ruined Signal Tower</code>).
+            </td>
+            <td>
+                Translates complex multi-criteria rules into a randomized selection pool of legal candidate sites.
+            </td>
+        </tr>
+    </table>
+
+    <!-- SECTION 2: FACTION BONUS -->
+    <h2 id="faction-bonus">2. Category: <code>Faction Bonus</code></h2>
+    <p>
+        The companion file includes direct influence recruiting bonuses harvested from character card rules text (as demonstrated in the <a href="worked_example_factions.html">Dynamic Faction Recruitment Worked Example</a>).
+    </p>
+    <p>
+        Any character with rules granting +2 Direct Influence against a specific faction is tagged with that faction's exact title (e.g. <em>Thranduil</em> &rarr; <code>Wood-elves</code>, <em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves</code>, <em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code>). This allows generative rules to recruit matching factions dynamically using <code>"Name": "{Leader.Tag:Faction Bonus}"</code>.
+    </p>
+
+    <!-- SECTION 3: AUTOMATIC ATTACK -->
+    <h2 id="automatic-attack">3. Category: <code>Automatic Attack</code></h2>
+    <p>
+        Official Cardnum card attributes do not include a dedicated field for site automatic attacks. To allow procedural deck rules and catalog filters to target or avoid specific guardian creatures, the <code>Automatic Attack</code> category indexes the creature types printed on site cards:
+    </p>
+
+    <table>
+        <tr>
+            <th>Creature Attack Type</th>
+            <th>Tag Value</th>
+            <th>Example Sites</th>
+            <th>Deckbuilding &amp; Rules Significance</th>
+        </tr>
+        <tr>
+            <td><strong>Dragon Lairs</strong></td>
+            <td><code>Dragon</code></td>
+            <td>
+                <em>Dancing Spire</em>, <em>The Lonely Mountain</em>, <em>Gold Hill</em>, <em>Caves of &Ucirc;lund</em>, <em>Zarak D&ucirc;m</em>
+            </td>
+            <td>
+                Identifies the 9 true Dragon Lairs. Differentiates true Dragons from sites with minor <em>Drake</em> attacks (such as <em>The Rusted-deeps</em>). Essential for building dragon-hunting archetypes or querying sites that contain hoards by game rule.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Standard Minion Defenses</strong></td>
+            <td><code>Orcs</code><br /><code>Trolls</code></td>
+            <td>
+                <em>Carn D&ucirc;m</em>, <em>Moria</em>, <em>Goblin-gate</em>, <em>Mount Gundabad</em>
+            </td>
+            <td>
+                Most Dark-holds and Shadow-holds feature Orc or Troll attacks. Sites with multiple attacks receive multi-tags (e.g. <code>Orcs; Trolls</code>), allowing queries to match either type.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Spirits &amp; Undead</strong></td>
+            <td><code>Undead</code></td>
+            <td>
+                <em>Dead Marshes</em>, <em>Minas Morgul</em>, <em>Barrow-downs</em>, <em>Ancient Deep-hold</em>
+            </td>
+            <td>
+                Useful for pairing with anti-undead heroes or hazard-keyed strategies.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Hero Haven Defenses (Minion Game)</strong></td>
+            <td><code>Elves</code><br /><code>D&uacute;nedain</code></td>
+            <td>
+                <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Edhellond</em>, <em>Grey Havens</em>
+            </td>
+            <td>
+                In minion play (<em>The Lidless Eye</em>), hero havens become dangerous Free-holds guarded by Elven and D&uacute;nedain automatic attacks.
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Lethal Entities</strong></td>
+            <td><code>Nazg&ucirc;l</code><br /><code>Maia</code><br /><code>Balrog</code></td>
+            <td>
+                <em>Barad-d&ucirc;r</em> (Maia), <em>Minas Morgul</em> (Nazg&ucirc;l), <em>The Under-gates</em> (Balrog)
+            </td>
+            <td>
+                Identifies non-cancelable or high-prowess guardian entities at major strongholds.
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Multiple Automatic Attacks:</strong> If a site features more than one automatic attack (for example, <em>Barad-d&ucirc;r</em> features Orcs, Trolls, and a Maia), all attack types are assigned to the card separated by semicolons (<code>Orcs; Trolls; Maia</code>). A query for any of those individual tags will successfully match the site.
+    </div>
+
+    <!-- SECTION 4: USING COMPANION TAGS IN DECK RULES -->
+    <h2 id="rules-syntax">4. Using Companion Tags in Procedural Deck Rules</h2>
+    <p>
+        These companion categories enable rich, declarative deck generation rules:
+    </p>
+
+    <h3>A. Universal Starting Site Rule (Handling Standard &amp; Dynamic Characters)</h3>
+    <pre><code>{
+  "Name": "Leader's Starting Site",
+  "Section": "Sites",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Site",
+    "Name": "{Leader.Home}"
+  },
+  "Fallback": {
+    "Name": "Dynamic Home Resolution Fallback",
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{Leader.Tag:Resolved Site}"
+    }
+  }
+}</code></pre>
+
+    <div class="note">
+        <strong>Execution Walkthrough:</strong>
+        <ul>
+            <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
+            <li><strong>Dynamic Characters (Alatar, Gandalf, Orc Captain, Minion Trolls):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Tag:Resolved Site}</code>!</li>
+        </ul>
+    </div>
+
+    <h3>B. Targeted Dragon Lair Expedition</h3>
+    <p>
+        Recruit destination sites specifically guarded by true Dragons without hardcoding site names:
+    </p>
+    <pre><code>{
+  "Name": "Dragon Lair Destinations",
+  "Section": "Sites",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Site"
+  },
+  "Tags": {
+    "Automatic Attack": "Dragon"
+  }
+}</code></pre>
+
+    <h3>C. Under-deeps Surface Entrances</h3>
+    <p>
+        Ensure an Under-deeps company includes an appropriate surface entrance:
+    </p>
+    <pre><code>{
+  "Name": "Under-deeps Surface Entrance",
+  "Section": "Sites",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Site",
+    "Name": "{DeepSite.Tag:Resolved Site}"
+  }
+}</code></pre>
+
+    <div class="tip">
+        <strong>See Also:</strong>
+        <ul>
+            <li><a href="taxonomy_extraction_tools.html"><strong>Taxonomy Extraction Tools:</strong></a> Step-by-step tutorial on harvesting card text and authoring custom regex rules.</li>
+            <li><a href="worked_example_factions.html"><strong>Worked Example: Dynamic Factions:</strong></a> End-to-end tutorial using <code>Faction Bonus</code> tags and variable interpolation.</li>
+        </ul>
+    </div>
+</body>
+</html>
+]]>
+  </file>
   <file path='.\Resources\Help\sets_and_faceting.html'>
 <![CDATA[
 <!DOCTYPE html>
@@ -864,11 +1395,40 @@ namespace MECCG_Deck_Builder.Properties {
         </tr>
     </table>
 
-    <h2>Cascading Faceted Search &amp; Conflict Resolution</h2>
+    <h2>Smart Cascading Filters &amp; Automatic Conflict Resolution</h2>
+    <p>
+        The filter engine uses intelligent cascading logic to ensure you only browse relevant options:
+    </p>
+
     <ul>
-        <li><strong>Context-Sensitive Value Pruning:</strong> Every dropdown automatically prunes options to show only values present among cards satisfying your active expansion sets and other active filter slots, completely eliminating zero-result queries.</li>
-        <li><strong>Order-Independent Narrowing:</strong> Filters can be selected in any sequence. Selecting <code>Skill = Diplomat</code> in Slot 2 prunes Slot 1's <code>Secondary</code> dropdown down to card types featuring diplomats.</li>
-        <li><strong>Automatic Conflict Resolution:</strong> If an active selection becomes impossible (e.g., deselecting an expansion set), the invalid slot automatically resets to blank (<code>""</code>).</li>
+        <li>
+            <strong>Static Keys (Attribute &amp; Category):</strong>
+            The upper dropdowns always display all available attributes (Slots 1 &amp; 2) and all taxonomy categories (Slots 3 &amp; 4) across the entire catalog, regardless of which expansion sets are currently checked.
+        </li>
+        <li>
+            <strong>Dynamic Value &amp; Tag Pruning:</strong>
+            The lower dropdowns (<strong>Value</strong> and <strong>Tag</strong>) automatically prune their lists in real time. They only show values and tags present on cards that satisfy your active expansion sets <em>and</em> the criteria in all other active filter slots.
+        </li>
+        <li>
+            <strong>Order-Independent Narrowing:</strong>
+            You can configure filter slots in any order. For example:
+            <ul>
+                <li>Enable only <em>The Wizards</em> (METW) in the <strong>Set</strong> menu.</li>
+                <li>In Slot 1, select <strong>Attribute:</strong> <code>Primary</code>. On its own, the <strong>Value</strong> dropdown lists all 5 primary card types (<em>Character</em>, <em>Resource</em>, <em>Hazard</em>, <em>Site</em>, <em>Region</em>).</li>
+                <li>In Slot 2, select <strong>Attribute:</strong> <code>Skill</code>. On its own, the <strong>Value</strong> dropdown lists 16 skills.</li>
+                <li>Now choose <strong>Value:</strong> <code>Diplomat</code> in Slot 2.</li>
+                <li>Slot 1's <strong>Value</strong> dropdown instantly prunes from 5 options down to just 2: <code>Character</code> and <code>Resource</code>, because in METW only characters and certain resource cards possess the Diplomat skill.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Automatic Conflict Resolution (Set Deselection):</strong>
+            Because dynamic pruning only offers values and tags that currently match cards, it is impossible to manually select a zero-result combination using the dropdowns. Instead, conflicts only occur when you <strong>deselect an expansion set</strong> in the <strong>Set</strong> menu. When a set is unchecked, the engine re-evaluates all active slots simultaneously:
+            <ul>
+                <li>If a currently selected Value or Tag only existed in the removed set, that slot automatically clears to blank (<code>""</code>) so you are not left viewing an empty list.</li>
+                <li>If the selection still exists in the remaining sets, it remains selected.</li>
+                <li><em>Example:</em> With both METW and METD checked, Slot 1 set to <code>Character</code>, and Slot 2 set to <code>Race = Hobbit</code>, unchecking METW causes Slot 2 to automatically clear to blank because METD contains no Hobbit characters (whereas selecting <code>Race = Dwarf</code> would remain selected).</li>
+            </ul>
+        </li>
     </ul>
 
     <h2>Clearing and Resetting Filters</h2>
@@ -1098,15 +1658,19 @@ pre {
 <body>
     <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="image_cache.html">Tools &amp; Technical Architecture</a> &gt; Taxonomy Extraction Tools</div>
     <h1>Taxonomy Extraction Tools</h1>
-    <p>Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to cards currently visible in your Master List.</p>
+    <p>
+        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to the cards currently visible in your Master List. It allows you to harvest card text, perform cross-card relational joins, or run custom regular expressions to tag hundreds of cards in bulk.
+    </p>
 
-    <h2>1. Dynamic Entity Harvesting (from Catalog Text)</h2>
+    <!-- SECTION 1: DYNAMIC ENTITY HARVEST -->
+    <h2 id="entity-harvest">1. Dynamic Entity Harvesting (from Catalog Text)</h2>
     <ul>
-        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans active sets in memory, extracts all matching entity titles, and searches your scoped Master List cards for references to those entities.</li>
-        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.</li>
+        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app scans active sets in memory, harvests all matching entity titles (e.g. <em>Wood-elves</em>, <em>Riders of Rohan</em>), and searches your scoped Master List cards for gameplay references to those titles.</li>
+        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes (enclosed in quotation marks) and book citations (e.g. <code>—LotRI</code>) are automatically stripped before evaluation, preventing lore quotes from generating false-positive tags.</li>
     </ul>
 
-    <h2>2. Relational Attribute Lookup (Cross-Card Join)</h2>
+    <!-- SECTION 2: RELATIONAL ATTRIBUTE LOOKUP -->
+    <h2 id="relational-lookup">2. Relational Attribute Lookup (Cross-Card Join)</h2>
     <p>Enables 2-step relational tagging between linked entities:</p>
     <ul>
         <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
@@ -1115,8 +1679,121 @@ pre {
         <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
     </ul>
 
-    <h2>3. Custom Regex &amp; JSON Rule Files</h2>
-    <p>Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> rule files.</p>
+    <!-- SECTION 3: CUSTOM REGEX EXPRESSION -->
+    <h2 id="custom-regex">3. Custom Regex Expressions (Mode 3)</h2>
+    <p>
+        Mode 3 allows you to test and execute arbitrary .NET regular expressions against the rules text of cards currently in scope. It provides three configurable fields:
+    </p>
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Description &amp; Behavior</th>
+            <th>Examples</th>
+        </tr>
+        <tr>
+            <td><strong>Category</strong></td>
+            <td>The destination custom taxonomy category where extracted tags will be stored.</td>
+            <td><code>Resolved Site</code>, <code>Combat Role</code>, <code>Audit</code></td>
+        </tr>
+        <tr>
+            <td><strong>Tag Name</strong></td>
+            <td>
+                The value assigned to matching cards. Supports two modes:
+                <ul>
+                    <li><strong>Static Tag / List:</strong> Enter a fixed string or semicolon-separated list. Every matching card receives this exact value.</li>
+                    <li><strong>Regex Capture Group (<code>$1</code>):</strong> If your pattern contains parentheses <code>(...)</code>, using <code>$1</code> dynamically assigns the exact word or phrase matched inside that group.</li>
+                </ul>
+            </td>
+            <td>
+                <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor</code><br />
+                <code>Scout Specialist</code><br />
+                <code>$1</code>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Pattern</strong></td>
+            <td>
+                The regular expression evaluated against card rules text. Useful flags:
+                <ul>
+                    <li><code>(?i)</code>: Case-insensitive matching.</li>
+                    <li><code>(?s)</code>: Dot-all (singleline) mode, allowing <code>.*</code> to span across multi-line card text paragraphs.</li>
+                    <li><code>\b</code>: Word boundary (ensures <code>\bdragon\b</code> matches "dragon" but not "dragonfly").</li>
+                </ul>
+            </td>
+            <td>
+                <code>(?i)Any Dark-hold</code><br />
+                <code>(?i)\b(greater)\b</code><br />
+                <code>(?is)(?=.*dragon)(?=.*ruin).*</code>
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Automatic Flavor Text Stripping:</strong>
+        The regex engine automatically strips Tolkien book quotes (<code>&quot;...&quot;</code>) and book attributions (e.g. <code>—LotR</code>, <code>-Hobbit</code>) before evaluating your pattern. Trailing card text like <code>Home Site:</code> is preserved, ensuring your regex searches only active gameplay mechanics.
+    </div>
+
+    <!-- SECTION 4: WORKED EXAMPLE (ANY DARK-HOLD) -->
+    <h2 id="worked-example">4. Worked Walkthrough: Batch-Tagging Minion Dark-holds</h2>
+    <p>
+        In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site (via <a href="rules_support_tags.html"><code>{Leader.Tag:Resolved Site}</code></a>), we can batch-tag all 15 characters in under 30 seconds:
+    </p>
+
+    <h3>Step 1: Scope the Master List to the Target Characters</h3>
+    <ol>
+        <li>In the main window, check <em>The Lidless Eye</em> (MELE) in the <strong>Set</strong> menu.</li>
+        <li>Set <strong>Filter Slot 1:</strong> <code>Attribute: Home</code>, <code>Value: Any Dark-hold</code>.</li>
+        <li>The Master List immediately displays all 15 matching minion characters.</li>
+    </ol>
+
+    <h3>Step 2: Configure Mode 3 in the Extraction Tool</h3>
+    <ol>
+        <li>Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>. Notice the hint confirming: <em>"Scanning 15 card(s) currently visible in the Master List."</em></li>
+        <li>Select the <strong>Custom Regex Expression</strong> radio button.</li>
+        <li>
+            Fill in the extraction parameters:
+            <ul>
+                <li><strong>Category:</strong> <code>Resolved Site</code></li>
+                <li><strong>Tag Name:</strong> <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                <li><strong>Pattern:</strong> <code>(?i)Any Dark-hold</code></li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3>Step 3: Preview and Apply</h3>
+    <ol>
+        <li>Click <strong>Test / Preview Matches</strong>. The preview table populates with all 15 characters, showing each will receive the 7 surface Dark-holds in their tag.</li>
+        <li>Click <strong>Apply Tags to Catalog</strong>. All 15 cards are tagged simultaneously in memory.</li>
+        <li>Select <strong>Filter &gt; Save Tag Set...</strong> to persist your new mappings by overwriting <code>Rules_Support_Tags.json</code>.</li>
+    </ol>
+
+    <!-- SECTION 5: JSON BATCH FILES -->
+    <h2 id="json-rules">5. Batch JSON Rule Sets (Mode 4)</h2>
+    <p>
+        For large-scale taxonomy extraction across multiple expansions, you can author reusable batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and load them via the <strong>Load Rules from File</strong> option.
+    </p>
+
+    <h3>Sample Extraction Rule Schema</h3>
+    <pre><code>[
+  {
+    "Category": "Faction Bonus",
+    "Pattern": "(?i)\\+2\\s+direct\\s+influence\\s+against\\s+([A-Za-z\\s-]+)",
+    "TagTemplate": "$1"
+  },
+  {
+    "Category": "Resolved Site",
+    "Pattern": "(?i)Any Dark-hold",
+    "TagTemplate": "Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Dol Guldur; Minas Morgul"
+  }
+]</code></pre>
+
+    <div class="tip">
+        <strong>See Also:</strong>
+        <ul>
+            <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference for the <code>Resolved Site</code> and <code>Faction Bonus</code> categories.</li>
+            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Alternative bulk-tagging method using Microsoft Excel or Google Sheets.</li>
+        </ul>
+    </div>
 </body>
 </html>
 ]]>
@@ -1647,6 +2324,7 @@ namespace MECCG_Deck_Builder
 - [ ] **v0.5.0 - Procedural Deck Generator**
   - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
   - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
+  - Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
 - [ ] **v1.0.0 - First Public Release**
 ]]>
   </file>
@@ -2487,6 +3165,79 @@ namespace MECCG_Deck_Builder
                 AppendCardCustomTag(cardId, keyName, tagValue);
             }
         }
+
+        /// <summary>
+        /// Non-destructively merges categories and tags from an external tag set into the active taxonomy.
+        /// </summary>
+        public void MergeCustomFilters(
+            List<List<string>> filters,
+            List<SortedDictionary<string, string>> cardMappings,
+            CardCatalogService catalog = null)
+        {
+            if (filters != null)
+            {
+                foreach (var f in filters)
+                {
+                    if (f == null || f.Count == 0) continue;
+                    string keyName = f[0];
+                    AddCustomKeyName(keyName);
+                    for (int i = 1; i < f.Count; i++)
+                    {
+                        AddCustomKeyValue(keyName, f[i]);
+                    }
+                }
+            }
+
+            if (cardMappings == null) return;
+
+            foreach (var dict in cardMappings)
+            {
+                string resolvedCardId = ResolveCardIdFromDictionary(dict, catalog);
+                if (string.IsNullOrEmpty(resolvedCardId)) continue;
+
+                foreach (var kvp in dict)
+                {
+                    if (IsMetadataKey(kvp.Key)) continue;
+
+                    AppendCardCustomTag(resolvedCardId, kvp.Key, kvp.Value);
+                }
+            }
+        }
+
+        private static string ResolveCardIdFromDictionary(SortedDictionary<string, string> dict, CardCatalogService catalog)
+        {
+            // 1. Match by fullCode
+            if (catalog != null && dict.TryGetValue("fullCode", out string fullCode) && !string.IsNullOrWhiteSpace(fullCode))
+            {
+                var card = catalog.Cards.FirstOrDefault(c => string.Equals(c.FullCode, fullCode.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (card != null) return card.Id;
+            }
+
+            // 2. Match by name and set
+            if (catalog != null &&
+                dict.TryGetValue("name", out string name) && !string.IsNullOrWhiteSpace(name) &&
+                dict.TryGetValue("set", out string set) && !string.IsNullOrWhiteSpace(set))
+            {
+                var card = catalog.Cards.FirstOrDefault(c =>
+                    string.Equals(c.Name, name.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(c.Set, set.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (card != null) return card.Id;
+            }
+
+            // 3. Fallback: legacy runtime ID
+            if (dict.TryGetValue("id", out string legacyId))
+            {
+                return legacyId;
+            }
+
+            return null;
+        }
+
+        private static bool IsMetadataKey(string key) =>
+            string.Equals(key, "id", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, "name", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, "set", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, "fullCode", StringComparison.OrdinalIgnoreCase);
 
         #endregion
 
@@ -4084,6 +4835,7 @@ namespace MECCG_Deck_Builder
             try
             {
                 await _catalogService.InitializeAsync();
+                LoadBaselineRulesTags(); // Auto-load Rules_Support_Tags.json if present
                 CreateMenus();
                 RefreshFilterKeyDropdowns();
                 UpdateFacetedFilters();
@@ -4096,11 +4848,41 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void LoadBaselineRulesTags()
+        {
+            try
+            {
+                string path = Path.Combine(Application.StartupPath, "Rules_Support_Tags.json");
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
+                    if (dto != null)
+                    {
+                        _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService);
+                    }
+                }
+            }
+            catch
+            {
+                // Baseline load fails gracefully without blocking catalog startup
+            }
+        }
+
         private void CreateMenus()
         {
             _isUpdatingFilters = true;
             try
             {
+                // Prevent Set menu from auto-closing on item clicks so users can toggle multiple sets
+                ToolStripMenuSet.DropDown.Closing += (s, e) =>
+                {
+                    if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+                    {
+                        e.Cancel = true;
+                    }
+                };
+
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
                     var set = _catalogService.Sets[i];
@@ -5064,6 +5846,36 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void ToolStripMenuFilterMerge_Click(object sender, EventArgs e)
+        {
+            using var openFileDialog = new OpenFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session", 
+                DefaultExt = "json",
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string json = File.ReadAllText(openFileDialog.FileName);
+                    var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
+                    if (dto != null)
+                    {
+                        _filterService.MergeCustomFilters(dto.Filters, dto.Cards, _catalogService);
+                        RefreshFilterKeyDropdowns();
+                        UpdateFacetedFilters();
+                        MessageBox.Show(this, "Tag set merged successfully into active taxonomy.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Failed to merge tag set: {ex.Message}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
         #endregion
 
         #region FACETED_FILTER_ENGINE
@@ -5075,7 +5887,40 @@ namespace MECCG_Deck_Builder
 
             try
             {
-                // Invalidation loop: detect dead-ends and reset invalid values to blank
+                // Pass 1: Symmetrically validate all slots against the active sets independently.
+                // Any value that does not exist in the active set(s) on its own is cleared first,
+                // preventing a dead value from falsely invalidating valid peer slots.
+                for (int i = 0; i < _filterSlots.Length; i++)
+                {
+                    var slot = _filterSlots[i];
+                    if (string.IsNullOrWhiteSpace(slot.CurrentKey) || string.IsNullOrWhiteSpace(slot.CurrentValue))
+                    {
+                        continue;
+                    }
+
+                    var baseValues = _filterService.GetAvailableValues(
+                        _catalogService.Cards,
+                        _currentDeck.IncludedSets,
+                        [], // No other criteria: test set validity only
+                        slot.Type,
+                        slot.CurrentKey);
+
+                    if (!baseValues.Exists(v => string.Equals(v, slot.CurrentValue, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        slot.ValueBox.DataSource = null;
+                        if (baseValues.Count > 0)
+                        {
+                            slot.ValueBox.DataSource = baseValues;
+                            slot.ValueBox.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            slot.ValueBox.Text = "";
+                        }
+                    }
+                }
+
+                // Pass 2: Mutual constraint check across surviving peer criteria
                 bool changed;
                 int maxIterations = 4;
                 do
@@ -5118,7 +5963,7 @@ namespace MECCG_Deck_Builder
                     }
                 } while (changed && --maxIterations > 0);
 
-                // Context-sensitive pruning: update dropdown contents for all 4 slots
+                // Pass 3: Context-sensitive pruning: update dropdown contents for all 4 slots
                 for (int i = 0; i < _filterSlots.Length; i++)
                 {
                     var slot = _filterSlots[i];
@@ -5786,6 +6631,7 @@ namespace MECCG_Deck_Builder
             ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuFilter = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuFilterManage = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuFilterMerge = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuFilterOpen = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -6432,7 +7278,7 @@ namespace MECCG_Deck_Builder
             // 
             // ToolStripMenuFilter
             // 
-            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterManage, toolStripSeparator7, ToolStripMenuFilterOpen, toolStripSeparator6, ToolStripMenuFilterSave });
+            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterManage, toolStripSeparator7, ToolStripMenuFilterOpen, ToolStripMenuFilterMerge, toolStripSeparator6, ToolStripMenuFilterSave });
             ToolStripMenuFilter.Name = "ToolStripMenuFilter";
             ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
             ToolStripMenuFilter.Text = "&Filter";
@@ -6444,6 +7290,13 @@ namespace MECCG_Deck_Builder
             ToolStripMenuFilterManage.Text = "&Manage Custom Tags...";
             ToolStripMenuFilterManage.Click += ToolStripMenuFilterManage_Click;
             // 
+            // ToolStripMenuFilterMerge
+            // 
+            // 
+            ToolStripMenuFilterMerge.Name = "ToolStripMenuFilterMerge";
+            ToolStripMenuFilterMerge.Size = new System.Drawing.Size(198, 22);
+            ToolStripMenuFilterMerge.Text = "&Merge Tag Set...";
+            ToolStripMenuFilterMerge.Click += new System.EventHandler(this.ToolStripMenuFilterMerge_Click);
             // toolStripSeparator7
             // 
             toolStripSeparator7.Name = "toolStripSeparator7";
@@ -6784,6 +7637,7 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterMerge;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
@@ -8639,7 +9493,9 @@ namespace MECCG_Deck_Builder
 
 #pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
         private static readonly Regex FlavorQuotesRegex = new(@"[""“\u201C][^""”\u201D]*[""”\u201D]", RegexOptions.Compiled);
-        private static readonly Regex FlavorAttributionRegex = new(@"[—–-]\s*(?:LotR|Hobbit|The Hobbit|Silmarillion)[^\r\n]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex FlavorAttributionRegex = new(
+    @"[—–-]\s*(?:LotR|Hobbit|The Hobbit|Silmarillion)(?:\s+[IVX0-9]+)?(?:\s*,\s*[^.\r\n]+)?(?=\s+Home Site:|$)",
+    RegexOptions.Compiled | RegexOptions.IgnoreCase);
 #pragma warning restore SYSLIB1045
 
         /// <summary>

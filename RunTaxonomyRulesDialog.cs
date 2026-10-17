@@ -57,6 +57,8 @@ namespace MECCG_Deck_Builder
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
 
+            var settings = UserSettingsService.Current;
+
             Text = $"Extract Taxonomy with Rules ({_targetCards.Count} cards in Master List)";
             ClientSize = new Size(720, 630);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -79,7 +81,6 @@ namespace MECCG_Deck_Builder
                 Text = "Dynamic Entity Harvest (from Catalog Text):",
                 Location = new Point(12, 20),
                 Size = new Size(290, 20),
-                Checked = true,
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbHarvest.CheckedChanged += RuleSource_Changed;
@@ -144,7 +145,7 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
 
-            // 3. Custom Regex Expression
+            // 3. Custom Regex Expression (Loaded from UserSettings)
             _rbQuick = new RadioButton
             {
                 Text = "Custom Regex Expression:",
@@ -155,13 +156,13 @@ namespace MECCG_Deck_Builder
             _rbQuick.CheckedChanged += RuleSource_Changed;
 
             var lblQCategory = new Label { Text = "Category:", Location = new Point(32, 174), Size = new Size(65, 18) };
-            _txtRegexCategory = new TextBox { Text = "Custom Trait", Location = new Point(97, 171), Size = new Size(150, 23), Enabled = false };
+            _txtRegexCategory = new TextBox { Text = settings.LastExtractionCategory ?? "Custom Trait", Location = new Point(97, 171), Size = new Size(150, 23), Enabled = false };
 
             var lblQTag = new Label { Text = "Tag Name:", Location = new Point(255, 174), Size = new Size(68, 18) };
-            _txtRegexTag = new TextBox { Text = "$1", Location = new Point(325, 171), Size = new Size(130, 23), Enabled = false };
+            _txtRegexTag = new TextBox { Text = settings.LastExtractionTag ?? "$1", Location = new Point(325, 171), Size = new Size(130, 23), Enabled = false };
 
             var lblQPattern = new Label { Text = "Pattern:", Location = new Point(465, 174), Size = new Size(50, 18) };
-            _txtRegexPattern = new TextBox { Text = @"(?i)Dwarf factions?", Location = new Point(515, 171), Size = new Size(167, 23), Enabled = false };
+            _txtRegexPattern = new TextBox { Text = settings.LastExtractionPattern ?? @"(?i)Dwarf factions?", Location = new Point(515, 171), Size = new Size(167, 23), Enabled = false };
 
             // 4. Load File
             _rbFile = new RadioButton
@@ -196,6 +197,23 @@ namespace MECCG_Deck_Builder
                 _rbQuick, lblQCategory, _txtRegexCategory, lblQTag, _txtRegexTag, lblQPattern, _txtRegexPattern,
                 _rbFile, _txtFilePath, _btnBrowseFile
             ]);
+
+            // Restore active extraction mode
+            switch (settings.LastExtractionMode)
+            {
+                case 2:
+                    _rbRelational.Checked = true;
+                    break;
+                case 3:
+                    _rbQuick.Checked = true;
+                    break;
+                case 4:
+                    _rbFile.Checked = true;
+                    break;
+                default:
+                    _rbHarvest.Checked = true;
+                    break;
+            }
 
             // Preview & actions
             _btnTest = new Button
@@ -254,7 +272,34 @@ namespace MECCG_Deck_Builder
             Controls.AddRange([grpSource, _btnTest, lblScopeHint, _lstPreview, _btnExportCsv, _btnApply, _btnClose]);
             CancelButton = _btnClose;
 
+            FormClosing += (s, e) => SaveCurrentSettings();
+
             PopulateDropdowns();
+        }
+
+        private void SaveCurrentSettings()
+        {
+            var settings = UserSettingsService.Current;
+
+            if (!string.IsNullOrWhiteSpace(_txtRegexCategory.Text))
+            {
+                settings.LastExtractionCategory = _txtRegexCategory.Text.Trim();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtRegexTag.Text))
+            {
+                settings.LastExtractionTag = _txtRegexTag.Text.Trim();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtRegexPattern.Text))
+            {
+                settings.LastExtractionPattern = _txtRegexPattern.Text.Trim();
+            }
+
+            if (_rbQuick.Checked) settings.LastExtractionMode = 3;
+            else if (_rbRelational.Checked) settings.LastExtractionMode = 2;
+            else if (_rbFile.Checked) settings.LastExtractionMode = 4;
+            else settings.LastExtractionMode = 1;
+
+            UserSettingsService.SaveSettings();
         }
 
         private void PopulateDropdowns()
@@ -415,6 +460,7 @@ namespace MECCG_Deck_Builder
 
         private void BtnTest_Click(object sender, EventArgs e)
         {
+            SaveCurrentSettings();
             var result = RunExtraction();
             if (result == null)
             {
@@ -450,6 +496,7 @@ namespace MECCG_Deck_Builder
 
         private void BtnExportCsv_Click(object sender, EventArgs e)
         {
+            SaveCurrentSettings();
             var result = RunExtraction();
             if (result == null || result.Matches.Count == 0)
             {
@@ -474,6 +521,7 @@ namespace MECCG_Deck_Builder
 
         private void BtnApply_Click(object sender, EventArgs e)
         {
+            SaveCurrentSettings();
             var result = RunExtraction();
             if (result == null || result.Matches.Count == 0)
             {
