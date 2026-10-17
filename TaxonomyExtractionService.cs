@@ -587,7 +587,9 @@ namespace MECCG_Deck_Builder
 
 #pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
         private static readonly Regex FlavorQuotesRegex = new(@"[""“\u201C][^""”\u201D]*[""”\u201D]", RegexOptions.Compiled);
-        private static readonly Regex FlavorAttributionRegex = new(@"[—–-]\s*(?:LotR|Hobbit|The Hobbit|Silmarillion)[^\r\n]*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex FlavorAttributionRegex = new(
+    @"[—–-]\s*(?:LotR|Hobbit|The Hobbit|Silmarillion)(?:\s+[IVX0-9]+)?(?:\s*,\s*[^.\r\n]+)?(?=\s+Home Site:|$)",
+    RegexOptions.Compiled | RegexOptions.IgnoreCase);
 #pragma warning restore SYSLIB1045
 
         /// <summary>

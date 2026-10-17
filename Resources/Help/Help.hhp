@@ -9,18 +9,19 @@ Language=0x409 English (United States)
 Title=MECCG Deck Builder Help
 
 [FILES]
-index.html
-interface.html
-deck_operations.html
-native_saving.html
-export_formats.html
-sets_and_faceting.html
 attributes_reference.html
 custom_taxonomy.html
-spreadsheet_pipeline.html
 deck_generation_engine.html
+deck_operations.html
 deck_rules_reference.html
-worked_example_factions.html
+export_formats.html
 image_cache.html
-taxonomy_extraction_tools.html
+index.html
+interface.html
+native_saving.html
+rules_support_tags.html
+sets_and_faceting.html
+spreadsheet_pipeline.html
 style.css
+taxonomy_extraction_tools.html
+worked_example_factions.html

@@ -67,7 +67,209 @@ namespace MECCG_Deck_Builder.Properties {
 
 ]]>
   </file>
-  <file path='.\Resources\Help\deck_building.html'>
+  <file path='.\Resources\Help\attributes_reference.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Official Card Attributes Reference</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; Official Attributes Reference</div>
+
+    <h1>Official Card Attributes Reference</h1>
+    <p>
+        Every card in the catalog carries official rules attributes synchronized from the Cardnum open database. These keys can be filtered via UI Slots 1 &amp; 2, queried in procedural deck rules, or inspected in the right-click <strong>Card Attributes</strong> monospace view.
+    </p>
+
+    <h2 id="identifiers">1. Core Identifiers &amp; Metadata</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Type</th>
+            <th>Example Values</th>
+            <th>Notes</th>
+        </tr>
+        <tr>
+            <td><code>Name</code></td>
+            <td>string</td>
+            <td><code>"Wood-elves"</code>, <code>"Rivendell"</code>, <code>"Glamdring"</code></td>
+            <td>Exact English card title. Queryable in deck generation rules and cross-card token lookups.</td>
+        </tr>
+        <tr>
+            <td><code>Set</code></td>
+            <td>string</td>
+            <td><code>"METW"</code>, <code>"MEDM"</code>, <code>"MELE"</code>, <code>"MEBA"</code></td>
+            <td>Canonical 4-letter expansion set code.</td>
+        </tr>
+        <tr>
+            <td><code>FullCode</code></td>
+            <td>string</td>
+            <td><code>"Wood-elves (TW)"</code>, <code>"Adrazar (LE)"</code></td>
+            <td>Set-disambiguated title used by Cardnum and Play MECCG.</td>
+        </tr>
+        <tr>
+            <td><code>Text</code></td>
+            <td>string</td>
+            <td>Rules text printed on the face of the card.</td>
+            <td>Evaluated by automated taxonomy regex harvesting.</td>
+        </tr>
+    </table>
+
+    <h2 id="classification">2. Classification &amp; Alignment</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Values</th>
+        </tr>
+        <tr>
+            <td><code>Primary</code></td>
+            <td><code>Character</code>, <code>Resource</code>, <code>Hazard</code>, <code>Site</code>, <code>Region</code></td>
+        </tr>
+        <tr>
+            <td><code>Secondary</code></td>
+            <td><code>Ally</code>, <code>Faction</code>, <code>Creature</code>, <code>Short-event</code>, <code>Long-event</code>, <code>Permanent-event</code>, <code>Minor Item</code>, <code>Major Item</code>, <code>Greater Item</code>, <code>Gold Ring Item</code>, <code>Special Item</code></td>
+        </tr>
+        <tr>
+            <td><code>Alignment</code></td>
+            <td><code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, <code>Neutral</code></td>
+        </tr>
+        <tr>
+            <td><code>Unique</code></td>
+            <td><code>Unique</code>, <code>Non-unique</code></td>
+        </tr>
+    </table>
+
+    <h2 id="character-stats">3. Character &amp; Creature Statistics</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Values &amp; Lore Normalization</th>
+        </tr>
+        <tr>
+            <td><code>Race</code></td>
+            <td>
+                <code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Dragon</code>, etc.<br />
+                <em>Note: Lore sub-races are canonically normalized to Elf and Dwarf for clean queries.</em>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Subrace</code></td>
+            <td>Preserves original Tolkien sub-races: <code>Silvan Elf</code>, <code>Noldo Elf</code>, <code>Longbeard Dwarf</code>, etc.</td>
+        </tr>
+        <tr>
+            <td><code>Skill</code></td>
+            <td><code>Warrior</code>, <code>Scout</code>, <code>Ranger</code>, <code>Sage</code>, <code>Diplomat</code>. Compound skills (e.g. <em>Warrior/Scout</em>) are indexed individually.</td>
+        </tr>
+        <tr>
+            <td><code>Mind</code>, <code>Direct</code>, <code>Prowess</code>, <code>Body</code>, <code>Corruption</code>, <code>MPs</code></td>
+            <td>Numeric gameplay stats and victory points.</td>
+        </tr>
+        <tr>
+            <td><code>Home</code></td>
+            <td>Designated home sites for characters (e.g. <code>"Rivendell"</code>, <code>"Bree"</code>).</td>
+        </tr>
+    </table>
+
+    <h2 id="site-movement">4. Sites &amp; Movement</h2>
+    <table>
+        <tr>
+            <th>Key</th>
+            <th>Values</th>
+        </tr>
+        <tr>
+            <td><code>Site</code></td>
+            <td><code>Free-hold</code>, <code>Border-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Shadow-hold</code>, <code>Dark-hold</code>, <code>Haven</code></td>
+        </tr>
+        <tr>
+            <td><code>Region</code></td>
+            <td>Geographic territory (e.g. <code>Arthedain</code>, <code>Rhudaur</code>, <code>Gorgoroth</code>).</td>
+        </tr>
+        <tr>
+            <td><code>Playable</code>, <code>Hoard</code>, <code>Haven</code></td>
+            <td>Site item-playability flags and nearest haven designations.</td>
+        </tr>
+    </table>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\custom_taxonomy.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Custom Taxonomy &amp; Tag Management</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; Custom Taxonomy</div>
+    <h1>Custom Taxonomy &amp; Tag Management</h1>
+    <p>MECCG Deck Builder allows you to classify cards using your own custom classification system (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code> or <code>Role</code> &rarr; <code>Scout Support</code>).</p>
+
+    <h2>1. Taxonomy Manager (Filter &gt; Manage Custom Tags...)</h2>
+    <p>Open <strong>Filter &gt; Manage Custom Tags...</strong> to access the central management dialog:</p>
+    <ul>
+        <li><strong>Add Categories:</strong> Create new classification categories (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
+        <li><strong>Rename Categories or Tags:</strong> Rename terms across your taxonomy; all tagged cards are updated automatically.</li>
+        <li><strong>Delete Categories or Tags:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
+    </ul>
+
+    <h2>2. Tagging Cards &amp; Multi-Tag Assignment</h2>
+    <p>Cards can hold multiple tags within the same custom category:</p>
+    <ul>
+        <li><strong>Assign or Reassign Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [Tag]</strong>. Currently assigned tags display a checkmark (<kbd>&#10003;</kbd>). Clicking a checkmarked tag toggles it off.</li>
+        <li><strong>Author New Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong> to create and assign a new tag in one action without disturbing your filter bar.</li>
+        <li><strong>Granular Removal:</strong> The <strong>Remove Tag</strong> menu displays each assigned tag individually, allowing removal without wiping the category.</li>
+    </ul>
+
+    <h2>3. Saving &amp; Loading Custom Tag Sets</h2>
+    <ul>
+        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your custom taxonomy and all card assignments to a <code>.json</code> file.</li>
+        <li><strong>Filter &gt; Load Tag Set...:</strong> Restores a previously saved custom tag set file.</li>
+    </ul>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\deck_generation_engine.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Procedural Deck Generation Engine</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Procedural Deck Generator &gt; Generator Engine</div>
+    <h1>Procedural Deck Generation Engine</h1>
+    <p>
+        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates (via <strong>Tools &gt; Generate Deck from Rules...</strong> or <kbd>F5</kbd>).
+    </p>
+
+    <h2>Core Generation Mechanics</h2>
+    <ul>
+        <li><strong>Symmetric Filtering:</strong> Rules can query official card attributes (<code>Primary</code>, <code>Race</code>, <code>Skill</code>, <code>Name</code>) and custom user taxonomy tags (<code>Faction Focus</code>, <code>Home Region</code>).</li>
+        <li><strong>Strict Legality &amp; Copy Limits:</strong> Automatically enforces game limits: maximum 1 copy for unique cards and maximum 3 copies for non-unique cards across the entire deck.</li>
+        <li><strong>Tiered Variety-First Distribution:</strong> To maximize card variety, the engine exhausts all 0-copy (unused) cards before assigning 2nd copies, and all 2-copy cards before assigning 3rd copies.</li>
+        <li><strong>Branching Archetypes (<code>RandomChoice</code>):</strong> Author multiple company archetypes or hazard strategies in a single file with weighted random selection and dynamic title overrides.</li>
+        <li><strong>Instant Re-Run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> (<strong>Tools &gt; Re-run Deck Rules</strong>) to immediately re-run the last used rules file directly from disk without re-opening file dialogs.</li>
+    </ul>
+
+    <h2>Documentation Topics</h2>
+    <ul>
+        <li><a href="deck_rules_reference.html"><strong>Deck Rules JSON Schema Reference:</strong></a> Complete technical reference for all rule properties, variables, and tokens.</li>
+        <li><a href="worked_example_factions.html"><strong>Worked Example: Dynamic Faction Recruitment:</strong></a> Step-by-step tutorial demonstrating variable capture, targeted faction recruiting, and fallbacks.</li>
+    </ul>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\deck_operations.html'>
 <![CDATA[
 <!DOCTYPE html>
 <html>
@@ -77,7 +279,7 @@ namespace MECCG_Deck_Builder.Properties {
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Deck Building Operations</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Deck Building &amp; Formats &gt; Deck Operations</div>
     <h1>Deck Building Operations</h1>
 
     <h2>Adding Cards</h2>
@@ -88,9 +290,7 @@ namespace MECCG_Deck_Builder.Properties {
     </ul>
 
     <h2>Duplicating Cards</h2>
-    <p>
-        To add another copy of a card already in a deck tab, simply <strong>double-click</strong> it directly within that tab's list.
-    </p>
+    <p>To add another copy of a card already in a deck tab, simply <strong>double-click</strong> it directly within that tab's list.</p>
 
     <h2>Moving Cards Between Tabs</h2>
     <ol>
@@ -104,74 +304,280 @@ namespace MECCG_Deck_Builder.Properties {
         <li>Right-click the card in the deck tab and select <strong>Delete</strong>.</li>
     </ul>
 
-    <h2>Context Menu Reference (Deck Tabs)</h2>
+    <h2>Deck Tab Context Menu Reference</h2>
     <table>
         <tr>
             <th>Menu Item</th>
             <th>Action</th>
         </tr>
-        <tr>
-            <td><em>[Card Name Header]</em></td>
-            <td>Shows card title in the active header color.</td>
-        </tr>
-        <tr>
-            <td><strong>Copy</strong></td>
-            <td>Duplicates card to Pool, Resources, Hazards, Sideboard, or Sites.</td>
-        </tr>
-        <tr>
-            <td><strong>Move</strong></td>
-            <td>Transfers card to another tab and removes it from current tab.</td>
-        </tr>
-        <tr>
-            <td><strong>Delete</strong></td>
-            <td>Permanently removes this copy from the current tab.</td>
-        </tr>
-        <tr>
-            <td><strong>Card Attributes</strong></td>
-            <td>Displays a monospace readout of all official database attributes for this card.</td>
-        </tr>
-        <tr>
-            <td><strong>Assigned Tags</strong></td>
-            <td>Shows user-defined tags currently assigned to this card.</td>
-        </tr>
-        <tr>
-            <td><strong>Assign Tag</strong></td>
-            <td>Assigns or reassigns a custom tag to this card (active tag is checkmarked), creates a new tag in an existing category, or authors a new category and tag.</td>
-        </tr>
-        <tr>
-            <td><strong>Remove Tag</strong></td>
-            <td>Removes an assigned custom tag from this card (only visible if the card currently has custom tags assigned; does not delete the tag from your taxonomy).</td>
-        </tr>
+        <tr><td><em>[Card Name Header]</em></td><td>Shows card title in the active header color.</td></tr>
+        <tr><td><strong>Copy</strong></td><td>Duplicates card to Pool, Resources, Hazards, Sideboard, or Sites.</td></tr>
+        <tr><td><strong>Move</strong></td><td>Transfers card to another tab and removes it from current tab.</td></tr>
+        <tr><td><strong>Delete</strong></td><td>Permanently removes this copy from the current tab.</td></tr>
+        <tr><td><strong>Card Attributes</strong></td><td>Displays a monospace readout of all official database attributes for this card.</td></tr>
+        <tr><td><strong>Assigned Tags</strong></td><td>Shows user-defined tags currently assigned to this card.</td></tr>
+        <tr><td><strong>Assign Tag</strong></td><td>Assigns or reassigns a custom tag (active tag is checkmarked), creates a new tag, or authors a new category and tag.</td></tr>
+        <tr><td><strong>Remove Tag</strong></td><td>Removes an assigned custom tag from this card.</td></tr>
     </table>
 </body>
 </html>
 ]]>
   </file>
-  <file path='.\Resources\Help\exporting_saving.html'>
+  <file path='.\Resources\Help\deck_rules_reference.html'>
 <![CDATA[
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Saving &amp; Exporting</title>
+    <title>Deck Rules JSON Schema Reference</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Saving &amp; Exporting</div>
-    <h1>Saving &amp; Export Formats</h1>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_generation_engine.html">Procedural Deck Generator</a> &gt; Rules JSON Schema Reference</div>
 
-    <h2>Native Deck Files (.json)</h2>
+    <h1>Deck Rules JSON Schema Reference</h1>
     <p>
-        Use <strong>File &gt; Save</strong> or <strong>File &gt; Open</strong> (<kbd>Ctrl+O</kbd>) to store and load complete deck configurations in native JSON format. This preserves:
+        Procedural deck generation templates are declarative JSON files loaded via <strong>Tools &gt; Generate Deck from Rules...</strong> (or re-run instantly with <kbd>F5</kbd>). This reference details all JSON schema elements, properties, data types, default values, and token interpolation rules.
+    </p>
+
+    <!-- ROOT OBJECT -->
+    <h2 id="root-object">1. Root Object (<code>DeckGenerationRuleSet</code>)</h2>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>DeckTitle</code></td>
+            <td>string</td>
+            <td><code>"Generated Deck"</code></td>
+            <td>Default title assigned to the deck. Can be dynamically overridden by a branch choice at runtime.</td>
+        </tr>
+        <tr>
+            <td><code>RuleSetType</code></td>
+            <td>string</td>
+            <td><code>"SequentialRules"</code></td>
+            <td>Execution strategy identifier (reserved for future execution engines).</td>
+        </tr>
+        <tr>
+            <td><code>Version</code></td>
+            <td>string</td>
+            <td><code>"1.0"</code></td>
+            <td>Schema version indicator.</td>
+        </tr>
+        <tr>
+            <td><code>Rules</code></td>
+            <td>array of objects</td>
+            <td><code>[]</code></td>
+            <td>An ordered list of <code>DeckGenerationRule</code> objects evaluated sequentially from top to bottom.</td>
+        </tr>
+    </table>
+
+    <!-- RULE OBJECT -->
+    <h2 id="rule-object">2. Rule Object (<code>DeckGenerationRule</code>)</h2>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>RuleType</code></td>
+            <td>string</td>
+            <td><code>"FilterQuery"</code></td>
+            <td>
+                Rule mode:
+                <ul>
+                    <li><code>"FilterQuery"</code>: Standard query that samples matching cards.</li>
+                    <li><code>"RandomChoice"</code> (or <code>"Choice"</code> / <code>"OneOf"</code>): Evaluates a weighted random branch from <code>Choices</code>.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Name</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>Descriptive name displayed in generation logs and shortfall notices.</td>
+        </tr>
+        <tr>
+            <td><code>Section</code></td>
+            <td>string</td>
+            <td><code>"Resources"</code></td>
+            <td>
+                Target deck partition: <code>"Pool"</code>, <code>"Resources"</code>, <code>"Hazards"</code>, <code>"Sideboard"</code>, or <code>"Sites"</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Count</code></td>
+            <td>integer</td>
+            <td><code>1</code></td>
+            <td>The exact number of card copies requested by this rule.</td>
+        </tr>
+        <tr>
+            <td><code>SaveAs</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>
+                Captures cards successfully selected by this rule into an in-memory variable (e.g. <code>"Leader"</code> or <code>"Scout"</code>). Subsequent rules can interpolate their attributes or tags using <code>{VariableName.Property}</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Sets</code></td>
+            <td>array of strings</td>
+            <td><code>[]</code></td>
+            <td>
+                Restricts sampling to specific expansion set codes (e.g. <code>["METW", "MEDM"]</code>). If omitted, defaults to the sets currently checked in the app's <strong>Set</strong> menu.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Attributes</code></td>
+            <td>object (key-value)</td>
+            <td><code>{}</code></td>
+            <td>
+                Dictionary of official Cardnum rules criteria (e.g. <code>"Primary"</code>, <code>"Race"</code>, <code>"Skill"</code>, <code>"Name"</code>). Supports semicolon <code>OR</code> syntax and variable interpolation.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Tags</code></td>
+            <td>object (key-value)</td>
+            <td><code>{}</code></td>
+            <td>
+                Dictionary of custom user taxonomy criteria (e.g. <code>"Archetype": "Ring Destruction"</code>). Supports semicolon <code>OR</code> syntax and variable interpolation.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Fallback</code></td>
+            <td>object</td>
+            <td><code>null</code></td>
+            <td>
+                A nested <code>DeckGenerationRule</code> executed automatically if this rule fails to fulfill its requested <code>Count</code> (due to missing tags, zero matching candidates, or deck uniqueness limits). Inherits the parent's target <code>Section</code> if unspecified.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Choices</code></td>
+            <td>array of objects</td>
+            <td><code>[]</code></td>
+            <td>Used when <code>RuleType</code> is <code>"RandomChoice"</code>. Contains weighted branches.</td>
+        </tr>
+    </table>
+
+    <!-- CHOICE OBJECT -->
+    <h2 id="choice-object">3. Branch Choice Object (<code>DeckGenerationChoice</code>)</h2>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>Name</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>Branch label recorded in the execution log (e.g. <code>"Dwarf Company"</code>).</td>
+        </tr>
+        <tr>
+            <td><code>DeckTitle</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>Optional deck title override applied if this branch is selected.</td>
+        </tr>
+        <tr>
+            <td><code>Weight</code></td>
+            <td>integer</td>
+            <td><code>1</code></td>
+            <td>
+                Relative lottery weight. Selection probability equals $\frac{\text{Weight}}{\sum \text{Weights}}$.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Rules</code></td>
+            <td>array of objects</td>
+            <td><code>[]</code></td>
+            <td>The list of sub-rules executed sequentially if this branch wins the roll.</td>
+        </tr>
+    </table>
+
+    <!-- QUERY & INTERPOLATION -->
+    <h2 id="query-syntax">4. Query &amp; Placeholder Interpolation Rules</h2>
+
+    <h3>A. Semicolon Multi-Value OR Logic</h3>
+    <p>
+        Any string inside <code>Attributes</code> or <code>Tags</code> can contain multiple semicolon-delimited values. A card matches if it satisfies <strong>any</strong> of the values:
+    </p>
+    <pre><code>"Attributes": {
+  "Skill": "Warrior; Scout",
+  "Secondary": "Major Item; Minor Item"
+}</code></pre>
+
+    <h3>B. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
+    <p>
+        When a rule captures a card via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query that card's properties using bracketed tokens:
+    </p>
+    <table>
+        <tr>
+            <th>Token Syntax</th>
+            <th>Target Source</th>
+            <th>Example</th>
+            <th>Resolved Output</th>
+        </tr>
+        <tr>
+            <td><code>{Variable.AttributeName}</code></td>
+            <td>Official Card Attribute</td>
+            <td><code>{Leader.Home}</code></td>
+            <td><code>"Rivendell"</code></td>
+        </tr>
+        <tr>
+            <td><code>{Variable.Race}</code></td>
+            <td>Official Card Attribute</td>
+            <td><code>{Leader.Race}</code></td>
+            <td><code>"Elf"</code></td>
+        </tr>
+        <tr>
+            <td><code>{Variable.Tag:CategoryName}</code></td>
+            <td>Custom User Taxonomy Tag</td>
+            <td><code>{Leader.Tag:Faction Bonus}</code></td>
+            <td><code>"Wood-elves; Silvan Elves"</code></td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Unmet Dependency Handling:</strong> If a token references a tag or property that is absent on the captured card, it resolves to an empty string (<code>""</code>). The rule recognizes that the requirement was not met and adds 0 cards, cleanly handing execution over to the <code>Fallback</code> rule without crashing.
+    </div>
+
+    <!-- NATIVE DECK JSON DISTINCTION -->
+    <h2 id="native-vs-rules">5. Native Save Files (.json) vs. Rule Templates (.json)</h2>
+    <p>
+        Both deck save files and procedural rule sets share the <code>.json</code> extension, but serve distinct roles:
     </p>
     <ul>
-        <li>The full contents of all 5 tabs (Pool, Resources, Hazards, Sideboard, Sites).</li>
-        <li>Active set selections.</li>
-        <li>Deck title.</li>
+        <li>
+            <strong>Deck Save Files (File &gt; Save / Open):</strong> Store an assembled <em>deck instance</em>. Root keys: <code>CurrentDeckTitle</code>, <code>SetList</code>, <code>PoolList</code>, <code>ResourceList</code>, <code>HazardList</code>, <code>SideboardList</code>, and <code>SiteList</code>.
+        </li>
+        <li>
+            <strong>Rule Templates (Tools &gt; Generate Deck):</strong> Declarative instructions used to generate random decks on demand. Root keys: <code>DeckTitle</code>, <code>RuleSetType</code>, and <code>Rules</code>.
+        </li>
     </ul>
-
-    <h2>Export Options (File &gt; Export / Ctrl+S)</h2>
-    <p>Choose <strong>File &gt; Export</strong> to open the export dialog and select from the dropdown filter:</p>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\export_formats.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Multi-Platform Export Formats</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Building &amp; Formats</a> &gt; Export Formats</div>
+    <h1>Multi-Platform Export Formats</h1>
+    <p>Select <strong>File &gt; Export</strong> to open the export dialog and choose from the supported formats:</p>
 
     <table>
         <tr>
@@ -183,14 +589,14 @@ namespace MECCG_Deck_Builder.Properties {
             <td><strong>Tabletop Simulator</strong></td>
             <td><code>.json</code></td>
             <td>
-                Generates five JSON deck files (one for each section: <code>_pool.json</code>, <code>_resource.json</code>, <code>_hazard.json</code>, <code>_sideboard.json</code>, <code>_site.json</code>) ready to be dropped into Tabletop Simulator's <code>Saved Objects</code> folder.
+                Generates five JSON deck files (one for each section: <code>_pool.json</code>, <code>_resource.json</code>, <code>_hazard.json</code>, <code>_sideboard.json</code>, <code>_site.json</code>) formatted for Tabletop Simulator's <code>Saved Objects</code> folder with cloud image links.
             </td>
         </tr>
         <tr>
             <td><strong>Play MECCG</strong></td>
             <td><code>.play</code></td>
             <td>
-                Standard export for the online <em>Play MECCG</em> client. Formats cards with parenthetical subtitle convention (e.g. <code>Adrazar (TW)</code>) using Windows-1252 ANSI encoding.
+                Standard export for the online <em>Play MECCG</em> client. Formats cards with parenthetical subtitle conventions (e.g. <code>Adrazar (TW)</code>) using Windows-1252 ANSI encoding.
             </td>
         </tr>
         <tr>
@@ -219,6 +625,52 @@ namespace MECCG_Deck_Builder.Properties {
 </html>
 ]]>
   </file>
+  <file path='.\Resources\Help\image_cache.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Card Artwork Cache &amp; Downloader</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Tools &amp; Technical Architecture &gt; Artwork Cache &amp; Downloader</div>
+    <h1>Card Artwork Cache &amp; Downloader</h1>
+
+    <h2>Card Artwork Cache System</h2>
+    <p>The application employs a high-performance two-tier caching architecture:</p>
+    <ol>
+        <li><strong>Memory Cache:</strong> An in-memory cache holding up to 10,000 active Bitmaps for instant display when clicking or navigating.</li>
+        <li>
+            <strong>Local Disk Cache:</strong> Checks for card images on disk under local set folders (e.g., <code>METW/metw_adrazar.jpg</code>).
+            <ul>
+                <li>If found locally, the image loads immediately with zero network latency.</li>
+                <li>If missing, it downloads asynchronously from Cardnum, saves a copy to disk, and loads it into memory.</li>
+            </ul>
+        </li>
+    </ol>
+
+    <h2>Batch Image Downloader</h2>
+    <p>To pre-cache card artwork for tournament or offline use:</p>
+    <ol>
+        <li>Enable all sets you want cached in the <strong>Set</strong> menu.</li>
+        <li>Reset filters (<kbd>Ctrl+R</kbd>) so all cards appear in the Master List.</li>
+        <li>Select <strong>Tools &gt; Download Images</strong>.</li>
+    </ol>
+    <div class="note">
+        <strong>Background Download:</strong> The batch downloader runs asynchronously with real-time progress reported in the window title bar, keeping the application responsive.
+    </div>
+
+    <h2>Offline Data Fallbacks</h2>
+    <ul>
+        <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch, falling back to local <code>cards-dc.json</code> if offline.</li>
+        <li><strong>Sets:</strong> Attempts to download set metadata on launch, falling back to local <code>sets-dc.json</code> if offline.</li>
+    </ul>
+</body>
+</html>
+]]>
+  </file>
   <file path='.\Resources\Help\index.html'>
 <![CDATA[
 <!DOCTYPE html>
@@ -229,7 +681,7 @@ namespace MECCG_Deck_Builder.Properties {
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar">Home &gt; Overview</div>
+    <div class="nav-bar">Home &gt; Welcome &amp; Getting Started &gt; Overview</div>
     <h1>MECCG Deck Builder</h1>
     <p>
         <strong>MECCG Deck Builder</strong> is a dedicated Windows desktop application designed to build, organize, filter, and export decks for the <em>Middle-earth Collectible Card Game (MECCG)</em> published by Iron Crown Enterprises (I.C.E.), including official expansions and player council Dreamcard sets.
@@ -241,6 +693,7 @@ namespace MECCG_Deck_Builder.Properties {
         <li><strong>On-Demand Image Preview &amp; Caching:</strong> Displays high-resolution card artwork downloaded on demand and cached locally to conserve bandwidth.</li>
         <li><strong>Five-Section Deck Partitioning:</strong> Organizes cards into standard MECCG deck sections: <em>Pool</em>, <em>Resources</em>, <em>Hazards</em>, <em>Sideboard</em>, and <em>Sites</em>.</li>
         <li><strong>Dual Filtering Engine:</strong> Filter the card catalog simultaneously by official Cardnum metadata (race, skills, items, alignments) and customizable user-defined tags.</li>
+        <li><strong>Procedural Deck Generator:</strong> Build legal, randomized decks from declarative JSON rule templates with tiered variety-first duplication and branching archetypes.</li>
         <li><strong>Multi-Platform Exporting:</strong> Directly export decks to Tabletop Simulator (TTS), Play MECCG online client, Cardnum list format, structured text archives, or plain text lists.</li>
     </ul>
 
@@ -269,337 +722,153 @@ namespace MECCG_Deck_Builder.Properties {
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Interface Walkthrough</title>
+    <title>User Interface Walkthrough</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Interface Walkthrough</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="index.html">Welcome &amp; Getting Started</a> &gt; Interface Walkthrough</div>
     <h1>User Interface Walkthrough</h1>
     <p>The application interface is divided into four main functional zones:</p>
 
     <h2>1. Master Card List (Left Pane)</h2>
-    <p>
-        The left listbox displays all available cards matching your selected sets and active filter criteria, sorted alphabetically.
-    </p>
+    <p>Displays all cards matching your active expansion sets and filter criteria, sorted alphabetically.</p>
     <ul>
-        <li><strong>Single-Click:</strong> Selects the card and loads its image into the central preview panel.</li>
-        <li><strong>Double-Click:</strong> Immediately appends the card to the currently selected deck tab on the right.</li>
-        <li><strong>Right-Click:</strong> Opens the master context menu to copy the card into a specific deck tab, inspect its official Card Attributes, view Assigned Tags, or assign custom tags.</li>
-        <li><strong>Drag &amp; Drop:</strong> Left-click and hold to drag the card title onto any deck listbox.</li>
+        <li><strong>Single-Click:</strong> Selects the card and loads its artwork into the preview panel.</li>
+        <li><strong>Double-Click:</strong> Appends the card to the currently selected deck tab on the right.</li>
+        <li><strong>Right-Click:</strong> Opens the master context menu to copy cards, inspect attributes, view tags, or assign custom tags.</li>
+        <li><strong>Drag &amp; Drop:</strong> Left-click and drag the card title onto any deck listbox.</li>
     </ul>
 
     <h2>2. Card Image Preview (Center Pane)</h2>
-    <p>
-        Displays a high-resolution preview of the selected card. Images are downloaded automatically from <code>cardnum.net</code> upon first selection and saved into a local folder named after the card set (e.g., <code>METW/</code>, <code>MEDM/</code>).
-    </p>
+    <p>Displays high-resolution card artwork downloaded on demand from <code>cardnum.net</code> and cached locally in set folders (e.g., <code>METW/</code>, <code>MEDM/</code>).</p>
     <div class="note">
         <strong>Errata Notice:</strong> Cards flagged with ICE errata automatically load their corrected image counterpart prefixed with <code>ice-</code>.
     </div>
 
     <h2>3. Deck Tabs (Right Pane)</h2>
-    <p>
-        The right pane features five tabbed lists representing standard MECCG deck sections:
-    </p>
+    <p>Five tabbed lists representing standard MECCG deck partitions:</p>
     <table>
         <tr>
             <th>Tab</th>
             <th>Name</th>
             <th>Description</th>
         </tr>
-        <tr>
-            <td><code>Pool</code></td>
-            <td>Starting Pool</td>
-            <td>Characters, starting items, and starter resources.</td>
-        </tr>
-        <tr>
-            <td><code>Res</code></td>
-            <td>Resources</td>
-            <td>Resource events, allies, factions, and playable items.</td>
-        </tr>
-        <tr>
-            <td><code>Haz</code></td>
-            <td>Hazards</td>
-            <td>Creatures, hazard events, and corruption cards.</td>
-        </tr>
-        <tr>
-            <td><code>Side</code></td>
-            <td>Sideboard</td>
-            <td>Reserve cards accessible during the game.</td>
-        </tr>
-        <tr>
-            <td><code>Site</code></td>
-            <td>Sites</td>
-            <td>Site cards and region movement paths.</td>
-        </tr>
+        <tr><td><code>Pool</code></td><td>Starting Pool</td><td>Characters, starting items, and starter resources.</td></tr>
+        <tr><td><code>Res</code></td><td>Resources</td><td>Resource events, allies, factions, and playable items.</td></tr>
+        <tr><td><code>Haz</code></td><td>Hazards</td><td>Creatures, hazard events, and corruption cards.</td></tr>
+        <tr><td><code>Side</code></td><td>Sideboard</td><td>Reserve cards accessible during the game.</td></tr>
+        <tr><td><code>Site</code></td><td>Sites</td><td>Site cards and movement region paths.</td></tr>
     </table>
 
     <h2>4. Filter Bar (Bottom Panel)</h2>
-    <p>
-        Located beneath the three main panes, the filter panel is organized into two distinct, titled group boxes that provide fine-grained, <strong>context-sensitive faceted filtering</strong>. Each filter slot operates as a clear vertical column pair, ensuring you immediately know which control selects the category/attribute and which selects the specific value or tag:
-    </p>
+    <p>Organized into two titled GroupBoxes providing context-sensitive faceted filtering:</p>
     <ul>
-        <li>
-            <strong>Left Box — Card Attributes (Official Database):</strong>
-            Contains two slots (Slots 1 &amp; 2) for querying official card rules attributes synchronized from the <strong>Cardnum</strong> database.
-            <ul>
-                <li><strong>Top Dropdown (Attribute):</strong> Selects the rules attribute (e.g., <em>Primary</em>, <em>Alignment</em>, <em>Race</em>, <em>Skill</em>, <em>Mind</em>, <em>Prowess</em>).</li>
-                <li><strong>Bottom Dropdown (Value):</strong> Selects the specific value (e.g., <em>Character</em>, <em>Hero</em>, <em>Dúnadan</em>, <em>Warrior</em>).</li>
-            </ul>
-        </li>
-        <li>
-            <strong>Right Box — Custom Tags (User Taxonomy):</strong>
-            Contains two slots (Slots 3 &amp; 4) for querying your own classification categories and tags.
-            <ul>
-                <li><strong>Top Dropdown (Category):</strong> Selects your user-defined category (e.g., <em>Archetype</em>, <em>Role</em>, <em>Hazard Strategy</em>).</li>
-                <li><strong>Bottom Dropdown (Tag):</strong> Selects the specific custom tag (e.g., <em>Ring Destruction</em>, <em>Scout Support</em>, <em>Anti-Fly</em>).</li>
-            </ul>
-        </li>
+        <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1 &amp; 2 query official Cardnum rules properties (Attribute above Value).</li>
+        <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 3 &amp; 4 query your custom classification taxonomy (Category above Tag).</li>
     </ul>
 
-    <div class="tip">
-        <strong>Quick Filter Clearing:</strong> You can clear any filter slot by pressing <kbd>Escape</kbd> while focused inside it, right-clicking any filter box to choose <em>Clear This Filter</em>, or pressing <kbd>Ctrl+R</kbd> (or selecting <strong>Filter &gt; Clear All Filters</strong>) to wipe all four filter pairs at once.
-    </div>
-
     <h2>Dynamic Title Bar Summary</h2>
-    <p>The window title updates automatically to reflect deck statistics:</p>
+    <p>The window title updates automatically to reflect live deck statistics:</p>
     <p><code>MECCG Deck Builder - "[Deck Title]" (Pool/Res[Characters]/Haz/Side/Site)</code></p>
     <p>For example: <code>MECCG Deck Builder - "Ring Hunter" (5/30[4]/30/20/12)</code> indicates 5 pool cards, 30 resource cards (including 4 characters), 30 hazards, 20 sideboard cards, and 12 sites.</p>
 </body>
 </html>
 ]]>
   </file>
-  <file path='.\Resources\Help\sets_and_filters.html'>
+  <file path='.\Resources\Help\native_saving.html'>
 <![CDATA[
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Sets &amp; Filter Management</title>
+    <title>Saving Native Decks (.json)</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Sets &amp; Filters</div>
-    <h1>Sets &amp; Filter Management</h1>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Building &amp; Formats</a> &gt; Saving Native Decks</div>
+    <h1>Saving Native Decks (.json)</h1>
 
-    <h2>Managing Card Sets</h2>
+    <h2>Native Save Files (.json)</h2>
     <p>
-        Click the <strong>Set</strong> menu in the top bar to choose which expansions are active in the Master List. You can combine multiple sets at will:
+        Use <strong>File &gt; Save</strong> (<kbd>Ctrl+S</kbd>) or <strong>File &gt; Open</strong> (<kbd>Ctrl+O</kbd>) to store and load complete deck configurations in native JSON format.
     </p>
+
+    <h2>What is Preserved</h2>
+    <ul>
+        <li><strong>Deck Title:</strong> Derived from the saved file name or procedural template title.</li>
+        <li><strong>Active Expansion Sets:</strong> The exact selection of sets used when building the deck.</li>
+        <li><strong>Section Contents:</strong> The complete card contents across all 5 deck partitions (Pool, Resources, Hazards, Sideboard, Sites).</li>
+    </ul>
+
+    <h2>Save File JSON Structure</h2>
+    <p>
+        Native deck save files store an assembled deck instance using simple card records <code>[Name, ImageName, Set, Id]</code>:
+    </p>
+    <pre><code>{
+  "CurrentDeckTitle": "Ring Hunter",
+  "SetList": [ "METW", "MEDM" ],
+  "PoolList": [
+    [ "Adrazar", "metw_adrazar.jpg", "METW", "0" ]
+  ],
+  "ResourceList": [],
+  "HazardList": [],
+  "SideboardList": [],
+  "SiteList": []
+}</code></pre>
+
+    <div class="note">
+        <strong>Rule Templates vs. Save Files:</strong> Native deck files represent <em>saved decks</em>. If you want to author generative rule files that create randomized decks from queries, see <a href="deck_rules_reference.html">Deck Rules JSON Schema Reference</a>.
+    </div>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\sets_and_faceting.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Sets &amp; Faceted Filtering</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Catalog Filtering &amp; Taxonomy &gt; Sets &amp; Faceted Filtering</div>
+    <h1>Sets &amp; Faceted Filtering</h1>
+
+    <h2>Managing Expansion Sets</h2>
+    <p>Click the <strong>Set</strong> menu in the top bar to choose which expansions are active in the Master List:</p>
     <ul>
         <li><strong>Select All:</strong> Enables all official sets and Dreamcard expansions.</li>
         <li><strong>Clear All:</strong> Deselects all expansions.</li>
-        <li><strong>Individual Sets:</strong> Check or uncheck individual expansions (e.g., <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or player council Dreamcard sets).</li>
+        <li><strong>Individual Sets:</strong> Check or uncheck individual expansions (e.g., <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or Dreamcard sets).</li>
     </ul>
 
     <h2>Dual-Layer Filtering Architecture</h2>
-    <p>
-        Located beneath the main workspace, four pairs of ComboBoxes provide fine-grained search and deck analysis. The bottom panel is partitioned into two clear GroupBoxes, with each filter slot arranged as a vertical column pair:
-    </p>
-
+    <p>Located beneath the main workspace, four vertical column pairs of ComboBoxes provide fine-grained catalog search:</p>
     <table>
         <tr>
-            <th>Filter Box &amp; Slots</th>
+            <th>Filter GroupBox</th>
             <th>Data Source</th>
-            <th>Taxonomy Management</th>
-            <th>Input Pairing</th>
+            <th>Behavior</th>
         </tr>
         <tr>
-            <td>
-                <strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)
-            </td>
-            <td>
-                <strong>Cardnum Open Database:</strong> Canonical card statistics synchronized from <code>cardnum.net</code> and GitHub, representing published cards from Iron Crown Enterprises (I.C.E.) and Council of Elrond Dreamcards.
-            </td>
-            <td>
-                <strong>Fixed Attributes:</strong> Rules-based properties (Primary, Alignment, Race, Skill, Stats) are immutable.
-            </td>
-            <td>
-                Vertical pair: <strong>Attribute</strong> dropdown above <strong>Value</strong> dropdown.
-            </td>
+            <td><strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)</td>
+            <td><strong>Cardnum Database:</strong> Canonical rules statistics (Primary, Alignment, Race, Skill, Mind, Prowess).</td>
+            <td>Fixed, read-only rules attributes. See <a href="attributes_reference.html">Official Attributes Reference</a>.</td>
         </tr>
         <tr>
-            <td>
-                <strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)
-            </td>
-            <td>
-                <strong>User-Defined Taxonomy:</strong> Managed locally in your deck builder session and saved to custom tag files (<code>.json</code>).
-            </td>
-            <td>
-                <strong>Explicit Taxonomy Management:</strong> Create, rename, or delete categories and tags via <strong>Filter &gt; Manage Custom Tags...</strong> or assign tags on the fly via the card context menu.
-            </td>
-            <td>
-                Vertical pair: <strong>Category</strong> dropdown above <strong>Tag</strong> dropdown.
-            </td>
+            <td><strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)</td>
+            <td><strong>User Taxonomy:</strong> Custom categories and tags managed locally.</td>
+            <td>Editable classification categories. See <a href="custom_taxonomy.html">Custom Taxonomy &amp; Tag Management</a>.</td>
         </tr>
     </table>
 
     <h2>Cascading Faceted Search &amp; Conflict Resolution</h2>
-    <p>
-        The filter system operates as an <strong>order-independent faceted search engine</strong>. All four slots continuously communicate with each other and with the active expansion set selections:
-    </p>
     <ul>
-        <li>
-            <strong>Context-Sensitive Value Pruning:</strong> The value dropdown for any slot only displays options present among cards that satisfy your active expansion sets and the other active filter slots. Selecting any choice from a dropdown is guaranteed to match at least one card, completely eliminating dead-end queries.
-        </li>
-        <li>
-            <strong>Order-Independent (Symmetric) Narrowing:</strong> You can choose filters in any order. For example, selecting <code>Skill</code> = <code>Diplomat</code> in Slot 2 first will automatically prune Slot 1's <code>Secondary</code> dropdown down to only card types that feature diplomats (<em>Ally</em>, <em>Avatar</em>, <em>Character</em> and <em>Short-event</em>).
-        </li>
-        <li>
-            <strong>Automatic Conflict Resolution:</strong> If an existing filter selection becomes impossible—such as deselecting an expansion in the <strong>Set</strong> menu or deleting a custom tag in the taxonomy manager—the invalid slot automatically and silently resets to blank (<code>""</code>).
-        </li>
-        <li>
-            <strong>Cross-Layer Integration:</strong> Custom tags in Slots 3 &amp; 4 participate fully in faceting. Selecting a custom archetype (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code>) will prune the Cardnum dropdowns (Slots 1 &amp; 2) to only show primary types, races, and skills present on cards tagged with that archetype.
-        </li>
-        <li>
-            <strong>Expansion Set Pruning:</strong> Checking or unchecking sets in the <strong>Set</strong> menu dynamically recalculates available filter values. If all expansions are deselected, the master list and card image preview are cleared.
-        </li>
-    </ul>
-
-    <h2>Cardnum Built-in Attributes (Slots 1 &amp; 2)</h2>
-    <p>
-        The two left-hand selectors filter the catalog using official card attributes. Because these properties reflect canonical game rules, they are strictly read-only:
-    </p>
-    <table>
-        <tr>
-            <th>Attribute Name</th>
-            <th>Typical Values</th>
-        </tr>
-        <tr>
-            <td><code>Primary</code></td>
-            <td>Character, Resource, Hazard, Site, Region</td>
-        </tr>
-        <tr>
-            <td><code>Secondary</code></td>
-            <td>Ally, Faction, Creature, Short-event, Long-event, Permanent-event, Minor Item, Major Item, Greater Item, etc.</td>
-        </tr>
-        <tr>
-            <td><code>Alignment</code></td>
-            <td>Hero, Minion, Fallen-wizard, Balrog, Neutral</td>
-        </tr>
-        <tr>
-            <td><code>Race</code></td>
-            <td>Dúnadan, Dwarf, Elf, Hobbit, Man, Wizard, Orc, Troll, Dragon</td>
-        </tr>
-        <tr>
-            <td><code>Skill</code></td>
-            <td>Warrior, Scout, Ranger, Sage, Diplomat</td>
-        </tr>
-        <tr>
-            <td><code>Site / Region</code></td>
-            <td>Free-hold, Border-hold, Ruins &amp; Lairs, Shadow-hold, Dark-hold, Haven</td>
-        </tr>
-        <tr>
-            <td><code>Prowess / Body / Mind / MPs</code></td>
-            <td>Numeric stats and victory point values</td>
-        </tr>
-    </table>
-
-    <div class="tip">
-        <strong>Multi-Skill Search:</strong> When searching by <code>Skill</code>, cards with compound skills (such as <em>Warrior/Scout</em>) are indexed by both terms individually.
-    </div>
-    <div class="tip">
-        <strong>Canonical Race Normalization:</strong> Tolkien sub-races in the catalog (such as <em>Silvan Elf</em>, <em>Noldo Elf</em>, <em>Longbeard Dwarf</em>, and <em>Firebeard Dwarf</em>) are canonically normalized to <code>Elf</code> and <code>Dwarf</code>. This ensures consistent filtering in Slot 2 and clean queries in deck generation rules, while the original detailed lore is preserved in the card attributes under <code>Subrace</code>.
-    </div>
-
-    <h2>Custom User Taxonomy (Slots 3 &amp; 4)</h2>
-    <p>
-        The two right-hand slots allow you to filter cards by your own classification system (e.g., <code>Archetype</code> &rarr; <code>Ring Destruction</code> or <code>Role</code> &rarr; <code>Scout Support</code>). Authoring and managing tags is cleanly decoupled from filtering:
-    </p>
-
-    <h3>1. Managing the Taxonomy (Filter &gt; Manage Custom Tags...)</h3>
-    <p>
-        Open <strong>Filter &gt; Manage Custom Tags...</strong> to access the central tag management dialog. Here you can:
-    </p>
-    <ul>
-        <li><strong>Add Categories:</strong> Create new classification categories (e.g., <code>Archetype</code>, <code>Hazard Package</code>, <code>Role</code>).</li>
-        <li><strong>Rename Categories or Tags:</strong> Rename terms across your entire taxonomy; all tagged cards are updated automatically.</li>
-        <li><strong>Add Tags:</strong> Add new tags under an existing category.</li>
-        <li><strong>Delete Categories or Tags:</strong> Safely remove terms from the database and strip them from tagged cards.</li>
-    </ul>
-
-    <h3>2. Assigning Custom Tags to Cards</h3>
-    <p>
-        You can tag cards in the Master List or any Deck Tab using the context menu:
-    </p>
-    <ul>
-        <li>
-            <strong>Assign or Reassign Existing Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [Tag]</strong>. The category menu displays a checkmark (<kbd>&#10003;</kbd>) next to the currently assigned tag; selecting a different tag seamlessly updates and remaps the card.
-        </li>
-        <li>
-            <strong>Author and Assign New Tag:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>. This prompts for both category and tag, registers them into your taxonomy, and assigns them to the card in a single action without affecting your active filter bar.
-        </li>
-        <li>
-            <strong>Add New Tag to Existing Category:</strong> Right-click a card and select <strong>Assign Tag &gt; [Category] &gt; [+ Add Tag...]</strong> to author a new tag and assign it immediately.
-        </li>
-    </ul>
-
-    <h3>3. Removing Tags from Cards</h3>
-    <ul>
-        <li>
-            <strong>Remove Tag from Single Card:</strong> Right-click the card and choose <strong>Remove Tag &gt; [Category] &gt; [Tag]</strong>. The tag is unassigned from that card, but remains in your taxonomy for other cards.
-        </li>
-        <li>
-            <strong>Delete Globally:</strong> Use <strong>Filter &gt; Manage Custom Tags...</strong> to permanently delete a category or tag across all cards in the catalog.
-        </li>
-    </ul>
-
-    <h3>4. Saving and Loading Custom Tag Sets</h3>
-    <ul>
-        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your entire custom taxonomy and all card tag assignments to a portable <code>.json</code> file.</li>
-        <li><strong>Filter &gt; Load Tag Set...:</strong> Loads a previously saved custom tag set, restoring all categories, tags, and card mappings.</li>
-    </ul>
-
-    <h2>Automated Taxonomy & Spreadsheet Tools</h2>
-    <p>
-        In addition to authoring tags manually, the application provides an automated extraction engine and a round-trip CSV spreadsheet pipeline under the <strong>Tools</strong> menu:
-    </p>
-
-    <h3>1. Dynamic Entity Harvesting & Regex Rules (Tools &gt; Extract Taxonomy with Rules...)</h3>
-    <p>
-        Opens an extraction dialog scoped to cards currently visible in the Master List:
-    </p>
-    <ul>
-        <li>
-            <strong>Dynamic Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans the active sets in memory, extracts all matching entity titles, and searches your Master List cards for references to those entities.
-        </li>
-        <li>
-            <strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.
-        </li>
-        <li>
-            <strong>Custom Regex &amp; JSON Rule Files:</strong> Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> files.
-        </li>
-        <li>
-            <strong>Preview &amp; Apply:</strong> Review matches in the preview grid before choosing to either export a CSV draft or apply tags directly into your active taxonomy.
-        </li>
-    </ul>
-
-    <h3>2. Spreadsheet Collaboration (CSV Draft Export &amp; Import)</h3>
-    <p>
-        Enables collaborative review and mass editing in Google Sheets or Microsoft Excel:
-    </p>
-    <ul>
-        <li>
-            <strong>Export Taxonomy Draft (CSV):</strong> Exports a spreadsheet containing only cards matching your current set and filter slot criteria. Includes <code>Card Name</code>, <code>Set</code>, <code>Primary</code>, a template category column, and full <code>Card Text</code> for reference.
-        </li>
-        <li>
-            <strong>Multi-Tag Syntax:</strong> To assign multiple tags within the same category to a single card, separate them with a semicolon (<code>;</code>), for example: <code>Elf Factions; Iron Hill Dwarves</code>.
-        </li>
-        <li>
-            <strong>Import Taxonomy from CSV:</strong> Ingests reviewed spreadsheets directly into the Deck Builder. Columns are mapped automatically to categories, placeholder text is safely ignored, and tags are mapped to stable card identifiers (<code>FullCode</code>, <code>Name</code>, <code>Set</code>).
-        </li>
-    </ul>
-
-    <h3>3. Multi-Tag Assignment via Context Menus</h3>
-    <p>
-        Cards can hold multiple tags within the same custom category:
-    </p>
-    <ul>
-        <li>
-            <strong>Toggle On / Off:</strong> In the <strong>Assign Tag</strong> menu, currently assigned tags display a checkmark (<kbd>&#10003;</kbd>). Clicking an unchecked tag adds it; clicking a checked tag unchecks and removes it.
-        </li>
-        <li>
-            <strong>Granular Removal:</strong> The <strong>Remove Tag</strong> menu displays each assigned tag individually, allowing you to remove a specific tag without clearing the entire category.
-        </li>
+        <li><strong>Context-Sensitive Value Pruning:</strong> Every dropdown automatically prunes options to show only values present among cards satisfying your active expansion sets and other active filter slots, completely eliminating zero-result queries.</li>
+        <li><strong>Order-Independent Narrowing:</strong> Filters can be selected in any sequence. Selecting <code>Skill = Diplomat</code> in Slot 2 prunes Slot 1's <code>Secondary</code> dropdown down to card types featuring diplomats.</li>
+        <li><strong>Automatic Conflict Resolution:</strong> If an active selection becomes impossible (e.g., deselecting an expansion set), the invalid slot automatically resets to blank (<code>""</code>).</li>
     </ul>
 
     <h2>Clearing and Resetting Filters</h2>
@@ -607,98 +876,66 @@ namespace MECCG_Deck_Builder.Properties {
         <tr>
             <th>Method</th>
             <th>Shortcut / Gesture</th>
-            <th>Scope &amp; Behavior</th>
+            <th>Behavior</th>
         </tr>
         <tr>
             <td><strong>Global Reset</strong></td>
-            <td>
-                Menu: <strong>Filter &gt; Clear All Filters</strong><br />
-                Keyboard: <kbd>Ctrl+R</kbd>
-            </td>
-            <td>
-                Instantly resets all four filter slots (Slots 1–4) to blank and refreshes the master card list.
-            </td>
+            <td><strong>Filter &gt; Clear All Filters</strong> / <kbd>Ctrl+R</kbd></td>
+            <td>Resets all 4 filter slots to blank instantly.</td>
         </tr>
         <tr>
             <td><strong>Slot Context Menu</strong></td>
-            <td>
-                <strong>Right-Click</strong> any of the 8 filter ComboBoxes
-            </td>
-            <td>
-                Opens a context menu with options to:
-                <ul>
-                    <li><strong>Clear This Filter:</strong> Resets both the category/attribute and value of that specific slot to blank.</li>
-                    <li><strong>Clear All Filters:</strong> Resets all four slots at once.</li>
-                </ul>
-            </td>
+            <td>Right-Click any filter ComboBox</td>
+            <td>Provides options to clear that specific slot or clear all slots.</td>
         </tr>
         <tr>
             <td><strong>Quick Keyboard Reset</strong></td>
-            <td>
-                <kbd>Escape</kbd>
-            </td>
-            <td>
-                When focused inside any category or tag ComboBox, pressing <kbd>Escape</kbd> immediately resets that box to the blank (<code>""</code>) entry.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Manual Dropdown Reset</strong></td>
-            <td>
-                Select the top blank entry (<code>""</code>)
-            </td>
-            <td>
-                Selecting the empty item at the top of any category dropdown resets that slot and clears its paired tag list.
-            </td>
+            <td><kbd>Escape</kbd></td>
+            <td>Resets focused filter ComboBox to blank (<code>""</code>).</td>
         </tr>
     </table>
-    <h2>Importing Custom Taxonomies via Spreadsheet (CSV)</h2>
-    <p>
-        To facilitate large-scale taxonomy creation, community sharing, and collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.
-    </p>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\spreadsheet_pipeline.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>CSV Spreadsheet Pipeline</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; CSV Pipeline</div>
+    <h1>CSV Spreadsheet Pipeline</h1>
+    <p>To facilitate large-scale taxonomy authoring or collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.</p>
 
-    <h3>Spreadsheet Column Layout</h3>
+    <h2>Spreadsheet Column Layout</h2>
     <table>
         <tr>
             <th>Column Header</th>
             <th>Required?</th>
             <th>Description &amp; Behavior</th>
         </tr>
-        <tr>
-            <td><code>Card Name</code></td>
-            <td><strong>Required</strong></td>
-            <td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in the catalog.</td>
-        </tr>
-        <tr>
-            <td><code>Set</code></td>
-            <td><strong>Required</strong></td>
-            <td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>, <code>MELE</code>) used to disambiguate reprint cards.</td>
-        </tr>
-        <tr>
-            <td><code>Primary</code></td>
-            <td>Optional</td>
-            <td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td>
-        </tr>
-        <tr>
-            <td><em>[Custom Category Columns]</em></td>
-            <td>Optional</td>
-            <td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>, <code>Hazard Archetype</code>) becomes a custom category. Cell contents are imported as tags.</td>
-        </tr>
-        <tr>
-            <td><code>Card Text</code></td>
-            <td>Optional</td>
-            <td>Full rules text provided for reference during spreadsheet verification. Ignored during import.</td>
-        </tr>
+        <tr><td><code>Card Name</code></td><td><strong>Required</strong></td><td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in catalog.</td></tr>
+        <tr><td><code>Set</code></td><td><strong>Required</strong></td><td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>) used to disambiguate reprint cards.</td></tr>
+        <tr><td><code>Primary</code></td><td>Optional</td><td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td></tr>
+        <tr><td><em>[Custom Category Columns]</em></td><td>Optional</td><td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>) becomes a custom category. Cell contents are imported as tags.</td></tr>
+        <tr><td><code>Card Text</code></td><td>Optional</td><td>Full rules text provided for reference during editing. Ignored during import.</td></tr>
     </table>
 
     <div class="tip">
         <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category to a card, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
     </div>
 
-    <h3>Step-by-Step Workflow</h3>
+    <h2>Step-by-Step Workflow</h2>
     <ol>
-        <li><strong>Generate a Draft:</strong> Click <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong> (or use <strong>Tools &gt; Extract Taxonomy with Rules...</strong>) to extract faction bonuses or rule matches into a <code>.csv</code> file.</li>
-        <li><strong>Review in Google Sheets / Excel:</strong> Open the CSV, inspect extracted tags side-by-side with <code>Card Text</code>, adjust or author new category columns, and download as <em>Comma Separated Values (.csv)</em>.</li>
-        <li><strong>Ingest into Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
+        <li><strong>Scope the Master List:</strong> Select your desired expansion sets and set filter criteria so that only target cards appear in the Master List.</li>
+        <li><strong>Export Draft:</strong> Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
+        <li><strong>Edit in Excel / Google Sheets:</strong> Add custom category headers, enter tags into cells, and download as a CSV file.</li>
+        <li><strong>Import to Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
     </ol>
 </body>
 </html>
@@ -827,79 +1064,346 @@ code, kbd {
             text-decoration: underline;
         }
 
+pre {
+    background-color: #F7FAFC;
+    border: 1px solid #CBD5E0;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 12px 0 16px 0;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 9pt;
+    line-height: 1.45;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+    pre code {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        font-family: inherit;
+        font-size: inherit;
+    }
 ]]>
   </file>
-  <file path='.\Resources\Help\tools_and_cache.html'>
+  <file path='.\Resources\Help\taxonomy_extraction_tools.html'>
 <![CDATA[
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Tools &amp; Image Cache</title>
+    <title>Taxonomy Extraction Tools</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Tools &amp; Image Cache</div>
-    <h1>Tools &amp; Image Cache Architecture</h1>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="image_cache.html">Tools &amp; Technical Architecture</a> &gt; Taxonomy Extraction Tools</div>
+    <h1>Taxonomy Extraction Tools</h1>
+    <p>Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to cards currently visible in your Master List.</p>
 
-    <h2>Card Artwork Cache System</h2>
-    <p>
-        The application employs a two-tier caching architecture:
-    </p>
-    <ol>
-        <li><strong>Memory Cache:</strong> An in-memory cache holding up to 10,000 active Bitmaps for instant display when scrolling or clicking.</li>
-        <li>
-            <strong>Local Disk Cache:</strong> Whenever a card image is requested, the application checks for an existing image on disk under a folder matching the set code (e.g., <code>METW/metw_adrazar.jpg</code>).
-            <ul>
-                <li>If found locally, the image loads immediately with zero network latency.</li>
-                <li>If not found, it downloads from Cardnum, saves a copy into the set folder, and stores it in memory.</li>
-            </ul>
-        </li>
-    </ol>
-
-    <h2>Batch Image Downloader</h2>
-    <p>
-        If you plan to use MECCG Deck Builder offline (e.g., on a laptop during tournaments or travel), you can pre-download card images:
-    </p>
-    <ol>
-        <li>Enable all sets you want cached via the <strong>Set</strong> menu.</li>
-        <li>Reset your filters so that all cards are listed in the Master List.</li>
-        <li>Select <strong>Tools &gt; Download Images</strong>.</li>
-    </ol>
-    <div class="note">
-        <strong>Note:</strong> The batch downloader runs asynchronously in the background with real-time progress reported in the window title bar, ensuring the application remains responsive while saving each card image to disk.
-    </div>
-
-    <h2>Offline Data Fallbacks</h2>
-    <p>The builder is resilient against network outages:</p>
+    <h2>1. Dynamic Entity Harvesting (from Catalog Text)</h2>
     <ul>
-        <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch. If offline or unavailable, it seamlessly falls back to the bundled local <code>cards-dc.json</code> file.</li>
-        <li><strong>Sets:</strong> Automatically attempts to download the latest expansion set metadata. If offline, it reads the bundled local <code>sets-dc.json</code> file.</li>
+        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans active sets in memory, extracts all matching entity titles, and searches your scoped Master List cards for references to those entities.</li>
+        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.</li>
     </ul>
 
-    <h2>Procedural Deck Generation (Tools &gt; Generate Deck from Rules... / F5)</h2>
-    <p>
-        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates.
-    </p>
-    <ul>
-        <li><strong>Symmetric Filtering:</strong> Rules can query official card attributes (<code>Primary</code>, <code>Race</code>, <code>Skill</code>) and custom taxonomy tags (<code>Faction Focus</code>, <code>Home Region</code>).</li>
-        <li><strong>Multi-Value &quot;OR&quot; Syntax:</strong> Semicolon-delimited values (e.g. <code>"Secondary": "Major Item; Minor Item"</code>) match cards satisfying any of the listed options.</li>
-        <li><strong>Copy Limits &amp; Uniqueness:</strong> Strictly enforces game legality: maximum 1 copy for unique cards and maximum 3 copies for non-unique cards across the entire deck.</li>
-        <li><strong>Tiered Variety-First Distribution:</strong> To maximize card variety, the engine exhausts all 0-copy (unused) cards before assigning 2nd copies, and all 2-copy cards before assigning 3rd copies.</li>
-        <li><strong>Branching Choice Groups (<code>RandomChoice</code>):</strong> Author multiple deck archetypes (e.g., Dwarf Company vs. Elf Company, or Nazg&ucirc;l vs. Dragon hazards) in a single rule file with weighted random selection and dynamic title overrides.</li>
-        <li><strong>Instant Re-run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> to re-run the last used rules file directly from disk without re-opening file dialogs.</li>
-    </ul>
-
-    <h2>Relational Attribute Lookup (Cross-Card Join)</h2>
-    <p>
-        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this mode enables 2-step relational tagging between linked entities:
-    </p>
+    <h2>2. Relational Attribute Lookup (Cross-Card Join)</h2>
+    <p>Enables 2-step relational tagging between linked entities:</p>
     <ul>
         <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
         <li><strong>Lookup Entity:</strong> Matches corresponding cards in the catalog (e.g. <code>Primary = Site</code>).</li>
         <li><strong>Extract Field:</strong> Reads the destination attribute (e.g. Site <code>Region</code>) and writes it into a custom category (e.g. <code>Home Region</code>).</li>
         <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
     </ul>
+
+    <h2>3. Custom Regex &amp; JSON Rule Files</h2>
+    <p>Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> rule files.</p>
+</body>
+</html>
+]]>
+  </file>
+  <file path='.\Resources\Help\worked_example_factions.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Worked Example: Dynamic Faction Recruitment</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_generation_engine.html">Procedural Deck Generator</a> &gt; Worked Example: Dynamic Factions</div>
+    <h1>Worked Example: Dynamic Faction Recruitment</h1>
+
+    <p>
+        This end-to-end tutorial demonstrates how several advanced features of <strong>MECCG Deck Builder</strong> work together to solve a complex deck construction problem:
+    </p>
+
+    <!-- STEP 0: THE GOAL -->
+    <h2>1. The Goal: Context-Aware Deck Archetypes</h2>
+    <p>
+        In MECCG, leaders often possess direct influence (DI) bonuses against specific factions (for example, <em>Thranduil</em> receives +2 DI against the <em>Wood-elves</em>, and <em>D&aacute;in II</em> receives +2 DI against the <em>Iron Hill Dwarves</em>).
+    </p>
+    <p>
+        We want to create an automated deck generator rule set that:
+    </p>
+    <ol>
+        <li>Randomly selects a company archetype (e.g. <strong>Dwarf Company</strong> vs. <strong>Elf Company</strong>).</li>
+        <li>Selects an appropriate starting diplomat leader for that company and captures them in memory.</li>
+        <li><strong>Dynamically recruits the specific faction</strong> our leader specializes in influencing.</li>
+        <li><strong>Gracefully falls back:</strong> If the randomly chosen leader has no faction influence bonus, the generator must automatically fall back to recruiting any faction matching that leader's race.</li>
+    </ol>
+
+    <!-- STEP 1: SCOPING THE MASTER LIST & AUTO-TAGGING -->
+    <h2>2. Step 1: Scoping the Master List &amp; Auto-Tagging Faction Bonuses</h2>
+    <p>
+        The extraction engine operates <strong>strictly on the cards currently visible in the Master List</strong>. The cards in this list are determined by two factors:
+    </p>
+    <ul>
+        <li><strong>Active Expansions:</strong> Checked sets in the top <strong>Set</strong> menu.</li>
+        <li><strong>Active Filters:</strong> The four filter slot pairs at the bottom of the window.</li>
+    </ul>
+
+    <p>
+        Since we only want to evaluate and tag characters for direct influence bonuses, we narrow the Master List before opening the tool:
+    </p>
+
+    <h3>A. Scope the Master List to Characters</h3>
+    <ol>
+        <li>Click <strong>Set</strong> in the top menu and ensure your desired expansions are checked (e.g. <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>).</li>
+        <li>
+            In <strong>Filter Slot 1</strong> (bottom left):
+            <ul>
+                <li>Set the top dropdown (<strong>Attribute</strong>) to <code>Primary</code>.</li>
+                <li>Set the bottom dropdown (<strong>Value</strong>) to <code>Character</code>.</li>
+            </ul>
+        </li>
+        <li>Leave Slots 2, 3, and 4 blank (or press <kbd>Ctrl+R</kbd> before setting Slot 1). The Master List now displays only characters from your selected sets.</li>
+    </ol>
+
+    <h3>B. Run the Dynamic Entity Harvest</h3>
+    <ol>
+        <li>Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>.</li>
+        <li>Note the dialog title and scope hint banner confirming: <em>"Scanning [X] card(s) currently visible in the Master List."</em></li>
+        <li>Select the <strong>Dynamic Entity Harvest (from Catalog Text)</strong> radio button.</li>
+        <li>
+            Configure the extraction fields:
+            <ul>
+                <li><strong>Target Category:</strong> Enter <code>Faction Bonus</code>.</li>
+                <li><strong>Attribute:</strong> Select <code>Secondary</code>.</li>
+                <li><strong>Value:</strong> Select <code>Faction</code>.</li>
+            </ul>
+        </li>
+        <li>
+            Click <strong>Test / Preview Matches</strong>. The engine performs a two-step query:
+            <ul>
+                <li>It scans all active catalog sets in memory to harvest published faction titles (e.g. <em>Wood-elves</em>, <em>Iron Hill Dwarves</em>, <em>Riders of Rohan</em>).</li>
+                <li>It strips all Tolkien flavor quotes from your scoped characters' rules text and flags every character whose active gameplay rules reference one of those factions (e.g. <em>"+2 direct influence against Wood-elves"</em>).</li>
+            </ul>
+        </li>
+        <li>Click <strong>Apply Tags to Catalog</strong>. Your characters are now permanently assigned structured tags in your session taxonomy (e.g. <em>Thranduil</em> &rarr; <code>Faction Bonus: Wood-elves</code>, <em>D&aacute;in II</em> &rarr; <code>Faction Bonus: Iron Hill Dwarves</code>).</li>
+    </ol>
+
+    <div class="tip">
+        <strong>Faceted Filter Verification:</strong> Once applied, you can immediately test these tags in the main window: reset Slot 1, select <strong>Category</strong> = <code>Faction Bonus</code> in Slot 3, and watch the <strong>Tag</strong> dropdown populate with all harvested factions!
+    </div>
+
+    <!-- STEP 2: UNDERSTANDING KEY CONCEPTS -->
+    <h2>3. Key Generation Concepts Explained</h2>
+
+    <h3>A. Archetype Branching (<code>RandomChoice</code>)</h3>
+    <p>
+        The <code>RandomChoice</code> rule type rolls weighted random branches at runtime. Each branch can define its own unique sub-rules and automatically update the deck title (e.g., <em>"Hero Elves of the Woodland Realm"</em>).
+    </p>
+
+    <h3>B. Runtime Variable Capture (<code>SaveAs</code>)</h3>
+    <p>
+        Adding <code>"SaveAs": "Leader"</code> to a rule captures whichever character is randomly sampled into a temporary execution context. Subsequent rules can reference that card's properties using <code>{Leader.Attribute}</code> or <code>{Leader.Tag:Category}</code>.
+    </p>
+
+    <h3>C. Direct Card Title Access (<code>Name</code>)</h3>
+    <p>
+        In the application interface, the filter dropdowns and context menus list official <em>game rules statistics</em> (such as <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>). However, inside the rules engine, <strong><code>Name</code> is a fully queryable attribute</strong>. Querying <code>"Name": "{Leader.Tag:Faction Bonus}"</code> matches the faction card whose title equals the leader's tagged bonus.
+    </p>
+
+    <h3>D. Token Interpolation &amp; Multi-Value OR Matching</h3>
+    <p>
+        If a character possesses bonuses for multiple factions (e.g. <code>Wood-elves; Silvan Elves</code>), the token resolves to a semicolon-delimited string. The engine automatically evaluates this as an <strong>OR</strong> query, matching either faction.
+    </p>
+
+    <h3>E. Automated Shortfall Fallbacks (<code>Fallback</code>)</h3>
+    <p>
+        If the leader has no faction bonus tag, or if that faction is unique and already at its deck limit, the primary rule experiences a shortfall (0 of 1 added). Instead of halting or leaving an incomplete deck, the engine detects the shortfall and immediately executes the nested <code>Fallback</code> rule for the remaining count.
+    </p>
+
+    <!-- STEP 3: THE JSON RULE TEMPLATE -->
+    <h2>4. Step 2: The Complete Rule Set (JSON)</h2>
+    <p>
+        Save the following JSON into a file named <code>Hero_Faction_Rules.json</code>:
+    </p>
+
+    <pre><code>{
+  "DeckTitle": "Hero Faction Theme Deck",
+  "RuleSetType": "SequentialRules",
+  "Version": "1.0",
+  "Rules": [
+    {
+      "RuleType": "RandomChoice",
+      "Name": "Starting Company Archetype",
+      "Choices": [
+        {
+          "Name": "Dwarf Company",
+          "DeckTitle": "Hero Dwarves of the Iron Hills",
+          "Weight": 1,
+          "Rules": [
+            {
+              "Name": "Starting Dwarf Leader",
+              "SaveAs": "Leader",
+              "Section": "Pool",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Dwarf",
+                "Skill": "Diplomat; Warrior"
+              }
+            },
+            {
+              "Name": "Dwarf Company Members",
+              "Section": "Pool",
+              "Count": 4,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Dwarf"
+              }
+            },
+            {
+              "Name": "Leader's Associated Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Name": "{Leader.Tag:Faction Bonus}"
+              },
+              "Fallback": {
+                "Name": "Fallback Dwarf Faction",
+                "Attributes": {
+                  "Primary": "Resource",
+                  "Secondary": "Faction",
+                  "Race": "{Leader.Race}"
+                }
+              }
+            },
+            {
+              "Name": "Secondary Dwarf Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Race": "Dwarf"
+              }
+            }
+          ]
+        },
+        {
+          "Name": "Elf Company",
+          "DeckTitle": "Hero Elves of the Woodland Realm",
+          "Weight": 1,
+          "Rules": [
+            {
+              "Name": "Starting Elf Leader",
+              "SaveAs": "Leader",
+              "Section": "Pool",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Elf",
+                "Skill": "Sage; Diplomat"
+              }
+            },
+            {
+              "Name": "Elf Company Members",
+              "Section": "Pool",
+              "Count": 4,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "Elf"
+              }
+            },
+            {
+              "Name": "Leader's Associated Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Name": "{Leader.Tag:Faction Bonus}"
+              },
+              "Fallback": {
+                "Name": "Fallback Elf Faction",
+                "Attributes": {
+                  "Primary": "Resource",
+                  "Secondary": "Faction",
+                  "Race": "{Leader.Race}"
+                }
+              }
+            },
+            {
+              "Name": "Secondary Elf Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Race": "Elf"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Name": "Standard Resource Items",
+      "Section": "Resources",
+      "Count": 8,
+      "Attributes": {
+        "Primary": "Resource",
+        "Secondary": "Major Item; Minor Item"
+      }
+    },
+    {
+      "Name": "Hazard Creatures",
+      "Section": "Hazards",
+      "Count": 15,
+      "Attributes": {
+        "Primary": "Hazard",
+        "Secondary": "Creature"
+      }
+    },
+    {
+      "Name": "Movement Sites",
+      "Section": "Sites",
+      "Count": 15,
+      "Attributes": {
+        "Primary": "Site"
+      }
+    }
+  ]
+}</code></pre>
+
+    <!-- STEP 4: EXECUTION & VERIFICATION -->
+    <h2>5. Step 3: Running and Verifying the Deck</h2>
+    <ol>
+        <li>Click <strong>Tools &gt; Generate Deck from Rules...</strong> and pick <code>Hero_Faction_Rules.json</code>.</li>
+        <li>
+            Inspect the generation summary dialog:
+            <ul>
+                <li><strong>Scenario A (Leader has Tag):</strong> If the generator selects <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
+                <li><strong>Scenario B (Leader has no Tag):</strong> If the generator selects a leader with no bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic dwarf faction (such as <em>Blue Mountain Dwarves</em>).</li>
+            </ul>
+        </li>
+        <li>Press <kbd>F5</kbd> (<strong>Tools &gt; Re-run Deck Rules</strong>) to generate instant variations with new leader, faction, item, and hazard combinations.</li>
+    </ol>
 </body>
 </html>
 ]]>
@@ -1080,7 +1584,7 @@ namespace MECCG_Deck_Builder
   - Card Data: cards-dc.json (synced from GitHub rezwits/cardnum/fdata/cards-dc.json with local fallback).
   - Set Data: sets-dc.json (synced from GitHub rezwits/cardnum/fdata/sets-dc.json with local fallback).
   - Images: https://cardnum.net/img/cards/{set}/{imageName} (with planned PlayMECCG mirror fallback).
-- Help File: MECCG_Deck_Builder.chm (compiled via Microsoft HTML Help Workshop).
+- Help File: `MECCG_Deck_Builder.chm` (compiled via Microsoft HTML Help Workshop across 14 modular topic files in a 5-folder `.hhc` hierarchy).
 
 ---
 
@@ -1104,8 +1608,8 @@ namespace MECCG_Deck_Builder
 - OpenCloseFilter.cs: DTO used for serializing/deserializing .json custom filter sets.
 - Messages.cs: Centralized message box text helper.
 - Program.cs: WinForms entry point; registers Windows-1252 code page provider.
-- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, and execution logs.
-- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, and branching choice groups.
+- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, variable captures (`SaveAs`), and automated shortfall fallbacks (`Fallback`).
+- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Tag:Cat}`), and fallback routing.
 - `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
 - `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
 
@@ -1142,6 +1646,7 @@ namespace MECCG_Deck_Builder
   - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
 - [ ] **v0.5.0 - Procedural Deck Generator**
   - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
+  - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
 - [ ] **v1.0.0 - First Public Release**
 ]]>
   </file>
@@ -3088,13 +3593,13 @@ namespace MECCG_Deck_Builder
     {
         public string RuleType { get; set; } = "FilterQuery";
         public string Name { get; set; } = string.Empty;
+        public string SaveAs { get; set; } = string.Empty; // <-- ADD THIS
         public string Section { get; set; } = "Resources";
         public int Count { get; set; } = 1;
         public List<string> Sets { get; set; } = [];
         public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, string> Tags { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-
-        // Sub-choices for RuleType == "RandomChoice" / "Choice" / "OneOf"
+        public DeckGenerationRule Fallback { get; set; }
         public List<DeckGenerationChoice> Choices { get; set; } = [];
     }
 
@@ -3122,12 +3627,19 @@ namespace MECCG_Deck_Builder
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace MECCG_Deck_Builder
 {
     public static class DeckGenerationService
     {
+#pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
+        private static readonly Regex PlaceholderRegex = new(
+            @"\{([a-zA-Z0-9_]+)\.(?:Tag:([^}]+)|([a-zA-Z0-9_]+))\}",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+#pragma warning restore SYSLIB1045
+
         public static DeckGenerationRuleSet LoadRuleSetFromJson(string json)
         {
             if (string.IsNullOrWhiteSpace(json)) return null;
@@ -3160,12 +3672,13 @@ namespace MECCG_Deck_Builder
             };
 
             var cardCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var contextVariables = new Dictionary<string, List<Card>>(StringComparer.OrdinalIgnoreCase);
             var logs = new List<DeckRuleExecutionLog>();
             var allCards = catalogCards?.ToList() ?? [];
 
             foreach (var rule in ruleSet.Rules)
             {
-                ExecuteRule(rule, deck, cardCountsByName, logs, allCards, defaultSets, filterService);
+                ExecuteRule(rule, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables);
             }
 
             deck.SortSections();
@@ -3185,9 +3698,12 @@ namespace MECCG_Deck_Builder
             List<DeckRuleExecutionLog> logs,
             IReadOnlyList<Card> allCards,
             ISet<string> defaultSets,
-            CardFilterService filterService)
+            CardFilterService filterService,
+            Dictionary<string, List<Card>> contextVariables = null)
         {
             if (rule == null) return;
+
+            contextVariables ??= new Dictionary<string, List<Card>>(StringComparer.OrdinalIgnoreCase);
 
             // Handle RandomChoice / ChoiceGroup ("OR" branches)
             if (IsChoiceRule(rule))
@@ -3195,7 +3711,6 @@ namespace MECCG_Deck_Builder
                 var validChoices = rule.Choices?.Where(c => c != null && c.Rules != null && c.Rules.Count > 0).ToList() ?? [];
                 if (validChoices.Count == 0) return;
 
-                // Weighted random selection (default weight is 1)
                 int totalWeight = validChoices.Sum(c => Math.Max(1, c.Weight));
                 int roll = Random.Shared.Next(totalWeight);
                 int cumulative = 0;
@@ -3211,7 +3726,6 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                // If choice provides a specific deck title, apply it
                 if (!string.IsNullOrWhiteSpace(chosen.DeckTitle))
                 {
                     deck.Title = chosen.DeckTitle;
@@ -3225,10 +3739,9 @@ namespace MECCG_Deck_Builder
                     AddedCount = 0
                 });
 
-                // Execute the chosen branch's sub-rules
                 foreach (var subRule in chosen.Rules)
                 {
-                    ExecuteRule(subRule, deck, cardCountsByName, logs, allCards, defaultSets, filterService);
+                    ExecuteRule(subRule, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables);
                 }
                 return;
             }
@@ -3245,7 +3758,30 @@ namespace MECCG_Deck_Builder
                 ? new HashSet<string>(rule.Sets, StringComparer.OrdinalIgnoreCase)
                 : defaultSets;
 
-            // 1. Filter candidates
+            // 1. Resolve runtime variable placeholders in Attributes & Tags
+            var resolvedAttributes = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
+            if (rule.Attributes != null)
+            {
+                foreach (var (attrKey, rawVal) in rule.Attributes)
+                {
+                    if (string.IsNullOrWhiteSpace(attrKey)) continue;
+                    string resolved = ResolvePlaceholders(rawVal, contextVariables, filterService);
+                    resolvedAttributes[attrKey] = (rawVal, resolved);
+                }
+            }
+
+            var resolvedTags = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
+            if (rule.Tags != null)
+            {
+                foreach (var (tagKey, rawVal) in rule.Tags)
+                {
+                    if (string.IsNullOrWhiteSpace(tagKey)) continue;
+                    string resolved = ResolvePlaceholders(rawVal, contextVariables, filterService);
+                    resolvedTags[tagKey] = (rawVal, resolved);
+                }
+            }
+
+            // 2. Filter candidates
             var candidates = allCards.Where(c =>
             {
                 if (ruleSets != null && ruleSets.Count > 0 && !ruleSets.Contains(c.Set))
@@ -3253,28 +3789,39 @@ namespace MECCG_Deck_Builder
                     return false;
                 }
 
-                if (rule.Attributes != null)
+                // Attribute evaluation
+                foreach (var (attrKey, (rawTemplate, resolvedVal)) in resolvedAttributes)
                 {
-                    foreach (var (attrKey, attrVal) in rule.Attributes)
+                    // If placeholder was specified (e.g. {Leader.Tag:Faction Bonus}) but resolved empty,
+                    // the dependency was not met: do not match any card.
+                    if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
                     {
-                        if (!string.IsNullOrWhiteSpace(attrKey) && !string.IsNullOrWhiteSpace(attrVal))
+                        return false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(resolvedVal))
+                    {
+                        var allowedValues = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        if (!allowedValues.Any(v => CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
                         {
-                            var allowedValues = attrVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            if (!allowedValues.Any(v => CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
-                            {
-                                return false;
-                            }
+                            return false;
                         }
                     }
                 }
 
-                if (rule.Tags != null && filterService != null)
+                // Tag evaluation
+                if (filterService != null)
                 {
-                    foreach (var (tagKey, tagVal) in rule.Tags)
+                    foreach (var (tagKey, (rawTemplate, resolvedVal)) in resolvedTags)
                     {
-                        if (!string.IsNullOrWhiteSpace(tagKey) && !string.IsNullOrWhiteSpace(tagVal))
+                        if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
                         {
-                            var allowedTags = tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            return false;
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(resolvedVal))
+                        {
+                            var allowedTags = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                             if (!allowedTags.Any(t => filterService.MatchesCustomCriterion(c.Id, tagKey, t)))
                             {
                                 return false;
@@ -3286,9 +3833,10 @@ namespace MECCG_Deck_Builder
                 return true;
             }).ToList();
 
-            // 2. Sample candidates with tiered variety-first duplication
+            // 3. Sample candidates with tiered variety-first distribution
             int addedForThisRule = 0;
             var targetSection = deck.GetSection(sectionType);
+            var newlyAdded = new List<Card>();
 
             while (addedForThisRule < rule.Count)
             {
@@ -3310,19 +3858,100 @@ namespace MECCG_Deck_Builder
 
                 targetSection.Add(selectedCard);
                 deck.IncludedSets.Add(selectedCard.Set);
+                newlyAdded.Add(selectedCard);
 
                 int currentCount = cardCountsByName.GetValueOrDefault(selectedCard.Name, 0) + 1;
                 cardCountsByName[selectedCard.Name] = currentCount;
                 addedForThisRule++;
             }
 
-            logs.Add(new DeckRuleExecutionLog
+            // 4. Capture selected cards to variable context if SaveAs is specified
+            if (!string.IsNullOrWhiteSpace(rule.SaveAs) && newlyAdded.Count > 0)
             {
-                RuleName = !string.IsNullOrWhiteSpace(rule.Name) ? rule.Name : $"Rule {logs.Count + 1}",
-                Section = sectionType.ToString(),
-                RequestedCount = rule.Count,
-                AddedCount = addedForThisRule
-            });
+                contextVariables[rule.SaveAs] = newlyAdded;
+            }
+
+            // 5. If shortfall occurred and a Fallback rule is defined, execute it for remaining count
+            if (addedForThisRule < rule.Count && rule.Fallback != null)
+            {
+                int remainingNeeded = rule.Count - addedForThisRule;
+                rule.Fallback.Count = remainingNeeded;
+
+                if (string.IsNullOrWhiteSpace(rule.Fallback.Section))
+                {
+                    rule.Fallback.Section = sectionType.ToString();
+                }
+
+                int countBefore = targetSection.Count;
+                ExecuteRule(rule.Fallback, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables);
+                int addedByFallback = targetSection.Count - countBefore;
+
+                // The fallback's own ExecuteRule already logged its results accurately,
+                // so return to avoid duplicate/conflicting log entries.
+                return;
+            }
+        }
+
+        private static string ResolvePlaceholders(
+            string template,
+            Dictionary<string, List<Card>> contextVariables,
+            CardFilterService filterService)
+        {
+            if (string.IsNullOrWhiteSpace(template) || !template.Contains('{'))
+            {
+                return template ?? string.Empty;
+            }
+
+            return PlaceholderRegex.Replace(template, match =>
+            {
+                string varName = match.Groups[1].Value;
+                if (!contextVariables.TryGetValue(varName, out var cards) || cards.Count == 0)
+                {
+                    return string.Empty;
+                }
+
+                var resolvedValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
+                {
+                    // Custom taxonomy tag lookup: {Variable.Tag:Category Name}
+                    string category = match.Groups[2].Value.Trim();
+                    if (filterService != null)
+                    {
+                        foreach (var card in cards)
+                        {
+                            var tags = filterService.GetCardTagsForCategory(card.Id, category);
+                            foreach (var tag in tags)
+                            {
+                                if (!string.IsNullOrWhiteSpace(tag))
+                                {
+                                    resolvedValues.Add(tag.Trim());
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
+                {
+                    // Official Cardnum attribute lookup: {Variable.AttributeName}
+                    string attrName = match.Groups[3].Value.Trim();
+                    foreach (var card in cards)
+                    {
+                        string val = card.GetAttribute(attrName);
+                        if (!string.IsNullOrWhiteSpace(val))
+                        {
+                            // Also split multi-values (e.g., compound skills or dual homes)
+                            var parts = val.Split([';', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            foreach (var part in parts)
+                            {
+                                resolvedValues.Add(part);
+                            }
+                        }
+                    }
+                }
+
+                return resolvedValues.Count > 0 ? string.Join("; ", resolvedValues) : string.Empty;
+            }).Trim();
         }
 
         private static bool IsChoiceRule(DeckGenerationRule rule)
@@ -3603,7 +4232,12 @@ namespace MECCG_Deck_Builder
         private void SetToolStripMenuMasterCardnumFilters(Card card)
         {
             ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
-            var pairs = new List<(string Key, string Value)>();
+            var pairs = new List<(string Key, string Value)>
+            {
+                ("Name", card.Name),
+                ("Set", card.Set),
+                ("FullCode", card.FullCode)
+            };
 
             foreach (string key in CardCatalogService.FilterKeys)
             {
@@ -4059,13 +4693,21 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabCardnumFilters(Card card)
         {
-            ToolStripMenuTabCardnumFilters.DropDownItems.Clear();
-            var pairs = new List<(string Key, string Value)>();
+            ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
+            var pairs = new List<(string Key, string Value)>
+            {
+                ("Name", card.Name),
+                ("Set", card.Set),
+                ("FullCode", card.FullCode)
+            };
 
             foreach (string key in CardCatalogService.FilterKeys)
             {
                 string val = card.GetAttribute(key);
-                if (!string.IsNullOrEmpty(val)) pairs.Add((key, val));
+                if (!string.IsNullOrEmpty(val))
+                {
+                    pairs.Add((key, val));
+                }
             }
 
             if (pairs.Count == 0) return;
@@ -4256,7 +4898,8 @@ namespace MECCG_Deck_Builder
                 CheckPathExists = true,
                 DefaultExt = "json",
                 Filter = "MECCG Deck Builder Deck (*.json)|*.json",
-                FilterIndex = 1
+                FilterIndex = 1,
+                FileName = GetSafeDeckFileName() // <-- Pre-populates "Hero Dwarves of the Iron Hills.json"
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -4334,12 +4977,15 @@ namespace MECCG_Deck_Builder
                 Title = Constants.AppTitle,
                 Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*.play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
                 FilterIndex = 1,
-                RestoreDirectory = true
+                RestoreDirectory = true,
+                FileName = GetSafeDeckFileName() // Pre-populates the deck name
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
-            string basePrefix = Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName) ?? "", Path.GetFileNameWithoutExtension(saveFileDialog.FileName));
+            string basePrefix = Path.Combine(
+                Path.GetDirectoryName(saveFileDialog.FileName) ?? "",
+                Path.GetFileNameWithoutExtension(saveFileDialog.FileName));
 
             switch ((SaveType)saveFileDialog.FilterIndex)
             {
@@ -4363,6 +5009,8 @@ namespace MECCG_Deck_Builder
                     DeckExportService.ExportToText(_currentDeck, $"{basePrefix}.txt");
                     break;
             }
+
+            MessageBox.Show(this, "Deck exported successfully.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
@@ -4913,6 +5561,22 @@ namespace MECCG_Deck_Builder
             }
 
             MessageBox.Show(this, sb.ToString(), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private string GetSafeDeckFileName()
+        {
+            if (string.IsNullOrWhiteSpace(_currentDeck.Title))
+            {
+                return "Deck";
+            }
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var safeChars = _currentDeck.Title
+                .Where(c => !invalidChars.Contains(c))
+                .ToArray();
+
+            string safeName = new string(safeChars).Trim();
+            return !string.IsNullOrWhiteSpace(safeName) ? safeName : "Deck";
         }
 
         #endregion
@@ -6558,12 +7222,12 @@ namespace MECCG_Deck_Builder
     internal sealed class OpenCloseDeck
     {
         public string CurrentDeckTitle { get; set; } = "New Deck";
+        public List<string> SetList { get; set; } = [];
         public List<string[]> PoolList { get; set; } = [];
         public List<string[]> ResourceList { get; set; } = [];
         public List<string[]> HazardList { get; set; } = [];
         public List<string[]> SideboardList { get; set; } = [];
         public List<string[]> SiteList { get; set; } = [];
-        public List<string> SetList { get; set; } = [];
 
         public static OpenCloseDeck FromDeck(Deck deck)
         {
@@ -6810,7 +7474,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - **Cardnum Deck (`.cnum`):** Standard `1 <Code>` listing format.
   - **Archive Breakdown (`.archive`):** Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - **Plain Text (`.txt`):** Formatted deck listing.
-- **Procedural Deck Generator:** Generate complete decks from JSON rule files with attribute/tag queries, copy limits, tiered variety-first duplication, and random branching choices (`RandomChoice`). Re-run instant variations with <kbd>F5</kbd>.
+- **Procedural Deck Generator:** Generate complete decks from JSON rule files with attribute/tag queries, copy limits, tiered variety-first duplication, and random branching choices (`RandomChoice`). Features runtime variable capture (`SaveAs`), dynamic cross-card token queries (e.g. `{Leader.Tag:Faction Bonus}`, `{Leader.Home}`), and automated shortfall fallbacks (`Fallback`). Re-run instant variations with <kbd>F5</kbd>.
 - **Relational Taxonomy Extraction:** Cross-reference card attributes across entities (such as mapping Character `Home` to Site `Region`) to produce automatic multi-tags.
 
 ---

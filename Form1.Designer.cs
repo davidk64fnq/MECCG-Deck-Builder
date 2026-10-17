@@ -104,6 +104,7 @@
             ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuFilter = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuFilterManage = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuFilterMerge = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuFilterOpen = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
@@ -750,7 +751,7 @@
             // 
             // ToolStripMenuFilter
             // 
-            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterManage, toolStripSeparator7, ToolStripMenuFilterOpen, toolStripSeparator6, ToolStripMenuFilterSave });
+            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterManage, toolStripSeparator7, ToolStripMenuFilterOpen, ToolStripMenuFilterMerge, toolStripSeparator6, ToolStripMenuFilterSave });
             ToolStripMenuFilter.Name = "ToolStripMenuFilter";
             ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
             ToolStripMenuFilter.Text = "&Filter";
@@ -762,6 +763,13 @@
             ToolStripMenuFilterManage.Text = "&Manage Custom Tags...";
             ToolStripMenuFilterManage.Click += ToolStripMenuFilterManage_Click;
             // 
+            // ToolStripMenuFilterMerge
+            // 
+            // 
+            ToolStripMenuFilterMerge.Name = "ToolStripMenuFilterMerge";
+            ToolStripMenuFilterMerge.Size = new System.Drawing.Size(198, 22);
+            ToolStripMenuFilterMerge.Text = "&Merge Tag Set...";
+            ToolStripMenuFilterMerge.Click += new System.EventHandler(this.ToolStripMenuFilterMerge_Click);
             // toolStripSeparator7
             // 
             toolStripSeparator7.Name = "toolStripSeparator7";
@@ -1102,6 +1110,7 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterMerge;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;

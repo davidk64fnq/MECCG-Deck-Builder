@@ -73,25 +73,27 @@
         </UL>
 
     <!-- BOOK 4: PROCEDURAL DECK GENERATOR -->
-    <LI> <OBJECT type="text/sitemap">
-        <param name="Name" value="Procedural Deck Generator">
-        <param name="Local" value="deck_generation_engine.html">
-        <param name="ImageNumber" value="1">
-        </OBJECT>
-        <UL>
-            <LI> <OBJECT type="text/sitemap">
-                <param name="Name" value="Generator Engine Overview">
-                <param name="Local" value="deck_generation_engine.html">
-                </OBJECT>
-            <LI> <OBJECT type="text/sitemap">
-                <param name="Name" value="Rules JSON Schema Reference">
-                <param name="Local" value="deck_rules_reference.html">
-                </OBJECT>
-            <LI> <OBJECT type="text/sitemap">
-                <param name="Name" value="Worked Example: Dynamic Factions">
-                <param name="Local" value="worked_example_factions.html">
-                </OBJECT>
-        </UL>
+    <li> <object type="text/sitemap">
+			<param name="Name" value="Procedural Deck Generator">
+			</object>
+		<ul>
+			<li> <object type="text/sitemap">
+				<param name="Name" value="Generator Engine">
+				<param name="Local" value="deck_generation_engine.html">
+				</object>
+			<li> <object type="text/sitemap">
+				<param name="Name" value="Rules JSON Schema Reference">
+				<param name="Local" value="deck_rules_reference.html">
+				</object>
+			<li> <object type="text/sitemap">
+				<param name="Name" value="Companion Rules Tags">
+				<param name="Local" value="rules_support_tags.html">
+				</object>
+			<li> <object type="text/sitemap">
+				<param name="Name" value="Worked Example: Dynamic Factions">
+				<param name="Local" value="worked_example_factions.html">
+				</object>
+		</ul>
 
     <!-- BOOK 5: TOOLS & ARCHITECTURE -->
     <LI> <OBJECT type="text/sitemap">

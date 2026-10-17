@@ -1,0 +1,996 @@
+{
+  "Cards": [
+    {
+      "Faction Bonus": "Men of Lebennin",
+      "fullCode": "Anborn (TW)",
+      "Home Region": "Lebennin",
+      "id": "2",
+      "name": "Anborn",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Rangers of the North",
+      "fullCode": "Aragorn II (TW)",
+      "Home Region": "Arthedain",
+      "id": "4",
+      "Marshalling Points Penalty": "Self",
+      "name": "Aragorn II",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Variags of Khand",
+      "fullCode": "Arinmîr (TW)",
+      "Home Region": "Anfalas",
+      "id": "5",
+      "name": "Arinmîr",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Beornings",
+      "fullCode": "Beorn (TW)",
+      "Home Region": "Anduin Vales",
+      "id": "10",
+      "name": "Beorn",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Rangers of the North",
+      "fullCode": "Beretar (TW)",
+      "Home Region": "Arthedain",
+      "id": "12",
+      "name": "Beretar",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Bonus": "Men of Anórien",
+      "fullCode": "Boromir II (TW)",
+      "Home Region": "Anórien",
+      "id": "18",
+      "name": "Boromir II",
+      "set": "METW"
+    },
+    {
+      "Combat Mechanics": "Cancellation",
+      "Faction Bonus": "Elves of Lindon",
+      "fullCode": "Círdan (TW)",
+      "Hand Mechanics": "Hand Size Bonus",
+      "Home Region": "Lindon",
+      "id": "20",
+      "Marshalling Points Penalty": "Self",
+      "name": "Círdan",
+      "Region Bonus": "Coastal Sea",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Men of Lamedon",
+      "fullCode": "Damrod (TW)",
+      "Home Region": "Lamedon",
+      "id": "22",
+      "name": "Damrod",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Tower Guard of Minas Tirith",
+      "fullCode": "Denethor II (TW)",
+      "Home Region": "Anórien",
+      "id": "23",
+      "name": "Denethor II",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Man",
+      "fullCode": "Dáin II (TW)",
+      "Home Region": "Iron Hills",
+      "id": "21",
+      "name": "Dáin II",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Riders of Rohan",
+      "fullCode": "Erkenbrand (TW)",
+      "Home Region": "Rohan",
+      "id": "31",
+      "name": "Erkenbrand",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Rangers of Ithilien",
+      "fullCode": "Faramir (TW)",
+      "Home Region": "Ithilien",
+      "id": "32",
+      "name": "Faramir",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Nazgûl",
+      "Faction Bonus": "Men of Dorwinion",
+      "fullCode": "Galva (TW)",
+      "Home Region": "Dorwinion",
+      "id": "38",
+      "name": "Galva",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Direct Influence Bonus": "Elf",
+      "Faction Bonus": "Iron Hill Dwarves; Elf",
+      "fullCode": "Gimli (TW)",
+      "Home Region": "Iron Hills",
+      "id": "43",
+      "name": "Gimli",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Direct Influence Bonus": "Dwarf",
+      "Faction Bonus": "Blue Mountain Dwarves; Dwarf",
+      "fullCode": "Glóin (TW)",
+      "Home Region": "Númeriador",
+      "id": "44",
+      "name": "Glóin",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Hillmen",
+      "fullCode": "Halbarad (TW)",
+      "Home Region": "Rhudaur",
+      "id": "46",
+      "name": "Halbarad",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Easterlings",
+      "fullCode": "Haldalam (TW)",
+      "Home Region": "Dorwinion",
+      "id": "47",
+      "name": "Haldalam",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Knights of Dol Amroth",
+      "fullCode": "Imrahil (TW)",
+      "Home Region": "Belfalas",
+      "id": "50",
+      "name": "Imrahil",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Wood-elves",
+      "fullCode": "Legolas (TW)",
+      "Home Region": "Woodland Realm",
+      "id": "52",
+      "name": "Legolas",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Men of Anfalas",
+      "fullCode": "Mablung (TW)",
+      "Home Region": "Anfalas",
+      "id": "53",
+      "name": "Mablung",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Direct Influence Bonus": "Dwarf",
+      "Faction Bonus": "Blue Mountain Dwarves; Dwarf",
+      "fullCode": "Thorin II (TW)",
+      "Home Region": "Númeriador",
+      "id": "67",
+      "name": "Thorin II",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Wood-elves",
+      "fullCode": "Thranduil (TW)",
+      "Home Region": "Woodland Realm",
+      "id": "68",
+      "name": "Thranduil",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Riders of Rohan",
+      "fullCode": "Théoden (TW)",
+      "Home Region": "Rohan",
+      "id": "66",
+      "name": "Théoden",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Nazgûl",
+      "Faction Bonus": "Lossoth",
+      "fullCode": "Vôteli (TW)",
+      "Home Region": "Forochel",
+      "id": "69",
+      "name": "Vôteli",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Woodmen",
+      "fullCode": "Wacho (TW)",
+      "Home Region": "Western Mirkwood",
+      "id": "71",
+      "name": "Wacho",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Riders of Rohan",
+      "fullCode": "Éomer (TW)",
+      "Home Region": "Rohan",
+      "id": "29",
+      "name": "Éomer",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "All",
+      "fullCode": "Adrazar (TW)",
+      "Home Region": "Belfalas",
+      "id": "0",
+      "name": "Adrazar",
+      "set": "METW"
+    },
+    {
+      "Direct Influence Bonus": "Aragorn II",
+      "fullCode": "Arwen (TW)",
+      "Home Region": "Rhudaur",
+      "id": "6",
+      "name": "Arwen",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Direct Influence Bonus": "Dwarf",
+      "Faction Bonus": "Dwarf",
+      "fullCode": "Balin [H] (TW)",
+      "Home Region": "Númeriador",
+      "id": "7",
+      "name": "Balin",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Barliman Butterbur (TW)",
+      "Home Region": "Arthedain",
+      "id": "9",
+      "name": "Barliman Butterbur",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Beregond (TW)",
+      "Home Region": "Anórien",
+      "id": "11",
+      "name": "Beregond",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Bifur (TW)",
+      "Home Region": "Númeriador",
+      "id": "14",
+      "name": "Bifur",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Bilbo (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "15",
+      "Marshalling Points Penalty": "Self",
+      "name": "Bilbo",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Bofur (TW)",
+      "Home Region": "Númeriador",
+      "id": "16",
+      "name": "Bofur",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Bombur (TW)",
+      "Home Region": "Númeriador",
+      "id": "17",
+      "name": "Bombur",
+      "set": "METW"
+    },
+    {
+      "Direct Influence Bonus": "Galadriel",
+      "fullCode": "Celeborn (TW)",
+      "Home Region": "Wold & Foothills",
+      "id": "19",
+      "name": "Celeborn",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Dori (TW)",
+      "Home Region": "Númeriador",
+      "id": "24",
+      "name": "Dori",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Dwalin (TW)",
+      "Home Region": "Númeriador",
+      "id": "25",
+      "name": "Dwalin",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "fullCode": "Elladan (TW)",
+      "Home Region": "Rhudaur",
+      "id": "26",
+      "name": "Elladan",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "fullCode": "Elrohir (TW)",
+      "Home Region": "Rhudaur",
+      "id": "27",
+      "name": "Elrohir",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Elrond (TW)",
+      "Hand Mechanics": "Hand Size Bonus",
+      "Home Region": "Rhudaur",
+      "id": "28",
+      "Marshalling Points Penalty": "Self",
+      "name": "Elrond",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Alatar [H] (TW)",
+      "Hand Mechanics": "Hand Size Bonus",
+      "Home Region": "Anfalas",
+      "id": "1",
+      "name": "Alatar",
+      "set": "METW"
+    },
+    {
+      "Combat Mechanics": "Cancellation",
+      "Corruption Bonus": "Self",
+      "fullCode": "Fatty Bolger (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "33",
+      "name": "Fatty Bolger",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Forlong (TW)",
+      "Home Region": "Anórien",
+      "id": "35",
+      "name": "Forlong",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Frodo (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "36",
+      "Marshalling Points Penalty": "Self",
+      "name": "Frodo",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Fíli (TW)",
+      "Home Region": "Númeriador",
+      "id": "34",
+      "name": "Fíli",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Galadriel (TW)",
+      "Hand Mechanics": "Hand Size Bonus",
+      "Home Region": "Wold & Foothills",
+      "id": "37",
+      "Marshalling Points Penalty": "Self",
+      "name": "Galadriel",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Gandalf [H] (TW)",
+      "Home Region": "Anfalas; Lindon; Wold & Foothills; Rhudaur",
+      "id": "40",
+      "name": "Gandalf",
+      "Resolved Site": "Edhellond; Grey Havens; Lórien; Rivendell",
+      "Ring Mechanics": "Test Ring",
+      "set": "METW"
+    },
+    {
+      "Faction Bonus": "Wose",
+      "fullCode": "Ghân-buri-Ghân (TW)",
+      "Home Region": "Anórien",
+      "id": "41",
+      "name": "Ghân-buri-Ghân",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "fullCode": "Gildor Inglorion (TW)",
+      "Home Region": "Rhudaur",
+      "id": "42",
+      "name": "Gildor Inglorion",
+      "set": "METW"
+    },
+    {
+      "Direct Influence Bonus": "Elf",
+      "fullCode": "Glorfindel II (TW)",
+      "Home Region": "Rhudaur",
+      "id": "45",
+      "name": "Glorfindel II",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Haldir (TW)",
+      "Home Region": "Wold & Foothills",
+      "id": "48",
+      "name": "Haldir",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Háma (TW)",
+      "Home Region": "Rohan",
+      "id": "49",
+      "name": "Háma",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Kíli (TW)",
+      "Home Region": "Númeriador",
+      "id": "51",
+      "name": "Kíli",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Merry (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "54",
+      "name": "Merry",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Nori (TW)",
+      "Home Region": "Númeriador",
+      "id": "55",
+      "name": "Nori",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Ori (TW)",
+      "Home Region": "Númeriador",
+      "id": "57",
+      "name": "Ori",
+      "set": "METW"
+    },
+    {
+      "Corruption Penalty": "Self",
+      "Faction Penalty": "All",
+      "fullCode": "Orophin (TW)",
+      "Home Region": "Wold & Foothills",
+      "id": "58",
+      "name": "Orophin",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Pallando [H] (TW)",
+      "Hand Mechanics": "Hand Size Bonus",
+      "Home Region": "Lindon",
+      "id": "59",
+      "name": "Pallando",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Nazgûl",
+      "Faction Bonus": "Dunlendings",
+      "fullCode": "Peath (TW)",
+      "Home Region": "Dunland",
+      "id": "60",
+      "name": "Peath",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Pippin (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "61",
+      "name": "Pippin",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Radagast [H] (TW)",
+      "Hand Mechanics": "Hand Size Bonus",
+      "Home Region": "Southern Mirkwood",
+      "id": "62",
+      "name": "Radagast",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Robin Smallburrow (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "63",
+      "name": "Robin Smallburrow",
+      "set": "METW"
+    },
+    {
+      "Corruption Bonus": "Self",
+      "fullCode": "Sam Gamgee (TW)",
+      "Home Region": "The Shire",
+      "Home Site Penalty": "Self",
+      "id": "64",
+      "name": "Sam Gamgee",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Saruman [H] (TW)",
+      "Hand Mechanics": "Spell Retrieval",
+      "Home Region": "Gap of Isen",
+      "id": "65",
+      "name": "Saruman",
+      "Palantír Mechanics": "Use Palantír",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Nazgûl",
+      "Faction Bonus": "Southrons",
+      "fullCode": "Vygavril (TW)",
+      "Home Region": "Harondor",
+      "id": "70",
+      "name": "Vygavril",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Nazgûl",
+      "fullCode": "Éowyn (TW)",
+      "Home Region": "Rohan",
+      "id": "30",
+      "name": "Éowyn",
+      "set": "METW"
+    },
+    {
+      "Combat Bonus": "Orc",
+      "Corruption Penalty": "Self",
+      "fullCode": "Óin (TW)",
+      "Home Region": "Númeriador",
+      "id": "56",
+      "name": "Óin",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Annalena (TW)",
+      "Home Region": "Anfalas",
+      "id": "3",
+      "name": "Annalena",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Bard Bowman (TW)",
+      "Home Region": "Northern Rhovanion",
+      "id": "8",
+      "name": "Bard Bowman",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Bergil (TW)",
+      "Home Region": "Anórien",
+      "id": "13",
+      "name": "Bergil",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Gamling the Old (TW)",
+      "Home Region": "Rohan",
+      "id": "39",
+      "name": "Gamling the Old",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Doeth - Durthak (WH)",
+      "id": "1804",
+      "name": "Doeth - Durthak",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Euog - Ulzog (WH)",
+      "id": "1805",
+      "name": "Euog - Ulzog",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Horseman in the Night (LE)",
+      "id": "1233",
+      "name": "Horseman in the Night",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Ill-favoured Fellow (WH)",
+      "id": "1807",
+      "name": "Ill-favoured Fellow",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Old Troll (LE)",
+      "id": "1247",
+      "name": "Old Troll",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Orc Brawler (LE)",
+      "id": "1248",
+      "name": "Orc Brawler",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Orc Captain (LE)",
+      "id": "1249",
+      "name": "Orc Captain",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Orc Chieftain (LE)",
+      "id": "1250",
+      "name": "Orc Chieftain",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Orc Sniffler (LE)",
+      "id": "1251",
+      "name": "Orc Sniffler",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Orc Tracker (LE)",
+      "id": "1252",
+      "name": "Orc Tracker",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Orc Veteran (LE)",
+      "id": "1253",
+      "name": "Orc Veteran",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Sly Southerner (WH)",
+      "id": "1812",
+      "name": "Sly Southerner",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Squint-eyed Brute (WH)",
+      "id": "1813",
+      "name": "Squint-eyed Brute",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Troll Lout (LE)",
+      "id": "1265",
+      "name": "Troll Lout",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Troll-chief (LE)",
+      "id": "1266",
+      "name": "Troll-chief",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Gandalf [F] (WH)",
+      "id": "1806",
+      "name": "Gandalf",
+      "Resolved Site": "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
+      "set": "MEWH"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Caves of Ûlund [H] (TW)",
+      "id": "430",
+      "name": "Caves of Ûlund",
+      "set": "METW"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Caves of Ûlund [M] (LE)",
+      "id": "1575",
+      "name": "Caves of Ûlund",
+      "set": "MELE"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Dancing Spire [H] (TW)",
+      "id": "432",
+      "name": "Dancing Spire",
+      "set": "METW"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Dancing Spire [M] (AS)",
+      "id": "1770",
+      "name": "Dancing Spire",
+      "set": "MEAS"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Gold Hill [H] (TD)",
+      "id": "1028",
+      "name": "Gold Hill",
+      "set": "METD"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Gold Hill [M] (AS)",
+      "id": "1776",
+      "name": "Gold Hill",
+      "set": "MEAS"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Gondmaeglom [M] (LE)",
+      "id": "1594",
+      "name": "Gondmaeglom",
+      "set": "MELE"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Gondmaeglom [H] (TD)",
+      "id": "1029",
+      "name": "Gondmaeglom",
+      "set": "METD"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Irerock [H] (TW)",
+      "id": "451",
+      "name": "Irerock",
+      "set": "METW"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Irerock [M] (AS)",
+      "id": "1779",
+      "name": "Irerock",
+      "set": "MEAS"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Isle of the Ulond [M] (AS)",
+      "id": "1780",
+      "name": "Isle of the Ulond",
+      "set": "MEAS"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Isle of the Ulond [H] (TD)",
+      "id": "1030",
+      "name": "Isle of the Ulond",
+      "set": "METD"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Ovir Hollow [H] (TD)",
+      "id": "1031",
+      "name": "Ovir Hollow",
+      "set": "METD"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Ovir Hollow [M] (AS)",
+      "id": "1785",
+      "name": "Ovir Hollow",
+      "set": "MEAS"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "The Lonely Mountain [H] (TW)",
+      "id": "477",
+      "name": "The Lonely Mountain",
+      "set": "METW"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "The Lonely Mountain [M] (LE)",
+      "id": "1621",
+      "name": "The Lonely Mountain",
+      "set": "MELE"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Zarak Dûm [H] (TD)",
+      "id": "1033",
+      "name": "Zarak Dûm",
+      "set": "METD"
+    },
+    {
+      "Automatic Attack": "Dragon",
+      "fullCode": "Zarak Dûm [M] (LE)",
+      "id": "1632",
+      "name": "Zarak Dûm",
+      "set": "MELE"
+    }
+  ],
+  "Filters": [
+    [
+      "Automatic Attack",
+      "Dragon"
+    ],
+    [
+      "Combat Bonus",
+      "All",
+      "Nazgûl",
+      "Orc"
+    ],
+    [
+      "Combat Mechanics",
+      "Cancellation"
+    ],
+    [
+      "Corruption Bonus",
+      "Self"
+    ],
+    [
+      "Corruption Penalty",
+      "Self"
+    ],
+    [
+      "Direct Influence Bonus",
+      "Aragorn II",
+      "Dwarf",
+      "Elf",
+      "Galadriel"
+    ],
+    [
+      "Faction Bonus",
+      "All",
+      "Beornings",
+      "Blue Mountain Dwarves",
+      "Dunlendings",
+      "Dwarf",
+      "Easterlings",
+      "Elf",
+      "Elves of Lindon",
+      "Hillmen",
+      "Iron Hill Dwarves",
+      "Knights of Dol Amroth",
+      "Lossoth",
+      "Man",
+      "Men of Anfalas",
+      "Men of Anórien",
+      "Men of Dorwinion",
+      "Men of Lamedon",
+      "Men of Lebennin",
+      "Rangers of Ithilien",
+      "Rangers of the North",
+      "Riders of Rohan",
+      "Southrons",
+      "Tower Guard of Minas Tirith",
+      "Variags of Khand",
+      "Wood-elves",
+      "Woodmen",
+      "Wose"
+    ],
+    [
+      "Faction Penalty",
+      "All"
+    ],
+    [
+      "Hand Mechanics",
+      "Hand Size Bonus",
+      "Spell Retrieval"
+    ],
+    [
+      "Home Region",
+      "Anduin Vales",
+      "Anfalas",
+      "Anórien",
+      "Arthedain",
+      "Belfalas",
+      "Dorwinion",
+      "Dunland",
+      "Forochel",
+      "Gap of Isen",
+      "Harondor",
+      "Iron Hills",
+      "Ithilien",
+      "Lamedon",
+      "Lebennin",
+      "Lindon",
+      "Northern Rhovanion",
+      "Númeriador",
+      "Rhudaur",
+      "Rohan",
+      "Southern Mirkwood",
+      "The Shire",
+      "Western Mirkwood",
+      "Wold & Foothills",
+      "Woodland Realm"
+    ],
+    [
+      "Home Site Penalty",
+      "Self"
+    ],
+    [
+      "Marshalling Points Penalty",
+      "Self"
+    ],
+    [
+      "Palantír Mechanics",
+      "Use Palantír"
+    ],
+    [
+      "Region Bonus",
+      "Coastal Sea"
+    ],
+    [
+      "Resolved Site",
+      "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
+      "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Edhellond; Grey Havens; Lórien; Rivendell"
+    ],
+    [
+      "Ring Mechanics",
+      "Test Ring"
+    ]
+  ]
+}

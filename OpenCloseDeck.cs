@@ -5,12 +5,12 @@ namespace MECCG_Deck_Builder
     internal sealed class OpenCloseDeck
     {
         public string CurrentDeckTitle { get; set; } = "New Deck";
+        public List<string> SetList { get; set; } = [];
         public List<string[]> PoolList { get; set; } = [];
         public List<string[]> ResourceList { get; set; } = [];
         public List<string[]> HazardList { get; set; } = [];
         public List<string[]> SideboardList { get; set; } = [];
         public List<string[]> SiteList { get; set; } = [];
-        public List<string> SetList { get; set; } = [];
 
         public static OpenCloseDeck FromDeck(Deck deck)
         {

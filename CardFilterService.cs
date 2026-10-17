@@ -382,6 +382,79 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        /// <summary>
+        /// Non-destructively merges categories and tags from an external tag set into the active taxonomy.
+        /// </summary>
+        public void MergeCustomFilters(
+            List<List<string>> filters,
+            List<SortedDictionary<string, string>> cardMappings,
+            CardCatalogService catalog = null)
+        {
+            if (filters != null)
+            {
+                foreach (var f in filters)
+                {
+                    if (f == null || f.Count == 0) continue;
+                    string keyName = f[0];
+                    AddCustomKeyName(keyName);
+                    for (int i = 1; i < f.Count; i++)
+                    {
+                        AddCustomKeyValue(keyName, f[i]);
+                    }
+                }
+            }
+
+            if (cardMappings == null) return;
+
+            foreach (var dict in cardMappings)
+            {
+                string resolvedCardId = ResolveCardIdFromDictionary(dict, catalog);
+                if (string.IsNullOrEmpty(resolvedCardId)) continue;
+
+                foreach (var kvp in dict)
+                {
+                    if (IsMetadataKey(kvp.Key)) continue;
+
+                    AppendCardCustomTag(resolvedCardId, kvp.Key, kvp.Value);
+                }
+            }
+        }
+
+        private static string ResolveCardIdFromDictionary(SortedDictionary<string, string> dict, CardCatalogService catalog)
+        {
+            // 1. Match by fullCode
+            if (catalog != null && dict.TryGetValue("fullCode", out string fullCode) && !string.IsNullOrWhiteSpace(fullCode))
+            {
+                var card = catalog.Cards.FirstOrDefault(c => string.Equals(c.FullCode, fullCode.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (card != null) return card.Id;
+            }
+
+            // 2. Match by name and set
+            if (catalog != null &&
+                dict.TryGetValue("name", out string name) && !string.IsNullOrWhiteSpace(name) &&
+                dict.TryGetValue("set", out string set) && !string.IsNullOrWhiteSpace(set))
+            {
+                var card = catalog.Cards.FirstOrDefault(c =>
+                    string.Equals(c.Name, name.Trim(), StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(c.Set, set.Trim(), StringComparison.OrdinalIgnoreCase));
+                if (card != null) return card.Id;
+            }
+
+            // 3. Fallback: legacy runtime ID
+            if (dict.TryGetValue("id", out string legacyId))
+            {
+                return legacyId;
+            }
+
+            return null;
+        }
+
+        private static bool IsMetadataKey(string key) =>
+            string.Equals(key, "id", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, "name", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, "set", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(key, "fullCode", StringComparison.OrdinalIgnoreCase);
+
         #endregion
 
         #region FILTER_AND_FACET_EVALUATION

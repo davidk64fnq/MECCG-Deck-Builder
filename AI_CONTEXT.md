@@ -71,4 +71,5 @@
 - [ ] **v0.5.0 - Procedural Deck Generator**
   - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
   - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
+  - Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
 - [ ] **v1.0.0 - First Public Release**

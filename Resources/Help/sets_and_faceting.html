@@ -37,11 +37,40 @@
         </tr>
     </table>
 
-    <h2>Cascading Faceted Search &amp; Conflict Resolution</h2>
+    <h2>Smart Cascading Filters &amp; Automatic Conflict Resolution</h2>
+    <p>
+        The filter engine uses intelligent cascading logic to ensure you only browse relevant options:
+    </p>
+
     <ul>
-        <li><strong>Context-Sensitive Value Pruning:</strong> Every dropdown automatically prunes options to show only values present among cards satisfying your active expansion sets and other active filter slots, completely eliminating zero-result queries.</li>
-        <li><strong>Order-Independent Narrowing:</strong> Filters can be selected in any sequence. Selecting <code>Skill = Diplomat</code> in Slot 2 prunes Slot 1's <code>Secondary</code> dropdown down to card types featuring diplomats.</li>
-        <li><strong>Automatic Conflict Resolution:</strong> If an active selection becomes impossible (e.g., deselecting an expansion set), the invalid slot automatically resets to blank (<code>""</code>).</li>
+        <li>
+            <strong>Static Keys (Attribute &amp; Category):</strong>
+            The upper dropdowns always display all available attributes (Slots 1 &amp; 2) and all taxonomy categories (Slots 3 &amp; 4) across the entire catalog, regardless of which expansion sets are currently checked.
+        </li>
+        <li>
+            <strong>Dynamic Value &amp; Tag Pruning:</strong>
+            The lower dropdowns (<strong>Value</strong> and <strong>Tag</strong>) automatically prune their lists in real time. They only show values and tags present on cards that satisfy your active expansion sets <em>and</em> the criteria in all other active filter slots.
+        </li>
+        <li>
+            <strong>Order-Independent Narrowing:</strong>
+            You can configure filter slots in any order. For example:
+            <ul>
+                <li>Enable only <em>The Wizards</em> (METW) in the <strong>Set</strong> menu.</li>
+                <li>In Slot 1, select <strong>Attribute:</strong> <code>Primary</code>. On its own, the <strong>Value</strong> dropdown lists all 5 primary card types (<em>Character</em>, <em>Resource</em>, <em>Hazard</em>, <em>Site</em>, <em>Region</em>).</li>
+                <li>In Slot 2, select <strong>Attribute:</strong> <code>Skill</code>. On its own, the <strong>Value</strong> dropdown lists 16 skills.</li>
+                <li>Now choose <strong>Value:</strong> <code>Diplomat</code> in Slot 2.</li>
+                <li>Slot 1's <strong>Value</strong> dropdown instantly prunes from 5 options down to just 2: <code>Character</code> and <code>Resource</code>, because in METW only characters and certain resource cards possess the Diplomat skill.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Automatic Conflict Resolution (Set Deselection):</strong>
+            Because dynamic pruning only offers values and tags that currently match cards, it is impossible to manually select a zero-result combination using the dropdowns. Instead, conflicts only occur when you <strong>deselect an expansion set</strong> in the <strong>Set</strong> menu. When a set is unchecked, the engine re-evaluates all active slots simultaneously:
+            <ul>
+                <li>If a currently selected Value or Tag only existed in the removed set, that slot automatically clears to blank (<code>""</code>) so you are not left viewing an empty list.</li>
+                <li>If the selection still exists in the remaining sets, it remains selected.</li>
+                <li><em>Example:</em> With both METW and METD checked, Slot 1 set to <code>Character</code>, and Slot 2 set to <code>Race = Hobbit</code>, unchecking METW causes Slot 2 to automatically clear to blank because METD contains no Hobbit characters (whereas selecting <code>Race = Dwarf</code> would remain selected).</li>
+            </ul>
+        </li>
     </ul>
 
     <h2>Clearing and Resetting Filters</h2>

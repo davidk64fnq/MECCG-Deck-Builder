@@ -69,6 +69,7 @@ namespace MECCG_Deck_Builder
             try
             {
                 await _catalogService.InitializeAsync();
+                LoadBaselineRulesTags(); // Auto-load Rules_Support_Tags.json if present
                 CreateMenus();
                 RefreshFilterKeyDropdowns();
                 UpdateFacetedFilters();
@@ -81,11 +82,41 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void LoadBaselineRulesTags()
+        {
+            try
+            {
+                string path = Path.Combine(Application.StartupPath, "Rules_Support_Tags.json");
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
+                    if (dto != null)
+                    {
+                        _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService);
+                    }
+                }
+            }
+            catch
+            {
+                // Baseline load fails gracefully without blocking catalog startup
+            }
+        }
+
         private void CreateMenus()
         {
             _isUpdatingFilters = true;
             try
             {
+                // Prevent Set menu from auto-closing on item clicks so users can toggle multiple sets
+                ToolStripMenuSet.DropDown.Closing += (s, e) =>
+                {
+                    if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+                    {
+                        e.Cancel = true;
+                    }
+                };
+
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
                     var set = _catalogService.Sets[i];
@@ -883,7 +914,8 @@ namespace MECCG_Deck_Builder
                 CheckPathExists = true,
                 DefaultExt = "json",
                 Filter = "MECCG Deck Builder Deck (*.json)|*.json",
-                FilterIndex = 1
+                FilterIndex = 1,
+                FileName = GetSafeDeckFileName() // <-- Pre-populates "Hero Dwarves of the Iron Hills.json"
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -961,12 +993,15 @@ namespace MECCG_Deck_Builder
                 Title = Constants.AppTitle,
                 Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*.play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
                 FilterIndex = 1,
-                RestoreDirectory = true
+                RestoreDirectory = true,
+                FileName = GetSafeDeckFileName() // Pre-populates the deck name
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
-            string basePrefix = Path.Combine(Path.GetDirectoryName(saveFileDialog.FileName) ?? "", Path.GetFileNameWithoutExtension(saveFileDialog.FileName));
+            string basePrefix = Path.Combine(
+                Path.GetDirectoryName(saveFileDialog.FileName) ?? "",
+                Path.GetFileNameWithoutExtension(saveFileDialog.FileName));
 
             switch ((SaveType)saveFileDialog.FilterIndex)
             {
@@ -990,6 +1025,8 @@ namespace MECCG_Deck_Builder
                     DeckExportService.ExportToText(_currentDeck, $"{basePrefix}.txt");
                     break;
             }
+
+            MessageBox.Show(this, "Deck exported successfully.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #endregion
@@ -1043,6 +1080,36 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void ToolStripMenuFilterMerge_Click(object sender, EventArgs e)
+        {
+            using var openFileDialog = new OpenFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Merge Custom Tag Set",
+                DefaultExt = "json",
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    string json = File.ReadAllText(openFileDialog.FileName);
+                    var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
+                    if (dto != null)
+                    {
+                        _filterService.MergeCustomFilters(dto.Filters, dto.Cards, _catalogService);
+                        RefreshFilterKeyDropdowns();
+                        UpdateFacetedFilters();
+                        MessageBox.Show(this, "Tag set merged successfully into active taxonomy.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Failed to merge tag set: {ex.Message}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
         #endregion
 
         #region FACETED_FILTER_ENGINE
@@ -1054,7 +1121,40 @@ namespace MECCG_Deck_Builder
 
             try
             {
-                // Invalidation loop: detect dead-ends and reset invalid values to blank
+                // Pass 1: Symmetrically validate all slots against the active sets independently.
+                // Any value that does not exist in the active set(s) on its own is cleared first,
+                // preventing a dead value from falsely invalidating valid peer slots.
+                for (int i = 0; i < _filterSlots.Length; i++)
+                {
+                    var slot = _filterSlots[i];
+                    if (string.IsNullOrWhiteSpace(slot.CurrentKey) || string.IsNullOrWhiteSpace(slot.CurrentValue))
+                    {
+                        continue;
+                    }
+
+                    var baseValues = _filterService.GetAvailableValues(
+                        _catalogService.Cards,
+                        _currentDeck.IncludedSets,
+                        [], // No other criteria: test set validity only
+                        slot.Type,
+                        slot.CurrentKey);
+
+                    if (!baseValues.Exists(v => string.Equals(v, slot.CurrentValue, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        slot.ValueBox.DataSource = null;
+                        if (baseValues.Count > 0)
+                        {
+                            slot.ValueBox.DataSource = baseValues;
+                            slot.ValueBox.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            slot.ValueBox.Text = "";
+                        }
+                    }
+                }
+
+                // Pass 2: Mutual constraint check across surviving peer criteria
                 bool changed;
                 int maxIterations = 4;
                 do
@@ -1097,7 +1197,7 @@ namespace MECCG_Deck_Builder
                     }
                 } while (changed && --maxIterations > 0);
 
-                // Context-sensitive pruning: update dropdown contents for all 4 slots
+                // Pass 3: Context-sensitive pruning: update dropdown contents for all 4 slots
                 for (int i = 0; i < _filterSlots.Length; i++)
                 {
                     var slot = _filterSlots[i];
@@ -1540,6 +1640,22 @@ namespace MECCG_Deck_Builder
             }
 
             MessageBox.Show(this, sb.ToString(), Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private string GetSafeDeckFileName()
+        {
+            if (string.IsNullOrWhiteSpace(_currentDeck.Title))
+            {
+                return "Deck";
+            }
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+            var safeChars = _currentDeck.Title
+                .Where(c => !invalidChars.Contains(c))
+                .ToArray();
+
+            string safeName = new string(safeChars).Trim();
+            return !string.IsNullOrWhiteSpace(safeName) ? safeName : "Deck";
         }
 
         #endregion

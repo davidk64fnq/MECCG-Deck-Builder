@@ -8,15 +8,19 @@
 <body>
     <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="image_cache.html">Tools &amp; Technical Architecture</a> &gt; Taxonomy Extraction Tools</div>
     <h1>Taxonomy Extraction Tools</h1>
-    <p>Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to cards currently visible in your Master List.</p>
+    <p>
+        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to the cards currently visible in your Master List. It allows you to harvest card text, perform cross-card relational joins, or run custom regular expressions to tag hundreds of cards in bulk.
+    </p>
 
-    <h2>1. Dynamic Entity Harvesting (from Catalog Text)</h2>
+    <!-- SECTION 1: DYNAMIC ENTITY HARVEST -->
+    <h2 id="entity-harvest">1. Dynamic Entity Harvesting (from Catalog Text)</h2>
     <ul>
-        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app automatically scans active sets in memory, extracts all matching entity titles, and searches your scoped Master List cards for references to those entities.</li>
-        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes and citations (enclosed in quotation marks) are automatically stripped before rules evaluation, preventing lore text from creating false-positive tags.</li>
+        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app scans active sets in memory, harvests all matching entity titles (e.g. <em>Wood-elves</em>, <em>Riders of Rohan</em>), and searches your scoped Master List cards for gameplay references to those titles.</li>
+        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes (enclosed in quotation marks) and book citations (e.g. <code>—LotRI</code>) are automatically stripped before evaluation, preventing lore quotes from generating false-positive tags.</li>
     </ul>
 
-    <h2>2. Relational Attribute Lookup (Cross-Card Join)</h2>
+    <!-- SECTION 2: RELATIONAL ATTRIBUTE LOOKUP -->
+    <h2 id="relational-lookup">2. Relational Attribute Lookup (Cross-Card Join)</h2>
     <p>Enables 2-step relational tagging between linked entities:</p>
     <ul>
         <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
@@ -25,7 +29,120 @@
         <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
     </ul>
 
-    <h2>3. Custom Regex &amp; JSON Rule Files</h2>
-    <p>Test individual regular expressions in real-time or load batch rule sets from portable <code>.json</code> rule files.</p>
+    <!-- SECTION 3: CUSTOM REGEX EXPRESSION -->
+    <h2 id="custom-regex">3. Custom Regex Expressions (Mode 3)</h2>
+    <p>
+        Mode 3 allows you to test and execute arbitrary .NET regular expressions against the rules text of cards currently in scope. It provides three configurable fields:
+    </p>
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Description &amp; Behavior</th>
+            <th>Examples</th>
+        </tr>
+        <tr>
+            <td><strong>Category</strong></td>
+            <td>The destination custom taxonomy category where extracted tags will be stored.</td>
+            <td><code>Resolved Site</code>, <code>Combat Role</code>, <code>Audit</code></td>
+        </tr>
+        <tr>
+            <td><strong>Tag Name</strong></td>
+            <td>
+                The value assigned to matching cards. Supports two modes:
+                <ul>
+                    <li><strong>Static Tag / List:</strong> Enter a fixed string or semicolon-separated list. Every matching card receives this exact value.</li>
+                    <li><strong>Regex Capture Group (<code>$1</code>):</strong> If your pattern contains parentheses <code>(...)</code>, using <code>$1</code> dynamically assigns the exact word or phrase matched inside that group.</li>
+                </ul>
+            </td>
+            <td>
+                <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor</code><br />
+                <code>Scout Specialist</code><br />
+                <code>$1</code>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Pattern</strong></td>
+            <td>
+                The regular expression evaluated against card rules text. Useful flags:
+                <ul>
+                    <li><code>(?i)</code>: Case-insensitive matching.</li>
+                    <li><code>(?s)</code>: Dot-all (singleline) mode, allowing <code>.*</code> to span across multi-line card text paragraphs.</li>
+                    <li><code>\b</code>: Word boundary (ensures <code>\bdragon\b</code> matches "dragon" but not "dragonfly").</li>
+                </ul>
+            </td>
+            <td>
+                <code>(?i)Any Dark-hold</code><br />
+                <code>(?i)\b(greater)\b</code><br />
+                <code>(?is)(?=.*dragon)(?=.*ruin).*</code>
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Automatic Flavor Text Stripping:</strong>
+        The regex engine automatically strips Tolkien book quotes (<code>&quot;...&quot;</code>) and book attributions (e.g. <code>—LotR</code>, <code>-Hobbit</code>) before evaluating your pattern. Trailing card text like <code>Home Site:</code> is preserved, ensuring your regex searches only active gameplay mechanics.
+    </div>
+
+    <!-- SECTION 4: WORKED EXAMPLE (ANY DARK-HOLD) -->
+    <h2 id="worked-example">4. Worked Walkthrough: Batch-Tagging Minion Dark-holds</h2>
+    <p>
+        In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site (via <a href="rules_support_tags.html"><code>{Leader.Tag:Resolved Site}</code></a>), we can batch-tag all 15 characters in under 30 seconds:
+    </p>
+
+    <h3>Step 1: Scope the Master List to the Target Characters</h3>
+    <ol>
+        <li>In the main window, check <em>The Lidless Eye</em> (MELE) in the <strong>Set</strong> menu.</li>
+        <li>Set <strong>Filter Slot 1:</strong> <code>Attribute: Home</code>, <code>Value: Any Dark-hold</code>.</li>
+        <li>The Master List immediately displays all 15 matching minion characters.</li>
+    </ol>
+
+    <h3>Step 2: Configure Mode 3 in the Extraction Tool</h3>
+    <ol>
+        <li>Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>. Notice the hint confirming: <em>"Scanning 15 card(s) currently visible in the Master List."</em></li>
+        <li>Select the <strong>Custom Regex Expression</strong> radio button.</li>
+        <li>
+            Fill in the extraction parameters:
+            <ul>
+                <li><strong>Category:</strong> <code>Resolved Site</code></li>
+                <li><strong>Tag Name:</strong> <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                <li><strong>Pattern:</strong> <code>(?i)Any Dark-hold</code></li>
+            </ul>
+        </li>
+    </ol>
+
+    <h3>Step 3: Preview and Apply</h3>
+    <ol>
+        <li>Click <strong>Test / Preview Matches</strong>. The preview table populates with all 15 characters, showing each will receive the 7 surface Dark-holds in their tag.</li>
+        <li>Click <strong>Apply Tags to Catalog</strong>. All 15 cards are tagged simultaneously in memory.</li>
+        <li>Select <strong>Filter &gt; Save Tag Set...</strong> (or <strong>Filter &gt; Merge Tag Set...</strong>) to persist your new mappings to <code>Rules_Support_Tags.json</code>.</li>
+    </ol>
+
+    <!-- SECTION 5: JSON BATCH FILES -->
+    <h2 id="json-rules">5. Batch JSON Rule Sets (Mode 4)</h2>
+    <p>
+        For large-scale taxonomy extraction across multiple expansions, you can author reusable batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and load them via the <strong>Load Rules from File</strong> option.
+    </p>
+
+    <h3>Sample Extraction Rule Schema</h3>
+    <pre><code>[
+  {
+    "Category": "Faction Bonus",
+    "Pattern": "(?i)\\+2\\s+direct\\s+influence\\s+against\\s+([A-Za-z\\s-]+)",
+    "TagTemplate": "$1"
+  },
+  {
+    "Category": "Resolved Site",
+    "Pattern": "(?i)Any Dark-hold",
+    "TagTemplate": "Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Dol Guldur; Minas Morgul"
+  }
+]</code></pre>
+
+    <div class="tip">
+        <strong>See Also:</strong>
+        <ul>
+            <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference for the <code>Resolved Site</code> and <code>Faction Bonus</code> categories.</li>
+            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Alternative bulk-tagging method using Microsoft Excel or Google Sheets.</li>
+        </ul>
+    </div>
 </body>
 </html>

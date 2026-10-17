@@ -26,10 +26,12 @@
         <li><strong>Granular Removal:</strong> The <strong>Remove Tag</strong> menu displays each assigned tag individually, allowing removal without wiping the category.</li>
     </ul>
 
-    <h2>3. Saving &amp; Loading Custom Tag Sets</h2>
+    <h2>3. Saving, Loading &amp; Merging Custom Tag Sets</h2>
     <ul>
-        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your custom taxonomy and all card assignments to a <code>.json</code> file.</li>
-        <li><strong>Filter &gt; Load Tag Set...:</strong> Restores a previously saved custom tag set file.</li>
+        <li><strong>Automatic Baseline Loading:</strong> On startup, the application automatically loads <code>Rules_Support_Tags.json</code> (if present in the program folder) as the baseline taxonomy, ensuring canonical rules tags like <code>Resolved Site</code> and <code>Faction Bonus</code> are active immediately.</li>
+        <li><strong>Filter &gt; Merge Tag Set...:</strong> Non-destructively merges a tag set into your active taxonomy. New categories and card assignments are appended without erasing existing tags.</li>
+        <li><strong>Filter &gt; Load Tag Set...:</strong> Clears the current taxonomy session and replaces it entirely with the selected <code>.json</code> file.</li>
+        <li><strong>Filter &gt; Save Tag Set...:</strong> Exports your complete active taxonomy and all card assignments to a portable <code>.json</code> file.</li>
     </ul>
 </body>
 </html>
