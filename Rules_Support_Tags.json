@@ -112,7 +112,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Direct Influence Bonus": "Elf",
       "Faction Bonus": "Iron Hill Dwarves; Elf; Iron Hill Dwarves; Elf",
       "fullCode": "Gimli (TW)",
@@ -122,7 +122,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Direct Influence Bonus": "Dwarf",
       "Faction Bonus": "Blue Mountain Dwarves; Dwarf; Blue Mountain Dwarves; Dwarf",
       "fullCode": "Glóin (TW)",
@@ -172,7 +172,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Direct Influence Bonus": "Dwarf",
       "Faction Bonus": "Blue Mountain Dwarves; Dwarf; Blue Mountain Dwarves; Dwarf",
       "fullCode": "Thorin II (TW)",
@@ -239,7 +239,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Direct Influence Bonus": "Dwarf",
       "Faction Bonus": "Dwarf",
       "fullCode": "Balin [H] (TW)",
@@ -267,7 +267,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Bifur (TW)",
@@ -287,7 +287,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Bofur (TW)",
@@ -297,7 +297,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Bombur (TW)",
@@ -315,7 +315,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Dori (TW)",
@@ -325,7 +325,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Dwalin (TW)",
@@ -335,7 +335,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "fullCode": "Elladan (TW)",
       "Home Region": "Rhudaur",
       "id": "26",
@@ -343,7 +343,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "fullCode": "Elrohir (TW)",
       "Home Region": "Rhudaur",
       "id": "27",
@@ -397,7 +397,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Fíli (TW)",
@@ -434,7 +434,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "fullCode": "Gildor Inglorion (TW)",
       "Home Region": "Rhudaur",
       "id": "42",
@@ -468,7 +468,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Kíli (TW)",
@@ -487,7 +487,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Nori (TW)",
@@ -497,7 +497,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "Faction Penalty": "All",
       "fullCode": "Ori (TW)",
@@ -595,7 +595,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orc",
+      "Combat Bonus": "Orcs",
       "Corruption Penalty": "Self",
       "fullCode": "Óin (TW)",
       "Home Region": "Númeriador",
@@ -1911,6 +1911,643 @@
       "id": "1209",
       "name": "The Under-gates",
       "set": "MEDM"
+    },
+    {
+      "fullCode": "Anarin (DM)",
+      "Home Region": "Redhorn Gate",
+      "id": "1034",
+      "name": "Anarin",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Asternak (LE)",
+      "Home Region": "Khand",
+      "id": "1216",
+      "name": "Asternak",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Azog (BA)",
+      "Home Region": "Redhorn Gate",
+      "id": "1925",
+      "name": "Azog",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Baduila (DM)",
+      "Home Region": "High Pass; Gundabad",
+      "id": "1035",
+      "name": "Baduila",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Belegorn (LE)",
+      "Home Region": "Angmar",
+      "id": "1217",
+      "name": "Belegorn",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Bill Ferny (DM)",
+      "Home Region": "Arthedain; Rhudaur",
+      "id": "1036",
+      "name": "Bill Ferny",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Bolg (BA)",
+      "Home Region": "Redhorn Gate",
+      "id": "1926",
+      "name": "Bolg",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Brand (TD)",
+      "Home Region": "Northern Rhovanion",
+      "id": "853",
+      "name": "Brand",
+      "set": "METD"
+    },
+    {
+      "fullCode": "Bróin (LE)",
+      "Home Region": "Redhorn Gate",
+      "id": "1218",
+      "name": "Bróin",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Bûthrakaur (BA)",
+      "Home Region": "Redhorn Gate",
+      "id": "1927",
+      "name": "Bûthrakaur",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Calendal (LE)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1219",
+      "name": "Calendal",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Carambor (LE)",
+      "Home Region": "Angmar",
+      "id": "1220",
+      "name": "Carambor",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Ciryaher (LE)",
+      "Home Region": "Gorgoroth",
+      "id": "1221",
+      "name": "Ciryaher",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Dâsakûn (DM)",
+      "Home Region": "Horse Plains; Khand; Dorwinion",
+      "id": "1037",
+      "name": "Dâsakûn",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Deallus (DM)",
+      "Home Region": "Dunland; Arthedain; Rhudaur",
+      "id": "1038",
+      "name": "Deallus",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Dôgrib (LE)",
+      "Home Region": "Forochel",
+      "id": "1222",
+      "name": "Dôgrib",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Dorelas (LE)",
+      "Home Region": "Anfalas",
+      "id": "1223",
+      "name": "Dorelas",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Drór (DM)",
+      "Home Region": "Númeriador",
+      "id": "1039",
+      "name": "Drór",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Dunlending Spy (LE)",
+      "Home Region": "Arthedain",
+      "id": "1224",
+      "name": "Dunlending Spy",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Elerína (DM)",
+      "Home Region": "Angmar",
+      "id": "1040",
+      "name": "Elerína",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Elwen (DM)",
+      "Home Region": "Belfalas; Anórien",
+      "id": "1041",
+      "name": "Elwen",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Eradan (LE)",
+      "Home Region": "Heart of Mirkwood",
+      "id": "1226",
+      "name": "Eradan",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Eun (DM)",
+      "Home Region": "Lamedon; Anfalas",
+      "id": "1042",
+      "name": "Eun",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Firiel (DM)",
+      "Home Region": "Lebennin; Lamedon",
+      "id": "1043",
+      "name": "Firiel",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Folco Boffin (DM)",
+      "Home Region": "The Shire",
+      "id": "1044",
+      "name": "Folco Boffin",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Fori the Beardless (DM)",
+      "Home Region": "Iron Hills",
+      "id": "1045",
+      "name": "Fori the Beardless",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Fram Framson (TD)",
+      "Home Region": "Anduin Vales",
+      "id": "854",
+      "name": "Fram Framson",
+      "set": "METD"
+    },
+    {
+      "fullCode": "Galdor (TD)",
+      "Home Region": "Lindon",
+      "id": "855",
+      "name": "Galdor",
+      "set": "METD"
+    },
+    {
+      "fullCode": "Gergeli (DM)",
+      "Home Region": "Dorwinion; Northern Rhovanion; Horse Plains",
+      "id": "1046",
+      "name": "Gergeli",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Gisulf (DM)",
+      "Home Region": "Western Mirkwood; Northern Rhovanion",
+      "id": "1047",
+      "name": "Gisulf",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Golodhros (DM)",
+      "Home Region": "Imlad Morgul; Gorgoroth",
+      "id": "1048",
+      "name": "Golodhros",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Gorbag (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1227",
+      "name": "Gorbag",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Gulla (LE)",
+      "Home Region": "Angmar",
+      "id": "1229",
+      "name": "Gulla",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Hador (LE)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1230",
+      "name": "Hador",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Hendolen (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1231",
+      "name": "Hendolen",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Herion (DM)",
+      "Home Region": "Anfalas; Belfalas",
+      "id": "1049",
+      "name": "Herion",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Ioreth (TD)",
+      "Home Region": "Anórien",
+      "id": "856",
+      "name": "Ioreth",
+      "set": "METD"
+    },
+    {
+      "fullCode": "Ivic (DM)",
+      "Home Region": "Harondor; Khand; Lebennin",
+      "id": "1050",
+      "name": "Ivic",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Jerrek (LE)",
+      "Home Region": "Harondor",
+      "id": "1235",
+      "name": "Jerrek",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Jûoma (DM)",
+      "Home Region": "Forochel; Arthedain",
+      "id": "1051",
+      "name": "Jûoma",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Khamûl the Ringwraith (LE)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1236",
+      "name": "Khamûl the Ringwraith",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Layos (LE)",
+      "Home Region": "Dorwinion",
+      "id": "1238",
+      "name": "Layos",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Leamon (DM)",
+      "Home Region": "Rhudaur; Dunland",
+      "id": "1052",
+      "name": "Leamon",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Lieutenant of Angmar (LE)",
+      "Home Region": "Angmar",
+      "id": "1239",
+      "name": "Lieutenant of Angmar",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Lieutenant of Dol Guldur (LE)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1240",
+      "name": "Lieutenant of Dol Guldur",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Lieutenant of Morgul (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1241",
+      "name": "Lieutenant of Morgul",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Lobelia Sackville-Baggins (DM)",
+      "Home Region": "The Shire; Arthedain",
+      "id": "1053",
+      "name": "Lobelia Sackville-Baggins",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Lugdush (WH)",
+      "Home Region": "Gap of Isen",
+      "id": "1808",
+      "name": "Lugdush",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Luitprand (LE)",
+      "Home Region": "Northern Rhovanion",
+      "id": "1242",
+      "name": "Luitprand",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Mauhúr (AS)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1634",
+      "name": "Mauhúr",
+      "set": "MEAS"
+    },
+    {
+      "fullCode": "Mîonid (AS)",
+      "Home Region": "Khand",
+      "id": "1635",
+      "name": "Mîonid",
+      "set": "MEAS"
+    },
+    {
+      "fullCode": "My Precious (DM)",
+      "Home Region": "High Pass; Redhorn Gate; Imlad Morgul; Gorgoroth",
+      "id": "1054",
+      "name": "My Precious",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Náin (LE)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1244",
+      "name": "Náin",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Nevido Smôd (LE)",
+      "Home Region": "Horse Plains",
+      "id": "1245",
+      "name": "Nevido Smôd",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Nimloth (DM)",
+      "Home Region": "Woodland Realm; Heart of Mirkwood",
+      "id": "1055",
+      "name": "Nimloth",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Odoacer (LE)",
+      "Home Region": "Western Mirkwood",
+      "id": "1246",
+      "name": "Odoacer",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Ôm-buri-Ôm (DM)",
+      "Home Region": "Anórien; Old Pûkel-land; Old Pûkel Gap",
+      "id": "1056",
+      "name": "Ôm-buri-Ôm",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Ostisen (LE)",
+      "Home Region": "Lamedon",
+      "id": "1254",
+      "name": "Ostisen",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Pallando [F] (WH)",
+      "Home Region": "Arthedain",
+      "id": "1809",
+      "name": "Pallando",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Perchen (AS)",
+      "Home Region": "Dunland",
+      "id": "1636",
+      "name": "Perchen",
+      "set": "MEAS"
+    },
+    {
+      "fullCode": "Pon Opar (LE)",
+      "Home Region": "Harondor",
+      "id": "1255",
+      "name": "Pon Opar",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Pôn-ora-Pôn (DM)",
+      "Home Region": "Anórien; Old Pûkel-land; Old Pûkel Gap",
+      "id": "1057",
+      "name": "Pôn-ora-Pôn",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Radagast [F] (WH)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1810",
+      "name": "Radagast",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Râisha (DM)",
+      "Home Region": "Khand; Horse Plains; Harondor",
+      "id": "1058",
+      "name": "Râisha",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Saruman [F] (WH)",
+      "Home Region": "Gap of Isen",
+      "id": "1811",
+      "name": "Saruman",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Shagrat (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1258",
+      "name": "Shagrat",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Shámas (LE)",
+      "Home Region": "Dunland",
+      "id": "1259",
+      "name": "Shámas",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Strider (BA)",
+      "Home Region": "Arthedain",
+      "id": "1931",
+      "name": "Strider",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Súrion (DM)",
+      "Home Region": "Anórien; Lebennin",
+      "id": "1059",
+      "name": "Súrion",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Taladhan (DM)",
+      "Home Region": "Heart of Mirkwood; Southern Mirkwood",
+      "id": "1060",
+      "name": "Taladhan",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "The Balrog [B] (BA)",
+      "Home Region": "Redhorn Gate",
+      "id": "1932",
+      "name": "The Balrog",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "The Grimburgoth (DM)",
+      "Home Region": "Southern Mirkwood",
+      "id": "1061",
+      "name": "The Grimburgoth",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "The Mouth (LE)",
+      "Home Region": "Gorgoroth",
+      "id": "1262",
+      "name": "The Mouth",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Threlin (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1264",
+      "name": "Threlin",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Tros Hesnef (LE)",
+      "Home Region": "Horse Plains",
+      "id": "1267",
+      "name": "Tros Hesnef",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Uchel (LE)",
+      "Home Region": "Rhudaur",
+      "id": "1268",
+      "name": "Uchel",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Uglúk (WH)",
+      "Home Region": "Gap of Isen",
+      "id": "1814",
+      "name": "Uglúk",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Ulkaur the Tongueless (LE)",
+      "Home Region": "Gorgoroth",
+      "id": "1270",
+      "name": "Ulkaur the Tongueless",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Umagaur (BA)",
+      "Home Region": "Redhorn Gate",
+      "id": "1933",
+      "name": "Umagaur",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Woffung (DM)",
+      "Home Region": "Northern Rhovanion; Dorwinion",
+      "id": "1062",
+      "name": "Woffung",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Wormtongue (DM)",
+      "Home Region": "Rohan; Gap of Isen",
+      "id": "1063",
+      "name": "Wormtongue",
+      "set": "MEDM"
+    },
+    {
+      "fullCode": "Adûnaphel the Ringwraith (LE)",
+      "Home Region": "Nurn",
+      "id": "1214",
+      "name": "Adûnaphel the Ringwraith",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Akhôrahil the Ringwraith (LE)",
+      "Home Region": "Nurn",
+      "id": "1215",
+      "name": "Akhôrahil the Ringwraith",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Alatar [F] (WH)",
+      "Home Region": "Cardolan; Southern Rhovanion; Redhorn Gate; Rhudaur; Harondor; Wold & Foothills; Forochel; Hollin; Enedhwaith; Heart of Mirkwood; Old Pûkel Gap; Andrast; Arthedain",
+      "id": "1803",
+      "name": "Alatar",
+      "Resolved Site": "Barrow-downs; Buhr Widu; Dimrill Dale; Ettenmoors; Haudh-in-Gwanûr; Hermit's Hill; Lossadan Cairn; Old Forest; Ost-in-Edhil; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Stones; The Worthy Hills; Weathertop",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Bûrat (AS)",
+      "Home Region": "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
+      "id": "1633",
+      "name": "Bûrat",
+      "Resolved Site": "Bandit Lair; Barrow-downs; Buhr Widu; Caves of Ülund; Dancing Spire; Dead Marshes; Dimrill Dale; Ettenmoors; Framsburg; Gladden Fields; Glittering Caves; Gold Hill; Haudh-in-Gwanûr; Hermit's Hill; Himring; Irerock; Isles of the Dead that Live; Lossadan Cairn; Old Forest; Ost-in-Edhil; Raider-hold; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Lonely Mountain; The Stones; The Wind Throne; The Worthy Hills; Tolfalas; Weathertop",
+      "set": "MEAS"
+    },
+    {
+      "fullCode": "Tûma (AS)",
+      "Home Region": "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
+      "id": "1637",
+      "name": "Tûma",
+      "Resolved Site": "Bandit Lair; Barrow-downs; Buhr Widu; Caves of Ülund; Dancing Spire; Dead Marshes; Dimrill Dale; Ettenmoors; Framsburg; Gladden Fields; Glittering Caves; Gold Hill; Haudh-in-Gwanûr; Hermit's Hill; Himring; Irerock; Isles of the Dead that Live; Lossadan Cairn; Old Forest; Ost-in-Edhil; Raider-hold; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Lonely Mountain; The Stones; The Wind Throne; The Worthy Hills; Tolfalas; Weathertop",
+      "set": "MEAS"
+    },
+    {
+      "fullCode": "Wûluag (AS)",
+      "Home Region": "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
+      "id": "1638",
+      "name": "Wûluag",
+      "Resolved Site": "Bandit Lair; Barrow-downs; Buhr Widu; Caves of Ülund; Dancing Spire; Dead Marshes; Dimrill Dale; Ettenmoors; Framsburg; Gladden Fields; Glittering Caves; Gold Hill; Haudh-in-Gwanûr; Hermit's Hill; Himring; Irerock; Isles of the Dead that Live; Lossadan Cairn; Old Forest; Ost-in-Edhil; Raider-hold; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Lonely Mountain; The Stones; The Wind Throne; The Worthy Hills; Tolfalas; Weathertop",
+      "set": "MEAS"
+    },
+    {
+      "fullCode": "Crook-legged Orc (BA)",
+      "Home Region": "Under-deeps",
+      "id": "1928",
+      "name": "Crook-legged Orc",
+      "Resolved Site": "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Hill-troll (BA)",
+      "Home Region": "Under-deeps",
+      "id": "1929",
+      "name": "Hill-troll",
+      "Resolved Site": "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Mountain-maggot (BA)",
+      "Home Region": "Under-deeps",
+      "id": "1930",
+      "name": "Mountain-maggot",
+      "Resolved Site": "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
+      "set": "MEBA"
     }
   ],
   "Filters": [
@@ -1938,7 +2575,7 @@
       "Combat Bonus",
       "All",
       "Nazgûl",
-      "Orc"
+      "Orcs"
     ],
     [
       "Combat Mechanics",
@@ -2002,28 +2639,47 @@
     ],
     [
       "Home Region",
+      "Andrast",
+      "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
       "Anduin Vales",
       "Anfalas",
       "Anfalas; Lindon; Wold & Foothills; Rhudaur",
+      "Angmar",
       "Anórien",
       "Arthedain",
       "Belfalas",
+      "Cardolan",
       "Dorwinion",
       "Dunland",
+      "Enedhwaith",
       "Forochel",
       "Gap of Isen",
+      "Gorgoroth",
+      "Gundabad",
       "Harondor",
+      "Heart of Mirkwood",
+      "High Pass",
+      "Hollin",
+      "Horse Plains",
+      "Imlad Morgul",
       "Iron Hills",
       "Ithilien",
+      "Khand",
       "Lamedon",
       "Lebennin",
       "Lindon",
       "Northern Rhovanion",
+      "Nurn",
       "Númeriador",
+      "Old Pûkel Gap",
+      "Old Pûkel-land",
+      "Redhorn Gate",
       "Rhudaur",
       "Rohan",
       "Southern Mirkwood",
+      "Southern Rhovanion",
       "The Shire",
+      "Under-deeps",
       "Western Mirkwood",
       "Wold & Foothills",
       "Woodland Realm"
@@ -2046,9 +2702,12 @@
     ],
     [
       "Resolved Site",
+      "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
       "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
+      "Bandit Lair; Barrow-downs; Buhr Widu; Caves of Ülund; Dancing Spire; Dead Marshes; Dimrill Dale; Ettenmoors; Framsburg; Gladden Fields; Glittering Caves; Gold Hill; Haudh-in-Gwanûr; Hermit's Hill; Himring; Irerock; Isles of the Dead that Live; Lossadan Cairn; Old Forest; Ost-in-Edhil; Raider-hold; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Lonely Mountain; The Stones; The Wind Throne; The Worthy Hills; Tolfalas; Weathertop",
       "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
-      "Edhellond; Grey Havens; Lórien; Rivendell"
+      "Edhellond; Grey Havens; Lórien; Rivendell",
+      "Tharbad"
     ],
     [
       "Ring Mechanics",

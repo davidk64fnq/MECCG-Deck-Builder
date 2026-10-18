@@ -10,8 +10,17 @@ namespace MECCG_Deck_Builder
     {
         public List<string> SelectedSets { get; set; } = [];
 
-        // Extraction Dialog Mode & Mode 3 Regex Defaults
+        // Active mode
         public int LastExtractionMode { get; set; } = 1; // 1 = Harvest, 2 = Relational, 3 = Quick Regex, 4 = File
+
+        // Mode 2 Relational Defaults
+        public string LastRelationalCategory { get; set; } = "Home Region";
+        public string LastRelationalSourceAttr { get; set; } = "Home";
+        public string LastRelationalLookupAttr { get; set; } = "Primary";
+        public string LastRelationalLookupVal { get; set; } = "Site";
+        public string LastRelationalTargetAttr { get; set; } = "Region";
+
+        // Mode 3 Regex Defaults
         public string LastExtractionCategory { get; set; } = "Custom Trait";
         public string LastExtractionTag { get; set; } = "$1";
         public string LastExtractionPattern { get; set; } = @"(?i)Dwarf factions?";

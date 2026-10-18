@@ -16,22 +16,23 @@ namespace MECCG_Deck_Builder
 
         // Mode 1: Dynamic Entity Harvest
         private readonly RadioButton _rbHarvest;
-        private readonly TextBox _txtHarvestCategory;
         private readonly ComboBox _cmbHarvestAttribute;
         private readonly ComboBox _cmbHarvestValue;
+        private readonly TextBox _txtHarvestCategory;
 
         // Mode 2: Relational Attribute Lookup (Cross-Card Join)
         private readonly RadioButton _rbRelational;
-        private readonly TextBox _txtRelCategory;
         private readonly ComboBox _cmbRelSourceAttr;
+        private readonly ComboBox _cmbRelLookupAttr;
         private readonly ComboBox _cmbRelLookupVal;
         private readonly ComboBox _cmbRelTargetAttr;
+        private readonly TextBox _txtRelCategory;
 
-        // Mode 3: Quick Regex
+        // Mode 3: Custom Regex
         private readonly RadioButton _rbQuick;
-        private readonly TextBox _txtRegexCategory;
-        private readonly TextBox _txtRegexTag;
         private readonly TextBox _txtRegexPattern;
+        private readonly TextBox _txtRegexTag;
+        private readonly TextBox _txtRegexCategory;
 
         // Mode 4: File
         private readonly RadioButton _rbFile;
@@ -60,7 +61,7 @@ namespace MECCG_Deck_Builder
             var settings = UserSettingsService.Current;
 
             Text = $"Extract Taxonomy with Rules ({_targetCards.Count} cards in Master List)";
-            ClientSize = new Size(720, 630);
+            ClientSize = new Size(740, 680);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -72,103 +73,151 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Extraction Rule Source",
                 Location = new Point(12, 12),
-                Size = new Size(696, 270)
+                Size = new Size(716, 320)
             };
 
-            // 1. Dynamic Entity Harvest
+            // ==========================================
+            // MODE 1: DYNAMIC ENTITY HARVEST
+            // ==========================================
             _rbHarvest = new RadioButton
             {
                 Text = "Dynamic Entity Harvest (from Catalog Text):",
                 Location = new Point(12, 20),
-                Size = new Size(290, 20),
+                Size = new Size(300, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbHarvest.CheckedChanged += RuleSource_Changed;
 
-            var lblHCategory = new Label { Text = "Target Category:", Location = new Point(32, 44), Size = new Size(100, 18) };
-            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(135, 41), Size = new Size(160, 23) };
-
-            var lblHAttr = new Label { Text = "Attribute:", Location = new Point(305, 44), Size = new Size(60, 18) };
+            // Row 1: Source Definition
+            var lblHAttr = new Label { Text = "Harvest Entity:", Location = new Point(32, 44), Size = new Size(90, 18) };
             _cmbHarvestAttribute = new ComboBox
             {
-                Location = new Point(365, 41),
-                Size = new Size(130, 23),
+                Location = new Point(125, 41),
+                Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbHarvestAttribute.SelectedIndexChanged += CmbHarvestAttribute_SelectedIndexChanged;
 
-            var lblHVal = new Label { Text = "Value:", Location = new Point(505, 44), Size = new Size(42, 18) };
+            var lblHEqual = new Label { Text = "=", Location = new Point(270, 44), Size = new Size(16, 18), TextAlign = ContentAlignment.MiddleCenter };
             _cmbHarvestValue = new ComboBox
             {
-                Location = new Point(547, 41),
-                Size = new Size(135, 23),
+                Location = new Point(292, 41),
+                Size = new Size(160, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
 
-            // 2. Relational Attribute Lookup (Cross-Card Join)
+            // Row 2: Destination Category
+            var lblHCategory = new Label { Text = "Save to Category:", Location = new Point(32, 72), Size = new Size(110, 18) };
+            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(145, 69), Size = new Size(307, 23) };
+
+            // ==========================================
+            // MODE 2: RELATIONAL ATTRIBUTE LOOKUP
+            // ==========================================
             _rbRelational = new RadioButton
             {
                 Text = "Relational Attribute Lookup (Cross-Card Join):",
-                Location = new Point(12, 72),
+                Location = new Point(12, 100),
                 Size = new Size(330, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbRelational.CheckedChanged += RuleSource_Changed;
 
-            var lblRelCategory = new Label { Text = "Target Category:", Location = new Point(32, 96), Size = new Size(100, 18) };
-            _txtRelCategory = new TextBox { Text = "Home Region", Location = new Point(135, 93), Size = new Size(160, 23), Enabled = false };
-
-            var lblRelSource = new Label { Text = "Source Field:", Location = new Point(305, 96), Size = new Size(76, 18) };
+            // Row 1: Read Field -> Lookup Entity (Attribute = Value)
+            var lblRel1 = new Label { Text = "Read Field:", Location = new Point(32, 124), Size = new Size(90, 18) };
             _cmbRelSourceAttr = new ComboBox
             {
-                Location = new Point(381, 93),
-                Size = new Size(114, 23),
+                Location = new Point(125, 121),
+                Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
 
-            var lblRelLookup = new Label { Text = "Lookup Entity:", Location = new Point(505, 96), Size = new Size(85, 18) };
+            var lblRel2 = new Label { Text = "Lookup Entity:", Location = new Point(280, 124), Size = new Size(90, 18) };
+            _cmbRelLookupAttr = new ComboBox
+            {
+                Location = new Point(375, 121),
+                Size = new Size(135, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = false
+            };
+            _cmbRelLookupAttr.SelectedIndexChanged += CmbRelLookupAttr_SelectedIndexChanged;
+
+            var lblRelEqual = new Label { Text = "=", Location = new Point(515, 124), Size = new Size(16, 18), TextAlign = ContentAlignment.MiddleCenter };
             _cmbRelLookupVal = new ComboBox
             {
-                Location = new Point(590, 93),
-                Size = new Size(92, 23),
+                Location = new Point(535, 121),
+                Size = new Size(165, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
 
-            var lblRelTarget = new Label { Text = "Extract Field:", Location = new Point(305, 124), Size = new Size(76, 18) };
+            // Row 2: Extract Field -> Save to Category
+            var lblRel3 = new Label { Text = "Extract Field:", Location = new Point(32, 152), Size = new Size(90, 18) };
             _cmbRelTargetAttr = new ComboBox
             {
-                Location = new Point(381, 121),
-                Size = new Size(114, 23),
+                Location = new Point(125, 149),
+                Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
 
-            // 3. Custom Regex Expression (Loaded from UserSettings)
+            var lblRel4 = new Label { Text = "Save to Category:", Location = new Point(280, 152), Size = new Size(115, 18) };
+            _txtRelCategory = new TextBox
+            {
+                Text = settings.LastRelationalCategory ?? "Home Region",
+                Location = new Point(400, 149),
+                Size = new Size(300, 23),
+                Enabled = false
+            };
+
+            // ==========================================
+            // MODE 3: CUSTOM REGEX EXPRESSION
+            // ==========================================
             _rbQuick = new RadioButton
             {
                 Text = "Custom Regex Expression:",
-                Location = new Point(12, 150),
+                Location = new Point(12, 180),
                 Size = new Size(220, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbQuick.CheckedChanged += RuleSource_Changed;
 
-            var lblQCategory = new Label { Text = "Category:", Location = new Point(32, 174), Size = new Size(65, 18) };
-            _txtRegexCategory = new TextBox { Text = settings.LastExtractionCategory ?? "Custom Trait", Location = new Point(97, 171), Size = new Size(150, 23), Enabled = false };
+            // Row 1: Full-width Search Pattern
+            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(32, 204), Size = new Size(60, 18) };
+            _txtRegexPattern = new TextBox
+            {
+                Text = settings.LastExtractionPattern ?? @"(?i)Dwarf factions?",
+                Location = new Point(95, 201),
+                Size = new Size(605, 23),
+                Enabled = false
+            };
 
-            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(255, 174), Size = new Size(68, 18) };
-            _txtRegexTag = new TextBox { Text = settings.LastExtractionTag ?? "$1", Location = new Point(325, 171), Size = new Size(130, 23), Enabled = false };
+            // Row 2: Tag Name -> Save to Category
+            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(32, 232), Size = new Size(65, 18) };
+            _txtRegexTag = new TextBox
+            {
+                Text = settings.LastExtractionTag ?? "$1",
+                Location = new Point(100, 229),
+                Size = new Size(290, 23),
+                Enabled = false
+            };
 
-            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(465, 174), Size = new Size(50, 18) };
-            _txtRegexPattern = new TextBox { Text = settings.LastExtractionPattern ?? @"(?i)Dwarf factions?", Location = new Point(515, 171), Size = new Size(167, 23), Enabled = false };
+            var lblQCategory = new Label { Text = "Save to Category:", Location = new Point(405, 232), Size = new Size(110, 18) };
+            _txtRegexCategory = new TextBox
+            {
+                Text = settings.LastExtractionCategory ?? "Custom Trait",
+                Location = new Point(520, 229),
+                Size = new Size(180, 23),
+                Enabled = false
+            };
 
-            // 4. Load File
+            // ==========================================
+            // MODE 4: FILE
+            // ==========================================
             _rbFile = new RadioButton
             {
                 Text = "Load Rules from File (.json):",
-                Location = new Point(12, 204),
+                Location = new Point(12, 260),
                 Size = new Size(220, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
@@ -176,8 +225,8 @@ namespace MECCG_Deck_Builder
 
             _txtFilePath = new TextBox
             {
-                Location = new Point(32, 228),
-                Size = new Size(550, 23),
+                Location = new Point(32, 283),
+                Size = new Size(570, 23),
                 ReadOnly = true,
                 Enabled = false
             };
@@ -185,16 +234,17 @@ namespace MECCG_Deck_Builder
             _btnBrowseFile = new Button
             {
                 Text = "Browse...",
-                Location = new Point(590, 227),
-                Size = new Size(92, 25),
+                Location = new Point(610, 282),
+                Size = new Size(90, 25),
                 Enabled = false
             };
             _btnBrowseFile.Click += BtnBrowseFile_Click;
 
             grpSource.Controls.AddRange([
-                _rbHarvest, lblHCategory, _txtHarvestCategory, lblHAttr, _cmbHarvestAttribute, lblHVal, _cmbHarvestValue,
-                _rbRelational, lblRelCategory, _txtRelCategory, lblRelSource, _cmbRelSourceAttr, lblRelLookup, _cmbRelLookupVal, lblRelTarget, _cmbRelTargetAttr,
-                _rbQuick, lblQCategory, _txtRegexCategory, lblQTag, _txtRegexTag, lblQPattern, _txtRegexPattern,
+                _rbHarvest, lblHAttr, _cmbHarvestAttribute, lblHEqual, _cmbHarvestValue, lblHCategory, _txtHarvestCategory,
+                _rbRelational, lblRel1, _cmbRelSourceAttr, lblRel2, _cmbRelLookupAttr, lblRelEqual, _cmbRelLookupVal,
+                lblRel3, _cmbRelTargetAttr, lblRel4, _txtRelCategory,
+                _rbQuick, lblQPattern, _txtRegexPattern, lblQTag, _txtRegexTag, lblQCategory, _txtRegexCategory,
                 _rbFile, _txtFilePath, _btnBrowseFile
             ]);
 
@@ -219,7 +269,7 @@ namespace MECCG_Deck_Builder
             _btnTest = new Button
             {
                 Text = "Test / Preview Matches",
-                Location = new Point(12, 290),
+                Location = new Point(12, 340),
                 Size = new Size(160, 28)
             };
             _btnTest.Click += BtnTest_Click;
@@ -227,15 +277,15 @@ namespace MECCG_Deck_Builder
             var lblScopeHint = new Label
             {
                 Text = $"Scanning {_targetCards.Count} card(s) currently visible in the Master List.",
-                Location = new Point(180, 295),
+                Location = new Point(180, 345),
                 Size = new Size(520, 20),
                 ForeColor = Color.DimGray
             };
 
             _lstPreview = new ListView
             {
-                Location = new Point(12, 326),
-                Size = new Size(696, 250),
+                Location = new Point(12, 375),
+                Size = new Size(716, 250),
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true
@@ -243,12 +293,12 @@ namespace MECCG_Deck_Builder
             _lstPreview.Columns.Add("Card Name", 230);
             _lstPreview.Columns.Add("Set", 60);
             _lstPreview.Columns.Add("Category", 150);
-            _lstPreview.Columns.Add("Extracted Tag", 230);
+            _lstPreview.Columns.Add("Extracted Tag", 250);
 
             _btnExportCsv = new Button
             {
                 Text = "Export to CSV...",
-                Location = new Point(330, 588),
+                Location = new Point(350, 638),
                 Size = new Size(130, 30)
             };
             _btnExportCsv.Click += BtnExportCsv_Click;
@@ -256,7 +306,7 @@ namespace MECCG_Deck_Builder
             _btnApply = new Button
             {
                 Text = "Apply Tags to Catalog",
-                Location = new Point(470, 588),
+                Location = new Point(490, 638),
                 Size = new Size(150, 30)
             };
             _btnApply.Click += BtnApply_Click;
@@ -264,7 +314,7 @@ namespace MECCG_Deck_Builder
             _btnClose = new Button
             {
                 Text = "Close",
-                Location = new Point(628, 588),
+                Location = new Point(648, 638),
                 Size = new Size(80, 30),
                 DialogResult = DialogResult.Cancel
             };
@@ -277,57 +327,38 @@ namespace MECCG_Deck_Builder
             PopulateDropdowns();
         }
 
-        private void SaveCurrentSettings()
+        private void PopulateDropdowns()
         {
             var settings = UserSettingsService.Current;
 
-            if (!string.IsNullOrWhiteSpace(_txtRegexCategory.Text))
-            {
-                settings.LastExtractionCategory = _txtRegexCategory.Text.Trim();
-            }
-            if (!string.IsNullOrWhiteSpace(_txtRegexTag.Text))
-            {
-                settings.LastExtractionTag = _txtRegexTag.Text.Trim();
-            }
-            if (!string.IsNullOrWhiteSpace(_txtRegexPattern.Text))
-            {
-                settings.LastExtractionPattern = _txtRegexPattern.Text.Trim();
-            }
-
-            if (_rbQuick.Checked) settings.LastExtractionMode = 3;
-            else if (_rbRelational.Checked) settings.LastExtractionMode = 2;
-            else if (_rbFile.Checked) settings.LastExtractionMode = 4;
-            else settings.LastExtractionMode = 1;
-
-            UserSettingsService.SaveSettings();
-        }
-
-        private void PopulateDropdowns()
-        {
-            // Populate harvest keys
             _cmbHarvestAttribute.Items.Clear();
+            _cmbRelSourceAttr.Items.Clear();
+            _cmbRelTargetAttr.Items.Clear();
+            _cmbRelLookupAttr.Items.Clear();
+
             var keys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
             foreach (var k in keys)
             {
                 _cmbHarvestAttribute.Items.Add(k);
                 _cmbRelSourceAttr.Items.Add(k);
                 _cmbRelTargetAttr.Items.Add(k);
+                _cmbRelLookupAttr.Items.Add(k);
             }
 
             int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
             if (defaultHarvestIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx;
 
-            // Relational Source defaults to "Home"
-            int homeIdx = _cmbRelSourceAttr.FindStringExact("Home");
-            _cmbRelSourceAttr.SelectedIndex = homeIdx >= 0 ? homeIdx : 0;
+            string savedSource = settings.LastRelationalSourceAttr ?? "Home";
+            int sourceIdx = _cmbRelSourceAttr.FindStringExact(savedSource);
+            _cmbRelSourceAttr.SelectedIndex = sourceIdx >= 0 ? sourceIdx : 0;
 
-            // Relational Target defaults to "Region"
-            int regionIdx = _cmbRelTargetAttr.FindStringExact("Region");
-            _cmbRelTargetAttr.SelectedIndex = regionIdx >= 0 ? regionIdx : 0;
+            string savedTarget = settings.LastRelationalTargetAttr ?? "Region";
+            int targetIdx = _cmbRelTargetAttr.FindStringExact(savedTarget);
+            _cmbRelTargetAttr.SelectedIndex = targetIdx >= 0 ? targetIdx : 0;
 
-            // Relational Lookup values
-            _cmbRelLookupVal.Items.AddRange(["Site", "Region", "Character", "Item", "Hazard"]);
-            _cmbRelLookupVal.SelectedIndex = 0;
+            string savedLookupAttr = settings.LastRelationalLookupAttr ?? "Primary";
+            int lookupAttrIdx = _cmbRelLookupAttr.FindStringExact(savedLookupAttr);
+            _cmbRelLookupAttr.SelectedIndex = lookupAttrIdx >= 0 ? lookupAttrIdx : 0;
         }
 
         private void CmbHarvestAttribute_SelectedIndexChanged(object sender, EventArgs e)
@@ -350,27 +381,98 @@ namespace MECCG_Deck_Builder
             else if (_cmbHarvestValue.Items.Count > 0) _cmbHarvestValue.SelectedIndex = 0;
         }
 
+        private void CmbRelLookupAttr_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string attr = _cmbRelLookupAttr.SelectedItem?.ToString() ?? string.Empty;
+            _cmbRelLookupVal.Items.Clear();
+            if (string.IsNullOrWhiteSpace(attr)) return;
+
+            var values = _catalog.GetFilterValues(attr);
+            foreach (var v in values)
+            {
+                if (!string.IsNullOrWhiteSpace(v))
+                {
+                    _cmbRelLookupVal.Items.Add(v);
+                }
+            }
+
+            string savedLookupVal = UserSettingsService.Current.LastRelationalLookupVal ?? "Site";
+            int defaultIdx = _cmbRelLookupVal.FindStringExact(savedLookupVal);
+            if (defaultIdx >= 0) _cmbRelLookupVal.SelectedIndex = defaultIdx;
+            else if (_cmbRelLookupVal.Items.Count > 0) _cmbRelLookupVal.SelectedIndex = 0;
+        }
+
         private void RuleSource_Changed(object sender, EventArgs e)
         {
             bool isHarvest = _rbHarvest.Checked;
-            _txtHarvestCategory.Enabled = isHarvest;
             _cmbHarvestAttribute.Enabled = isHarvest;
             _cmbHarvestValue.Enabled = isHarvest;
+            _txtHarvestCategory.Enabled = isHarvest;
 
             bool isRelational = _rbRelational.Checked;
-            _txtRelCategory.Enabled = isRelational;
             _cmbRelSourceAttr.Enabled = isRelational;
+            _cmbRelLookupAttr.Enabled = isRelational;
             _cmbRelLookupVal.Enabled = isRelational;
             _cmbRelTargetAttr.Enabled = isRelational;
+            _txtRelCategory.Enabled = isRelational;
 
             bool isQuick = _rbQuick.Checked;
-            _txtRegexCategory.Enabled = isQuick;
-            _txtRegexTag.Enabled = isQuick;
             _txtRegexPattern.Enabled = isQuick;
+            _txtRegexTag.Enabled = isQuick;
+            _txtRegexCategory.Enabled = isQuick;
 
             bool isFile = _rbFile.Checked;
             _txtFilePath.Enabled = isFile;
             _btnBrowseFile.Enabled = isFile;
+        }
+
+        private void SaveCurrentSettings()
+        {
+            var settings = UserSettingsService.Current;
+
+            // Mode 3 Quick Regex
+            if (!string.IsNullOrWhiteSpace(_txtRegexCategory.Text))
+            {
+                settings.LastExtractionCategory = _txtRegexCategory.Text.Trim();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtRegexTag.Text))
+            {
+                settings.LastExtractionTag = _txtRegexTag.Text.Trim();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtRegexPattern.Text))
+            {
+                settings.LastExtractionPattern = _txtRegexPattern.Text.Trim();
+            }
+
+            // Mode 2 Relational Lookup
+            if (!string.IsNullOrWhiteSpace(_txtRelCategory.Text))
+            {
+                settings.LastRelationalCategory = _txtRelCategory.Text.Trim();
+            }
+            if (_cmbRelSourceAttr.SelectedItem != null)
+            {
+                settings.LastRelationalSourceAttr = _cmbRelSourceAttr.SelectedItem.ToString();
+            }
+            if (_cmbRelLookupAttr.SelectedItem != null)
+            {
+                settings.LastRelationalLookupAttr = _cmbRelLookupAttr.SelectedItem.ToString();
+            }
+            if (_cmbRelLookupVal.SelectedItem != null)
+            {
+                settings.LastRelationalLookupVal = _cmbRelLookupVal.SelectedItem.ToString();
+            }
+            if (_cmbRelTargetAttr.SelectedItem != null)
+            {
+                settings.LastRelationalTargetAttr = _cmbRelTargetAttr.SelectedItem.ToString();
+            }
+
+            // Active mode
+            if (_rbQuick.Checked) settings.LastExtractionMode = 3;
+            else if (_rbRelational.Checked) settings.LastExtractionMode = 2;
+            else if (_rbFile.Checked) settings.LastExtractionMode = 4;
+            else settings.LastExtractionMode = 1;
+
+            UserSettingsService.SaveSettings();
         }
 
         private void BtnBrowseFile_Click(object sender, EventArgs e)
@@ -399,9 +501,12 @@ namespace MECCG_Deck_Builder
 
         private ExtractionResult RunExtraction()
         {
+            SaveCurrentSettings();
+
             if (_rbRelational.Checked)
             {
                 string sourceAttr = _cmbRelSourceAttr.SelectedItem?.ToString() ?? "Home";
+                string lookupAttr = _cmbRelLookupAttr.SelectedItem?.ToString() ?? "Primary";
                 string lookupVal = _cmbRelLookupVal.SelectedItem?.ToString() ?? "Site";
                 string targetAttr = _cmbRelTargetAttr.SelectedItem?.ToString() ?? "Region";
                 string category = _txtRelCategory.Text.Trim();
@@ -410,7 +515,7 @@ namespace MECCG_Deck_Builder
                     _targetCards,
                     _catalog.Cards,
                     sourceAttr,
-                    "Primary",
+                    lookupAttr,
                     lookupVal,
                     targetAttr,
                     category);
@@ -460,7 +565,6 @@ namespace MECCG_Deck_Builder
 
         private void BtnTest_Click(object sender, EventArgs e)
         {
-            SaveCurrentSettings();
             var result = RunExtraction();
             if (result == null)
             {
@@ -496,7 +600,6 @@ namespace MECCG_Deck_Builder
 
         private void BtnExportCsv_Click(object sender, EventArgs e)
         {
-            SaveCurrentSettings();
             var result = RunExtraction();
             if (result == null || result.Matches.Count == 0)
             {
@@ -521,7 +624,6 @@ namespace MECCG_Deck_Builder
 
         private void BtnApply_Click(object sender, EventArgs e)
         {
-            SaveCurrentSettings();
             var result = RunExtraction();
             if (result == null || result.Matches.Count == 0)
             {

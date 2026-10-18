@@ -37,6 +37,7 @@
 - `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
 - `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
+- RunTaxonomyRulesDialog.cs: Modal extraction dialog with harmonized source-to-destination data flow across all tools (Dynamic Entity Harvest, Dynamic Relational Attribute Lookup, Full-Width Custom Regex, and JSON Batch Rule Execution).
 
 ---
 
@@ -74,4 +75,5 @@
   - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
   - Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
 - Issue #24: Persist expansion set selection and extraction regex parameters across sessions
+- Issue #25: Harmonize taxonomy extraction UI layout, data flow sequencing, and documentation
 - [ ] **v1.0.0 - First Public Release**

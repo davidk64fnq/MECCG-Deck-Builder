@@ -10,166 +10,228 @@
 
     <h1>Companion Rules Tag Set Reference</h1>
     <p>
-        MECCG Deck Builder includes a companion taxonomy file (<strong><code>Rules_Support_Tags.json</code></strong>) that loads automatically on startup (or via <strong>Filter &gt; Load/Merge Tag Set...</strong>).
+        MECCG Deck Builder includes a companion taxonomy file (<strong><code>Rules_Support_Tags.json</code></strong>) that loads automatically on startup (or via <strong>Filter &gt; Load / Merge Tag Set...</strong>).
     </p>
     <p>
-        Its primary purpose is to enrich the catalog with objective rules data that Cardnum lacks as structured columns—bridging descriptive rules text (such as <em>&ldquo;Any Dark-hold&rdquo;</em>), character recruiting bonuses, and site automatic-attack classifications so they can be queried by the procedural deck generation engine.
+        Its primary purpose is to enrich the catalog with objective rules data that Cardnum lacks as structured columns—bridging descriptive rules text (such as <em>&ldquo;Any Dark-hold&rdquo;</em>), character recruiting bonuses, site automatic-attack classifications, and gameplay mechanics so they can be queried by the procedural deck generation engine and faceted filters.
     </p>
 
     <div class="tip">
-        <strong>Viewing Tagged Cards In-App:</strong> Rather than consulting a static manual list, you can view the live list of cards tagged in this file at any time right inside the application: in <strong>Filter Slot 3</strong> (bottom panel), select <strong>Category:</strong> <code>Resolved Site</code>, <code>Faction Bonus</code>, or <code>Automatic Attack</code>. The Master List will immediately display all matching cards from your active sets.
+        <strong>Viewing Tagged Cards In-App:</strong> Rather than consulting a static manual list, you can view the live list of cards tagged in this file at any time inside the application: in <strong>Filter Slot 3</strong> (bottom panel), select any <strong>Category</strong> from the table below. The Master List will immediately display all matching cards from your active sets.
     </div>
 
-    <!-- SECTION 1: RESOLVED SITE -->
-    <h2 id="resolved-site">1. Category: <code>Resolved Site</code></h2>
+    <!-- SECTION 1: CUSTOM RULES TAXONOMY TABLE -->
+    <h2 id="taxonomy-table">1. Rules Support Categories &amp; Tags</h2>
     <p>
-        Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).
-    </p>
-    <p>
-        For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites). These fall into three primary archetypes:
+        The following table documents all structured rules categories and illustrative tags maintained in <code>Rules_Support_Tags.json</code>:
     </p>
 
     <table>
         <tr>
-            <th>Resolution Archetype</th>
-            <th>Printed Rule Pattern</th>
-            <th>Representative Cards</th>
-            <th>Resolved Tag Value(s)</th>
-            <th>How It Works in Deck Rules</th>
+            <th style="width: 20%;">Category Name</th>
+            <th style="width: 45%;">Purpose &amp; Description</th>
+            <th style="width: 35%;">Representative Card(s) &amp; Tag Values</th>
         </tr>
         <tr>
-            <td><strong>Hold Type / Site Classification</strong></td>
+            <td><code>Automatic Attack</code></td>
             <td>
-                <code>Home Site: Any Dark-hold</code><br />
-                <code>Home Site: Any Haven</code><br />
-                <code>Home Site: Any Free-hold</code>
+                Indexes guardian creature species printed on site cards (or created by site modifications). Differentiates true Dragon lairs from minor Drake sites and maps regional defenses (Orcs, Trolls, Undead, Elves, etc.) for hazard matching and expedition rules.
             </td>
             <td>
-                Minion Orcs &amp; Trolls (<em>Doeth</em>, <em>Orc Captain</em>, <em>Troll Lout</em>, etc.), <em>Gandalf</em>
-            </td>
-            <td>
-                Semicolon list of surface sites matching that hold type (e.g. <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code> or <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code>).
-            </td>
-            <td>
-                Translates a category classification into concrete surface site titles. When sampled by the engine, one site from the list is chosen at random.
+                <ul>
+                    <li><em>Dancing Spire</em>, <em>The Lonely Mountain</em> &rarr; <code>Dragon</code></li>
+                    <li><em>Carn D&ucirc;m</em>, <em>Moria</em> &rarr; <code>Orcs; Trolls</code></li>
+                    <li><em>Barrow-downs</em>, <em>Dead Marshes</em> &rarr; <code>Undead</code></li>
+                    <li><em>Barad-d&ucirc;r</em> &rarr; <code>Orcs; Trolls; Maia</code></li>
+                    <li><em>Rivendell</em> (Minion) &rarr; <code>Elves; D&uacute;nedain</code></li>
+                </ul>
             </td>
         </tr>
         <tr>
-            <td><strong>Geographic Territory</strong></td>
+            <td><code>Combat Bonus</code></td>
             <td>
-                <code>Adjacent Sites: Any site in &Ucirc;d&ucirc;n (0)</code><br />
-                <code>Home Site: Any site in &Ucirc;d&ucirc;n</code><br />
-                <code>Home Site: Any site in Imlad Morgul</code>
+                Flags cards providing direct prowess, strike cancellation, or tactical combat bonuses against specific creature species or to company members in combat.
             </td>
             <td>
-                <em>The Under-galleries</em>, <em>Dwar of Waw</em>, <em>The Witch-king</em>
-            </td>
-            <td>
-                <code>Cirith Gorgor</code><br />
-                <code>Minas Morgul</code>
-            </td>
-            <td>
-                Resolves regional descriptions to the specific surface hold(s) located within that territory (e.g., <em>Cirith Gorgor</em> is the sole surface hold in the &Ucirc;d&ucirc;n region).
+                <ul>
+                    <li>Rangers/Warriors with bonuses vs. Orcs &rarr; <code>Orc</code></li>
+                    <li>Nazg&ucirc;l hunters &rarr; <code>Nazg&ucirc;l</code></li>
+                    <li>General company prowess boosters &rarr; <code>All</code></li>
+                </ul>
             </td>
         </tr>
         <tr>
-            <td><strong>Complex Conditional Criteria</strong></td>
+            <td><code>Combat Mechanics</code></td>
             <td>
-                <code>Home Site: Any non-"Dragon's lair" Ruins &amp; Lairs in a Wilderness</code><br />
-                <code>Home Site: Any non-Under-deeps Ruins &amp; Lairs</code>
+                Identifies special combat manipulation capabilities, specifically attack cancellations, strike avoidance, and combat evasion events.
             </td>
             <td>
-                <em>Alatar</em>, Stone Trolls (<em>T&ocirc;ma</em>, <em>Brat</em>, <em>Wluag</em>)
+                <ul>
+                    <li><em>Fog</em>, <em>Vanishment</em>, <em>Old Road</em> &rarr; <code>Cancellation</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Corruption Bonus</code></td>
+            <td>
+                Identifies characters, items, or permanent conditions that confer corruption resistance bonuses or roll adjustments protecting the bearer.
             </td>
             <td>
-                Semicolon list of eligible canonical sites (e.g. <code>Dr&uacute;adan Forest; Hermit's Hill; Woodmen-town; Cameth Brin; Dunnish Clan-hold; Ruined Signal Tower</code>).
+                <ul>
+                    <li>Characters with inherent corruption resistance bonuses &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Corruption Penalty</code></td>
+            <td>
+                Marks characters or conditions bearing an inherent drawback or penalty on their own corruption checks (vulnerable or burdened characters).
             </td>
             <td>
-                Translates complex multi-criteria rules into a randomized selection pool of legal candidate sites.
+                <ul>
+                    <li>Characters with self-inflicted corruption check penalties &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Direct Influence Bonus</code></td>
+            <td>
+                Identifies characters who receive bonus Direct Influence (DI) when controlling specific named followers or characters of a particular race.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Galadriel</em> &rarr; <code>Galadriel; Elf</code> (+DI controlling Celeborn or Elves)</li>
+                    <li><em>Aragorn II</em> &rarr; <code>Aragorn II</code> (+DI controlling D&uacute;nedain/followers)</li>
+                    <li>Dwarf company leaders &rarr; <code>Dwarf</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Faction Bonus</code></td>
+            <td>
+                Character recruiting bonuses granting +2 (or more) Direct Influence when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Tag:Faction Bonus}"</code>).
+            </td>
+            <td>
+                <ul>
+                    <li><em>Thranduil</em> &rarr; <code>Wood-elves</code></li>
+                    <li><em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves; Dwarf</code></li>
+                    <li><em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code></li>
+                    <li><em>Elrond</em> &rarr; <code>All; Elf</code></li>
+                    <li><em>Beregond</em> &rarr; <code>Tower Guard of Minas Tirith</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Faction Penalty</code></td>
+            <td>
+                Marks characters who suffer influence penalties or recruitment restrictions when attempting to recruit factions.
+            </td>
+            <td>
+                <ul>
+                    <li>Characters who cannot influence or suffer -DI penalties against factions &rarr; <code>All</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Hand Mechanics</code></td>
+            <td>
+                Identifies cards that increase maximum hand size or permit retrieving cards (such as spells or events) directly from the discard pile or play deck.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Tom Bombadil</em>, <em>Promptings of Wisdom</em> &rarr; <code>Hand Size Bonus</code></li>
+                    <li><em>Gandalf</em>, <em>Voices of Malice</em> &rarr; <code>Spell Retrieval</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Home Region</code></td>
+            <td>
+                Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies (e.g. Eriador, Gondor, Rohan companies) or calculate movement routes.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Aragorn II</em> (Rivendell) &rarr; <code>Rhudaur</code></li>
+                    <li><em>Boromir</em> (Minas Tirith) &rarr; <code>An&oacute;rien</code></li>
+                    <li><em>Th&eacute;oden</em> (Edoras) &rarr; <code>Rohan</code></li>
+                    <li><em>Gimli</em> (Blue Mountain Dwarf-hold) &rarr; <code>Lindon</code></li>
+                    <li><em>Robin Smallburrow</em> &rarr; <code>The Shire; Arthedain</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Home Site Penalty</code></td>
+            <td>
+                Marks characters who suffer gameplay drawbacks, stat reductions, or limitations while at (or away from) their designated home site.
+            </td>
+            <td>
+                <ul>
+                    <li>Characters with localized home penalties &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Marshalling Points Penalty</code></td>
+            <td>
+                Marks liability cards that surrender Marshalling Points (MPs) to the opponent or impose negative victory points if defeated, tapped, or corrupted.
+            </td>
+            <td>
+                <ul>
+                    <li>Characters/items that concede negative MP burdens upon defeat &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Palant&iacute;r Mechanics</code></td>
+            <td>
+                Identifies characters or cards specifically capable of using, tapping, or gaining bonuses from Palant&iacute;ri without standard drawbacks.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Saruman</em>, <em>Denethor II</em> &rarr; <code>Use Palant&iacute;r</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Region Bonus</code></td>
+            <td>
+                Tags cards granting movement advantages, hazard cancellations, or combat bonuses when traveling through or stationed in specific region terrain types.
+            </td>
+            <td>
+                <ul>
+                    <li>Mariners and coastal travelers &rarr; <code>Coastal Sea</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Resolved Site</code></td>
+            <td>
+                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).<br /><br />
+                For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites).
+            </td>
+            <td>
+                <ul>
+                    <li><em>Doeth</em>, <em>Durthak</em> (card text <em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                    <li><em>Gandalf</em> (card text <em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
+                    <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Ring Mechanics</code></td>
+            <td>
+                Identifies characters, items, or events with dedicated mechanics for testing Gold Rings, searching for the One Ring, or modifying ring test dice rolls.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Gandalf</em>, <em>Saruman</em>, <em>Gollum</em> &rarr; <code>Test Ring</code></li>
+                </ul>
             </td>
         </tr>
     </table>
 
-    <!-- SECTION 2: FACTION BONUS -->
-    <h2 id="faction-bonus">2. Category: <code>Faction Bonus</code></h2>
-    <p>
-        The companion file includes direct influence recruiting bonuses harvested from character card rules text (as demonstrated in the <a href="worked_example_factions.html">Dynamic Faction Recruitment Worked Example</a>).
-    </p>
-    <p>
-        Any character with rules granting +2 Direct Influence against a specific faction is tagged with that faction's exact title (e.g. <em>Thranduil</em> &rarr; <code>Wood-elves</code>, <em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves</code>, <em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code>). This allows generative rules to recruit matching factions dynamically using <code>"Name": "{Leader.Tag:Faction Bonus}"</code>.
-    </p>
-
-    <!-- SECTION 3: AUTOMATIC ATTACK -->
-    <h2 id="automatic-attack">3. Category: <code>Automatic Attack</code></h2>
-    <p>
-        Official Cardnum card attributes do not include a dedicated field for site automatic attacks. To allow procedural deck rules and catalog filters to target or avoid specific guardian creatures, the <code>Automatic Attack</code> category indexes the creature types printed on site cards:
-    </p>
-
-    <table>
-        <tr>
-            <th>Creature Attack Type</th>
-            <th>Tag Value</th>
-            <th>Example Sites</th>
-            <th>Deckbuilding &amp; Rules Significance</th>
-        </tr>
-        <tr>
-            <td><strong>Dragon Lairs</strong></td>
-            <td><code>Dragon</code></td>
-            <td>
-                <em>Dancing Spire</em>, <em>The Lonely Mountain</em>, <em>Gold Hill</em>, <em>Caves of &Ucirc;lund</em>, <em>Zarak D&ucirc;m</em>
-            </td>
-            <td>
-                Identifies the 9 true Dragon Lairs. Differentiates true Dragons from sites with minor <em>Drake</em> attacks (such as <em>The Rusted-deeps</em>). Essential for building dragon-hunting archetypes or querying sites that contain hoards by game rule.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Standard Minion Defenses</strong></td>
-            <td><code>Orcs</code><br /><code>Trolls</code></td>
-            <td>
-                <em>Carn D&ucirc;m</em>, <em>Moria</em>, <em>Goblin-gate</em>, <em>Mount Gundabad</em>
-            </td>
-            <td>
-                Most Dark-holds and Shadow-holds feature Orc or Troll attacks. Sites with multiple attacks receive multi-tags (e.g. <code>Orcs; Trolls</code>), allowing queries to match either type.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Spirits &amp; Undead</strong></td>
-            <td><code>Undead</code></td>
-            <td>
-                <em>Dead Marshes</em>, <em>Minas Morgul</em>, <em>Barrow-downs</em>, <em>Ancient Deep-hold</em>
-            </td>
-            <td>
-                Useful for pairing with anti-undead heroes or hazard-keyed strategies.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Hero Haven Defenses (Minion Game)</strong></td>
-            <td><code>Elves</code><br /><code>D&uacute;nedain</code></td>
-            <td>
-                <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Edhellond</em>, <em>Grey Havens</em>
-            </td>
-            <td>
-                In minion play (<em>The Lidless Eye</em>), hero havens become dangerous Free-holds guarded by Elven and D&uacute;nedain automatic attacks.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Lethal Entities</strong></td>
-            <td><code>Nazg&ucirc;l</code><br /><code>Maia</code><br /><code>Balrog</code></td>
-            <td>
-                <em>Barad-d&ucirc;r</em> (Maia), <em>Minas Morgul</em> (Nazg&ucirc;l), <em>The Under-gates</em> (Balrog)
-            </td>
-            <td>
-                Identifies non-cancelable or high-prowess guardian entities at major strongholds.
-            </td>
-        </tr>
-    </table>
-
-    <div class="note">
-        <strong>Multiple Automatic Attacks:</strong> If a site features more than one automatic attack (for example, <em>Barad-d&ucirc;r</em> features Orcs, Trolls, and a Maia), all attack types are assigned to the card separated by semicolons (<code>Orcs; Trolls; Maia</code>). A query for any of those individual tags will successfully match the site.
-    </div>
-
-    <!-- SECTION 4: USING COMPANION TAGS IN DECK RULES -->
-    <h2 id="rules-syntax">4. Using Companion Tags in Procedural Deck Rules</h2>
+    <!-- SECTION 2: USING COMPANION TAGS IN DECK RULES -->
+    <h2 id="rules-syntax">2. Using Companion Tags in Procedural Deck Rules</h2>
     <p>
         These companion categories enable rich, declarative deck generation rules:
     </p>
@@ -196,7 +258,7 @@
         <strong>Execution Walkthrough:</strong>
         <ul>
             <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
-            <li><strong>Dynamic Characters (Alatar, Gandalf, Orc Captain, Minion Trolls):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Tag:Resolved Site}</code>!</li>
+            <li><strong>Dynamic Characters (Doeth, Durthak, Gandalf, Orc Captain):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Tag:Resolved Site}</code>!</li>
         </ul>
     </div>
 
@@ -216,17 +278,19 @@
   }
 }</code></pre>
 
-    <h3>C. Under-deeps Surface Entrances</h3>
+    <h3>C. Regional Themed Recruitment</h3>
     <p>
-        Ensure an Under-deeps company includes an appropriate surface entrance:
+        Recruit backup characters whose home site is located in the same geographic region as the company leader:
     </p>
     <pre><code>{
-  "Name": "Under-deeps Surface Entrance",
-  "Section": "Sites",
-  "Count": 1,
+  "Name": "Regional Reinforcements",
+  "Section": "Pool",
+  "Count": 2,
   "Attributes": {
-    "Primary": "Site",
-    "Name": "{DeepSite.Tag:Resolved Site}"
+    "Primary": "Character"
+  },
+  "Tags": {
+    "Home Region": "{Leader.Tag:Home Region}"
   }
 }</code></pre>
 

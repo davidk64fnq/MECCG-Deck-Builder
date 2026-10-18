@@ -231,11 +231,11 @@ namespace MECCG_Deck_Builder
 
             string category = string.IsNullOrWhiteSpace(categoryName) ? "Relational Tags" : categoryName.Trim();
 
-            // 1. Build lookup dictionary from catalog entities (e.g. Primary = Site)
+            // 1. Build lookup dictionary from catalog entities using MatchesCardnumCriterion
             var lookupCards = catalogCards;
             if (!string.IsNullOrWhiteSpace(lookupAttribute) && !string.IsNullOrWhiteSpace(lookupValue))
             {
-                lookupCards = lookupCards.Where(c => string.Equals(c.GetAttribute(lookupAttribute), lookupValue.Trim(), StringComparison.OrdinalIgnoreCase));
+                lookupCards = lookupCards.Where(c => CardFilterService.MatchesCardnumCriterion(c, lookupAttribute, lookupValue));
             }
 
             // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"])
@@ -280,7 +280,6 @@ namespace MECCG_Deck_Builder
                 var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var part in parts)
                 {
-                    // Also handle " or " and " and "
                     var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     foreach (var sub in subParts)
                     {
