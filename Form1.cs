@@ -103,10 +103,10 @@ namespace MECCG_Deck_Builder
             }
         }
 
-
         private void CreateMenus()
         {
-            ToolStripMenuSet.DropDown.Closing += (s, e) =>
+            // Keep Catalog dropdown open while ticking expansion sets
+            ToolStripMenuCatalog.DropDown.Closing += (s, e) =>
             {
                 if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
                 {
@@ -118,15 +118,6 @@ namespace MECCG_Deck_Builder
             ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
             ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
 
-            var clearMenuItem = new ToolStripMenuItem("Clear All Filters")
-            {
-                ShortcutKeys = Keys.Control | Keys.R
-            };
-            clearMenuItem.Click += (s, e) => ResetAllFilters();
-
-            ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
-            ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
-
             PopulateSetMenuItems();
         }
 
@@ -135,12 +126,21 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                while (ToolStripMenuSet.DropDownItems.Count > 2)
+                // Remove existing set items (identified by Tag is string)
+                var existingSetItems = ToolStripMenuCatalog.DropDownItems
+                    .OfType<ToolStripMenuItem>()
+                    .Where(item => item.Tag is string)
+                    .ToList();
+
+                foreach (var item in existingSetItems)
                 {
-                    ToolStripMenuSet.DropDownItems.RemoveAt(2);
+                    ToolStripMenuCatalog.DropDownItems.Remove(item);
                 }
 
                 var savedSets = new HashSet<string>(UserSettingsService.Current.SelectedSets ?? [], StringComparer.OrdinalIgnoreCase);
+
+                // Insert set checkboxes right above the bottom separator
+                int insertIndex = ToolStripMenuCatalog.DropDownItems.Count - 2;
 
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
@@ -162,13 +162,13 @@ namespace MECCG_Deck_Builder
                         _currentDeck.IncludedSets.Add(set.Code);
                     }
 
-                    ToolStripMenuSet.DropDownItems.Add(menuItem);
+                    ToolStripMenuCatalog.DropDownItems.Insert(insertIndex++, menuItem);
                 }
 
                 if (_currentDeck.IncludedSets.Count == 0 && _catalogService.Sets.Count > 0)
                 {
                     var firstSet = _catalogService.Sets[0];
-                    if (ToolStripMenuSet.DropDownItems.Count > 2 && ToolStripMenuSet.DropDownItems[2] is ToolStripMenuItem firstItem)
+                    if (ToolStripMenuCatalog.DropDownItems.Count > 3 && ToolStripMenuCatalog.DropDownItems[3] is ToolStripMenuItem firstItem)
                     {
                         firstItem.Checked = true;
                     }
@@ -346,7 +346,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.AddCustomKeyName(result.Value.Key);
                     _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
-                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value); // Appends instead of overwriting
+                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -368,7 +368,7 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
-                        _filterService.AppendCardCustomTag(card.Id, keyName, val); // Appends instead of overwriting
+                        _filterService.AppendCardCustomTag(card.Id, keyName, val);
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
                     }
@@ -539,15 +539,12 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+                foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                 {
-                    if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && item.Checked)
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string code && setItem.Checked)
                     {
-                        item.Checked = false;
-                        if (item.Tag is string code)
-                        {
-                            _currentDeck.IncludedSets.Remove(code);
-                        }
+                        setItem.Checked = false;
+                        _currentDeck.IncludedSets.Remove(code);
                     }
                 }
             }
@@ -565,15 +562,12 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+                foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                 {
-                    if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && !item.Checked)
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string code && !setItem.Checked)
                     {
-                        item.Checked = true;
-                        if (item.Tag is string code)
-                        {
-                            _currentDeck.IncludedSets.Add(code);
-                        }
+                        setItem.Checked = true;
+                        _currentDeck.IncludedSets.Add(code);
                     }
                 }
             }
@@ -952,10 +946,32 @@ namespace MECCG_Deck_Builder
                 DefaultExt = "json",
                 Filter = "MECCG Deck Builder Deck (*.json)|*.json",
                 FilterIndex = 1,
-                FileName = GetSafeDeckFileName() // <-- Pre-populates "Hero Dwarves of the Iron Hills.json"
+                FileName = GetSafeDeckFileName()
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                _currentDeck.Title = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                var dto = OpenCloseDeck.FromDeck(_currentDeck);
+                string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
+                File.WriteAllText(saveFileDialog.FileName, json);
+                UpdateFormTitle();
+            }
+        }
+
+        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var saveFileDialog = new SaveFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Save Deck As",
+                CheckPathExists = true,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Deck (*.json)|*.json",
+                FilterIndex = 1,
+                FileName = GetSafeDeckFileName()
+            };
+
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 _currentDeck.Title = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
                 var dto = OpenCloseDeck.FromDeck(_currentDeck);
@@ -1000,7 +1016,7 @@ namespace MECCG_Deck_Builder
                 _isUpdatingFilters = true;
                 try
                 {
-                    foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                    foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                     {
                         if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
                         {
@@ -1032,7 +1048,7 @@ namespace MECCG_Deck_Builder
                 Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*.play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
                 FilterIndex = 1,
                 RestoreDirectory = true,
-                FileName = GetSafeDeckFileName() // Pre-populates the deck name
+                FileName = GetSafeDeckFileName()
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
@@ -1094,7 +1110,7 @@ namespace MECCG_Deck_Builder
                 var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
                 if (dto != null)
                 {
-                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService); // Passed _catalogService
+                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -1112,7 +1128,7 @@ namespace MECCG_Deck_Builder
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService); // Passed _catalogService
+                var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService);
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
             }
@@ -1122,7 +1138,7 @@ namespace MECCG_Deck_Builder
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session", 
+                Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session",
                 DefaultExt = "json",
                 Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
@@ -1160,8 +1176,6 @@ namespace MECCG_Deck_Builder
             try
             {
                 // Pass 1: Symmetrically validate all slots against the active sets independently.
-                // Any value that does not exist in the active set(s) on its own is cleared first,
-                // preventing a dead value from falsely invalidating valid peer slots.
                 for (int i = 0; i < _filterSlots.Length; i++)
                 {
                     var slot = _filterSlots[i];
@@ -1173,7 +1187,7 @@ namespace MECCG_Deck_Builder
                     var baseValues = _filterService.GetAvailableValues(
                         _catalogService.Cards,
                         _currentDeck.IncludedSets,
-                        [], // No other criteria: test set validity only
+                        [],
                         slot.Type,
                         slot.CurrentKey);
 
@@ -1536,6 +1550,18 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(this,
+                $"{Constants.AppTitle}\nVersion 0.5.0\n\n" +
+                "A desktop deck builder and collection manager for the Middle-earth Collectible Card Game (MECCG).\n\n" +
+                "Card data and artwork courtesy of the Cardnum Project (https://cardnum.net).\n" +
+                "MECCG is © Iron Crown Enterprises and Tolkien Enterprises.",
+                $"About {Constants.AppTitle}",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
         private void ToolStripMenuToolsGenerateDeck_Click(object sender, EventArgs e)
         {
             using var ofd = new OpenFileDialog
@@ -1559,7 +1585,6 @@ namespace MECCG_Deck_Builder
             }
             else
             {
-                // If not run yet in this session, open file picker
                 ToolStripMenuToolsGenerateDeck_Click(sender, e);
             }
         }
@@ -1627,7 +1652,7 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                 {
                     if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
                     {
@@ -1699,43 +1724,6 @@ namespace MECCG_Deck_Builder
             return !string.IsNullOrWhiteSpace(safeName) ? safeName : "Deck";
         }
 
-        private async void ToolStripMenuToolsUpdateDatabase_Click(object sender, EventArgs e)
-        {
-            var confirm = MessageBox.Show(this,
-                "This will download the latest card and set definitions from the Cardnum GitHub repository and save them to your local data folder.\n\n" +
-                "Note: Any custom card attribute modifications made directly to your local cards-dc.json file will be superseded.\n\n" +
-                "Do you wish to proceed?",
-                $"{Constants.AppTitle} - Update Database",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (confirm != DialogResult.Yes) return;
-
-            Cursor = Cursors.WaitCursor;
-            Enabled = false;
-            try
-            {
-                var (success, message) = await _catalogService.UpdateDatabaseFromCardnumAsync();
-                if (success)
-                {
-                    PopulateSetMenuItems();
-                    RefreshFilterKeyDropdowns();
-                    UpdateFacetedFilters();
-                    UpdateFormTitle();
-                    MessageBox.Show(this, message, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show(this, message, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            finally
-            {
-                Enabled = true;
-                Cursor = Cursors.Default;
-            }
-        }
-
         #endregion
 
         #region TAXONOMY_TOOLS
@@ -1782,12 +1770,10 @@ namespace MECCG_Deck_Builder
 
             if (sfd.ShowDialog(this) == DialogResult.OK)
             {
-                // Gather active keys from Filter Slots 1 & 2 (Official Attributes)
                 var activeAttributes = new List<string>();
                 if (!string.IsNullOrWhiteSpace(_filterSlots[0].CurrentKey)) activeAttributes.Add(_filterSlots[0].CurrentKey);
                 if (!string.IsNullOrWhiteSpace(_filterSlots[1].CurrentKey)) activeAttributes.Add(_filterSlots[1].CurrentKey);
 
-                // Gather active keys from Filter Slots 3 & 4 (Custom Categories)
                 var activeCategories = new List<string>();
                 if (!string.IsNullOrWhiteSpace(_filterSlots[2].CurrentKey)) activeCategories.Add(_filterSlots[2].CurrentKey);
                 if (!string.IsNullOrWhiteSpace(_filterSlots[3].CurrentKey)) activeCategories.Add(_filterSlots[3].CurrentKey);
@@ -1807,7 +1793,7 @@ namespace MECCG_Deck_Builder
                     "Workflow in Google Sheets or Excel:\n" +
                     "1. Review and edit tags (separate multiple tags with ';').\n" +
                     "2. Add new category columns as needed.\n" +
-                    "3. Import changes back via Tools > Import Taxonomy from CSV...",
+                    "3. Import changes back via Taxonomy > Import Taxonomy from CSV...",
                     Constants.AppTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);

@@ -88,31 +88,121 @@
         </li>
     </ol>
 
+    
+
     <!-- LOAD RULES FROM FILE -->
     <h2 id="json-rules">Load Rules from File (.json)</h2>
     <p>
         For large-scale taxonomy extraction across multiple expansions, you can author batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and execute them in a single operation.
     </p>
 
-    <h3>Sample Batch Extraction Schema</h3>
+    <h3>Batch Rule Schema</h3>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>Category</code></td>
+            <td>string</td>
+            <td>The custom taxonomy category where matches will be saved (e.g. <code>"Automatic Attack"</code>).</td>
+        </tr>
+        <tr>
+            <td><code>Pattern</code></td>
+            <td>string</td>
+            <td>
+                The .NET regular expression to evaluate against card rules text. Backslashes must be double-escaped for JSON encoding (e.g. <code>"\\b"</code>, <code>"\\s+"</code>).
+            </td>
+        </tr>
+        <tr>
+            <td><code>TagTemplate</code></td>
+            <td>string</td>
+            <td>
+                The tag assigned upon match. Can be a fixed string (e.g. <code>"Dwarves"</code>) or a capture group token (e.g. <code>"$1"</code>).
+            </td>
+        </tr>
+    </table>
+
+    <!-- WORKED EXAMPLE: SECTION-GUARDED BATCH RULES -->
+    <h3 id="worked-example-batch">Worked Example: Sandboxed Site Automatic Attacks</h3>
+    <p>
+        Site cards follow a strict top-to-bottom layout, but a naive search like <code>\bdwar(?:f|ves)\b</code> evaluates the entire card text, creating two distinct sources of false positives:
+    </p>
+
+    <ol>
+        <li>
+            <strong>Top False Positives (Adjacent Sites / Havens):</strong> Under-deeps sites list their surface entrances at the very top. For example, <em>The Drowning-deeps</em> begins with <code>Adjacent Sites: Blue Mountain Dwarf-hold (13)...</code>, triggering a false <code>Dwarves</code> tag even though its actual attack is a <code>Drake</code>.
+        </li>
+        <li>
+            <strong>Bottom False Positives (Special Rules):</strong> Many sites list special racial healing bonuses or movement effects at the bottom. For example, a site guarded only by <code>Orcs</code> might conclude with <code>Special: Dwarven characters receive +1 direct influence here</code>, triggering an unwanted <code>Dwarves</code> tag.
+        </li>
+    </ol>
+
+    <div class="tip">
+        <strong>Building a Two-Sided Regex Sandbox:</strong>
+        <p>You can strictly confine the search to the automatic-attack block using a tempered greedy token:</p>
+        <pre><code>(?is)Automatic-attacks?(?:(?!Special:).)*?\bdwar(?:f|ves)\b</code></pre>
+        <ul>
+            <li><code>(?is)Automatic-attacks?</code>: <strong>The Top Guard.</strong> Anchors to the attack header, ignoring all site names in <code>Adjacent Sites:</code> or <code>Nearest Haven:</code> above it.</li>
+            <li><code>(?:(?!Special:).)*?</code>: <strong>The Bottom Guard.</strong> Advances across lines character-by-character, strictly verifying that it has not reached <code>Special:</code>.</li>
+            <li><code>\bdwar(?:f|ves)\b</code>: Matches the creature species. If <code>Special:</code> is encountered before the creature name, the match fails immediately.</li>
+        </ul>
+    </div>
+
+    <h4>1. Sample Sandboxed Rule File (<code>Automatic_Attack_Rules.json</code>)</h4>
     <pre><code>[
   {
-    "Category": "Faction Bonus",
-    "Pattern": "(?i)\\+2\\s+direct\\s+influence\\s+against\\s+([A-Za-z\\s-]+)",
-    "TagTemplate": "$1"
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\bdwar(?:f|ves)\\b",
+    "TagTemplate": "Dwarves"
   },
   {
-    "Category": "Resolved Site",
-    "Pattern": "Any Dark-hold",
-    "TagTemplate": "Barad-dûr; Carn Dûm; Cirith Gorgor; Dol Guldur; Minas Morgul"
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\bdrakes?\\b",
+    "TagTemplate": "Drake"
+  },
+  {
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\borcs?\\b",
+    "TagTemplate": "Orcs"
+  },
+  {
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\btrolls?\\b",
+    "TagTemplate": "Trolls"
+  },
+  {
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\b(?:undead|wights?|ghosts?)\\b",
+    "TagTemplate": "Undead"
   }
 ]</code></pre>
+
+    <h4>2. Step-by-Step Batch Execution &amp; Audit Workflow</h4>
+    <ol>
+        <li>
+            <strong>Scope the Master List:</strong> In the top <strong>Set</strong> menu, check your target expansions (e.g. <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>). In <strong>Filter Slot 1</strong>, set <code>Attribute: Primary</code> and <code>Value: Site</code> so only site cards are evaluated.
+        </li>
+        <li>
+            <strong>Load and Run the Batch File:</strong> Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, select <strong>Load Rules from File (.json)</strong>, browse to <code>Automatic_Attack_Rules.json</code>, and click <strong>Test / Preview Matches</strong>. Review the preview list, then click <strong>Apply Tags to Catalog</strong>.
+        </li>
+        <li>
+            <strong>Audit via Dynamic CSV Pipeline:</strong> In the main window, set <strong>Slot 3:</strong> <code>Category: Automatic Attack</code> and select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.
+        </li>
+        <li>
+            <strong>Review in Excel or Google Sheets:</strong> Open the CSV to glance down the pre-populated <code>Automatic Attack</code> column. Multi-attack sites (like <em>Carn Dûm</em> or <em>Moria</em>) cleanly show multiple tags (<code>Orcs; Trolls</code>), and complex edge cases can be edited directly in the spreadsheet.
+        </li>
+        <li>
+            <strong>Sync and Persist:</strong> Save the CSV and choose <strong>Tools &gt; Import Taxonomy from CSV...</strong> to apply your authoritative edits. Finally, select <strong>Filter &gt; Save Tag Set...</strong>, choose <code>Rules_Support_Tags.json</code>, and confirm overwrite so all tags persist permanently across application launches.
+        </li>
+    </ol>
 
     <div class="tip">
         <strong>See Also:</strong>
         <ul>
             <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference table of all standard rules categories and tags.</li>
-            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Bulk-tagging workflow using Microsoft Excel or Google Sheets.</li>
+            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Bulk-tagging and multi-column edit &amp; replace workflow using spreadsheets.</li>
         </ul>
     </div>
 </body>

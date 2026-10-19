@@ -753,9 +753,11 @@
     },
     {
       "fullCode": "Gandalf [F] (WH)",
+      "Home Region": "Anórien; Anduin Vales; Arthedain; Belfalas; Fangorn; High Pass; Iron Hills; Lebennin; Lindon; Rohan; Woodland Realm",
       "id": "1806",
       "name": "Gandalf",
-      "Resolved Site": "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall; Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
+      "Resolved Site": "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall; Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall; Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
+      "Ring Mechanics": "Test Ring",
       "set": "MEWH"
     },
     {
@@ -1011,7 +1013,7 @@
       "set": "METW"
     },
     {
-      "Automatic Attack": "Undead",
+      "Automatic Attack": "Undead; Nazgûl",
       "fullCode": "Minas Morgul [B] (BA)",
       "id": "2013",
       "name": "Minas Morgul",
@@ -1277,14 +1279,14 @@
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men; Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creatures",
       "fullCode": "The Pûkel-deeps [H] (DM)",
       "id": "1205",
       "name": "The Pûkel-deeps",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Men; Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creatures",
       "fullCode": "The Pûkel-deeps [M] (AS)",
       "id": "1791",
       "name": "The Pûkel-deeps",
@@ -2563,12 +2565,138 @@
       "name": "Mountain-maggot",
       "Resolved Site": "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
       "set": "MEBA"
+    },
+    {
+      "fullCode": "Dwar the Ringwraith (LE)",
+      "Home Region": "Udûn",
+      "id": "1225",
+      "name": "Dwar the Ringwraith",
+      "Resolved Site": "Cirith Gorgor",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Hoarmûrath the Ringwraith (LE)",
+      "Home Region": "Udûn",
+      "id": "1232",
+      "name": "Hoarmûrath the Ringwraith",
+      "Resolved Site": "Cirith Gorgor",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Grishnákh (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1228",
+      "name": "Grishnákh",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Lagduf (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1237",
+      "name": "Lagduf",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Muzgash (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1243",
+      "name": "Muzgash",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Radbug (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1256",
+      "name": "Radbug",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Snaga (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1260",
+      "name": "Snaga",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "The Witch-king (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1263",
+      "name": "The Witch-king",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Ufthak (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1269",
+      "name": "Ufthak",
+      "Resolved Site": "Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Indûr the Ringwraith (LE)",
+      "Home Region": "Imlad Morgul; Udûn",
+      "id": "1234",
+      "name": "Indûr the Ringwraith",
+      "Resolved Site": "Cirith Gorgor; Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Ren the Ringwraith (LE)",
+      "Home Region": "Gorgoroth",
+      "id": "1257",
+      "name": "Ren the Ringwraith",
+      "Resolved Site": "Barad-dûr; Mount Doom",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Thráin II (TD)",
+      "Home Region": "Anfalas; Lindon; Rhudaur; Wold & Foothills",
+      "id": "857",
+      "name": "Thráin II",
+      "Resolved Site": "Edhellond; Grey Havens; Lórien; Rivendell",
+      "set": "METD"
+    },
+    {
+      "fullCode": "Ûvatha the Ringwraith (LE)",
+      "Home Region": "Khand",
+      "id": "1271",
+      "name": "Ûvatha the Ringwraith",
+      "Resolved Site": "Variag Camp",
+      "set": "MELE"
+    },
+    {
+      "Automatic Attack": "Orcs; Trolls",
+      "fullCode": "Carn Dûm [M] (LE)",
+      "id": "1574",
+      "name": "Carn Dûm",
+      "set": "MELE"
+    },
+    {
+      "Automatic Attack": "Orcs; Trolls",
+      "fullCode": "Urlurtsu Nurn [M] (LE)",
+      "id": "1627",
+      "name": "Urlurtsu Nurn",
+      "set": "MELE"
+    },
+    {
+      "Automatic Attack": "Awakened Plant",
+      "fullCode": "Wellinghall [M] (AS)",
+      "id": "1802",
+      "name": "Wellinghall",
+      "set": "MEAS"
     }
   ],
   "Filters": [
     [
       "Automatic Attack",
       "Animals",
+      "Awakened Plant",
       "Balrog",
       "Dragon",
       "Drake",
@@ -2658,9 +2786,11 @@
       "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
       "Anduin Vales",
       "Anfalas",
+      "Anfalas; Lindon; Rhudaur; Wold & Foothills",
       "Anfalas; Lindon; Wold & Foothills; Rhudaur",
       "Angmar",
       "Anórien",
+      "Anórien; Anduin Vales; Arthedain; Belfalas; Fangorn; High Pass; Iron Hills; Lebennin; Lindon; Rohan; Woodland Realm",
       "Arthedain",
       "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "Belfalas",
@@ -2678,6 +2808,7 @@
       "Hollin",
       "Horse Plains",
       "Imlad Morgul",
+      "Imlad Morgul; Udûn",
       "Iron Hills",
       "Ithilien",
       "Khand",
@@ -2695,6 +2826,7 @@
       "Southern Mirkwood",
       "Southern Rhovanion",
       "The Shire",
+      "Udûn",
       "Under-deeps",
       "Western Mirkwood",
       "Wold & Foothills",
@@ -2722,8 +2854,13 @@
       "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
       "Bandit Lair; Barrow-downs; Buhr Widu; Caves of Ülund; Dancing Spire; Dead Marshes; Dimrill Dale; Ettenmoors; Framsburg; Gladden Fields; Glittering Caves; Gold Hill; Haudh-in-Gwanûr; Hermit's Hill; Himring; Irerock; Isles of the Dead that Live; Lossadan Cairn; Old Forest; Ost-in-Edhil; Raider-hold; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Lonely Mountain; The Stones; The Wind Throne; The Worthy Hills; Tolfalas; Weathertop",
       "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Barad-dûr; Mount Doom",
+      "Cirith Gorgor",
+      "Cirith Gorgor; Cirith Ungol; Minas Morgul; Shelob's Lair",
+      "Cirith Ungol; Minas Morgul; Shelob's Lair",
       "Edhellond; Grey Havens; Lórien; Rivendell",
-      "Tharbad"
+      "Tharbad",
+      "Variag Camp"
     ],
     [
       "Ring Mechanics",
