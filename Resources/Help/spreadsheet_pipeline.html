@@ -8,32 +8,112 @@
 <body>
     <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; CSV Pipeline</div>
     <h1>CSV Spreadsheet Pipeline</h1>
-    <p>To facilitate large-scale taxonomy authoring or collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.</p>
+    <p>
+        MECCG Deck Builder features a two-way CSV spreadsheet pipeline via the <strong>Tools</strong> menu (<strong>Export Taxonomy Draft (CSV)...</strong> and <strong>Import Taxonomy from CSV...</strong>). This allows you to audit card taxonomy across hundreds of cards at a glance, bulk-assign tags in Microsoft Excel or Google Sheets, and perform multi-category edits in a single import.
+    </p>
 
-    <h2>Spreadsheet Column Layout</h2>
+    <!-- SECTION 1: COLUMN LAYOUT -->
+    <h2>1. Dynamic Spreadsheet Column Layout</h2>
+    <p>
+        When you select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>, the export automatically configures its columns based on your active filter slots:
+    </p>
+
     <table>
         <tr>
-            <th>Column Header</th>
-            <th>Required?</th>
-            <th>Description &amp; Behavior</th>
+            <th style="width: 25%;">Column Header</th>
+            <th style="width: 15%;">Role / Type</th>
+            <th style="width: 60%;">Description &amp; Behavior</th>
         </tr>
-        <tr><td><code>Card Name</code></td><td><strong>Required</strong></td><td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in catalog.</td></tr>
-        <tr><td><code>Set</code></td><td><strong>Required</strong></td><td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>) used to disambiguate reprint cards.</td></tr>
-        <tr><td><code>Primary</code></td><td>Optional</td><td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td></tr>
-        <tr><td><em>[Custom Category Columns]</em></td><td>Optional</td><td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>) becomes a custom category. Cell contents are imported as tags.</td></tr>
-        <tr><td><code>Card Text</code></td><td>Optional</td><td>Full rules text provided for reference during editing. Ignored during import.</td></tr>
+        <tr>
+            <td><code>Card Name</code></td>
+            <td><strong>Required</strong></td>
+            <td>The exact printed title of the card (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in the catalog.</td>
+        </tr>
+        <tr>
+            <td><code>Set</code></td>
+            <td><strong>Required</strong></td>
+            <td>The 4-letter expansion code (e.g. <code>METW</code>, <code>MEDM</code>, <code>MEAS</code>). Disambiguates reprints across expansions.</td>
+        </tr>
+        <tr>
+            <td><em>[Active Official Attributes]</em></td>
+            <td>Reference (Read-Only)</td>
+            <td>
+                Any official rules attributes selected in <strong>Slots 1 &amp; 2</strong> (e.g. <code>Race</code>, <code>Skill</code>, <code>Alignment</code>). Populated with each card's official data. Defaults to <code>Primary</code> if no attributes are selected.<br />
+                <em>Import Safety:</em> All official Cardnum attributes are automatically recognized and skipped during import, ensuring they never become custom tags.
+            </td>
+        </tr>
+        <tr>
+            <td><em>[Custom Category Columns]</em></td>
+            <td><strong>Editable (Custom Tags)</strong></td>
+            <td>
+                Any custom categories selected in <strong>Slots 3 &amp; 4</strong> (e.g. <code>Faction Focus</code>, <code>Combat Role</code>). Exports pre-populated with all tags currently assigned to each card. If no custom category is selected in the filter slots, an <code>[Insert Category Name]</code> template column is generated instead.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Card Text</code></td>
+            <td>Reference (Read-Only)</td>
+            <td>Full printed rules text for reference while editing. Automatically skipped during import.</td>
+        </tr>
     </table>
 
     <div class="tip">
-        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category to a card, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
+        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category column, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
     </div>
 
-    <h2>Step-by-Step Workflow</h2>
+    <!-- SECTION 2: IMPORT SYNCHRONIZATION -->
+    <h2>2. Authoritative "Edit &amp; Replace" Import Behavior</h2>
+    <p>
+        When you select <strong>Tools &gt; Import Taxonomy from CSV...</strong>, the importer treats the spreadsheet as the authoritative record for every custom category column included in the file:
+    </p>
+
+    <ul>
+        <li>
+            <strong>Multiple Columns Processed Simultaneously:</strong>
+            You can add as many custom category columns side-by-side as you like (e.g. <code>Faction Focus</code>, <code>Role</code>, <code>Hazard Package</code>, <code>Deck Priority</code>). The importer evaluates every custom column for every card in the spreadsheet.
+        </li>
+        <li>
+            <strong>Full Edit &amp; Replace (Not Append):</strong>
+            If a card already possesses tags in a category, the import replaces them with the exact contents of the cell. If you change <code>Scout Support</code> to <code>Warrior Tank</code>, the old tag is removed and the new tag is assigned.
+        </li>
+        <li>
+            <strong>Clearing &amp; Deleting Tags:</strong>
+            Emptying a cell (or typing <code>[clear]</code>, <code>[none]</code>, or <code>-</code>) completely removes that category's tags from that card.
+        </li>
+        <li>
+            <strong>Column Scope Isolation:</strong>
+            Only the custom categories present as headers in the CSV are updated. Any categories not in the spreadsheet remain completely untouched.
+        </li>
+        <li>
+            <strong>Card Scope Isolation:</strong>
+            The import only updates the specific cards listed in the CSV. Any cards from your catalog omitted from the file retain their existing tags.
+        </li>
+        <li>
+            <strong>Placeholder Protection:</strong>
+            Unmodified template headers (like <code>[Insert Category Name]</code>) and instructional cell hints (like <code>[Insert tag...]</code>) are automatically detected and ignored.
+        </li>
+    </ul>
+
+    <!-- SECTION 3: STEP BY STEP WORKFLOW -->
+    <h2>3. Step-by-Step Workflow</h2>
+
+    <h3>Scenario A: Auditing &amp; Editing Existing Tags</h3>
     <ol>
-        <li><strong>Scope the Master List:</strong> Select your desired expansion sets and set filter criteria so that only target cards appear in the Master List.</li>
-        <li><strong>Export Draft:</strong> Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
-        <li><strong>Edit in Excel / Google Sheets:</strong> Add custom category headers, enter tags into cells, and download as a CSV file.</li>
-        <li><strong>Import to Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
+        <li>In the main window, choose the expansion sets you want to audit in the <strong>Set</strong> menu.</li>
+        <li>In <strong>Slot 3</strong> (bottom panel), select the category you want to inspect (e.g. <strong>Category:</strong> <code>Faction Focus</code>).</li>
+        <li>Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong> and save the file.</li>
+        <li>Open the CSV in Excel or Google Sheets. The <code>Faction Focus</code> column is already filled with all current tags. You can glance down the column, correct typos, delete tags, or add second tags with a semicolon (<code>;</code>).</li>
+        <li>Save the spreadsheet as a CSV file.</li>
+        <li>In MECCG Deck Builder, select <strong>Tools &gt; Import Taxonomy from CSV...</strong> and select your edited file. Your catalog is updated instantly.</li>
+    </ol>
+
+    <h3>Scenario B: Drafting Brand New Categories from Scratch</h3>
+    <ol>
+        <li>Filter the Master List to the cards you want to classify (for example, set Slot 1 to <code>Primary = Character</code>).</li>
+        <li>Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
+        <li>Open the file in your spreadsheet editor. Replace the header <code>[Insert Category Name]</code> with your desired category name (e.g. <code>Combat Role</code>).</li>
+        <li>(Optional) Add additional custom category columns next to it (e.g. <code>Expedition Priority</code>).</li>
+        <li>Enter tags for each card and save as CSV.</li>
+        <li>Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. All new categories and tags are immediately registered in the application.</li>
     </ol>
 </body>
 </html>

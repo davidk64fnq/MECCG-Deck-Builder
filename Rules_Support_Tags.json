@@ -633,107 +633,122 @@
     },
     {
       "fullCode": "Doeth - Durthak (WH)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1804",
       "name": "Doeth - Durthak",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MEWH"
     },
     {
       "fullCode": "Euog - Ulzog (WH)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1805",
       "name": "Euog - Ulzog",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MEWH"
     },
     {
       "fullCode": "Horseman in the Night (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1233",
       "name": "Horseman in the Night",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Ill-favoured Fellow (WH)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1807",
       "name": "Ill-favoured Fellow",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MEWH"
     },
     {
       "fullCode": "Old Troll (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1247",
       "name": "Old Troll",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Orc Brawler (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1248",
       "name": "Orc Brawler",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Orc Captain (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1249",
       "name": "Orc Captain",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Orc Chieftain (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1250",
       "name": "Orc Chieftain",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Orc Sniffler (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1251",
       "name": "Orc Sniffler",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Orc Tracker (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1252",
       "name": "Orc Tracker",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Orc Veteran (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1253",
       "name": "Orc Veteran",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Sly Southerner (WH)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1812",
       "name": "Sly Southerner",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MEWH"
     },
     {
       "fullCode": "Squint-eyed Brute (WH)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1813",
       "name": "Squint-eyed Brute",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MEWH"
     },
     {
       "fullCode": "Troll Lout (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1265",
       "name": "Troll Lout",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
       "fullCode": "Troll-chief (LE)",
+      "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1266",
       "name": "Troll-chief",
-      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
+      "Resolved Site": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn; Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "set": "MELE"
     },
     {
@@ -2647,6 +2662,7 @@
       "Angmar",
       "Anórien",
       "Arthedain",
+      "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "Belfalas",
       "Cardolan",
       "Dorwinion",

@@ -1782,16 +1782,32 @@ namespace MECCG_Deck_Builder
 
             if (sfd.ShowDialog(this) == DialogResult.OK)
             {
-                TaxonomyExtractionService.ExportTemplateDraftToCsv(_masterCards, sfd.FileName);
+                // Gather active keys from Filter Slots 1 & 2 (Official Attributes)
+                var activeAttributes = new List<string>();
+                if (!string.IsNullOrWhiteSpace(_filterSlots[0].CurrentKey)) activeAttributes.Add(_filterSlots[0].CurrentKey);
+                if (!string.IsNullOrWhiteSpace(_filterSlots[1].CurrentKey)) activeAttributes.Add(_filterSlots[1].CurrentKey);
+
+                // Gather active keys from Filter Slots 3 & 4 (Custom Categories)
+                var activeCategories = new List<string>();
+                if (!string.IsNullOrWhiteSpace(_filterSlots[2].CurrentKey)) activeCategories.Add(_filterSlots[2].CurrentKey);
+                if (!string.IsNullOrWhiteSpace(_filterSlots[3].CurrentKey)) activeCategories.Add(_filterSlots[3].CurrentKey);
+
+                TaxonomyExtractionService.ExportTemplateDraftToCsv(
+                    _masterCards,
+                    _filterService,
+                    sfd.FileName,
+                    activeAttributes,
+                    activeCategories);
 
                 MessageBox.Show(this,
-                    $"Taxonomy draft template exported successfully to:\n{sfd.FileName}\n\n" +
-                    $"Cards exported: {_masterCards.Count} (matching your active set and filter criteria).\n\n" +
+                    $"Taxonomy draft exported successfully to:\n{sfd.FileName}\n\n" +
+                    $"Cards exported: {_masterCards.Count}\n" +
+                    $"Official attribute columns: {(activeAttributes.Count > 0 ? string.Join(", ", activeAttributes) : "Primary (default)")}\n" +
+                    $"Custom category columns: {(activeCategories.Count > 0 ? string.Join(", ", activeCategories) : "[Insert Category Name] (blank draft)")}\n\n" +
                     "Workflow in Google Sheets or Excel:\n" +
-                    "1. Rename '[Insert Category Name]' to your category (e.g. 'Combat Role' or 'Faction Focus').\n" +
-                    "2. Add additional category columns if desired.\n" +
-                    "3. Enter tags for each card (use ';' for multiple tags).\n" +
-                    "4. Import back via Tools > Import Taxonomy from CSV...",
+                    "1. Review and edit tags (separate multiple tags with ';').\n" +
+                    "2. Add new category columns as needed.\n" +
+                    "3. Import changes back via Tools > Import Taxonomy from CSV...",
                     Constants.AppTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);

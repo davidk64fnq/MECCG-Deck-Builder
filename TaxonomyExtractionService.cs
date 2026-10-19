@@ -320,23 +320,84 @@ namespace MECCG_Deck_Builder
 
         #region CSV_EXPORT_AND_IMPORT
 
-        public static void ExportTemplateDraftToCsv(IReadOnlyList<Card> cards, string filePath)
+        public static void ExportTemplateDraftToCsv(
+            IReadOnlyList<Card> cards,
+            CardFilterService filterService,
+            string filePath,
+            IReadOnlyList<string> selectedAttributes = null,
+            IReadOnlyList<string> selectedCategories = null)
         {
             if (cards == null || cards.Count == 0) return;
 
             var sb = new StringBuilder();
-            sb.AppendLine("Card Name,Set,Primary,[Insert Category Name],Card Text");
 
+            // 1. Determine active official attribute columns (Slots 1 & 2)
+            var attributeColumns = selectedAttributes?
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? [];
+
+            if (attributeColumns.Count == 0)
+            {
+                attributeColumns.Add("Primary"); // Default reference column if none selected
+            }
+
+            // 2. Determine active custom category columns (Slots 3 & 4)
+            var categoryColumns = selectedCategories?
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? [];
+
+            bool hasCategoryColumns = categoryColumns.Count > 0;
+            if (!hasCategoryColumns)
+            {
+                categoryColumns.Add("[Insert Category Name]");
+            }
+
+            // 3. Build CSV Header
+            sb.Append("Card Name,Set");
+            foreach (var attr in attributeColumns)
+            {
+                sb.Append(',').Append(EscapeCsv(attr));
+            }
+            foreach (var cat in categoryColumns)
+            {
+                sb.Append(',').Append(EscapeCsv(cat));
+            }
+            sb.AppendLine(",Card Text");
+
+            // 4. Build Card Rows
             for (int i = 0; i < cards.Count; i++)
             {
                 var card = cards[i];
-                string tagHint = (i == 0) ? "[Insert tag (separate multiple tags with semicolon)]" : string.Empty;
-
                 sb.Append(EscapeCsv(card.Name)).Append(',');
-                sb.Append(EscapeCsv(card.Set)).Append(',');
-                sb.Append(EscapeCsv(card.Primary)).Append(',');
-                sb.Append(EscapeCsv(tagHint)).Append(',');
-                sb.AppendLine(EscapeCsv(card.Text));
+                sb.Append(EscapeCsv(card.Set));
+
+                // Official Attributes
+                foreach (var attr in attributeColumns)
+                {
+                    sb.Append(',').Append(EscapeCsv(card.GetAttribute(attr)));
+                }
+
+                // Custom Categories (live tags or placeholder hint)
+                foreach (var cat in categoryColumns)
+                {
+                    if (hasCategoryColumns && filterService != null)
+                    {
+                        var tags = filterService.GetCardTagsForCategory(card.Id, cat);
+                        string tagVal = tags.Count > 0 ? string.Join("; ", tags) : string.Empty;
+                        sb.Append(',').Append(EscapeCsv(tagVal));
+                    }
+                    else
+                    {
+                        // Blank template hint on the first row
+                        string hint = (i == 0) ? "[Insert tag (separate multiple tags with semicolon)]" : string.Empty;
+                        sb.Append(',').Append(EscapeCsv(hint));
+                    }
+                }
+
+                // Reference text
+                sb.Append(',').AppendLine(EscapeCsv(card.Text));
             }
 
             File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
@@ -399,6 +460,7 @@ namespace MECCG_Deck_Builder
             int setIndex = -1;
             var categoryColumnIndices = new List<(int Index, string CategoryName)>();
 
+            // 1. Map columns from header
             for (int i = 0; i < header.Count; i++)
             {
                 string col = header[i].Trim();
@@ -414,15 +476,16 @@ namespace MECCG_Deck_Builder
                 else if (string.Equals(col, "Primary", StringComparison.OrdinalIgnoreCase) ||
                          string.Equals(col, "Card Text", StringComparison.OrdinalIgnoreCase) ||
                          string.Equals(col, "Text", StringComparison.OrdinalIgnoreCase) ||
-                         string.Equals(col, "Id", StringComparison.OrdinalIgnoreCase))
+                         string.Equals(col, "Id", StringComparison.OrdinalIgnoreCase) ||
+                         CardCatalogService.FilterKeys.Contains(col, StringComparer.OrdinalIgnoreCase))
                 {
-                    // Skip fixed/reference columns
+                    // Skip fixed/reference columns and official database attributes
                 }
                 else if (!string.IsNullOrWhiteSpace(col))
                 {
                     if (col.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
                     {
-                        continue; // Skip placeholder template header if left untouched
+                        continue; // Skip untouched template placeholder column
                     }
                     categoryColumnIndices.Add((i, col));
                 }
@@ -436,7 +499,9 @@ namespace MECCG_Deck_Builder
             int cardsMatched = 0;
             int tagsAssigned = 0;
             var categoriesImportedSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var matchedCardIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+            // 2. Process each row with Authoritative Edit & Replace
             for (int r = 1; r < records.Count; r++)
             {
                 var row = records[r];
@@ -454,18 +519,20 @@ namespace MECCG_Deck_Builder
 
                 if (card == null) continue;
 
-                cardsMatched++;
+                if (matchedCardIds.Add(card.Id))
+                {
+                    cardsMatched++;
+                }
 
+                // Process every custom category column present in the CSV
                 foreach (var (colIdx, catName) in categoryColumnIndices)
                 {
                     if (colIdx >= row.Count) continue;
 
                     string cellValue = row[colIdx].Trim();
-                    if (string.IsNullOrWhiteSpace(cellValue)) continue;
 
-                    // Skip instructional hint if left untouched
-                    if (cellValue.Contains("[Insert", StringComparison.OrdinalIgnoreCase) ||
-                        (cellValue.StartsWith('[') && cellValue.EndsWith(']')))
+                    // Skip instructional template placeholder hint if left untouched
+                    if (cellValue.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
@@ -473,14 +540,40 @@ namespace MECCG_Deck_Builder
                     filterService.AddCustomKeyName(catName);
                     categoriesImportedSet.Add(catName);
 
-                    var tags = cellValue.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    foreach (var tag in tags)
-                    {
-                        if (string.IsNullOrWhiteSpace(tag)) continue;
-                        if (tag.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase)) continue;
+                    // Check for explicit clear command or empty cell
+                    bool isExplicitClear = string.Equals(cellValue, "[clear]", StringComparison.OrdinalIgnoreCase) ||
+                                           string.Equals(cellValue, "[none]", StringComparison.OrdinalIgnoreCase) ||
+                                           string.Equals(cellValue, "-", StringComparison.Ordinal);
 
-                        filterService.AppendCardCustomTag(card.Id, catName, tag);
-                        tagsAssigned++;
+                    if (string.IsNullOrWhiteSpace(cellValue) || isExplicitClear)
+                    {
+                        // Cell was cleared: remove this category tag from the card
+                        filterService.DeleteCardCustomTag(card.Id, catName);
+                        continue;
+                    }
+
+                    // Parse semicolon-delimited tags
+                    var tags = cellValue.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                        .Where(t => !t.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
+                                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                                        .ToList();
+
+                    if (tags.Count > 0)
+                    {
+                        // Edit & Replace: overwrites existing tags for this category with the exact cell content
+                        string combinedTags = string.Join("; ", tags);
+                        filterService.SetCardCustomTag(card.Id, catName, combinedTags);
+
+                        // Ensure tags are added to the dropdown value registry
+                        foreach (var tag in tags)
+                        {
+                            filterService.AddCustomKeyValue(catName, tag);
+                            tagsAssigned++;
+                        }
+                    }
+                    else
+                    {
+                        filterService.DeleteCardCustomTag(card.Id, catName);
                     }
                 }
             }
