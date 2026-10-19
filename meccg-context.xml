@@ -1123,166 +1123,228 @@ namespace MECCG_Deck_Builder.Properties {
 
     <h1>Companion Rules Tag Set Reference</h1>
     <p>
-        MECCG Deck Builder includes a companion taxonomy file (<strong><code>Rules_Support_Tags.json</code></strong>) that loads automatically on startup (or via <strong>Filter &gt; Load/Merge Tag Set...</strong>).
+        MECCG Deck Builder includes a companion taxonomy file (<strong><code>Rules_Support_Tags.json</code></strong>) that loads automatically on startup (or via <strong>Filter &gt; Load / Merge Tag Set...</strong>).
     </p>
     <p>
-        Its primary purpose is to enrich the catalog with objective rules data that Cardnum lacks as structured columns—bridging descriptive rules text (such as <em>&ldquo;Any Dark-hold&rdquo;</em>), character recruiting bonuses, and site automatic-attack classifications so they can be queried by the procedural deck generation engine.
+        Its primary purpose is to enrich the catalog with objective rules data that Cardnum lacks as structured columns—bridging descriptive rules text (such as <em>&ldquo;Any Dark-hold&rdquo;</em>), character recruiting bonuses, site automatic-attack classifications, and gameplay mechanics so they can be queried by the procedural deck generation engine and faceted filters.
     </p>
 
     <div class="tip">
-        <strong>Viewing Tagged Cards In-App:</strong> Rather than consulting a static manual list, you can view the live list of cards tagged in this file at any time right inside the application: in <strong>Filter Slot 3</strong> (bottom panel), select <strong>Category:</strong> <code>Resolved Site</code>, <code>Faction Bonus</code>, or <code>Automatic Attack</code>. The Master List will immediately display all matching cards from your active sets.
+        <strong>Viewing Tagged Cards In-App:</strong> Rather than consulting a static manual list, you can view the live list of cards tagged in this file at any time inside the application: in <strong>Filter Slot 3</strong> (bottom panel), select any <strong>Category</strong> from the table below. The Master List will immediately display all matching cards from your active sets.
     </div>
 
-    <!-- SECTION 1: RESOLVED SITE -->
-    <h2 id="resolved-site">1. Category: <code>Resolved Site</code></h2>
+    <!-- SECTION 1: CUSTOM RULES TAXONOMY TABLE -->
+    <h2 id="taxonomy-table">1. Rules Support Categories &amp; Tags</h2>
     <p>
-        Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).
-    </p>
-    <p>
-        For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites). These fall into three primary archetypes:
+        The following table documents all structured rules categories and illustrative tags maintained in <code>Rules_Support_Tags.json</code>:
     </p>
 
     <table>
         <tr>
-            <th>Resolution Archetype</th>
-            <th>Printed Rule Pattern</th>
-            <th>Representative Cards</th>
-            <th>Resolved Tag Value(s)</th>
-            <th>How It Works in Deck Rules</th>
+            <th style="width: 20%;">Category Name</th>
+            <th style="width: 45%;">Purpose &amp; Description</th>
+            <th style="width: 35%;">Representative Card(s) &amp; Tag Values</th>
         </tr>
         <tr>
-            <td><strong>Hold Type / Site Classification</strong></td>
+            <td><code>Automatic Attack</code></td>
             <td>
-                <code>Home Site: Any Dark-hold</code><br />
-                <code>Home Site: Any Haven</code><br />
-                <code>Home Site: Any Free-hold</code>
+                Indexes guardian creature species printed on site cards (or created by site modifications). Differentiates true Dragon lairs from minor Drake sites and maps regional defenses (Orcs, Trolls, Undead, Elves, etc.) for hazard matching and expedition rules.
             </td>
             <td>
-                Minion Orcs &amp; Trolls (<em>Doeth</em>, <em>Orc Captain</em>, <em>Troll Lout</em>, etc.), <em>Gandalf</em>
-            </td>
-            <td>
-                Semicolon list of surface sites matching that hold type (e.g. <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code> or <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code>).
-            </td>
-            <td>
-                Translates a category classification into concrete surface site titles. When sampled by the engine, one site from the list is chosen at random.
+                <ul>
+                    <li><em>Dancing Spire</em>, <em>The Lonely Mountain</em> &rarr; <code>Dragon</code></li>
+                    <li><em>Carn D&ucirc;m</em>, <em>Moria</em> &rarr; <code>Orcs; Trolls</code></li>
+                    <li><em>Barrow-downs</em>, <em>Dead Marshes</em> &rarr; <code>Undead</code></li>
+                    <li><em>Barad-d&ucirc;r</em> &rarr; <code>Orcs; Trolls; Maia</code></li>
+                    <li><em>Rivendell</em> (Minion) &rarr; <code>Elves; D&uacute;nedain</code></li>
+                </ul>
             </td>
         </tr>
         <tr>
-            <td><strong>Geographic Territory</strong></td>
+            <td><code>Combat Bonus</code></td>
             <td>
-                <code>Adjacent Sites: Any site in &Ucirc;d&ucirc;n (0)</code><br />
-                <code>Home Site: Any site in &Ucirc;d&ucirc;n</code><br />
-                <code>Home Site: Any site in Imlad Morgul</code>
+                Flags cards providing direct prowess, strike cancellation, or tactical combat bonuses against specific creature species or to company members in combat.
             </td>
             <td>
-                <em>The Under-galleries</em>, <em>Dwar of Waw</em>, <em>The Witch-king</em>
-            </td>
-            <td>
-                <code>Cirith Gorgor</code><br />
-                <code>Minas Morgul</code>
-            </td>
-            <td>
-                Resolves regional descriptions to the specific surface hold(s) located within that territory (e.g., <em>Cirith Gorgor</em> is the sole surface hold in the &Ucirc;d&ucirc;n region).
+                <ul>
+                    <li>Rangers/Warriors with bonuses vs. Orcs &rarr; <code>Orc</code></li>
+                    <li>Nazg&ucirc;l hunters &rarr; <code>Nazg&ucirc;l</code></li>
+                    <li>General company prowess boosters &rarr; <code>All</code></li>
+                </ul>
             </td>
         </tr>
         <tr>
-            <td><strong>Complex Conditional Criteria</strong></td>
+            <td><code>Combat Mechanics</code></td>
             <td>
-                <code>Home Site: Any non-"Dragon's lair" Ruins &amp; Lairs in a Wilderness</code><br />
-                <code>Home Site: Any non-Under-deeps Ruins &amp; Lairs</code>
+                Identifies special combat manipulation capabilities, specifically attack cancellations, strike avoidance, and combat evasion events.
             </td>
             <td>
-                <em>Alatar</em>, Stone Trolls (<em>T&ocirc;ma</em>, <em>Brat</em>, <em>Wluag</em>)
+                <ul>
+                    <li><em>Fog</em>, <em>Vanishment</em>, <em>Old Road</em> &rarr; <code>Cancellation</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Corruption Bonus</code></td>
+            <td>
+                Identifies characters, items, or permanent conditions that confer corruption resistance bonuses or roll adjustments protecting the bearer.
             </td>
             <td>
-                Semicolon list of eligible canonical sites (e.g. <code>Dr&uacute;adan Forest; Hermit's Hill; Woodmen-town; Cameth Brin; Dunnish Clan-hold; Ruined Signal Tower</code>).
+                <ul>
+                    <li>Characters with inherent corruption resistance bonuses &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Corruption Penalty</code></td>
+            <td>
+                Marks characters or conditions bearing an inherent drawback or penalty on their own corruption checks (vulnerable or burdened characters).
             </td>
             <td>
-                Translates complex multi-criteria rules into a randomized selection pool of legal candidate sites.
+                <ul>
+                    <li>Characters with self-inflicted corruption check penalties &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Direct Influence Bonus</code></td>
+            <td>
+                Identifies characters who receive bonus Direct Influence (DI) when controlling specific named followers or characters of a particular race.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Galadriel</em> &rarr; <code>Galadriel; Elf</code> (+DI controlling Celeborn or Elves)</li>
+                    <li><em>Aragorn II</em> &rarr; <code>Aragorn II</code> (+DI controlling D&uacute;nedain/followers)</li>
+                    <li>Dwarf company leaders &rarr; <code>Dwarf</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Faction Bonus</code></td>
+            <td>
+                Character recruiting bonuses granting +2 (or more) Direct Influence when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Tag:Faction Bonus}"</code>).
+            </td>
+            <td>
+                <ul>
+                    <li><em>Thranduil</em> &rarr; <code>Wood-elves</code></li>
+                    <li><em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves; Dwarf</code></li>
+                    <li><em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code></li>
+                    <li><em>Elrond</em> &rarr; <code>All; Elf</code></li>
+                    <li><em>Beregond</em> &rarr; <code>Tower Guard of Minas Tirith</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Faction Penalty</code></td>
+            <td>
+                Marks characters who suffer influence penalties or recruitment restrictions when attempting to recruit factions.
+            </td>
+            <td>
+                <ul>
+                    <li>Characters who cannot influence or suffer -DI penalties against factions &rarr; <code>All</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Hand Mechanics</code></td>
+            <td>
+                Identifies cards that increase maximum hand size or permit retrieving cards (such as spells or events) directly from the discard pile or play deck.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Tom Bombadil</em>, <em>Promptings of Wisdom</em> &rarr; <code>Hand Size Bonus</code></li>
+                    <li><em>Gandalf</em>, <em>Voices of Malice</em> &rarr; <code>Spell Retrieval</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Home Region</code></td>
+            <td>
+                Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies (e.g. Eriador, Gondor, Rohan companies) or calculate movement routes.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Aragorn II</em> (Rivendell) &rarr; <code>Rhudaur</code></li>
+                    <li><em>Boromir</em> (Minas Tirith) &rarr; <code>An&oacute;rien</code></li>
+                    <li><em>Th&eacute;oden</em> (Edoras) &rarr; <code>Rohan</code></li>
+                    <li><em>Gimli</em> (Blue Mountain Dwarf-hold) &rarr; <code>Lindon</code></li>
+                    <li><em>Robin Smallburrow</em> &rarr; <code>The Shire; Arthedain</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Home Site Penalty</code></td>
+            <td>
+                Marks characters who suffer gameplay drawbacks, stat reductions, or limitations while at (or away from) their designated home site.
+            </td>
+            <td>
+                <ul>
+                    <li>Characters with localized home penalties &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Marshalling Points Penalty</code></td>
+            <td>
+                Marks liability cards that surrender Marshalling Points (MPs) to the opponent or impose negative victory points if defeated, tapped, or corrupted.
+            </td>
+            <td>
+                <ul>
+                    <li>Characters/items that concede negative MP burdens upon defeat &rarr; <code>Self</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Palant&iacute;r Mechanics</code></td>
+            <td>
+                Identifies characters or cards specifically capable of using, tapping, or gaining bonuses from Palant&iacute;ri without standard drawbacks.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Saruman</em>, <em>Denethor II</em> &rarr; <code>Use Palant&iacute;r</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Region Bonus</code></td>
+            <td>
+                Tags cards granting movement advantages, hazard cancellations, or combat bonuses when traveling through or stationed in specific region terrain types.
+            </td>
+            <td>
+                <ul>
+                    <li>Mariners and coastal travelers &rarr; <code>Coastal Sea</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Resolved Site</code></td>
+            <td>
+                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).<br /><br />
+                For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites).
+            </td>
+            <td>
+                <ul>
+                    <li><em>Doeth</em>, <em>Durthak</em> (card text <em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                    <li><em>Gandalf</em> (card text <em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
+                    <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Ring Mechanics</code></td>
+            <td>
+                Identifies characters, items, or events with dedicated mechanics for testing Gold Rings, searching for the One Ring, or modifying ring test dice rolls.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Gandalf</em>, <em>Saruman</em>, <em>Gollum</em> &rarr; <code>Test Ring</code></li>
+                </ul>
             </td>
         </tr>
     </table>
 
-    <!-- SECTION 2: FACTION BONUS -->
-    <h2 id="faction-bonus">2. Category: <code>Faction Bonus</code></h2>
-    <p>
-        The companion file includes direct influence recruiting bonuses harvested from character card rules text (as demonstrated in the <a href="worked_example_factions.html">Dynamic Faction Recruitment Worked Example</a>).
-    </p>
-    <p>
-        Any character with rules granting +2 Direct Influence against a specific faction is tagged with that faction's exact title (e.g. <em>Thranduil</em> &rarr; <code>Wood-elves</code>, <em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves</code>, <em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code>). This allows generative rules to recruit matching factions dynamically using <code>"Name": "{Leader.Tag:Faction Bonus}"</code>.
-    </p>
-
-    <!-- SECTION 3: AUTOMATIC ATTACK -->
-    <h2 id="automatic-attack">3. Category: <code>Automatic Attack</code></h2>
-    <p>
-        Official Cardnum card attributes do not include a dedicated field for site automatic attacks. To allow procedural deck rules and catalog filters to target or avoid specific guardian creatures, the <code>Automatic Attack</code> category indexes the creature types printed on site cards:
-    </p>
-
-    <table>
-        <tr>
-            <th>Creature Attack Type</th>
-            <th>Tag Value</th>
-            <th>Example Sites</th>
-            <th>Deckbuilding &amp; Rules Significance</th>
-        </tr>
-        <tr>
-            <td><strong>Dragon Lairs</strong></td>
-            <td><code>Dragon</code></td>
-            <td>
-                <em>Dancing Spire</em>, <em>The Lonely Mountain</em>, <em>Gold Hill</em>, <em>Caves of &Ucirc;lund</em>, <em>Zarak D&ucirc;m</em>
-            </td>
-            <td>
-                Identifies the 9 true Dragon Lairs. Differentiates true Dragons from sites with minor <em>Drake</em> attacks (such as <em>The Rusted-deeps</em>). Essential for building dragon-hunting archetypes or querying sites that contain hoards by game rule.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Standard Minion Defenses</strong></td>
-            <td><code>Orcs</code><br /><code>Trolls</code></td>
-            <td>
-                <em>Carn D&ucirc;m</em>, <em>Moria</em>, <em>Goblin-gate</em>, <em>Mount Gundabad</em>
-            </td>
-            <td>
-                Most Dark-holds and Shadow-holds feature Orc or Troll attacks. Sites with multiple attacks receive multi-tags (e.g. <code>Orcs; Trolls</code>), allowing queries to match either type.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Spirits &amp; Undead</strong></td>
-            <td><code>Undead</code></td>
-            <td>
-                <em>Dead Marshes</em>, <em>Minas Morgul</em>, <em>Barrow-downs</em>, <em>Ancient Deep-hold</em>
-            </td>
-            <td>
-                Useful for pairing with anti-undead heroes or hazard-keyed strategies.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Hero Haven Defenses (Minion Game)</strong></td>
-            <td><code>Elves</code><br /><code>D&uacute;nedain</code></td>
-            <td>
-                <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Edhellond</em>, <em>Grey Havens</em>
-            </td>
-            <td>
-                In minion play (<em>The Lidless Eye</em>), hero havens become dangerous Free-holds guarded by Elven and D&uacute;nedain automatic attacks.
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Lethal Entities</strong></td>
-            <td><code>Nazg&ucirc;l</code><br /><code>Maia</code><br /><code>Balrog</code></td>
-            <td>
-                <em>Barad-d&ucirc;r</em> (Maia), <em>Minas Morgul</em> (Nazg&ucirc;l), <em>The Under-gates</em> (Balrog)
-            </td>
-            <td>
-                Identifies non-cancelable or high-prowess guardian entities at major strongholds.
-            </td>
-        </tr>
-    </table>
-
-    <div class="note">
-        <strong>Multiple Automatic Attacks:</strong> If a site features more than one automatic attack (for example, <em>Barad-d&ucirc;r</em> features Orcs, Trolls, and a Maia), all attack types are assigned to the card separated by semicolons (<code>Orcs; Trolls; Maia</code>). A query for any of those individual tags will successfully match the site.
-    </div>
-
-    <!-- SECTION 4: USING COMPANION TAGS IN DECK RULES -->
-    <h2 id="rules-syntax">4. Using Companion Tags in Procedural Deck Rules</h2>
+    <!-- SECTION 2: USING COMPANION TAGS IN DECK RULES -->
+    <h2 id="rules-syntax">2. Using Companion Tags in Procedural Deck Rules</h2>
     <p>
         These companion categories enable rich, declarative deck generation rules:
     </p>
@@ -1309,7 +1371,7 @@ namespace MECCG_Deck_Builder.Properties {
         <strong>Execution Walkthrough:</strong>
         <ul>
             <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
-            <li><strong>Dynamic Characters (Alatar, Gandalf, Orc Captain, Minion Trolls):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Tag:Resolved Site}</code>!</li>
+            <li><strong>Dynamic Characters (Doeth, Durthak, Gandalf, Orc Captain):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Tag:Resolved Site}</code>!</li>
         </ul>
     </div>
 
@@ -1329,17 +1391,19 @@ namespace MECCG_Deck_Builder.Properties {
   }
 }</code></pre>
 
-    <h3>C. Under-deeps Surface Entrances</h3>
+    <h3>C. Regional Themed Recruitment</h3>
     <p>
-        Ensure an Under-deeps company includes an appropriate surface entrance:
+        Recruit backup characters whose home site is located in the same geographic region as the company leader:
     </p>
     <pre><code>{
-  "Name": "Under-deeps Surface Entrance",
-  "Section": "Sites",
-  "Count": 1,
+  "Name": "Regional Reinforcements",
+  "Section": "Pool",
+  "Count": 2,
   "Attributes": {
-    "Primary": "Site",
-    "Name": "{DeepSite.Tag:Resolved Site}"
+    "Primary": "Character"
+  },
+  "Tags": {
+    "Home Region": "{Leader.Tag:Home Region}"
   }
 }</code></pre>
 
@@ -1374,6 +1438,9 @@ namespace MECCG_Deck_Builder.Properties {
         <li><strong>Clear All:</strong> Deselects all expansions.</li>
         <li><strong>Individual Sets:</strong> Check or uncheck individual expansions (e.g., <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or Dreamcard sets).</li>
     </ul>
+    <div class="note">
+        <strong>Session Persistence:</strong> Your active set selection is automatically saved to <code>user_settings.json</code> and restored whenever the application is reopened.
+    </div>
 
     <h2>Dual-Layer Filtering Architecture</h2>
     <p>Located beneath the main workspace, four vertical column pairs of ComboBoxes provide fine-grained catalog search:</p>
@@ -1659,121 +1726,92 @@ pre {
     <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="image_cache.html">Tools &amp; Technical Architecture</a> &gt; Taxonomy Extraction Tools</div>
     <h1>Taxonomy Extraction Tools</h1>
     <p>
-        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to the cards currently visible in your Master List. It allows you to harvest card text, perform cross-card relational joins, or run custom regular expressions to tag hundreds of cards in bulk.
+        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to the cards currently visible in your Master List. It allows you to harvest card text, perform cross-card relational joins, or execute regular expressions to tag hundreds of cards in bulk.
     </p>
-
-    <!-- SECTION 1: DYNAMIC ENTITY HARVEST -->
-    <h2 id="entity-harvest">1. Dynamic Entity Harvesting (from Catalog Text)</h2>
-    <ul>
-        <li><strong>Entity Harvest:</strong> Select any canonical card rules attribute and value (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The app scans active sets in memory, harvests all matching entity titles (e.g. <em>Wood-elves</em>, <em>Riders of Rohan</em>), and searches your scoped Master List cards for gameplay references to those titles.</li>
-        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes (enclosed in quotation marks) and book citations (e.g. <code>—LotRI</code>) are automatically stripped before evaluation, preventing lore quotes from generating false-positive tags.</li>
-    </ul>
-
-    <!-- SECTION 2: RELATIONAL ATTRIBUTE LOOKUP -->
-    <h2 id="relational-lookup">2. Relational Attribute Lookup (Cross-Card Join)</h2>
-    <p>Enables 2-step relational tagging between linked entities:</p>
-    <ul>
-        <li><strong>Source Field:</strong> Reads an attribute from cards in scope (e.g. Character <code>Home</code>).</li>
-        <li><strong>Lookup Entity:</strong> Matches corresponding cards in the catalog (e.g. <code>Primary = Site</code>).</li>
-        <li><strong>Extract Field:</strong> Reads the destination attribute (e.g. Site <code>Region</code>) and writes it into a custom category (e.g. <code>Home Region</code>).</li>
-        <li><strong>Compound Token Parsing:</strong> Characters with multiple homesites (e.g. <code>Rivendell, Bree</code>) automatically resolve both sites to generate semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).</li>
-    </ul>
-
-    <!-- SECTION 3: CUSTOM REGEX EXPRESSION -->
-    <h2 id="custom-regex">3. Custom Regex Expressions (Mode 3)</h2>
-    <p>
-        Mode 3 allows you to test and execute arbitrary .NET regular expressions against the rules text of cards currently in scope. It provides three configurable fields:
-    </p>
-    <table>
-        <tr>
-            <th>Field</th>
-            <th>Description &amp; Behavior</th>
-            <th>Examples</th>
-        </tr>
-        <tr>
-            <td><strong>Category</strong></td>
-            <td>The destination custom taxonomy category where extracted tags will be stored.</td>
-            <td><code>Resolved Site</code>, <code>Combat Role</code>, <code>Audit</code></td>
-        </tr>
-        <tr>
-            <td><strong>Tag Name</strong></td>
-            <td>
-                The value assigned to matching cards. Supports two modes:
-                <ul>
-                    <li><strong>Static Tag / List:</strong> Enter a fixed string or semicolon-separated list. Every matching card receives this exact value.</li>
-                    <li><strong>Regex Capture Group (<code>$1</code>):</strong> If your pattern contains parentheses <code>(...)</code>, using <code>$1</code> dynamically assigns the exact word or phrase matched inside that group.</li>
-                </ul>
-            </td>
-            <td>
-                <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor</code><br />
-                <code>Scout Specialist</code><br />
-                <code>$1</code>
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Pattern</strong></td>
-            <td>
-                The regular expression evaluated against card rules text. Useful flags:
-                <ul>
-                    <li><code>(?i)</code>: Case-insensitive matching.</li>
-                    <li><code>(?s)</code>: Dot-all (singleline) mode, allowing <code>.*</code> to span across multi-line card text paragraphs.</li>
-                    <li><code>\b</code>: Word boundary (ensures <code>\bdragon\b</code> matches "dragon" but not "dragonfly").</li>
-                </ul>
-            </td>
-            <td>
-                <code>(?i)Any Dark-hold</code><br />
-                <code>(?i)\b(greater)\b</code><br />
-                <code>(?is)(?=.*dragon)(?=.*ruin).*</code>
-            </td>
-        </tr>
-    </table>
 
     <div class="note">
-        <strong>Automatic Flavor Text Stripping:</strong>
-        The regex engine automatically strips Tolkien book quotes (<code>&quot;...&quot;</code>) and book attributions (e.g. <code>—LotR</code>, <code>-Hobbit</code>) before evaluating your pattern. Trailing card text like <code>Home Site:</code> is preserved, ensuring your regex searches only active gameplay mechanics.
+        <strong>Master List Scoping:</strong> All extraction tools evaluate <em>only the cards currently visible in the Master List</em>. To target specific cards (e.g. only characters or only cards from a specific expansion), set your filters in the main window before opening the dialog.
     </div>
 
-    <!-- SECTION 4: WORKED EXAMPLE (ANY DARK-HOLD) -->
-    <h2 id="worked-example">4. Worked Walkthrough: Batch-Tagging Minion Dark-holds</h2>
+    <!-- DYNAMIC ENTITY HARVEST -->
+    <h2 id="entity-harvest">Dynamic Entity Harvest (from Catalog Text)</h2>
+    <p>
+        Scans the gameplay text of your scoped cards for references to published entities found across the catalog (such as factions, regions, or characters):
+    </p>
+    <ul>
+        <li><strong>Harvest Entity:</strong> Select the canonical attribute and value that defines the entities you want to search for (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The engine inspects all active sets and gathers all published names (e.g. <em>Wood-elves</em>, <em>Riders of Rohan</em>).</li>
+        <li><strong>Save to Category:</strong> Enter the custom category name where matched tags will be assigned (e.g. <code>Faction Focus</code> or <code>Recruitable Factions</code>).</li>
+        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes (enclosed in quotation marks) and book citations (e.g. <code>—LotRI</code>) are automatically stripped before evaluation, ensuring lore quotes never generate false-positive tags.</li>
+    </ul>
+
+    <!-- RELATIONAL ATTRIBUTE LOOKUP -->
+    <h2 id="relational-lookup">Relational Attribute Lookup (Cross-Card Join)</h2>
+    <p>
+        Performs a two-step relational cross-reference between cards in scope and linked catalog cards to extract attributes into tags:
+    </p>
+    <ul>
+        <li><strong>Read Field:</strong> The attribute on cards currently in scope used as the join key (e.g. Character <code>Home</code>).</li>
+        <li><strong>Lookup Entity:</strong> The catalog criteria used to find matching destination cards (e.g. <code>Primary = Site</code> or <code>Secondary = Faction</code>).</li>
+        <li><strong>Extract Field:</strong> The attribute pulled from the matched catalog cards (e.g. Site <code>Region</code>).</li>
+        <li><strong>Save to Category:</strong> The custom category where the extracted payload is stored as a tag (e.g. <code>Home Region</code>).</li>
+    </ul>
+
+    <div class="tip">
+        <strong>Compound Token Parsing:</strong> Characters with multiple locations (e.g. <code>Rivendell, Bree</code>) automatically resolve each site individually to generate clean, semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).
+    </div>
+
+    <!-- CUSTOM REGEX EXPRESSION -->
+    <h2 id="custom-regex">Custom Regex Expression</h2>
+    <p>
+        Evaluates custom .NET regular expressions directly against card rules text:
+    </p>
+    <ul>
+        <li><strong>Pattern:</strong> The regular expression evaluated against card rules text (e.g. <code>Ruins &amp; Lairs in a Wilderness</code> or <code>\b(greater)\b</code>). Case-insensitivity is enabled by default.</li>
+        <li>
+            <strong>Tag Name:</strong> The value assigned to matching cards. Supports three formats:
+            <ul>
+                <li><em>Static Value:</em> A single fixed label (e.g. <code>Cancellation</code>).</li>
+                <li><em>Multi-Tag List:</em> A semicolon-delimited string (e.g. <code>Barad-dûr; Carn Dûm; Cirith Gorgor</code>).</li>
+                <li><em>Regex Capture Group (<code>$1</code>):</em> If your pattern contains parentheses <code>(...)</code>, using <code>$1</code> dynamically assigns the exact captured word or phrase.</li>
+            </ul>
+        </li>
+        <li><strong>Save to Category:</strong> The custom taxonomy category where extracted tags will be stored.</li>
+    </ul>
+
+    <div class="note">
+        <strong>Session Persistence:</strong> Your last-used Pattern, Tag Name, and Category are automatically remembered across application launches so you can make iterative passes without retyping.
+    </div>
+
+    <!-- WORKED EXAMPLE: CUSTOM REGEX -->
+    <h3 id="worked-example">Worked Example: Batch-Tagging Minion Dark-holds</h3>
     <p>
         In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site (via <a href="rules_support_tags.html"><code>{Leader.Tag:Resolved Site}</code></a>), we can batch-tag all 15 characters in under 30 seconds:
     </p>
 
-    <h3>Step 1: Scope the Master List to the Target Characters</h3>
     <ol>
-        <li>In the main window, check <em>The Lidless Eye</em> (MELE) in the <strong>Set</strong> menu.</li>
-        <li>Set <strong>Filter Slot 1:</strong> <code>Attribute: Home</code>, <code>Value: Any Dark-hold</code>.</li>
-        <li>The Master List immediately displays all 15 matching minion characters.</li>
-    </ol>
-
-    <h3>Step 2: Configure Mode 3 in the Extraction Tool</h3>
-    <ol>
-        <li>Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>. Notice the hint confirming: <em>"Scanning 15 card(s) currently visible in the Master List."</em></li>
-        <li>Select the <strong>Custom Regex Expression</strong> radio button.</li>
         <li>
-            Fill in the extraction parameters:
+            <strong>Scope the Master List:</strong> In the main window, check <em>The Lidless Eye</em> (MELE) in the <strong>Set</strong> menu, and set <strong>Filter Slot 1:</strong> <code>Attribute: Home</code>, <code>Value: Any Dark-hold</code>.
+        </li>
+        <li>
+            <strong>Configure the Extraction Tool:</strong> Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, choose <strong>Custom Regex Expression</strong>, and enter:
             <ul>
-                <li><strong>Category:</strong> <code>Resolved Site</code></li>
-                <li><strong>Tag Name:</strong> <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
-                <li><strong>Pattern:</strong> <code>(?i)Any Dark-hold</code></li>
+                <li><strong>Pattern:</strong> <code>Any Dark-hold</code></li>
+                <li><strong>Tag Name:</strong> <code>Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                <li><strong>Save to Category:</strong> <code>Resolved Site</code></li>
             </ul>
+        </li>
+        <li>
+            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong> to verify the 15 characters, then click <strong>Apply Tags to Catalog</strong>. Persist your changes via <strong>Filter &gt; Save Tag Set...</strong> overwriting <code>Rules_Support_Tags.json</code>.
         </li>
     </ol>
 
-    <h3>Step 3: Preview and Apply</h3>
-    <ol>
-        <li>Click <strong>Test / Preview Matches</strong>. The preview table populates with all 15 characters, showing each will receive the 7 surface Dark-holds in their tag.</li>
-        <li>Click <strong>Apply Tags to Catalog</strong>. All 15 cards are tagged simultaneously in memory.</li>
-        <li>Select <strong>Filter &gt; Save Tag Set...</strong> to persist your new mappings by overwriting <code>Rules_Support_Tags.json</code>.</li>
-    </ol>
-
-    <!-- SECTION 5: JSON BATCH FILES -->
-    <h2 id="json-rules">5. Batch JSON Rule Sets (Mode 4)</h2>
+    <!-- LOAD RULES FROM FILE -->
+    <h2 id="json-rules">Load Rules from File (.json)</h2>
     <p>
-        For large-scale taxonomy extraction across multiple expansions, you can author reusable batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and load them via the <strong>Load Rules from File</strong> option.
+        For large-scale taxonomy extraction across multiple expansions, you can author batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and execute them in a single operation.
     </p>
 
-    <h3>Sample Extraction Rule Schema</h3>
+    <h3>Sample Batch Extraction Schema</h3>
     <pre><code>[
   {
     "Category": "Faction Bonus",
@@ -1782,16 +1820,16 @@ pre {
   },
   {
     "Category": "Resolved Site",
-    "Pattern": "(?i)Any Dark-hold",
-    "TagTemplate": "Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Dol Guldur; Minas Morgul"
+    "Pattern": "Any Dark-hold",
+    "TagTemplate": "Barad-dûr; Carn Dûm; Cirith Gorgor; Dol Guldur; Minas Morgul"
   }
 ]</code></pre>
 
     <div class="tip">
         <strong>See Also:</strong>
         <ul>
-            <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference for the <code>Resolved Site</code> and <code>Faction Bonus</code> categories.</li>
-            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Alternative bulk-tagging method using Microsoft Excel or Google Sheets.</li>
+            <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference table of all standard rules categories and tags.</li>
+            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Bulk-tagging workflow using Microsoft Excel or Google Sheets.</li>
         </ul>
     </div>
 </body>
@@ -2289,6 +2327,8 @@ namespace MECCG_Deck_Builder
 - `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Tag:Cat}`), and fallback routing.
 - `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
 - `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
+- UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
+- RunTaxonomyRulesDialog.cs: Modal extraction dialog with harmonized source-to-destination data flow across all tools (Dynamic Entity Harvest, Dynamic Relational Attribute Lookup, Full-Width Custom Regex, and JSON Batch Rule Execution).
 
 ---
 
@@ -2325,6 +2365,8 @@ namespace MECCG_Deck_Builder
   - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
   - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
   - Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
+- Issue #24: Persist expansion set selection and extraction regex parameters across sessions
+- Issue #25: Harmonize taxonomy extraction UI layout, data flow sequencing, and documentation
 - [ ] **v1.0.0 - First Public Release**
 ]]>
   </file>
@@ -4883,6 +4925,8 @@ namespace MECCG_Deck_Builder
                     }
                 };
 
+                var savedSets = new HashSet<string>(UserSettingsService.Current.SelectedSets ?? [], StringComparer.OrdinalIgnoreCase);
+
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
                     var set = _catalogService.Sets[i];
@@ -4892,12 +4936,30 @@ namespace MECCG_Deck_Builder
                         CheckOnClick = true
                     };
                     menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
-                    if (i == 0)
+
+                    // Restore saved set state; if no saved sets exist yet, default to first set (METW)
+                    bool shouldCheck = savedSets.Count > 0
+                        ? savedSets.Contains(set.Code)
+                        : (i == 0);
+
+                    if (shouldCheck)
                     {
                         menuItem.Checked = true;
                         _currentDeck.IncludedSets.Add(set.Code);
                     }
+
                     ToolStripMenuSet.DropDownItems.Add(menuItem);
+                }
+
+                // Fallback guarantee: if saved codes didn't match any catalog set, select the first set
+                if (_currentDeck.IncludedSets.Count == 0 && _catalogService.Sets.Count > 0)
+                {
+                    var firstSet = _catalogService.Sets[0];
+                    if (ToolStripMenuSet.DropDownItems.Count > 2 && ToolStripMenuSet.DropDownItems[2] is ToolStripMenuItem firstItem)
+                    {
+                        firstItem.Checked = true;
+                    }
+                    _currentDeck.IncludedSets.Add(firstSet.Code);
                 }
             }
             finally
@@ -4917,6 +4979,12 @@ namespace MECCG_Deck_Builder
 
             ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
             ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
+        }
+
+        private void PersistSelectedSets()
+        {
+            UserSettingsService.Current.SelectedSets = [.. _currentDeck.IncludedSets];
+            UserSettingsService.SaveSettings();
         }
 
         private void RefreshFilterKeyDropdowns()
@@ -5262,6 +5330,7 @@ namespace MECCG_Deck_Builder
                 _currentDeck.IncludedSets.Remove(setCode);
             }
 
+            PersistSelectedSets();
             UpdateFacetedFilters();
         }
 
@@ -5287,6 +5356,7 @@ namespace MECCG_Deck_Builder
                 _isUpdatingFilters = false;
             }
 
+            PersistSelectedSets();
             UpdateFacetedFilters();
         }
 
@@ -5312,6 +5382,7 @@ namespace MECCG_Deck_Builder
                 _isUpdatingFilters = false;
             }
 
+            PersistSelectedSets();
             UpdateFacetedFilters();
         }
 
@@ -5747,6 +5818,7 @@ namespace MECCG_Deck_Builder
                     RefreshSectionListBox(sectionType);
                 }
 
+                PersistSelectedSets();
                 UpdateFacetedFilters();
                 UpdateFormTitle();
             }
@@ -6365,6 +6437,7 @@ namespace MECCG_Deck_Builder
             {
                 _isUpdatingFilters = false;
             }
+            PersistSelectedSets();
 
             // Reset filter controls so user can freely inspect master list
             ResetAllFilters();
@@ -8329,7 +8402,8 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - **Archive Breakdown (`.archive`):** Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - **Plain Text (`.txt`):** Formatted deck listing.
 - **Procedural Deck Generator:** Generate complete decks from JSON rule files with attribute/tag queries, copy limits, tiered variety-first duplication, and random branching choices (`RandomChoice`). Features runtime variable capture (`SaveAs`), dynamic cross-card token queries (e.g. `{Leader.Tag:Faction Bonus}`, `{Leader.Home}`), and automated shortfall fallbacks (`Fallback`). Re-run instant variations with <kbd>F5</kbd>.
-- **Relational Taxonomy Extraction:** Cross-reference card attributes across entities (such as mapping Character `Home` to Site `Region`) to produce automatic multi-tags.
+- **Relational Taxonomy Extraction & Harvesting:** Scan card text to harvest published entities, perform cross-card relational joins across any entity attribute, or execute custom regular expressions in an expanded full-width workspace with automatic session persistence and flavor text filtering.
+- **Session Persistence:** Remembers your active expansion set selection across application restarts and preserves your last-used taxonomy extraction mode, regular expressions, and tag categories for iterative tagging workflows.
 
 ---
 
@@ -8414,22 +8488,23 @@ namespace MECCG_Deck_Builder
 
         // Mode 1: Dynamic Entity Harvest
         private readonly RadioButton _rbHarvest;
-        private readonly TextBox _txtHarvestCategory;
         private readonly ComboBox _cmbHarvestAttribute;
         private readonly ComboBox _cmbHarvestValue;
+        private readonly TextBox _txtHarvestCategory;
 
         // Mode 2: Relational Attribute Lookup (Cross-Card Join)
         private readonly RadioButton _rbRelational;
-        private readonly TextBox _txtRelCategory;
         private readonly ComboBox _cmbRelSourceAttr;
+        private readonly ComboBox _cmbRelLookupAttr;
         private readonly ComboBox _cmbRelLookupVal;
         private readonly ComboBox _cmbRelTargetAttr;
+        private readonly TextBox _txtRelCategory;
 
-        // Mode 3: Quick Regex
+        // Mode 3: Custom Regex
         private readonly RadioButton _rbQuick;
-        private readonly TextBox _txtRegexCategory;
-        private readonly TextBox _txtRegexTag;
         private readonly TextBox _txtRegexPattern;
+        private readonly TextBox _txtRegexTag;
+        private readonly TextBox _txtRegexCategory;
 
         // Mode 4: File
         private readonly RadioButton _rbFile;
@@ -8455,8 +8530,10 @@ namespace MECCG_Deck_Builder
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
 
+            var settings = UserSettingsService.Current;
+
             Text = $"Extract Taxonomy with Rules ({_targetCards.Count} cards in Master List)";
-            ClientSize = new Size(720, 630);
+            ClientSize = new Size(740, 680);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -8468,104 +8545,151 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Extraction Rule Source",
                 Location = new Point(12, 12),
-                Size = new Size(696, 270)
+                Size = new Size(716, 320)
             };
 
-            // 1. Dynamic Entity Harvest
+            // ==========================================
+            // MODE 1: DYNAMIC ENTITY HARVEST
+            // ==========================================
             _rbHarvest = new RadioButton
             {
                 Text = "Dynamic Entity Harvest (from Catalog Text):",
                 Location = new Point(12, 20),
-                Size = new Size(290, 20),
-                Checked = true,
+                Size = new Size(300, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbHarvest.CheckedChanged += RuleSource_Changed;
 
-            var lblHCategory = new Label { Text = "Target Category:", Location = new Point(32, 44), Size = new Size(100, 18) };
-            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(135, 41), Size = new Size(160, 23) };
-
-            var lblHAttr = new Label { Text = "Attribute:", Location = new Point(305, 44), Size = new Size(60, 18) };
+            // Row 1: Source Definition
+            var lblHAttr = new Label { Text = "Harvest Entity:", Location = new Point(32, 44), Size = new Size(90, 18) };
             _cmbHarvestAttribute = new ComboBox
             {
-                Location = new Point(365, 41),
-                Size = new Size(130, 23),
+                Location = new Point(125, 41),
+                Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbHarvestAttribute.SelectedIndexChanged += CmbHarvestAttribute_SelectedIndexChanged;
 
-            var lblHVal = new Label { Text = "Value:", Location = new Point(505, 44), Size = new Size(42, 18) };
+            var lblHEqual = new Label { Text = "=", Location = new Point(270, 44), Size = new Size(16, 18), TextAlign = ContentAlignment.MiddleCenter };
             _cmbHarvestValue = new ComboBox
             {
-                Location = new Point(547, 41),
-                Size = new Size(135, 23),
+                Location = new Point(292, 41),
+                Size = new Size(160, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
 
-            // 2. Relational Attribute Lookup (Cross-Card Join)
+            // Row 2: Destination Category
+            var lblHCategory = new Label { Text = "Save to Category:", Location = new Point(32, 72), Size = new Size(110, 18) };
+            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(145, 69), Size = new Size(307, 23) };
+
+            // ==========================================
+            // MODE 2: RELATIONAL ATTRIBUTE LOOKUP
+            // ==========================================
             _rbRelational = new RadioButton
             {
                 Text = "Relational Attribute Lookup (Cross-Card Join):",
-                Location = new Point(12, 72),
+                Location = new Point(12, 100),
                 Size = new Size(330, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbRelational.CheckedChanged += RuleSource_Changed;
 
-            var lblRelCategory = new Label { Text = "Target Category:", Location = new Point(32, 96), Size = new Size(100, 18) };
-            _txtRelCategory = new TextBox { Text = "Home Region", Location = new Point(135, 93), Size = new Size(160, 23), Enabled = false };
-
-            var lblRelSource = new Label { Text = "Source Field:", Location = new Point(305, 96), Size = new Size(76, 18) };
+            // Row 1: Read Field -> Lookup Entity (Attribute = Value)
+            var lblRel1 = new Label { Text = "Read Field:", Location = new Point(32, 124), Size = new Size(90, 18) };
             _cmbRelSourceAttr = new ComboBox
             {
-                Location = new Point(381, 93),
-                Size = new Size(114, 23),
+                Location = new Point(125, 121),
+                Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
 
-            var lblRelLookup = new Label { Text = "Lookup Entity:", Location = new Point(505, 96), Size = new Size(85, 18) };
+            var lblRel2 = new Label { Text = "Lookup Entity:", Location = new Point(280, 124), Size = new Size(90, 18) };
+            _cmbRelLookupAttr = new ComboBox
+            {
+                Location = new Point(375, 121),
+                Size = new Size(135, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = false
+            };
+            _cmbRelLookupAttr.SelectedIndexChanged += CmbRelLookupAttr_SelectedIndexChanged;
+
+            var lblRelEqual = new Label { Text = "=", Location = new Point(515, 124), Size = new Size(16, 18), TextAlign = ContentAlignment.MiddleCenter };
             _cmbRelLookupVal = new ComboBox
             {
-                Location = new Point(590, 93),
-                Size = new Size(92, 23),
+                Location = new Point(535, 121),
+                Size = new Size(165, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
 
-            var lblRelTarget = new Label { Text = "Extract Field:", Location = new Point(305, 124), Size = new Size(76, 18) };
+            // Row 2: Extract Field -> Save to Category
+            var lblRel3 = new Label { Text = "Extract Field:", Location = new Point(32, 152), Size = new Size(90, 18) };
             _cmbRelTargetAttr = new ComboBox
             {
-                Location = new Point(381, 121),
-                Size = new Size(114, 23),
+                Location = new Point(125, 149),
+                Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
 
-            // 3. Custom Regex Expression
+            var lblRel4 = new Label { Text = "Save to Category:", Location = new Point(280, 152), Size = new Size(115, 18) };
+            _txtRelCategory = new TextBox
+            {
+                Text = settings.LastRelationalCategory ?? "Home Region",
+                Location = new Point(400, 149),
+                Size = new Size(300, 23),
+                Enabled = false
+            };
+
+            // ==========================================
+            // MODE 3: CUSTOM REGEX EXPRESSION
+            // ==========================================
             _rbQuick = new RadioButton
             {
                 Text = "Custom Regex Expression:",
-                Location = new Point(12, 150),
+                Location = new Point(12, 180),
                 Size = new Size(220, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbQuick.CheckedChanged += RuleSource_Changed;
 
-            var lblQCategory = new Label { Text = "Category:", Location = new Point(32, 174), Size = new Size(65, 18) };
-            _txtRegexCategory = new TextBox { Text = "Custom Trait", Location = new Point(97, 171), Size = new Size(150, 23), Enabled = false };
+            // Row 1: Full-width Search Pattern
+            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(32, 204), Size = new Size(60, 18) };
+            _txtRegexPattern = new TextBox
+            {
+                Text = settings.LastExtractionPattern ?? @"(?i)Dwarf factions?",
+                Location = new Point(95, 201),
+                Size = new Size(605, 23),
+                Enabled = false
+            };
 
-            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(255, 174), Size = new Size(68, 18) };
-            _txtRegexTag = new TextBox { Text = "$1", Location = new Point(325, 171), Size = new Size(130, 23), Enabled = false };
+            // Row 2: Tag Name -> Save to Category
+            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(32, 232), Size = new Size(65, 18) };
+            _txtRegexTag = new TextBox
+            {
+                Text = settings.LastExtractionTag ?? "$1",
+                Location = new Point(100, 229),
+                Size = new Size(290, 23),
+                Enabled = false
+            };
 
-            var lblQPattern = new Label { Text = "Pattern:", Location = new Point(465, 174), Size = new Size(50, 18) };
-            _txtRegexPattern = new TextBox { Text = @"(?i)Dwarf factions?", Location = new Point(515, 171), Size = new Size(167, 23), Enabled = false };
+            var lblQCategory = new Label { Text = "Save to Category:", Location = new Point(405, 232), Size = new Size(110, 18) };
+            _txtRegexCategory = new TextBox
+            {
+                Text = settings.LastExtractionCategory ?? "Custom Trait",
+                Location = new Point(520, 229),
+                Size = new Size(180, 23),
+                Enabled = false
+            };
 
-            // 4. Load File
+            // ==========================================
+            // MODE 4: FILE
+            // ==========================================
             _rbFile = new RadioButton
             {
                 Text = "Load Rules from File (.json):",
-                Location = new Point(12, 204),
+                Location = new Point(12, 260),
                 Size = new Size(220, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
@@ -8573,8 +8697,8 @@ namespace MECCG_Deck_Builder
 
             _txtFilePath = new TextBox
             {
-                Location = new Point(32, 228),
-                Size = new Size(550, 23),
+                Location = new Point(32, 283),
+                Size = new Size(570, 23),
                 ReadOnly = true,
                 Enabled = false
             };
@@ -8582,24 +8706,42 @@ namespace MECCG_Deck_Builder
             _btnBrowseFile = new Button
             {
                 Text = "Browse...",
-                Location = new Point(590, 227),
-                Size = new Size(92, 25),
+                Location = new Point(610, 282),
+                Size = new Size(90, 25),
                 Enabled = false
             };
             _btnBrowseFile.Click += BtnBrowseFile_Click;
 
             grpSource.Controls.AddRange([
-                _rbHarvest, lblHCategory, _txtHarvestCategory, lblHAttr, _cmbHarvestAttribute, lblHVal, _cmbHarvestValue,
-                _rbRelational, lblRelCategory, _txtRelCategory, lblRelSource, _cmbRelSourceAttr, lblRelLookup, _cmbRelLookupVal, lblRelTarget, _cmbRelTargetAttr,
-                _rbQuick, lblQCategory, _txtRegexCategory, lblQTag, _txtRegexTag, lblQPattern, _txtRegexPattern,
+                _rbHarvest, lblHAttr, _cmbHarvestAttribute, lblHEqual, _cmbHarvestValue, lblHCategory, _txtHarvestCategory,
+                _rbRelational, lblRel1, _cmbRelSourceAttr, lblRel2, _cmbRelLookupAttr, lblRelEqual, _cmbRelLookupVal,
+                lblRel3, _cmbRelTargetAttr, lblRel4, _txtRelCategory,
+                _rbQuick, lblQPattern, _txtRegexPattern, lblQTag, _txtRegexTag, lblQCategory, _txtRegexCategory,
                 _rbFile, _txtFilePath, _btnBrowseFile
             ]);
+
+            // Restore active extraction mode
+            switch (settings.LastExtractionMode)
+            {
+                case 2:
+                    _rbRelational.Checked = true;
+                    break;
+                case 3:
+                    _rbQuick.Checked = true;
+                    break;
+                case 4:
+                    _rbFile.Checked = true;
+                    break;
+                default:
+                    _rbHarvest.Checked = true;
+                    break;
+            }
 
             // Preview & actions
             _btnTest = new Button
             {
                 Text = "Test / Preview Matches",
-                Location = new Point(12, 290),
+                Location = new Point(12, 340),
                 Size = new Size(160, 28)
             };
             _btnTest.Click += BtnTest_Click;
@@ -8607,15 +8749,15 @@ namespace MECCG_Deck_Builder
             var lblScopeHint = new Label
             {
                 Text = $"Scanning {_targetCards.Count} card(s) currently visible in the Master List.",
-                Location = new Point(180, 295),
+                Location = new Point(180, 345),
                 Size = new Size(520, 20),
                 ForeColor = Color.DimGray
             };
 
             _lstPreview = new ListView
             {
-                Location = new Point(12, 326),
-                Size = new Size(696, 250),
+                Location = new Point(12, 375),
+                Size = new Size(716, 250),
                 View = View.Details,
                 FullRowSelect = true,
                 GridLines = true
@@ -8623,12 +8765,12 @@ namespace MECCG_Deck_Builder
             _lstPreview.Columns.Add("Card Name", 230);
             _lstPreview.Columns.Add("Set", 60);
             _lstPreview.Columns.Add("Category", 150);
-            _lstPreview.Columns.Add("Extracted Tag", 230);
+            _lstPreview.Columns.Add("Extracted Tag", 250);
 
             _btnExportCsv = new Button
             {
                 Text = "Export to CSV...",
-                Location = new Point(330, 588),
+                Location = new Point(350, 638),
                 Size = new Size(130, 30)
             };
             _btnExportCsv.Click += BtnExportCsv_Click;
@@ -8636,7 +8778,7 @@ namespace MECCG_Deck_Builder
             _btnApply = new Button
             {
                 Text = "Apply Tags to Catalog",
-                Location = new Point(470, 588),
+                Location = new Point(490, 638),
                 Size = new Size(150, 30)
             };
             _btnApply.Click += BtnApply_Click;
@@ -8644,7 +8786,7 @@ namespace MECCG_Deck_Builder
             _btnClose = new Button
             {
                 Text = "Close",
-                Location = new Point(628, 588),
+                Location = new Point(648, 638),
                 Size = new Size(80, 30),
                 DialogResult = DialogResult.Cancel
             };
@@ -8652,35 +8794,43 @@ namespace MECCG_Deck_Builder
             Controls.AddRange([grpSource, _btnTest, lblScopeHint, _lstPreview, _btnExportCsv, _btnApply, _btnClose]);
             CancelButton = _btnClose;
 
+            FormClosing += (s, e) => SaveCurrentSettings();
+
             PopulateDropdowns();
         }
 
         private void PopulateDropdowns()
         {
-            // Populate harvest keys
+            var settings = UserSettingsService.Current;
+
             _cmbHarvestAttribute.Items.Clear();
+            _cmbRelSourceAttr.Items.Clear();
+            _cmbRelTargetAttr.Items.Clear();
+            _cmbRelLookupAttr.Items.Clear();
+
             var keys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
             foreach (var k in keys)
             {
                 _cmbHarvestAttribute.Items.Add(k);
                 _cmbRelSourceAttr.Items.Add(k);
                 _cmbRelTargetAttr.Items.Add(k);
+                _cmbRelLookupAttr.Items.Add(k);
             }
 
             int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
             if (defaultHarvestIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx;
 
-            // Relational Source defaults to "Home"
-            int homeIdx = _cmbRelSourceAttr.FindStringExact("Home");
-            _cmbRelSourceAttr.SelectedIndex = homeIdx >= 0 ? homeIdx : 0;
+            string savedSource = settings.LastRelationalSourceAttr ?? "Home";
+            int sourceIdx = _cmbRelSourceAttr.FindStringExact(savedSource);
+            _cmbRelSourceAttr.SelectedIndex = sourceIdx >= 0 ? sourceIdx : 0;
 
-            // Relational Target defaults to "Region"
-            int regionIdx = _cmbRelTargetAttr.FindStringExact("Region");
-            _cmbRelTargetAttr.SelectedIndex = regionIdx >= 0 ? regionIdx : 0;
+            string savedTarget = settings.LastRelationalTargetAttr ?? "Region";
+            int targetIdx = _cmbRelTargetAttr.FindStringExact(savedTarget);
+            _cmbRelTargetAttr.SelectedIndex = targetIdx >= 0 ? targetIdx : 0;
 
-            // Relational Lookup values
-            _cmbRelLookupVal.Items.AddRange(["Site", "Region", "Character", "Item", "Hazard"]);
-            _cmbRelLookupVal.SelectedIndex = 0;
+            string savedLookupAttr = settings.LastRelationalLookupAttr ?? "Primary";
+            int lookupAttrIdx = _cmbRelLookupAttr.FindStringExact(savedLookupAttr);
+            _cmbRelLookupAttr.SelectedIndex = lookupAttrIdx >= 0 ? lookupAttrIdx : 0;
         }
 
         private void CmbHarvestAttribute_SelectedIndexChanged(object sender, EventArgs e)
@@ -8703,27 +8853,98 @@ namespace MECCG_Deck_Builder
             else if (_cmbHarvestValue.Items.Count > 0) _cmbHarvestValue.SelectedIndex = 0;
         }
 
+        private void CmbRelLookupAttr_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string attr = _cmbRelLookupAttr.SelectedItem?.ToString() ?? string.Empty;
+            _cmbRelLookupVal.Items.Clear();
+            if (string.IsNullOrWhiteSpace(attr)) return;
+
+            var values = _catalog.GetFilterValues(attr);
+            foreach (var v in values)
+            {
+                if (!string.IsNullOrWhiteSpace(v))
+                {
+                    _cmbRelLookupVal.Items.Add(v);
+                }
+            }
+
+            string savedLookupVal = UserSettingsService.Current.LastRelationalLookupVal ?? "Site";
+            int defaultIdx = _cmbRelLookupVal.FindStringExact(savedLookupVal);
+            if (defaultIdx >= 0) _cmbRelLookupVal.SelectedIndex = defaultIdx;
+            else if (_cmbRelLookupVal.Items.Count > 0) _cmbRelLookupVal.SelectedIndex = 0;
+        }
+
         private void RuleSource_Changed(object sender, EventArgs e)
         {
             bool isHarvest = _rbHarvest.Checked;
-            _txtHarvestCategory.Enabled = isHarvest;
             _cmbHarvestAttribute.Enabled = isHarvest;
             _cmbHarvestValue.Enabled = isHarvest;
+            _txtHarvestCategory.Enabled = isHarvest;
 
             bool isRelational = _rbRelational.Checked;
-            _txtRelCategory.Enabled = isRelational;
             _cmbRelSourceAttr.Enabled = isRelational;
+            _cmbRelLookupAttr.Enabled = isRelational;
             _cmbRelLookupVal.Enabled = isRelational;
             _cmbRelTargetAttr.Enabled = isRelational;
+            _txtRelCategory.Enabled = isRelational;
 
             bool isQuick = _rbQuick.Checked;
-            _txtRegexCategory.Enabled = isQuick;
-            _txtRegexTag.Enabled = isQuick;
             _txtRegexPattern.Enabled = isQuick;
+            _txtRegexTag.Enabled = isQuick;
+            _txtRegexCategory.Enabled = isQuick;
 
             bool isFile = _rbFile.Checked;
             _txtFilePath.Enabled = isFile;
             _btnBrowseFile.Enabled = isFile;
+        }
+
+        private void SaveCurrentSettings()
+        {
+            var settings = UserSettingsService.Current;
+
+            // Mode 3 Quick Regex
+            if (!string.IsNullOrWhiteSpace(_txtRegexCategory.Text))
+            {
+                settings.LastExtractionCategory = _txtRegexCategory.Text.Trim();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtRegexTag.Text))
+            {
+                settings.LastExtractionTag = _txtRegexTag.Text.Trim();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtRegexPattern.Text))
+            {
+                settings.LastExtractionPattern = _txtRegexPattern.Text.Trim();
+            }
+
+            // Mode 2 Relational Lookup
+            if (!string.IsNullOrWhiteSpace(_txtRelCategory.Text))
+            {
+                settings.LastRelationalCategory = _txtRelCategory.Text.Trim();
+            }
+            if (_cmbRelSourceAttr.SelectedItem != null)
+            {
+                settings.LastRelationalSourceAttr = _cmbRelSourceAttr.SelectedItem.ToString();
+            }
+            if (_cmbRelLookupAttr.SelectedItem != null)
+            {
+                settings.LastRelationalLookupAttr = _cmbRelLookupAttr.SelectedItem.ToString();
+            }
+            if (_cmbRelLookupVal.SelectedItem != null)
+            {
+                settings.LastRelationalLookupVal = _cmbRelLookupVal.SelectedItem.ToString();
+            }
+            if (_cmbRelTargetAttr.SelectedItem != null)
+            {
+                settings.LastRelationalTargetAttr = _cmbRelTargetAttr.SelectedItem.ToString();
+            }
+
+            // Active mode
+            if (_rbQuick.Checked) settings.LastExtractionMode = 3;
+            else if (_rbRelational.Checked) settings.LastExtractionMode = 2;
+            else if (_rbFile.Checked) settings.LastExtractionMode = 4;
+            else settings.LastExtractionMode = 1;
+
+            UserSettingsService.SaveSettings();
         }
 
         private void BtnBrowseFile_Click(object sender, EventArgs e)
@@ -8752,9 +8973,12 @@ namespace MECCG_Deck_Builder
 
         private ExtractionResult RunExtraction()
         {
+            SaveCurrentSettings();
+
             if (_rbRelational.Checked)
             {
                 string sourceAttr = _cmbRelSourceAttr.SelectedItem?.ToString() ?? "Home";
+                string lookupAttr = _cmbRelLookupAttr.SelectedItem?.ToString() ?? "Primary";
                 string lookupVal = _cmbRelLookupVal.SelectedItem?.ToString() ?? "Site";
                 string targetAttr = _cmbRelTargetAttr.SelectedItem?.ToString() ?? "Region";
                 string category = _txtRelCategory.Text.Trim();
@@ -8763,7 +8987,7 @@ namespace MECCG_Deck_Builder
                     _targetCards,
                     _catalog.Cards,
                     sourceAttr,
-                    "Primary",
+                    lookupAttr,
                     lookupVal,
                     targetAttr,
                     category);
@@ -9137,11 +9361,11 @@ namespace MECCG_Deck_Builder
 
             string category = string.IsNullOrWhiteSpace(categoryName) ? "Relational Tags" : categoryName.Trim();
 
-            // 1. Build lookup dictionary from catalog entities (e.g. Primary = Site)
+            // 1. Build lookup dictionary from catalog entities using MatchesCardnumCriterion
             var lookupCards = catalogCards;
             if (!string.IsNullOrWhiteSpace(lookupAttribute) && !string.IsNullOrWhiteSpace(lookupValue))
             {
-                lookupCards = lookupCards.Where(c => string.Equals(c.GetAttribute(lookupAttribute), lookupValue.Trim(), StringComparison.OrdinalIgnoreCase));
+                lookupCards = lookupCards.Where(c => CardFilterService.MatchesCardnumCriterion(c, lookupAttribute, lookupValue));
             }
 
             // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"])
@@ -9186,7 +9410,6 @@ namespace MECCG_Deck_Builder
                 var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 foreach (var part in parts)
                 {
-                    // Also handle " or " and " and "
                     var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                     foreach (var sub in subParts)
                     {
@@ -9516,6 +9739,88 @@ namespace MECCG_Deck_Builder
         }
 
         #endregion
+    }
+}
+]]>
+  </file>
+  <file path='.\UserSettings.cs'>
+<![CDATA[
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Windows.Forms;
+using Newtonsoft.Json;
+
+namespace MECCG_Deck_Builder
+{
+    public sealed class UserSettings
+    {
+        public List<string> SelectedSets { get; set; } = [];
+
+        // Active mode
+        public int LastExtractionMode { get; set; } = 1; // 1 = Harvest, 2 = Relational, 3 = Quick Regex, 4 = File
+
+        // Mode 2 Relational Defaults
+        public string LastRelationalCategory { get; set; } = "Home Region";
+        public string LastRelationalSourceAttr { get; set; } = "Home";
+        public string LastRelationalLookupAttr { get; set; } = "Primary";
+        public string LastRelationalLookupVal { get; set; } = "Site";
+        public string LastRelationalTargetAttr { get; set; } = "Region";
+
+        // Mode 3 Regex Defaults
+        public string LastExtractionCategory { get; set; } = "Custom Trait";
+        public string LastExtractionTag { get; set; } = "$1";
+        public string LastExtractionPattern { get; set; } = @"(?i)Dwarf factions?";
+    }
+
+    public static class UserSettingsService
+    {
+        private static readonly string SettingsFilePath = Path.Combine(Application.StartupPath, "user_settings.json");
+        private static UserSettings s_current;
+
+        public static UserSettings Current
+        {
+            get
+            {
+                s_current ??= LoadSettings();
+                return s_current;
+            }
+        }
+
+        public static UserSettings LoadSettings()
+        {
+            try
+            {
+                if (File.Exists(SettingsFilePath))
+                {
+                    string json = File.ReadAllText(SettingsFilePath);
+                    var settings = JsonConvert.DeserializeObject<UserSettings>(json);
+                    if (settings != null)
+                    {
+                        return settings;
+                    }
+                }
+            }
+            catch
+            {
+                // Graceful fallback to default instance on I/O or JSON read errors
+            }
+
+            return new UserSettings();
+        }
+
+        public static void SaveSettings()
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(Current, Formatting.Indented);
+                File.WriteAllText(SettingsFilePath, json);
+            }
+            catch
+            {
+                // Non-fatal if disk write fails due to permissions
+            }
+        }
     }
 }
 ]]>

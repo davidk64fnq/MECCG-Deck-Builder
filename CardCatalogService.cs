@@ -42,7 +42,7 @@ namespace MECCG_Deck_Builder
 
         public IReadOnlyList<string> GetFilterKeys()
         {
-            var keys = new List<string> { "" }; // Index 0 is blank
+            var keys = new List<string> { "" };
             var sortedKeys = new List<string>(_filterOptions.Keys);
             sortedKeys.Sort(StringComparer.Ordinal);
             keys.AddRange(sortedKeys);
@@ -55,7 +55,7 @@ namespace MECCG_Deck_Builder
             {
                 return values;
             }
-            return [""]; // If key is blank, values list is just blank
+            return [""];
         }
 
         public async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -66,118 +66,96 @@ namespace MECCG_Deck_Builder
 
         private async Task LoadSetsAsync(CancellationToken cancellationToken)
         {
-            string json = null;
+            string filePath = StoragePathService.ResolveDataFilePath(Constants.CardnumSetsFile);
             List<CardnumSet> rawSets = null;
 
-            // 1. Try download from GitHub
-            try
+            if (File.Exists(filePath))
             {
-                json = await s_httpClient.GetStringAsync(Constants.CardnumSetsURL, cancellationToken).ConfigureAwait(false);
-                rawSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                 try
                 {
-                    await File.WriteAllTextAsync(Constants.CardnumSetsFile, json, cancellationToken).ConfigureAwait(false);
+                    string json = await File.ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
+                    rawSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                 }
                 catch (Exception)
                 {
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo3"));
-                }
-            }
-            catch (Exception)
-            {
-                // 2. Fallback to local file
-                try
-                {
-                    json = await File.ReadAllTextAsync(Constants.CardnumSetsFile, cancellationToken).ConfigureAwait(false);
-                    rawSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                     WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo1"));
                 }
-                catch (Exception)
+            }
+
+            if (rawSets == null || rawSets.Count == 0)
+            {
+                _sets.Clear();
+                _sets.Add(new CardSet
                 {
-                    // 3. Emergency fallback
-                    _sets.Clear();
-                    _sets.Add(new CardSet
-                    {
-                        Code = "METW",
-                        Name = "The Wizards",
-                        Format = "General",
-                        Position = 1,
-                        Dreamcards = false,
-                        Released = true
-                    });
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo2"));
-                    return;
-                }
+                    Code = "METW",
+                    Name = "The Wizards",
+                    Format = "General",
+                    Position = 1,
+                    Dreamcards = false,
+                    Released = true
+                });
+                WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo2"));
+                return;
             }
 
             _sets.Clear();
-            if (rawSets != null)
+            foreach (var s in rawSets)
             {
-                foreach (var s in rawSets)
+                _sets.Add(new CardSet
                 {
-                    _sets.Add(new CardSet
-                    {
-                        Code = s.Code,
-                        Name = s.Name,
-                        Format = s.Format,
-                        Position = s.Position,
-                        Dreamcards = s.Dreamcards,
-                        Released = s.Released
-                    });
-                }
+                    Code = s.Code,
+                    Name = s.Name,
+                    Format = s.Format,
+                    Position = s.Position,
+                    Dreamcards = s.Dreamcards,
+                    Released = s.Released
+                });
             }
         }
 
         private async Task LoadCardsAsync(CancellationToken cancellationToken)
         {
-            string json = null;
+            string filePath = StoragePathService.ResolveDataFilePath(Constants.CardnumCardsFile);
             List<CardnumCard> rawCards = null;
 
-            // 1. Try download from GitHub
-            try
+            if (File.Exists(filePath))
             {
-                json = await s_httpClient.GetStringAsync(Constants.CardnumCardsURL, cancellationToken).ConfigureAwait(false);
-                rawCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
                 try
                 {
-                    await File.WriteAllTextAsync(Constants.CardnumCardsFile, json, cancellationToken).ConfigureAwait(false);
-                }
-                catch (Exception)
-                {
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo3"));
-                }
-            }
-            catch (Exception)
-            {
-                // 2. Fallback to local file
-                try
-                {
-                    json = await File.ReadAllTextAsync(Constants.CardnumCardsFile, cancellationToken).ConfigureAwait(false);
+                    string json = await File.ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
                     rawCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo1"));
                 }
                 catch (Exception)
                 {
-                    // 3. Emergency fallback: Single default card
-                    var emergencyCard = new Card
-                    {
-                        Id = "0",
-                        Set = "METW",
-                        FullCode = "Adrazar (TW)",
-                        Name = "Adrazar",
-                        Alignment = "Hero",
-                        ImageName = "metw_adrazar.jpg",
-                        Released = true
-                    };
-                    _cards.Clear();
-                    _cardsById.Clear();
-                    _cards.Add(emergencyCard);
-                    _cardsById[emergencyCard.Id] = emergencyCard;
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo2"));
-                    return;
+                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo1"));
                 }
             }
 
+            if (rawCards == null || rawCards.Count == 0)
+            {
+                var emergencyCard = new Card
+                {
+                    Id = "0",
+                    Set = "METW",
+                    FullCode = "Adrazar (TW)",
+                    Name = "Adrazar",
+                    Alignment = "Hero",
+                    ImageName = "metw_adrazar.jpg",
+                    Released = true
+                };
+                _cards.Clear();
+                _cardsById.Clear();
+                _cards.Add(emergencyCard);
+                _cardsById[emergencyCard.Id] = emergencyCard;
+                WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo2"));
+                return;
+            }
+
+            PopulateCards(rawCards);
+        }
+
+        private void PopulateCards(List<CardnumCard> rawCards)
+        {
             InitializeFilterKeys();
 
             _cards.Clear();
@@ -195,17 +173,16 @@ namespace MECCG_Deck_Builder
 
                     string imageName = raw.Ice_errata == true ? $"ice-{raw.ImageName}" : raw.ImageName;
 
-                    // Normalize Tolkien lore sub-races to canonical game races
                     string rawRace = raw.Race ?? string.Empty;
                     string canonicalRace = rawRace;
-                    string subrace = string.Empty; // Defaults to empty for all cards
+                    string subrace = string.Empty;
 
                     if (rawRace.EndsWith("Elf", StringComparison.OrdinalIgnoreCase))
                     {
                         canonicalRace = "Elf";
                         if (!string.Equals(rawRace, "Elf", StringComparison.OrdinalIgnoreCase))
                         {
-                            subrace = rawRace; // Only "Silvan Elf", "Noldo Elf", "Sinda Elf", "Nando Elf"
+                            subrace = rawRace;
                         }
                     }
                     else if (rawRace.EndsWith("Dwarf", StringComparison.OrdinalIgnoreCase))
@@ -213,7 +190,7 @@ namespace MECCG_Deck_Builder
                         canonicalRace = "Dwarf";
                         if (!string.Equals(rawRace, "Dwarf", StringComparison.OrdinalIgnoreCase))
                         {
-                            subrace = rawRace; // Only "Longbeard Dwarf", "Firebeard Dwarf", etc.
+                            subrace = rawRace;
                         }
                     }
 
@@ -270,6 +247,62 @@ namespace MECCG_Deck_Builder
                     _cardsById[card.Id] = card;
                 }
             }
+        }
+
+        /// <summary>
+        /// Explicit, user-initiated database update that downloads the latest Cardnum datasets
+        /// from GitHub and saves them to the writable LocalAppData folder.
+        /// </summary>
+        public async Task<(bool Success, string Message)> UpdateDatabaseFromCardnumAsync(CancellationToken cancellationToken = default)
+        {
+            string setsJson;
+            string cardsJson;
+
+            try
+            {
+                setsJson = await s_httpClient.GetStringAsync(Constants.CardnumSetsURL, cancellationToken).ConfigureAwait(false);
+                var testSets = JsonConvert.DeserializeObject<List<CardnumSet>>(setsJson);
+                if (testSets == null || testSets.Count == 0)
+                {
+                    return (false, "Retrieved set data was empty or invalid.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to download sets from Cardnum:\n{ex.Message}");
+            }
+
+            try
+            {
+                cardsJson = await s_httpClient.GetStringAsync(Constants.CardnumCardsURL, cancellationToken).ConfigureAwait(false);
+                var testCards = JsonConvert.DeserializeObject<List<CardnumCard>>(cardsJson);
+                if (testCards == null || testCards.Count == 0)
+                {
+                    return (false, "Retrieved card data was empty or invalid.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to download cards from Cardnum:\n{ex.Message}");
+            }
+
+            string setsPath = StoragePathService.GetWritableDataFilePath(Constants.CardnumSetsFile);
+            string cardsPath = StoragePathService.GetWritableDataFilePath(Constants.CardnumCardsFile);
+
+            try
+            {
+                await File.WriteAllTextAsync(setsPath, setsJson, cancellationToken).ConfigureAwait(false);
+                await File.WriteAllTextAsync(cardsPath, cardsJson, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to save database files to local storage:\n{ex.Message}");
+            }
+
+            await LoadSetsAsync(cancellationToken).ConfigureAwait(false);
+            await LoadCardsAsync(cancellationToken).ConfigureAwait(false);
+
+            return (true, $"Database successfully updated and reloaded!\n\nSets: {_sets.Count}\nCards: {_cards.Count}");
         }
 
         private void InitializeFilterKeys()

@@ -91,6 +91,7 @@
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsUpdateDatabase = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGenerateDeck = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparatorDeckGen = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuToolsRerunDeckGen = new System.Windows.Forms.ToolStripMenuItem();
@@ -522,6 +523,13 @@
             ToolStripMenuNew.Size = new System.Drawing.Size(147, 22);
             ToolStripMenuNew.Text = "&New";
             ToolStripMenuNew.Click += NewToolStripMenu_Click;
+            // 
+            // ToolStripMenuToolsUpdateDatabase 
+            // 
+            ToolStripMenuToolsUpdateDatabase.Name = "ToolStripMenuToolsUpdateDatabase";
+            ToolStripMenuToolsUpdateDatabase.Size = new System.Drawing.Size(265, 22);
+            ToolStripMenuToolsUpdateDatabase.Text = "Update Card Database from Cardnum...";
+            ToolStripMenuToolsUpdateDatabase.Click += ToolStripMenuToolsUpdateDatabase_Click;
             // 
             // OpenToolStripMenuItem
             // 
@@ -1143,6 +1151,7 @@
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSideboard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsUpdateDatabase;
         private System.Windows.Forms.GroupBox GroupBoxCardAttributes;
         private System.Windows.Forms.Label LblSlot1Key;
         private System.Windows.Forms.ComboBox ComboBoxKey1;

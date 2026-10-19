@@ -10,7 +10,6 @@ namespace MECCG_Deck_Builder
 {
     public class CardImageCache
     {
-        // HttpClient should be a shared, static, or long-lived instance
         private static readonly HttpClient s_httpClient = new();
 
         private readonly MemoryCache Cache = new(new MemoryCacheOptions()
@@ -23,7 +22,7 @@ namespace MECCG_Deck_Builder
         /// <summary>
         /// Asynchronously retrieves an image from in-memory cache, local disk, or remote Cardnum endpoint.
         /// </summary>
-        internal async Task<Bitmap> GetOrCreateAsync(string key, string setFolder, string imageName, CancellationToken cancellationToken = default)
+        internal async Task<Bitmap> GetOrCreateAsync(string key, string setCode, string imageName, CancellationToken cancellationToken = default)
         {
             // 1. Check in-memory cache
             if (Cache.TryGetValue(key, out Bitmap cacheEntry))
@@ -31,12 +30,12 @@ namespace MECCG_Deck_Builder
                 return cacheEntry;
             }
 
-            string filePath = Path.Combine(setFolder, imageName);
+            string readPath = StoragePathService.ResolveImageReadPath(setCode, imageName);
 
             // 2. Fall back to local disk asynchronously
-            if (File.Exists(filePath))
+            if (File.Exists(readPath))
             {
-                cacheEntry = await LoadImageNonLockingAsync(filePath, cancellationToken).ConfigureAwait(false);
+                cacheEntry = await LoadImageNonLockingAsync(readPath, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -47,11 +46,13 @@ namespace MECCG_Deck_Builder
                 {
                     try
                     {
+                        string writePath = StoragePathService.GetCardImagePath(setCode, imageName);
+                        string setFolder = Path.GetDirectoryName(writePath);
                         if (!Directory.Exists(setFolder))
                         {
                             Directory.CreateDirectory(setFolder);
                         }
-                        cacheEntry.Save(filePath);
+                        cacheEntry.Save(writePath);
                     }
                     catch (Exception)
                     {
@@ -72,9 +73,6 @@ namespace MECCG_Deck_Builder
             return cacheEntry;
         }
 
-        /// <summary>
-        /// Asynchronously downloads card image bytes and converts them into a non-locking Bitmap.
-        /// </summary>
         internal static async Task<Bitmap> CreateItemAsync(string key, CancellationToken cancellationToken = default)
         {
             try
@@ -98,9 +96,6 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        /// <summary>
-        /// Reads image bytes into memory asynchronously before creating a Bitmap so GDI+ does not lock the file on disk.
-        /// </summary>
         private static async Task<Bitmap> LoadImageNonLockingAsync(string filePath, CancellationToken cancellationToken = default)
         {
             try
@@ -120,18 +115,18 @@ namespace MECCG_Deck_Builder
 
         #region SYNCHRONOUS_METHODS
 
-        internal Bitmap GetOrCreate(string key, string setFolder, string imageName)
+        internal Bitmap GetOrCreate(string key, string setCode, string imageName)
         {
             if (Cache.TryGetValue(key, out Bitmap cacheEntry))
             {
                 return cacheEntry;
             }
 
-            string filePath = Path.Combine(setFolder, imageName);
+            string readPath = StoragePathService.ResolveImageReadPath(setCode, imageName);
 
-            if (File.Exists(filePath))
+            if (File.Exists(readPath))
             {
-                cacheEntry = LoadImageNonLocking(filePath);
+                cacheEntry = LoadImageNonLocking(readPath);
             }
             else
             {
@@ -141,11 +136,13 @@ namespace MECCG_Deck_Builder
                 {
                     try
                     {
+                        string writePath = StoragePathService.GetCardImagePath(setCode, imageName);
+                        string setFolder = Path.GetDirectoryName(writePath);
                         if (!Directory.Exists(setFolder))
                         {
                             Directory.CreateDirectory(setFolder);
                         }
-                        cacheEntry.Save(filePath);
+                        cacheEntry.Save(writePath);
                     }
                     catch (Exception)
                     {

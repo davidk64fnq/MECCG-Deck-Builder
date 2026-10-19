@@ -10,14 +10,14 @@
     <h1>Card Artwork Cache &amp; Downloader</h1>
 
     <h2>Card Artwork Cache System</h2>
-    <p>The application employs a high-performance two-tier caching architecture:</p>
+    <p>The application employs a high-performance two-tier caching architecture designed to run reliably in restricted environments (such as <code>C:\Program Files</code>):</p>
     <ol>
         <li><strong>Memory Cache:</strong> An in-memory cache holding up to 10,000 active Bitmaps for instant display when clicking or navigating.</li>
         <li>
-            <strong>Local Disk Cache:</strong> Checks for card images on disk under local set folders (e.g., <code>METW/metw_adrazar.jpg</code>).
+            <strong>Local Disk Cache:</strong> Checks for card images in the user storage cache under <code>%LOCALAPPDATA%\MECCG Deck Builder\Images\{Set}\</code> (or local subfolders in portable mode).
             <ul>
-                <li>If found locally, the image loads immediately with zero network latency.</li>
-                <li>If missing, it downloads asynchronously from Cardnum, saves a copy to disk, and loads it into memory.</li>
+                <li>If found locally in user storage or in pre-bundled application set folders, the image loads immediately with zero network latency.</li>
+                <li>If missing, it downloads asynchronously from Cardnum, saves a copy to disk in user storage, and loads it into memory.</li>
             </ul>
         </li>
     </ol>
@@ -33,10 +33,10 @@
         <strong>Background Download:</strong> The batch downloader runs asynchronously with real-time progress reported in the window title bar, keeping the application responsive.
     </div>
 
-    <h2>Offline Data Fallbacks</h2>
+    <h2>Offline Architecture &amp; Database Upgrades</h2>
     <ul>
-        <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch, falling back to local <code>cards-dc.json</code> if offline.</li>
-        <li><strong>Sets:</strong> Attempts to download set metadata on launch, falling back to local <code>sets-dc.json</code> if offline.</li>
+        <li><strong>Curated Local Database:</strong> The application starts immediately using the local curated card (<code>cards-dc.json</code>) and set (<code>sets-dc.json</code>) definitions with zero startup network calls.</li>
+        <li><strong>Portable Mode:</strong> Placing an empty file named <code>portable.flag</code> next to <code>MECCG Deck Builder.exe</code> directs all images, data files, and user settings to stay inside the application folder rather than using <code>%LOCALAPPDATA%</code>.</li>
     </ul>
 </body>
 </html>

@@ -320,13 +320,13 @@
         </li>
     </ul>
 
-    <h3>B. Why Local File Edits Do Not Persist</h3>
+    <h3>B. Curated Local Master Dataset &amp; Data Persistence</h3>
     <p>
-        Users sometimes attempt to correct database typos or sign inversions by manually editing their local copy of <code>cards-dc.json</code> in a text editor.
+        MECCG Deck Builder ships with a curated, validated master dataset (<code>cards-dc.json</code>) loaded directly from local storage on launch. The application does not contact remote servers on startup, so it will never overwrite your local file.
     </p>
-    <div class="warning">
-        <strong>Automatic Overwrite Notice:</strong> Every time MECCG Deck Builder launches with an active internet connection, it checks the GitHub master repository and re-downloads the latest master definitions, immediately overwriting your local <code>cards-dc.json</code> file. Any manual changes made directly to that file will be lost.
-    </div>
+    <p>
+        Any manual corrections or customizations made directly to <code>cards-dc.json</code> persist permanently across sessions and restarts.
+    </p>
 
     <h3>C. Recommended Workaround: Custom Categories &amp; Tags</h3>
     <p>

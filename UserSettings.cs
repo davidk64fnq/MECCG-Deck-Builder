@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace MECCG_Deck_Builder
@@ -28,7 +27,6 @@ namespace MECCG_Deck_Builder
 
     public static class UserSettingsService
     {
-        private static readonly string SettingsFilePath = Path.Combine(Application.StartupPath, "user_settings.json");
         private static UserSettings s_current;
 
         public static UserSettings Current
@@ -44,13 +42,30 @@ namespace MECCG_Deck_Builder
         {
             try
             {
-                if (File.Exists(SettingsFilePath))
+                string path = StoragePathService.GetSettingsFilePath();
+                if (File.Exists(path))
                 {
-                    string json = File.ReadAllText(SettingsFilePath);
+                    string json = File.ReadAllText(path);
                     var settings = JsonConvert.DeserializeObject<UserSettings>(json);
                     if (settings != null)
                     {
                         return settings;
+                    }
+                }
+                else if (!StoragePathService.IsPortableMode)
+                {
+                    // Check legacy path in app directory for seamless migration
+                    string legacyPath = Path.Combine(StoragePathService.AppBaseDirectory, "user_settings.json");
+                    if (File.Exists(legacyPath))
+                    {
+                        string json = File.ReadAllText(legacyPath);
+                        var settings = JsonConvert.DeserializeObject<UserSettings>(json);
+                        if (settings != null)
+                        {
+                            s_current = settings; // Assign BEFORE saving to prevent recursion
+                            SaveSettings();
+                            return settings;
+                        }
                     }
                 }
             }
@@ -64,10 +79,15 @@ namespace MECCG_Deck_Builder
 
         public static void SaveSettings()
         {
+            // Access s_current directly to avoid re-triggering LoadSettings()
+            var settingsToSave = s_current;
+            if (settingsToSave == null) return;
+
             try
             {
-                string json = JsonConvert.SerializeObject(Current, Formatting.Indented);
-                File.WriteAllText(SettingsFilePath, json);
+                string path = StoragePathService.GetSettingsFilePath();
+                string json = JsonConvert.SerializeObject(settingsToSave, Formatting.Indented);
+                File.WriteAllText(path, json);
             }
             catch
             {

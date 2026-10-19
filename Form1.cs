@@ -86,7 +86,7 @@ namespace MECCG_Deck_Builder
         {
             try
             {
-                string path = Path.Combine(Application.StartupPath, "Rules_Support_Tags.json");
+                string path = StoragePathService.ResolveDataFilePath("Rules_Support_Tags.json");
                 if (File.Exists(path))
                 {
                     string json = File.ReadAllText(path);
@@ -103,19 +103,42 @@ namespace MECCG_Deck_Builder
             }
         }
 
+
         private void CreateMenus()
+        {
+            ToolStripMenuSet.DropDown.Closing += (s, e) =>
+            {
+                if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+                {
+                    e.Cancel = true;
+                }
+            };
+
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
+            ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
+
+            var clearMenuItem = new ToolStripMenuItem("Clear All Filters")
+            {
+                ShortcutKeys = Keys.Control | Keys.R
+            };
+            clearMenuItem.Click += (s, e) => ResetAllFilters();
+
+            ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
+            ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
+
+            PopulateSetMenuItems();
+        }
+
+        private void PopulateSetMenuItems()
         {
             _isUpdatingFilters = true;
             try
             {
-                // Prevent Set menu from auto-closing on item clicks so users can toggle multiple sets
-                ToolStripMenuSet.DropDown.Closing += (s, e) =>
+                while (ToolStripMenuSet.DropDownItems.Count > 2)
                 {
-                    if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
-                    {
-                        e.Cancel = true;
-                    }
-                };
+                    ToolStripMenuSet.DropDownItems.RemoveAt(2);
+                }
 
                 var savedSets = new HashSet<string>(UserSettingsService.Current.SelectedSets ?? [], StringComparer.OrdinalIgnoreCase);
 
@@ -129,7 +152,6 @@ namespace MECCG_Deck_Builder
                     };
                     menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
 
-                    // Restore saved set state; if no saved sets exist yet, default to first set (METW)
                     bool shouldCheck = savedSets.Count > 0
                         ? savedSets.Contains(set.Code)
                         : (i == 0);
@@ -143,7 +165,6 @@ namespace MECCG_Deck_Builder
                     ToolStripMenuSet.DropDownItems.Add(menuItem);
                 }
 
-                // Fallback guarantee: if saved codes didn't match any catalog set, select the first set
                 if (_currentDeck.IncludedSets.Count == 0 && _catalogService.Sets.Count > 0)
                 {
                     var firstSet = _catalogService.Sets[0];
@@ -158,19 +179,6 @@ namespace MECCG_Deck_Builder
             {
                 _isUpdatingFilters = false;
             }
-
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
-            ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
-
-            var clearMenuItem = new ToolStripMenuItem("Clear All Filters")
-            {
-                ShortcutKeys = Keys.Control | Keys.R
-            };
-            clearMenuItem.Click += (s, e) => ResetAllFilters();
-
-            ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
-            ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
         }
 
         private void PersistSelectedSets()
@@ -1481,14 +1489,16 @@ namespace MECCG_Deck_Builder
 
                     if (string.IsNullOrEmpty(card.ImageName) || string.IsNullOrEmpty(card.Set)) continue;
 
-                    string targetPath = Path.Combine(card.Set, card.ImageName);
-                    if (File.Exists(targetPath))
+                    string readPath = StoragePathService.ResolveImageReadPath(card.Set, card.ImageName);
+                    if (File.Exists(readPath))
                     {
                         skippedCount++;
                         continue;
                     }
 
-                    if (!Directory.Exists(card.Set)) Directory.CreateDirectory(card.Set);
+                    string targetPath = StoragePathService.GetCardImagePath(card.Set, card.ImageName);
+                    string setDir = Path.GetDirectoryName(targetPath);
+                    if (!Directory.Exists(setDir)) Directory.CreateDirectory(setDir);
 
                     using var bmp = await CardImageCache.CreateItemAsync($"https://cardnum.net/img/cards/{card.Set}/{card.ImageName}");
                     if (bmp != null)
@@ -1687,6 +1697,43 @@ namespace MECCG_Deck_Builder
 
             string safeName = new string(safeChars).Trim();
             return !string.IsNullOrWhiteSpace(safeName) ? safeName : "Deck";
+        }
+
+        private async void ToolStripMenuToolsUpdateDatabase_Click(object sender, EventArgs e)
+        {
+            var confirm = MessageBox.Show(this,
+                "This will download the latest card and set definitions from the Cardnum GitHub repository and save them to your local data folder.\n\n" +
+                "Note: Any custom card attribute modifications made directly to your local cards-dc.json file will be superseded.\n\n" +
+                "Do you wish to proceed?",
+                $"{Constants.AppTitle} - Update Database",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (confirm != DialogResult.Yes) return;
+
+            Cursor = Cursors.WaitCursor;
+            Enabled = false;
+            try
+            {
+                var (success, message) = await _catalogService.UpdateDatabaseFromCardnumAsync();
+                if (success)
+                {
+                    PopulateSetMenuItems();
+                    RefreshFilterKeyDropdowns();
+                    UpdateFacetedFilters();
+                    UpdateFormTitle();
+                    MessageBox.Show(this, message, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(this, message, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            finally
+            {
+                Enabled = true;
+                Cursor = Cursors.Default;
+            }
         }
 
         #endregion
