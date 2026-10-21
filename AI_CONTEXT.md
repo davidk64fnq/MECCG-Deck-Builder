@@ -1,9 +1,4 @@
-﻿---
-
-### 2. Full Revised `AI_CONTEXT.md`
-
-```markdown
-# AI Development Context: MECCG Deck Builder
+﻿# AI Development Context: MECCG Deck Builder
 
 ## Project Summary
 - Type: Windows Forms (WinForms) Desktop Application
@@ -19,9 +14,7 @@
 
 ## Application Architecture & Core Files
 
-- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Menu icon assignment maps floppy disk to `Save Deck` and keeps `Export Deck...` clean.
-- ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags (`Taxonomy > Manage Custom Tags...`).
-- AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
+- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, dual-mode right pane (`Deck Builder` vs `Card Taxonomy Inspector` with monospace metadata view and pinned Quick Assign bar), two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Flush height alignment across master list, card artwork, and right pane.- AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
 - CardCatalogService.cs: Card catalog management, local JSON loading, filter option discovery; normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
@@ -96,4 +89,5 @@
   - [x] Issue #28: Menu Bar Modernization: Unified Four-Header Hierarchy and Standardized Shortcuts
   - [x] Issue #29: Realine Help System and Documentation with Modernized Menu Bar Architecture, Symmetrical Rule Categories, and Clean Terminology
   - [ ] Issue #30: Configurable Card Distribution Strategies in Procedural Deck Rules (`Distribution: Variety | Focused | Uniform`)
+  - [x] Issue #31: Dual-Mode Right Pane with Card Taxonomy Inspector, Monospace Metadata Readout, and Pinned Quick-Assign Bar
 - [ ] **v1.0.0 - First Public Release**

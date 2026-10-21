@@ -57,17 +57,30 @@
             ToolStripMenuTabDeleteCard = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTabCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
             PictureBoxCardImage = new System.Windows.Forms.PictureBox();
-            ListBoxPool = new System.Windows.Forms.ListBox();
-            ListBoxResources = new System.Windows.Forms.ListBox();
-            ListBoxHazards = new System.Windows.Forms.ListBox();
-            ListBoxSideboard = new System.Windows.Forms.ListBox();
-            ListBoxSites = new System.Windows.Forms.ListBox();
+            BtnModeDeck = new System.Windows.Forms.Button();
+            BtnModeTaxonomy = new System.Windows.Forms.Button();
             TabControlDeck = new System.Windows.Forms.TabControl();
             TabPagePool = new System.Windows.Forms.TabPage();
+            ListBoxPool = new System.Windows.Forms.ListBox();
             TabPageResources = new System.Windows.Forms.TabPage();
+            ListBoxResources = new System.Windows.Forms.ListBox();
             TabPageHazards = new System.Windows.Forms.TabPage();
+            ListBoxHazards = new System.Windows.Forms.ListBox();
             TabPageSideboard = new System.Windows.Forms.TabPage();
+            ListBoxSideboard = new System.Windows.Forms.ListBox();
             TabPageSites = new System.Windows.Forms.TabPage();
+            ListBoxSites = new System.Windows.Forms.ListBox();
+            PanelTaxonomy = new System.Windows.Forms.Panel();
+            LblTaxonomyCardTitle = new System.Windows.Forms.Label();
+            RichTextBoxTaxonomy = new System.Windows.Forms.RichTextBox();
+            GroupBoxQuickAssign = new System.Windows.Forms.GroupBox();
+            LblAssignCategory = new System.Windows.Forms.Label();
+            CmbAssignCategory = new System.Windows.Forms.ComboBox();
+            LblAssignTag = new System.Windows.Forms.Label();
+            CmbAssignTag = new System.Windows.Forms.ComboBox();
+            BtnAssignTag = new System.Windows.Forms.Button();
+            BtnRemoveTag = new System.Windows.Forms.Button();
+            BtnAuthorTag = new System.Windows.Forms.Button();
             MenuStrip1 = new System.Windows.Forms.MenuStrip();
             ToolStripMenuDeck = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -121,6 +134,8 @@
             TabPageHazards.SuspendLayout();
             TabPageSideboard.SuspendLayout();
             TabPageSites.SuspendLayout();
+            PanelTaxonomy.SuspendLayout();
+            GroupBoxQuickAssign.SuspendLayout();
             MenuStrip1.SuspendLayout();
             GroupBoxCardAttributes.SuspendLayout();
             GroupBoxCustomTags.SuspendLayout();
@@ -130,6 +145,7 @@
             // 
             ListBoxMaster.ContextMenuStrip = ContextMenuStripMaster;
             ListBoxMaster.FormattingEnabled = true;
+            ListBoxMaster.IntegralHeight = false;
             ListBoxMaster.ItemHeight = 15;
             ListBoxMaster.Location = new System.Drawing.Point(12, 37);
             ListBoxMaster.Name = "ListBoxMaster";
@@ -314,97 +330,34 @@
             // 
             // PictureBoxCardImage
             // 
-            PictureBoxCardImage.Location = new System.Drawing.Point(243, 37);
+            PictureBoxCardImage.Location = new System.Drawing.Point(232, 37);
             PictureBoxCardImage.Name = "PictureBoxCardImage";
-            PictureBoxCardImage.Size = new System.Drawing.Size(443, 505);
+            PictureBoxCardImage.Size = new System.Drawing.Size(366, 505);
             PictureBoxCardImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             PictureBoxCardImage.TabIndex = 1;
             PictureBoxCardImage.TabStop = false;
             // 
-            // ListBoxPool
+            // BtnModeDeck
             // 
-            ListBoxPool.AllowDrop = true;
-            ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxPool.FormattingEnabled = true;
-            ListBoxPool.ItemHeight = 15;
-            ListBoxPool.Location = new System.Drawing.Point(3, 3);
-            ListBoxPool.Name = "ListBoxPool";
-            ListBoxPool.Size = new System.Drawing.Size(196, 471);
-            ListBoxPool.Sorted = true;
-            ListBoxPool.TabIndex = 4;
-            ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxPool.DragDrop += ListBoxTab_DragDrop;
-            ListBoxPool.DragOver += ListBoxTab_DragOver;
-            ListBoxPool.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxPool.MouseDown += ListBoxTab_MouseDown;
+            BtnModeDeck.BackColor = System.Drawing.SystemColors.Window;
+            BtnModeDeck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            BtnModeDeck.Location = new System.Drawing.Point(608, 37);
+            BtnModeDeck.Name = "BtnModeDeck";
+            BtnModeDeck.Size = new System.Drawing.Size(151, 26);
+            BtnModeDeck.TabIndex = 2;
+            BtnModeDeck.Text = "Deck Builder";
+            BtnModeDeck.UseVisualStyleBackColor = false;
             // 
-            // ListBoxResources
+            // BtnModeTaxonomy
             // 
-            ListBoxResources.AllowDrop = true;
-            ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxResources.FormattingEnabled = true;
-            ListBoxResources.ItemHeight = 15;
-            ListBoxResources.Location = new System.Drawing.Point(3, 3);
-            ListBoxResources.Name = "ListBoxResources";
-            ListBoxResources.Size = new System.Drawing.Size(196, 471);
-            ListBoxResources.Sorted = true;
-            ListBoxResources.TabIndex = 5;
-            ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxResources.DragDrop += ListBoxTab_DragDrop;
-            ListBoxResources.DragOver += ListBoxTab_DragOver;
-            ListBoxResources.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxResources.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // ListBoxHazards
-            // 
-            ListBoxHazards.AllowDrop = true;
-            ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxHazards.FormattingEnabled = true;
-            ListBoxHazards.ItemHeight = 15;
-            ListBoxHazards.Location = new System.Drawing.Point(3, 3);
-            ListBoxHazards.Name = "ListBoxHazards";
-            ListBoxHazards.Size = new System.Drawing.Size(196, 471);
-            ListBoxHazards.Sorted = true;
-            ListBoxHazards.TabIndex = 6;
-            ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxHazards.DragDrop += ListBoxTab_DragDrop;
-            ListBoxHazards.DragOver += ListBoxTab_DragOver;
-            ListBoxHazards.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxHazards.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // ListBoxSideboard
-            // 
-            ListBoxSideboard.AllowDrop = true;
-            ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxSideboard.FormattingEnabled = true;
-            ListBoxSideboard.ItemHeight = 15;
-            ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
-            ListBoxSideboard.Name = "ListBoxSideboard";
-            ListBoxSideboard.Size = new System.Drawing.Size(196, 471);
-            ListBoxSideboard.Sorted = true;
-            ListBoxSideboard.TabIndex = 7;
-            ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxSideboard.DragDrop += ListBoxTab_DragDrop;
-            ListBoxSideboard.DragOver += ListBoxTab_DragOver;
-            ListBoxSideboard.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxSideboard.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // ListBoxSites
-            // 
-            ListBoxSites.AllowDrop = true;
-            ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxSites.FormattingEnabled = true;
-            ListBoxSites.ItemHeight = 15;
-            ListBoxSites.Location = new System.Drawing.Point(3, 3);
-            ListBoxSites.Name = "ListBoxSites";
-            ListBoxSites.Size = new System.Drawing.Size(196, 471);
-            ListBoxSites.Sorted = true;
-            ListBoxSites.TabIndex = 8;
-            ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxSites.DragDrop += ListBoxTab_DragDrop;
-            ListBoxSites.DragOver += ListBoxTab_DragOver;
-            ListBoxSites.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxSites.MouseDown += ListBoxTab_MouseDown;
+            BtnModeTaxonomy.BackColor = System.Drawing.SystemColors.Control;
+            BtnModeTaxonomy.Font = new System.Drawing.Font("Segoe UI", 9F);
+            BtnModeTaxonomy.Location = new System.Drawing.Point(761, 37);
+            BtnModeTaxonomy.Name = "BtnModeTaxonomy";
+            BtnModeTaxonomy.Size = new System.Drawing.Size(153, 26);
+            BtnModeTaxonomy.TabIndex = 3;
+            BtnModeTaxonomy.Text = "Card Taxonomy";
+            BtnModeTaxonomy.UseVisualStyleBackColor = false;
             // 
             // TabControlDeck
             // 
@@ -413,13 +366,13 @@
             TabControlDeck.Controls.Add(TabPageHazards);
             TabControlDeck.Controls.Add(TabPageSideboard);
             TabControlDeck.Controls.Add(TabPageSites);
-            TabControlDeck.ItemSize = new System.Drawing.Size(41, 20);
-            TabControlDeck.Location = new System.Drawing.Point(706, 37);
+            TabControlDeck.ItemSize = new System.Drawing.Size(58, 20);
+            TabControlDeck.Location = new System.Drawing.Point(608, 66);
             TabControlDeck.Name = "TabControlDeck";
             TabControlDeck.SelectedIndex = 0;
-            TabControlDeck.Size = new System.Drawing.Size(210, 505);
+            TabControlDeck.Size = new System.Drawing.Size(306, 476);
             TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            TabControlDeck.TabIndex = 2;
+            TabControlDeck.TabIndex = 4;
             // 
             // TabPagePool
             // 
@@ -427,10 +380,28 @@
             TabPagePool.Location = new System.Drawing.Point(4, 24);
             TabPagePool.Name = "TabPagePool";
             TabPagePool.Padding = new System.Windows.Forms.Padding(3);
-            TabPagePool.Size = new System.Drawing.Size(202, 477);
+            TabPagePool.Size = new System.Drawing.Size(298, 448);
             TabPagePool.TabIndex = 0;
             TabPagePool.Text = "Pool";
             TabPagePool.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxPool
+            // 
+            ListBoxPool.AllowDrop = true;
+            ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxPool.FormattingEnabled = true;
+            ListBoxPool.IntegralHeight = false;
+            ListBoxPool.ItemHeight = 15;
+            ListBoxPool.Location = new System.Drawing.Point(3, 3);
+            ListBoxPool.Name = "ListBoxPool";
+            ListBoxPool.Size = new System.Drawing.Size(292, 442);
+            ListBoxPool.Sorted = true;
+            ListBoxPool.TabIndex = 0;
+            ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxPool.DragDrop += ListBoxTab_DragDrop;
+            ListBoxPool.DragOver += ListBoxTab_DragOver;
+            ListBoxPool.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxPool.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageResources
             // 
@@ -438,10 +409,28 @@
             TabPageResources.Location = new System.Drawing.Point(4, 24);
             TabPageResources.Name = "TabPageResources";
             TabPageResources.Padding = new System.Windows.Forms.Padding(3);
-            TabPageResources.Size = new System.Drawing.Size(202, 477);
+            TabPageResources.Size = new System.Drawing.Size(298, 448);
             TabPageResources.TabIndex = 1;
             TabPageResources.Text = "Res";
             TabPageResources.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxResources
+            // 
+            ListBoxResources.AllowDrop = true;
+            ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxResources.FormattingEnabled = true;
+            ListBoxResources.IntegralHeight = false;
+            ListBoxResources.ItemHeight = 15;
+            ListBoxResources.Location = new System.Drawing.Point(3, 3);
+            ListBoxResources.Name = "ListBoxResources";
+            ListBoxResources.Size = new System.Drawing.Size(292, 442);
+            ListBoxResources.Sorted = true;
+            ListBoxResources.TabIndex = 0;
+            ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxResources.DragDrop += ListBoxTab_DragDrop;
+            ListBoxResources.DragOver += ListBoxTab_DragOver;
+            ListBoxResources.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxResources.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageHazards
             // 
@@ -449,10 +438,28 @@
             TabPageHazards.Location = new System.Drawing.Point(4, 24);
             TabPageHazards.Name = "TabPageHazards";
             TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
-            TabPageHazards.Size = new System.Drawing.Size(202, 477);
+            TabPageHazards.Size = new System.Drawing.Size(298, 448);
             TabPageHazards.TabIndex = 2;
             TabPageHazards.Text = "Haz";
             TabPageHazards.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxHazards
+            // 
+            ListBoxHazards.AllowDrop = true;
+            ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxHazards.FormattingEnabled = true;
+            ListBoxHazards.IntegralHeight = false;
+            ListBoxHazards.ItemHeight = 15;
+            ListBoxHazards.Location = new System.Drawing.Point(3, 3);
+            ListBoxHazards.Name = "ListBoxHazards";
+            ListBoxHazards.Size = new System.Drawing.Size(292, 442);
+            ListBoxHazards.Sorted = true;
+            ListBoxHazards.TabIndex = 0;
+            ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxHazards.DragDrop += ListBoxTab_DragDrop;
+            ListBoxHazards.DragOver += ListBoxTab_DragOver;
+            ListBoxHazards.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxHazards.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageSideboard
             // 
@@ -460,10 +467,28 @@
             TabPageSideboard.Location = new System.Drawing.Point(4, 24);
             TabPageSideboard.Name = "TabPageSideboard";
             TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSideboard.Size = new System.Drawing.Size(202, 477);
+            TabPageSideboard.Size = new System.Drawing.Size(298, 448);
             TabPageSideboard.TabIndex = 3;
             TabPageSideboard.Text = "Side";
             TabPageSideboard.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxSideboard
+            // 
+            ListBoxSideboard.AllowDrop = true;
+            ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxSideboard.FormattingEnabled = true;
+            ListBoxSideboard.IntegralHeight = false;
+            ListBoxSideboard.ItemHeight = 15;
+            ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
+            ListBoxSideboard.Name = "ListBoxSideboard";
+            ListBoxSideboard.Size = new System.Drawing.Size(292, 442);
+            ListBoxSideboard.Sorted = true;
+            ListBoxSideboard.TabIndex = 0;
+            ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxSideboard.DragDrop += ListBoxTab_DragDrop;
+            ListBoxSideboard.DragOver += ListBoxTab_DragOver;
+            ListBoxSideboard.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxSideboard.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageSites
             // 
@@ -471,10 +496,146 @@
             TabPageSites.Location = new System.Drawing.Point(4, 24);
             TabPageSites.Name = "TabPageSites";
             TabPageSites.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSites.Size = new System.Drawing.Size(202, 477);
+            TabPageSites.Size = new System.Drawing.Size(298, 448);
             TabPageSites.TabIndex = 4;
             TabPageSites.Text = "Site";
             TabPageSites.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxSites
+            // 
+            ListBoxSites.AllowDrop = true;
+            ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxSites.FormattingEnabled = true;
+            ListBoxSites.IntegralHeight = false;
+            ListBoxSites.ItemHeight = 15;
+            ListBoxSites.Location = new System.Drawing.Point(3, 3);
+            ListBoxSites.Name = "ListBoxSites";
+            ListBoxSites.Size = new System.Drawing.Size(292, 442);
+            ListBoxSites.Sorted = true;
+            ListBoxSites.TabIndex = 0;
+            ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxSites.DragDrop += ListBoxTab_DragDrop;
+            ListBoxSites.DragOver += ListBoxTab_DragOver;
+            ListBoxSites.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxSites.MouseDown += ListBoxTab_MouseDown;
+            // 
+            // PanelTaxonomy
+            // 
+            PanelTaxonomy.Controls.Add(LblTaxonomyCardTitle);
+            PanelTaxonomy.Controls.Add(RichTextBoxTaxonomy);
+            PanelTaxonomy.Controls.Add(GroupBoxQuickAssign);
+            PanelTaxonomy.Location = new System.Drawing.Point(608, 66);
+            PanelTaxonomy.Name = "PanelTaxonomy";
+            PanelTaxonomy.Size = new System.Drawing.Size(306, 476);
+            PanelTaxonomy.TabIndex = 5;
+            PanelTaxonomy.Visible = false;
+            // 
+            // LblTaxonomyCardTitle
+            // 
+            LblTaxonomyCardTitle.AutoEllipsis = true;
+            LblTaxonomyCardTitle.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            LblTaxonomyCardTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            LblTaxonomyCardTitle.ForeColor = System.Drawing.SystemColors.ControlText;
+            LblTaxonomyCardTitle.Location = new System.Drawing.Point(2, 2);
+            LblTaxonomyCardTitle.Name = "LblTaxonomyCardTitle";
+            LblTaxonomyCardTitle.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            LblTaxonomyCardTitle.Size = new System.Drawing.Size(302, 22);
+            LblTaxonomyCardTitle.TabIndex = 0;
+            LblTaxonomyCardTitle.Text = "(No card selected)";
+            LblTaxonomyCardTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // RichTextBoxTaxonomy
+            // 
+            RichTextBoxTaxonomy.BackColor = System.Drawing.Color.White;
+            RichTextBoxTaxonomy.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            RichTextBoxTaxonomy.Font = new System.Drawing.Font("Consolas", 8.25F);
+            RichTextBoxTaxonomy.Location = new System.Drawing.Point(2, 26);
+            RichTextBoxTaxonomy.Name = "RichTextBoxTaxonomy";
+            RichTextBoxTaxonomy.ReadOnly = true;
+            RichTextBoxTaxonomy.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            RichTextBoxTaxonomy.Size = new System.Drawing.Size(302, 338);
+            RichTextBoxTaxonomy.TabIndex = 1;
+            RichTextBoxTaxonomy.Text = "";
+            RichTextBoxTaxonomy.WordWrap = true;
+            // 
+            // GroupBoxQuickAssign
+            // 
+            GroupBoxQuickAssign.Controls.Add(LblAssignCategory);
+            GroupBoxQuickAssign.Controls.Add(CmbAssignCategory);
+            GroupBoxQuickAssign.Controls.Add(LblAssignTag);
+            GroupBoxQuickAssign.Controls.Add(CmbAssignTag);
+            GroupBoxQuickAssign.Controls.Add(BtnAssignTag);
+            GroupBoxQuickAssign.Controls.Add(BtnRemoveTag);
+            GroupBoxQuickAssign.Controls.Add(BtnAuthorTag);
+            GroupBoxQuickAssign.Location = new System.Drawing.Point(2, 368);
+            GroupBoxQuickAssign.Name = "GroupBoxQuickAssign";
+            GroupBoxQuickAssign.Size = new System.Drawing.Size(302, 106);
+            GroupBoxQuickAssign.TabIndex = 2;
+            GroupBoxQuickAssign.TabStop = false;
+            GroupBoxQuickAssign.Text = "Quick Assign Tag";
+            // 
+            // LblAssignCategory
+            // 
+            LblAssignCategory.Location = new System.Drawing.Point(6, 24);
+            LblAssignCategory.Name = "LblAssignCategory";
+            LblAssignCategory.Size = new System.Drawing.Size(58, 16);
+            LblAssignCategory.TabIndex = 0;
+            LblAssignCategory.Text = "Category:";
+            // 
+            // CmbAssignCategory
+            // 
+            CmbAssignCategory.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            CmbAssignCategory.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            CmbAssignCategory.FormattingEnabled = true;
+            CmbAssignCategory.Location = new System.Drawing.Point(66, 21);
+            CmbAssignCategory.Name = "CmbAssignCategory";
+            CmbAssignCategory.Size = new System.Drawing.Size(228, 23);
+            CmbAssignCategory.TabIndex = 1;
+            // 
+            // LblAssignTag
+            // 
+            LblAssignTag.Location = new System.Drawing.Point(6, 51);
+            LblAssignTag.Name = "LblAssignTag";
+            LblAssignTag.Size = new System.Drawing.Size(58, 16);
+            LblAssignTag.TabIndex = 2;
+            LblAssignTag.Text = "Tag:";
+            // 
+            // CmbAssignTag
+            // 
+            CmbAssignTag.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            CmbAssignTag.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            CmbAssignTag.FormattingEnabled = true;
+            CmbAssignTag.Location = new System.Drawing.Point(66, 48);
+            CmbAssignTag.Name = "CmbAssignTag";
+            CmbAssignTag.Size = new System.Drawing.Size(228, 23);
+            CmbAssignTag.TabIndex = 3;
+            // 
+            // BtnAssignTag
+            // 
+            BtnAssignTag.Location = new System.Drawing.Point(6, 76);
+            BtnAssignTag.Name = "BtnAssignTag";
+            BtnAssignTag.Size = new System.Drawing.Size(92, 24);
+            BtnAssignTag.TabIndex = 4;
+            BtnAssignTag.Text = "+ Assign";
+            BtnAssignTag.UseVisualStyleBackColor = true;
+            // 
+            // BtnRemoveTag
+            // 
+            BtnRemoveTag.Location = new System.Drawing.Point(103, 76);
+            BtnRemoveTag.Name = "BtnRemoveTag";
+            BtnRemoveTag.Size = new System.Drawing.Size(92, 24);
+            BtnRemoveTag.TabIndex = 5;
+            BtnRemoveTag.Text = "- Remove";
+            BtnRemoveTag.UseVisualStyleBackColor = true;
+            // 
+            // BtnAuthorTag
+            // 
+            BtnAuthorTag.Location = new System.Drawing.Point(200, 76);
+            BtnAuthorTag.Name = "BtnAuthorTag";
+            BtnAuthorTag.Size = new System.Drawing.Size(94, 24);
+            BtnAuthorTag.TabIndex = 6;
+            BtnAuthorTag.Text = "New Tag...";
+            BtnAuthorTag.UseVisualStyleBackColor = true;
             // 
             // MenuStrip1
             // 
@@ -487,7 +648,7 @@
             MenuStrip1.Location = new System.Drawing.Point(0, 0);
             MenuStrip1.Name = "MenuStrip1";
             MenuStrip1.Size = new System.Drawing.Size(926, 24);
-            MenuStrip1.TabIndex = 15;
+            MenuStrip1.TabIndex = 6;
             MenuStrip1.Text = "Main Menu";
             // 
             // ToolStripMenuDeck
@@ -728,7 +889,7 @@
             GroupBoxCardAttributes.Location = new System.Drawing.Point(12, 552);
             GroupBoxCardAttributes.Name = "GroupBoxCardAttributes";
             GroupBoxCardAttributes.Size = new System.Drawing.Size(444, 118);
-            GroupBoxCardAttributes.TabIndex = 3;
+            GroupBoxCardAttributes.TabIndex = 7;
             GroupBoxCardAttributes.TabStop = false;
             GroupBoxCardAttributes.Text = "Card Attributes (Official Database)";
             // 
@@ -827,7 +988,7 @@
             GroupBoxCustomTags.Location = new System.Drawing.Point(470, 552);
             GroupBoxCustomTags.Name = "GroupBoxCustomTags";
             GroupBoxCustomTags.Size = new System.Drawing.Size(444, 118);
-            GroupBoxCustomTags.TabIndex = 4;
+            GroupBoxCustomTags.TabIndex = 8;
             GroupBoxCustomTags.TabStop = false;
             GroupBoxCustomTags.Text = "Custom Tags (User Taxonomy)";
             // 
@@ -920,7 +1081,10 @@
             ClientSize = new System.Drawing.Size(926, 682);
             Controls.Add(GroupBoxCardAttributes);
             Controls.Add(GroupBoxCustomTags);
+            Controls.Add(BtnModeDeck);
+            Controls.Add(BtnModeTaxonomy);
             Controls.Add(TabControlDeck);
+            Controls.Add(PanelTaxonomy);
             Controls.Add(PictureBoxCardImage);
             Controls.Add(ListBoxMaster);
             Controls.Add(MenuStrip1);
@@ -936,6 +1100,8 @@
             TabPageHazards.ResumeLayout(false);
             TabPageSideboard.ResumeLayout(false);
             TabPageSites.ResumeLayout(false);
+            PanelTaxonomy.ResumeLayout(false);
+            GroupBoxQuickAssign.ResumeLayout(false);
             MenuStrip1.ResumeLayout(false);
             MenuStrip1.PerformLayout();
             GroupBoxCardAttributes.ResumeLayout(false);
@@ -949,20 +1115,35 @@
 
         private System.Windows.Forms.ListBox ListBoxMaster;
         private System.Windows.Forms.PictureBox PictureBoxCardImage;
-        private System.Windows.Forms.ListBox ListBoxResources;
-        private System.Windows.Forms.ListBox ListBoxHazards;
-        private System.Windows.Forms.ListBox ListBoxSideboard;
-        private System.Windows.Forms.ListBox ListBoxSites;
+        private System.Windows.Forms.Button BtnModeDeck;
+        private System.Windows.Forms.Button BtnModeTaxonomy;
         private System.Windows.Forms.TabControl TabControlDeck;
         private System.Windows.Forms.TabPage TabPagePool;
-        private System.Windows.Forms.TabPage TabPageResources;
-        private System.Windows.Forms.TabPage TabPageHazards;
-        private System.Windows.Forms.TabPage TabPageSideboard;
-        private System.Windows.Forms.TabPage TabPageSites;
-        private System.Windows.Forms.MenuStrip MenuStrip1;
         private System.Windows.Forms.ListBox ListBoxPool;
+        private System.Windows.Forms.TabPage TabPageResources;
+        private System.Windows.Forms.ListBox ListBoxResources;
+        private System.Windows.Forms.TabPage TabPageHazards;
+        private System.Windows.Forms.ListBox ListBoxHazards;
+        private System.Windows.Forms.TabPage TabPageSideboard;
+        private System.Windows.Forms.ListBox ListBoxSideboard;
+        private System.Windows.Forms.TabPage TabPageSites;
+        private System.Windows.Forms.ListBox ListBoxSites;
+
+        // Card Taxonomy Inspector Panel
+        private System.Windows.Forms.Panel PanelTaxonomy;
+        private System.Windows.Forms.Label LblTaxonomyCardTitle;
+        private System.Windows.Forms.RichTextBox RichTextBoxTaxonomy;
+        private System.Windows.Forms.GroupBox GroupBoxQuickAssign;
+        private System.Windows.Forms.Label LblAssignCategory;
+        private System.Windows.Forms.ComboBox CmbAssignCategory;
+        private System.Windows.Forms.Label LblAssignTag;
+        private System.Windows.Forms.ComboBox CmbAssignTag;
+        private System.Windows.Forms.Button BtnAssignTag;
+        private System.Windows.Forms.Button BtnRemoveTag;
+        private System.Windows.Forms.Button BtnAuthorTag;
 
         // Deck Menu
+        private System.Windows.Forms.MenuStrip MenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuDeck;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuNew;
         private System.Windows.Forms.ToolStripMenuItem OpenToolStripMenuItem;

@@ -33,14 +33,54 @@ namespace MECCG_Deck_Builder
                 return values;
             }
 
+            var distinct = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // 1. Check predefined schema filters
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
                 for (int i = 1; i < _customFilters[index].Count; i++)
                 {
-                    values.Add(_customFilters[index][i]);
+                    string val = _customFilters[index][i];
+                    if (!string.IsNullOrWhiteSpace(val))
+                    {
+                        if (val.Contains(';'))
+                        {
+                            foreach (var part in val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                            {
+                                distinct.Add(part);
+                            }
+                        }
+                        else
+                        {
+                            distinct.Add(val.Trim());
+                        }
+                    }
                 }
             }
+
+            // 2. Also harvest all tags assigned across cards for this category
+            foreach (var tags in _cardCustomTags.Values)
+            {
+                if (tags.TryGetValue(keyName, out string tagVal) && !string.IsNullOrWhiteSpace(tagVal))
+                {
+                    if (tagVal.Contains(';'))
+                    {
+                        foreach (var part in tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        {
+                            distinct.Add(part);
+                        }
+                    }
+                    else
+                    {
+                        distinct.Add(tagVal.Trim());
+                    }
+                }
+            }
+
+            var sorted = distinct.ToList();
+            sorted.Sort(StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+            values.AddRange(sorted);
             return values;
         }
 
@@ -300,27 +340,36 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
+            // Snap category to canonical casing if already known
+            string resolvedKey = _customFilters.FirstOrDefault(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase))?[0] ?? keyName.Trim();
+
+            // Snap tag value to canonical casing if already known
+            var knownValues = GetCustomKeyValues(resolvedKey);
+            string trimmedVal = value.Trim();
+            string canonicalVal = knownValues.FirstOrDefault(v => string.Equals(v, trimmedVal, StringComparison.OrdinalIgnoreCase));
+            string resolvedValue = !string.IsNullOrEmpty(canonicalVal) ? canonicalVal : trimmedVal;
+
             if (!_cardCustomTags.TryGetValue(cardId, out var tags))
             {
                 tags = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 _cardCustomTags[cardId] = tags;
             }
 
-            if (tags.TryGetValue(keyName, out string existing) && !string.IsNullOrWhiteSpace(existing))
+            if (tags.TryGetValue(resolvedKey, out string existing) && !string.IsNullOrWhiteSpace(existing))
             {
                 var existingList = existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
-                if (!existingList.Contains(value.Trim(), StringComparer.OrdinalIgnoreCase))
+                if (!existingList.Contains(resolvedValue, StringComparer.OrdinalIgnoreCase))
                 {
-                    existingList.Add(value.Trim());
-                    tags[keyName] = string.Join("; ", existingList);
+                    existingList.Add(resolvedValue);
+                    tags[resolvedKey] = string.Join("; ", existingList);
                 }
             }
             else
             {
-                tags[keyName] = value.Trim();
+                tags[resolvedKey] = resolvedValue;
             }
 
-            AddCustomKeyValue(keyName, value.Trim());
+            AddCustomKeyValue(resolvedKey, resolvedValue);
         }
 
         public List<string> GetCardTagsForCategory(string cardId, string keyName)

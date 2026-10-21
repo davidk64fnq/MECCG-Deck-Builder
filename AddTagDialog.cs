@@ -13,7 +13,7 @@ namespace MECCG_Deck_Builder
         public string SelectedKey => _cmbKey.Text.Trim();
         public string SelectedValue => _cmbValue.Text.Trim();
 
-        private AddTagDialog(string cardName, CardFilterService filterService)
+        private AddTagDialog(string cardName, CardFilterService filterService, string initialCategory = null)
         {
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
 
@@ -86,15 +86,16 @@ namespace MECCG_Deck_Builder
             AcceptButton = btnOk;
             CancelButton = btnCancel;
 
-            PopulateKeys();
-
+            // Wire events BEFORE populating keys so initial selection triggers tag population
             _cmbKey.SelectedIndexChanged += (s, e) => PopulateValuesForKey();
             _cmbKey.TextChanged += (s, e) => PopulateValuesForKey();
+
+            PopulateKeys(initialCategory);
 
             Shown += (s, e) => _cmbKey.Focus();
         }
 
-        private void PopulateKeys()
+        private void PopulateKeys(string initialCategory = null)
         {
             _cmbKey.Items.Clear();
             var keys = _filterService.GetCustomKeyNames();
@@ -106,16 +107,34 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            if (_cmbKey.Items.Count > 0)
+            if (!string.IsNullOrWhiteSpace(initialCategory))
+            {
+                int idx = _cmbKey.FindStringExact(initialCategory);
+                if (idx >= 0)
+                {
+                    _cmbKey.SelectedIndex = idx;
+                }
+                else
+                {
+                    _cmbKey.Text = initialCategory;
+                }
+            }
+            else if (_cmbKey.Items.Count > 0)
             {
                 _cmbKey.SelectedIndex = 0;
             }
+
+            PopulateValuesForKey();
         }
 
         private void PopulateValuesForKey()
         {
             string key = _cmbKey.Text.Trim();
+            string prevTag = _cmbValue.Text.Trim();
+
             _cmbValue.Items.Clear();
+            _cmbValue.Text = string.Empty; // Explicitly clear old text
+
             if (string.IsNullOrWhiteSpace(key)) return;
 
             var values = _filterService.GetCustomKeyValues(key);
@@ -125,6 +144,28 @@ namespace MECCG_Deck_Builder
                 {
                     _cmbValue.Items.Add(v);
                 }
+            }
+
+            // 1. If the previous tag also exists in the new category, preserve it
+            if (!string.IsNullOrEmpty(prevTag))
+            {
+                int matchIdx = _cmbValue.FindStringExact(prevTag);
+                if (matchIdx >= 0)
+                {
+                    _cmbValue.SelectedIndex = matchIdx;
+                    return;
+                }
+            }
+
+            // 2. Otherwise snap to the first tag in the new category
+            if (_cmbValue.Items.Count > 0)
+            {
+                _cmbValue.SelectedIndex = 0;
+            }
+            else
+            {
+                _cmbValue.SelectedIndex = -1;
+                _cmbValue.Text = string.Empty;
             }
         }
 
@@ -147,9 +188,9 @@ namespace MECCG_Deck_Builder
             DialogResult = DialogResult.OK;
         }
 
-        public static (string Key, string Value)? Show(IWin32Window owner, string cardName, CardFilterService filterService)
+        public static (string Key, string Value)? Show(IWin32Window owner, string cardName, CardFilterService filterService, string initialCategory = null)
         {
-            using var dlg = new AddTagDialog(cardName, filterService);
+            using var dlg = new AddTagDialog(cardName, filterService, initialCategory);
             if (dlg.ShowDialog(owner) == DialogResult.OK)
             {
                 return (dlg.SelectedKey, dlg.SelectedValue);

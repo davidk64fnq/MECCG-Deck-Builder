@@ -51,6 +51,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | F5 | Global | Re-run last used deck generation rules file (Deck > Re-run Deck Rules) |
 | Ctrl + R | Global | Clear all active filter slots (Taxonomy > Clear All Active Filters) |
 | F1 | Global | Open Help documentation (Help > Help Contents) |
+| Enter | Quick Assign Tag Box | Assign tag(s) to the active card (+ Assign) |
 
 ---
 

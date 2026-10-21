@@ -13,16 +13,46 @@
     </p>
 
     <!-- SECTION 1: CARD TAGGING (IN-SITU) -->
-    <h2>1. Tagging Cards &amp; Quick Authoring</h2>
+    <h2>1. Tagging Cards &amp; Rapid Authoring</h2>
     <p>
-        You can assign, toggle, or author custom tags directly on any card in the Master List or active deck tabs without disturbing your filter dropdowns:
+        You can assign, inspect, toggle, or author custom tags through two complementary interfaces:
+    </p>
+
+    <h3>A. The Card Taxonomy Inspector (Right Pane)</h3>
+    <p>
+        Click <strong>[ Card Taxonomy ]</strong> at the top of the right pane to open the dedicated metadata inspector. As you arrow or click through cards in the Master List, the inspector updates instantly:
+    </p>
+    <ul>
+        <li>
+            <strong>Live Monospace Readout:</strong> Displays all official rules attributes and assigned custom tags. Long tag lists (such as characters with multiple regions or sites) wrap cleanly under the colon using a <strong>column-aligned hanging indent</strong>, with smooth vertical mouse-wheel scrolling for dense cards.
+        </li>
+        <li>
+            <strong>Filter-Synchronized Category:</strong> When you filter by a custom category in bottom <strong>Slot 3</strong> (or Slot 4), the Quick Assign <strong>Category</strong> dropdown automatically mirrors your selection.
+        </li>
+        <li>
+            <strong>Status Checkmarks (<code>✓</code>):</strong> In the Quick Assign <strong>Tag</strong> dropdown, any tag currently held by the inspected card is prefixed with a checkmark (<code>✓</code>).
+        </li>
+        <li>
+            <strong>Single &amp; Multi-Tag Assignment (<code>+ Assign</code>):</strong> Select or type a tag and click <code>+ Assign</code> (or press <kbd>Enter</kbd>). You can assign multiple tags in one action by separating them with semicolons (e.g. <code>Cardolan; Rhudaur; The Shire</code>).
+        </li>
+        <li>
+            <strong>Targeted Removal (<code>- Remove</code>):</strong> If the Tag dropdown shows an assigned tag, clicking <code>- Remove</code> strips that specific tag. If the tag field is blank or doesn't match an assigned tag, clicking <code>- Remove</code> opens a popup menu listing all tags currently on the card for quick one-click deletion.
+        </li>
+        <li>
+            <strong>Direct Authoring (<code>New Tag...</code>):</strong> Opens the tag creation dialog, pre-seeded with the active category and pre-populated with all existing tags, to register and assign a new tag in one step.
+        </li>
+    </ul>
+
+    <h3>B. In-Situ Context Menus (Master List &amp; Deck Tabs)</h3>
+    <p>
+        You can also tag cards directly from any list without switching panes:
     </p>
     <ul>
         <li>
             <strong>Assign or Toggle a Tag:</strong> Right-click a card and navigate to <strong>Assign Tag &gt; [Category] &gt; [Tag]</strong>. Currently assigned tags display a checkmark (<kbd>&#10003;</kbd>). Clicking an already-assigned tag toggles it off.
         </li>
         <li>
-            <strong>Author a New Tag on the Fly:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>. This opens a quick prompt where you can select or type a category and tag in one action, immediately registering it in your catalog.
+            <strong>Author a New Tag on the Fly:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>.
         </li>
         <li>
             <strong>Add Tag to Existing Category:</strong> Under <strong>Assign Tag &gt; [Category]</strong>, click <strong>+ Add Tag...</strong> to append a new tag value directly into that specific category.
