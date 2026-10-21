@@ -23,12 +23,12 @@ namespace MECCG_Deck_Builder
     {
         public string RuleType { get; set; } = "FilterQuery";
         public string Name { get; set; } = string.Empty;
-        public string SaveAs { get; set; } = string.Empty; // <-- ADD THIS
+        public string SaveAs { get; set; } = string.Empty;
         public string Section { get; set; } = "Resources";
         public int Count { get; set; } = 1;
         public List<string> Sets { get; set; } = [];
         public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-        public Dictionary<string, string> Tags { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, string> Categories { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public DeckGenerationRule Fallback { get; set; }
         public List<DeckGenerationChoice> Choices { get; set; } = [];
     }

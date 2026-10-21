@@ -391,13 +391,13 @@ namespace MECCG_Deck_Builder.Properties {
         </li>
     </ul>
 
-    <h3>B. Why Local File Edits Do Not Persist</h3>
+    <h3>B. Curated Local Master Dataset &amp; Data Persistence</h3>
     <p>
-        Users sometimes attempt to correct database typos or sign inversions by manually editing their local copy of <code>cards-dc.json</code> in a text editor.
+        MECCG Deck Builder ships with a curated, validated master dataset (<code>cards-dc.json</code>) loaded directly from local storage on launch. The application does not contact remote servers on startup, so it will never overwrite your local file.
     </p>
-    <div class="warning">
-        <strong>Automatic Overwrite Notice:</strong> Every time MECCG Deck Builder launches with an active internet connection, it checks the GitHub master repository and re-downloads the latest master definitions, immediately overwriting your local <code>cards-dc.json</code> file. Any manual changes made directly to that file will be lost.
-    </div>
+    <p>
+        Any manual corrections or customizations made directly to <code>cards-dc.json</code> persist permanently across sessions and restarts.
+    </p>
 
     <h3>C. Recommended Workaround: Custom Categories &amp; Tags</h3>
     <p>
@@ -925,14 +925,14 @@ namespace MECCG_Deck_Builder.Properties {
     <h1>Card Artwork Cache &amp; Downloader</h1>
 
     <h2>Card Artwork Cache System</h2>
-    <p>The application employs a high-performance two-tier caching architecture:</p>
+    <p>The application employs a high-performance two-tier caching architecture designed to run reliably in restricted environments (such as <code>C:\Program Files</code>):</p>
     <ol>
         <li><strong>Memory Cache:</strong> An in-memory cache holding up to 10,000 active Bitmaps for instant display when clicking or navigating.</li>
         <li>
-            <strong>Local Disk Cache:</strong> Checks for card images on disk under local set folders (e.g., <code>METW/metw_adrazar.jpg</code>).
+            <strong>Local Disk Cache:</strong> Checks for card images in the user storage cache under <code>%LOCALAPPDATA%\MECCG Deck Builder\Images\{Set}\</code> (or local subfolders in portable mode).
             <ul>
-                <li>If found locally, the image loads immediately with zero network latency.</li>
-                <li>If missing, it downloads asynchronously from Cardnum, saves a copy to disk, and loads it into memory.</li>
+                <li>If found locally in user storage or in pre-bundled application set folders, the image loads immediately with zero network latency.</li>
+                <li>If missing, it downloads asynchronously from Cardnum, saves a copy to disk in user storage, and loads it into memory.</li>
             </ul>
         </li>
     </ol>
@@ -948,10 +948,10 @@ namespace MECCG_Deck_Builder.Properties {
         <strong>Background Download:</strong> The batch downloader runs asynchronously with real-time progress reported in the window title bar, keeping the application responsive.
     </div>
 
-    <h2>Offline Data Fallbacks</h2>
+    <h2>Offline Architecture &amp; Database Upgrades</h2>
     <ul>
-        <li><strong>Cards:</strong> Automatically attempts to download the latest card definitions from Cardnum on launch, falling back to local <code>cards-dc.json</code> if offline.</li>
-        <li><strong>Sets:</strong> Attempts to download set metadata on launch, falling back to local <code>sets-dc.json</code> if offline.</li>
+        <li><strong>Curated Local Database:</strong> The application starts immediately using the local curated card (<code>cards-dc.json</code>) and set (<code>sets-dc.json</code>) definitions with zero startup network calls.</li>
+        <li><strong>Portable Mode:</strong> Placing an empty file named <code>portable.flag</code> next to <code>MECCG Deck Builder.exe</code> directs all images, data files, and user settings to stay inside the application folder rather than using <code>%LOCALAPPDATA%</code>.</li>
     </ul>
 </body>
 </html>
@@ -1537,32 +1537,112 @@ namespace MECCG_Deck_Builder.Properties {
 <body>
     <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; CSV Pipeline</div>
     <h1>CSV Spreadsheet Pipeline</h1>
-    <p>To facilitate large-scale taxonomy authoring or collaborative review in Google Sheets or Microsoft Excel, MECCG Deck Builder supports round-trip CSV draft exporting and importing via the <strong>Tools</strong> menu.</p>
+    <p>
+        MECCG Deck Builder features a two-way CSV spreadsheet pipeline via the <strong>Tools</strong> menu (<strong>Export Taxonomy Draft (CSV)...</strong> and <strong>Import Taxonomy from CSV...</strong>). This allows you to audit card taxonomy across hundreds of cards at a glance, bulk-assign tags in Microsoft Excel or Google Sheets, and perform multi-category edits in a single import.
+    </p>
 
-    <h2>Spreadsheet Column Layout</h2>
+    <!-- SECTION 1: COLUMN LAYOUT -->
+    <h2>1. Dynamic Spreadsheet Column Layout</h2>
+    <p>
+        When you select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>, the export automatically configures its columns based on your active filter slots:
+    </p>
+
     <table>
         <tr>
-            <th>Column Header</th>
-            <th>Required?</th>
-            <th>Description &amp; Behavior</th>
+            <th style="width: 25%;">Column Header</th>
+            <th style="width: 15%;">Role / Type</th>
+            <th style="width: 60%;">Description &amp; Behavior</th>
         </tr>
-        <tr><td><code>Card Name</code></td><td><strong>Required</strong></td><td>Exact card title (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in catalog.</td></tr>
-        <tr><td><code>Set</code></td><td><strong>Required</strong></td><td>Expansion code (e.g. <code>METW</code>, <code>MEDM</code>) used to disambiguate reprint cards.</td></tr>
-        <tr><td><code>Primary</code></td><td>Optional</td><td>Official primary type (e.g. <code>Character</code>). Read-only; ignored during import.</td></tr>
-        <tr><td><em>[Custom Category Columns]</em></td><td>Optional</td><td>Any header (e.g. <code>Faction Focus</code>, <code>Role</code>) becomes a custom category. Cell contents are imported as tags.</td></tr>
-        <tr><td><code>Card Text</code></td><td>Optional</td><td>Full rules text provided for reference during editing. Ignored during import.</td></tr>
+        <tr>
+            <td><code>Card Name</code></td>
+            <td><strong>Required</strong></td>
+            <td>The exact printed title of the card (e.g. <code>Anborn</code>, <code>Adrazar</code>). Matches cards in the catalog.</td>
+        </tr>
+        <tr>
+            <td><code>Set</code></td>
+            <td><strong>Required</strong></td>
+            <td>The 4-letter expansion code (e.g. <code>METW</code>, <code>MEDM</code>, <code>MEAS</code>). Disambiguates reprints across expansions.</td>
+        </tr>
+        <tr>
+            <td><em>[Active Official Attributes]</em></td>
+            <td>Reference (Read-Only)</td>
+            <td>
+                Any official rules attributes selected in <strong>Slots 1 &amp; 2</strong> (e.g. <code>Race</code>, <code>Skill</code>, <code>Alignment</code>). Populated with each card's official data. Defaults to <code>Primary</code> if no attributes are selected.<br />
+                <em>Import Safety:</em> All official Cardnum attributes are automatically recognized and skipped during import, ensuring they never become custom tags.
+            </td>
+        </tr>
+        <tr>
+            <td><em>[Custom Category Columns]</em></td>
+            <td><strong>Editable (Custom Tags)</strong></td>
+            <td>
+                Any custom categories selected in <strong>Slots 3 &amp; 4</strong> (e.g. <code>Faction Focus</code>, <code>Combat Role</code>). Exports pre-populated with all tags currently assigned to each card. If no custom category is selected in the filter slots, an <code>[Insert Category Name]</code> template column is generated instead.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Card Text</code></td>
+            <td>Reference (Read-Only)</td>
+            <td>Full printed rules text for reference while editing. Automatically skipped during import.</td>
+        </tr>
     </table>
 
     <div class="tip">
-        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category to a card, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
+        <strong>Multi-Tagging Syntax:</strong> To assign multiple tags within the same category column, separate them with a semicolon (<code>;</code>), for example: <code>Dwarf Factions; All Factions</code> or <code>Scout Support; Ranger Buffer</code>.
     </div>
 
-    <h2>Step-by-Step Workflow</h2>
+    <!-- SECTION 2: IMPORT SYNCHRONIZATION -->
+    <h2>2. Authoritative "Edit &amp; Replace" Import Behavior</h2>
+    <p>
+        When you select <strong>Tools &gt; Import Taxonomy from CSV...</strong>, the importer treats the spreadsheet as the authoritative record for every custom category column included in the file:
+    </p>
+
+    <ul>
+        <li>
+            <strong>Multiple Columns Processed Simultaneously:</strong>
+            You can add as many custom category columns side-by-side as you like (e.g. <code>Faction Focus</code>, <code>Role</code>, <code>Hazard Package</code>, <code>Deck Priority</code>). The importer evaluates every custom column for every card in the spreadsheet.
+        </li>
+        <li>
+            <strong>Full Edit &amp; Replace (Not Append):</strong>
+            If a card already possesses tags in a category, the import replaces them with the exact contents of the cell. If you change <code>Scout Support</code> to <code>Warrior Tank</code>, the old tag is removed and the new tag is assigned.
+        </li>
+        <li>
+            <strong>Clearing &amp; Deleting Tags:</strong>
+            Emptying a cell (or typing <code>[clear]</code>, <code>[none]</code>, or <code>-</code>) completely removes that category's tags from that card.
+        </li>
+        <li>
+            <strong>Column Scope Isolation:</strong>
+            Only the custom categories present as headers in the CSV are updated. Any categories not in the spreadsheet remain completely untouched.
+        </li>
+        <li>
+            <strong>Card Scope Isolation:</strong>
+            The import only updates the specific cards listed in the CSV. Any cards from your catalog omitted from the file retain their existing tags.
+        </li>
+        <li>
+            <strong>Placeholder Protection:</strong>
+            Unmodified template headers (like <code>[Insert Category Name]</code>) and instructional cell hints (like <code>[Insert tag...]</code>) are automatically detected and ignored.
+        </li>
+    </ul>
+
+    <!-- SECTION 3: STEP BY STEP WORKFLOW -->
+    <h2>3. Step-by-Step Workflow</h2>
+
+    <h3>Scenario A: Auditing &amp; Editing Existing Tags</h3>
     <ol>
-        <li><strong>Scope the Master List:</strong> Select your desired expansion sets and set filter criteria so that only target cards appear in the Master List.</li>
-        <li><strong>Export Draft:</strong> Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
-        <li><strong>Edit in Excel / Google Sheets:</strong> Add custom category headers, enter tags into cells, and download as a CSV file.</li>
-        <li><strong>Import to Deck Builder:</strong> Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. Categories and tags immediately populate filter dropdowns and card context menus.</li>
+        <li>In the main window, choose the expansion sets you want to audit in the <strong>Set</strong> menu.</li>
+        <li>In <strong>Slot 3</strong> (bottom panel), select the category you want to inspect (e.g. <strong>Category:</strong> <code>Faction Focus</code>).</li>
+        <li>Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong> and save the file.</li>
+        <li>Open the CSV in Excel or Google Sheets. The <code>Faction Focus</code> column is already filled with all current tags. You can glance down the column, correct typos, delete tags, or add second tags with a semicolon (<code>;</code>).</li>
+        <li>Save the spreadsheet as a CSV file.</li>
+        <li>In MECCG Deck Builder, select <strong>Tools &gt; Import Taxonomy from CSV...</strong> and select your edited file. Your catalog is updated instantly.</li>
+    </ol>
+
+    <h3>Scenario B: Drafting Brand New Categories from Scratch</h3>
+    <ol>
+        <li>Filter the Master List to the cards you want to classify (for example, set Slot 1 to <code>Primary = Character</code>).</li>
+        <li>Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
+        <li>Open the file in your spreadsheet editor. Replace the header <code>[Insert Category Name]</code> with your desired category name (e.g. <code>Combat Role</code>).</li>
+        <li>(Optional) Add additional custom category columns next to it (e.g. <code>Expedition Priority</code>).</li>
+        <li>Enter tags for each card and save as CSV.</li>
+        <li>Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. All new categories and tags are immediately registered in the application.</li>
     </ol>
 </body>
 </html>
@@ -1805,31 +1885,121 @@ pre {
         </li>
     </ol>
 
+    
+
     <!-- LOAD RULES FROM FILE -->
     <h2 id="json-rules">Load Rules from File (.json)</h2>
     <p>
         For large-scale taxonomy extraction across multiple expansions, you can author batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and execute them in a single operation.
     </p>
 
-    <h3>Sample Batch Extraction Schema</h3>
+    <h3>Batch Rule Schema</h3>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>Category</code></td>
+            <td>string</td>
+            <td>The custom taxonomy category where matches will be saved (e.g. <code>"Automatic Attack"</code>).</td>
+        </tr>
+        <tr>
+            <td><code>Pattern</code></td>
+            <td>string</td>
+            <td>
+                The .NET regular expression to evaluate against card rules text. Backslashes must be double-escaped for JSON encoding (e.g. <code>"\\b"</code>, <code>"\\s+"</code>).
+            </td>
+        </tr>
+        <tr>
+            <td><code>TagTemplate</code></td>
+            <td>string</td>
+            <td>
+                The tag assigned upon match. Can be a fixed string (e.g. <code>"Dwarves"</code>) or a capture group token (e.g. <code>"$1"</code>).
+            </td>
+        </tr>
+    </table>
+
+    <!-- WORKED EXAMPLE: SECTION-GUARDED BATCH RULES -->
+    <h3 id="worked-example-batch">Worked Example: Sandboxed Site Automatic Attacks</h3>
+    <p>
+        Site cards follow a strict top-to-bottom layout, but a naive search like <code>\bdwar(?:f|ves)\b</code> evaluates the entire card text, creating two distinct sources of false positives:
+    </p>
+
+    <ol>
+        <li>
+            <strong>Top False Positives (Adjacent Sites / Havens):</strong> Under-deeps sites list their surface entrances at the very top. For example, <em>The Drowning-deeps</em> begins with <code>Adjacent Sites: Blue Mountain Dwarf-hold (13)...</code>, triggering a false <code>Dwarves</code> tag even though its actual attack is a <code>Drake</code>.
+        </li>
+        <li>
+            <strong>Bottom False Positives (Special Rules):</strong> Many sites list special racial healing bonuses or movement effects at the bottom. For example, a site guarded only by <code>Orcs</code> might conclude with <code>Special: Dwarven characters receive +1 direct influence here</code>, triggering an unwanted <code>Dwarves</code> tag.
+        </li>
+    </ol>
+
+    <div class="tip">
+        <strong>Building a Two-Sided Regex Sandbox:</strong>
+        <p>You can strictly confine the search to the automatic-attack block using a tempered greedy token:</p>
+        <pre><code>(?is)Automatic-attacks?(?:(?!Special:).)*?\bdwar(?:f|ves)\b</code></pre>
+        <ul>
+            <li><code>(?is)Automatic-attacks?</code>: <strong>The Top Guard.</strong> Anchors to the attack header, ignoring all site names in <code>Adjacent Sites:</code> or <code>Nearest Haven:</code> above it.</li>
+            <li><code>(?:(?!Special:).)*?</code>: <strong>The Bottom Guard.</strong> Advances across lines character-by-character, strictly verifying that it has not reached <code>Special:</code>.</li>
+            <li><code>\bdwar(?:f|ves)\b</code>: Matches the creature species. If <code>Special:</code> is encountered before the creature name, the match fails immediately.</li>
+        </ul>
+    </div>
+
+    <h4>1. Sample Sandboxed Rule File (<code>Automatic_Attack_Rules.json</code>)</h4>
     <pre><code>[
   {
-    "Category": "Faction Bonus",
-    "Pattern": "(?i)\\+2\\s+direct\\s+influence\\s+against\\s+([A-Za-z\\s-]+)",
-    "TagTemplate": "$1"
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\bdwar(?:f|ves)\\b",
+    "TagTemplate": "Dwarves"
   },
   {
-    "Category": "Resolved Site",
-    "Pattern": "Any Dark-hold",
-    "TagTemplate": "Barad-dûr; Carn Dûm; Cirith Gorgor; Dol Guldur; Minas Morgul"
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\bdrakes?\\b",
+    "TagTemplate": "Drake"
+  },
+  {
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\borcs?\\b",
+    "TagTemplate": "Orcs"
+  },
+  {
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\btrolls?\\b",
+    "TagTemplate": "Trolls"
+  },
+  {
+    "Category": "Automatic Attack",
+    "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\b(?:undead|wights?|ghosts?)\\b",
+    "TagTemplate": "Undead"
   }
 ]</code></pre>
+
+    <h4>2. Step-by-Step Batch Execution &amp; Audit Workflow</h4>
+    <ol>
+        <li>
+            <strong>Scope the Master List:</strong> In the top <strong>Set</strong> menu, check your target expansions (e.g. <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>). In <strong>Filter Slot 1</strong>, set <code>Attribute: Primary</code> and <code>Value: Site</code> so only site cards are evaluated.
+        </li>
+        <li>
+            <strong>Load and Run the Batch File:</strong> Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, select <strong>Load Rules from File (.json)</strong>, browse to <code>Automatic_Attack_Rules.json</code>, and click <strong>Test / Preview Matches</strong>. Review the preview list, then click <strong>Apply Tags to Catalog</strong>.
+        </li>
+        <li>
+            <strong>Audit via Dynamic CSV Pipeline:</strong> In the main window, set <strong>Slot 3:</strong> <code>Category: Automatic Attack</code> and select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.
+        </li>
+        <li>
+            <strong>Review in Excel or Google Sheets:</strong> Open the CSV to glance down the pre-populated <code>Automatic Attack</code> column. Multi-attack sites (like <em>Carn Dûm</em> or <em>Moria</em>) cleanly show multiple tags (<code>Orcs; Trolls</code>), and complex edge cases can be edited directly in the spreadsheet.
+        </li>
+        <li>
+            <strong>Sync and Persist:</strong> Save the CSV and choose <strong>Tools &gt; Import Taxonomy from CSV...</strong> to apply your authoritative edits. Finally, select <strong>Filter &gt; Save Tag Set...</strong>, choose <code>Rules_Support_Tags.json</code>, and confirm overwrite so all tags persist permanently across application launches.
+        </li>
+    </ol>
 
     <div class="tip">
         <strong>See Also:</strong>
         <ul>
             <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference table of all standard rules categories and tags.</li>
-            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Bulk-tagging workflow using Microsoft Excel or Google Sheets.</li>
+            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Bulk-tagging and multi-column edit &amp; replace workflow using spreadsheets.</li>
         </ul>
     </div>
 </body>
@@ -2545,7 +2715,7 @@ namespace MECCG_Deck_Builder
 
         public IReadOnlyList<string> GetFilterKeys()
         {
-            var keys = new List<string> { "" }; // Index 0 is blank
+            var keys = new List<string> { "" };
             var sortedKeys = new List<string>(_filterOptions.Keys);
             sortedKeys.Sort(StringComparer.Ordinal);
             keys.AddRange(sortedKeys);
@@ -2558,7 +2728,7 @@ namespace MECCG_Deck_Builder
             {
                 return values;
             }
-            return [""]; // If key is blank, values list is just blank
+            return [""];
         }
 
         public async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -2569,118 +2739,96 @@ namespace MECCG_Deck_Builder
 
         private async Task LoadSetsAsync(CancellationToken cancellationToken)
         {
-            string json = null;
+            string filePath = StoragePathService.ResolveDataFilePath(Constants.CardnumSetsFile);
             List<CardnumSet> rawSets = null;
 
-            // 1. Try download from GitHub
-            try
+            if (File.Exists(filePath))
             {
-                json = await s_httpClient.GetStringAsync(Constants.CardnumSetsURL, cancellationToken).ConfigureAwait(false);
-                rawSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                 try
                 {
-                    await File.WriteAllTextAsync(Constants.CardnumSetsFile, json, cancellationToken).ConfigureAwait(false);
+                    string json = await File.ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
+                    rawSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                 }
                 catch (Exception)
                 {
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo3"));
-                }
-            }
-            catch (Exception)
-            {
-                // 2. Fallback to local file
-                try
-                {
-                    json = await File.ReadAllTextAsync(Constants.CardnumSetsFile, cancellationToken).ConfigureAwait(false);
-                    rawSets = JsonConvert.DeserializeObject<List<CardnumSet>>(json);
                     WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo1"));
                 }
-                catch (Exception)
+            }
+
+            if (rawSets == null || rawSets.Count == 0)
+            {
+                _sets.Clear();
+                _sets.Add(new CardSet
                 {
-                    // 3. Emergency fallback
-                    _sets.Clear();
-                    _sets.Add(new CardSet
-                    {
-                        Code = "METW",
-                        Name = "The Wizards",
-                        Format = "General",
-                        Position = 1,
-                        Dreamcards = false,
-                        Released = true
-                    });
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo2"));
-                    return;
-                }
+                    Code = "METW",
+                    Name = "The Wizards",
+                    Format = "General",
+                    Position = 1,
+                    Dreamcards = false,
+                    Released = true
+                });
+                WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumSetInfo2"));
+                return;
             }
 
             _sets.Clear();
-            if (rawSets != null)
+            foreach (var s in rawSets)
             {
-                foreach (var s in rawSets)
+                _sets.Add(new CardSet
                 {
-                    _sets.Add(new CardSet
-                    {
-                        Code = s.Code,
-                        Name = s.Name,
-                        Format = s.Format,
-                        Position = s.Position,
-                        Dreamcards = s.Dreamcards,
-                        Released = s.Released
-                    });
-                }
+                    Code = s.Code,
+                    Name = s.Name,
+                    Format = s.Format,
+                    Position = s.Position,
+                    Dreamcards = s.Dreamcards,
+                    Released = s.Released
+                });
             }
         }
 
         private async Task LoadCardsAsync(CancellationToken cancellationToken)
         {
-            string json = null;
+            string filePath = StoragePathService.ResolveDataFilePath(Constants.CardnumCardsFile);
             List<CardnumCard> rawCards = null;
 
-            // 1. Try download from GitHub
-            try
+            if (File.Exists(filePath))
             {
-                json = await s_httpClient.GetStringAsync(Constants.CardnumCardsURL, cancellationToken).ConfigureAwait(false);
-                rawCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
                 try
                 {
-                    await File.WriteAllTextAsync(Constants.CardnumCardsFile, json, cancellationToken).ConfigureAwait(false);
-                }
-                catch (Exception)
-                {
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo3"));
-                }
-            }
-            catch (Exception)
-            {
-                // 2. Fallback to local file
-                try
-                {
-                    json = await File.ReadAllTextAsync(Constants.CardnumCardsFile, cancellationToken).ConfigureAwait(false);
+                    string json = await File.ReadAllTextAsync(filePath, cancellationToken).ConfigureAwait(false);
                     rawCards = JsonConvert.DeserializeObject<List<CardnumCard>>(json);
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo1"));
                 }
                 catch (Exception)
                 {
-                    // 3. Emergency fallback: Single default card
-                    var emergencyCard = new Card
-                    {
-                        Id = "0",
-                        Set = "METW",
-                        FullCode = "Adrazar (TW)",
-                        Name = "Adrazar",
-                        Alignment = "Hero",
-                        ImageName = "metw_adrazar.jpg",
-                        Released = true
-                    };
-                    _cards.Clear();
-                    _cardsById.Clear();
-                    _cards.Add(emergencyCard);
-                    _cardsById[emergencyCard.Id] = emergencyCard;
-                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo2"));
-                    return;
+                    WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo1"));
                 }
             }
 
+            if (rawCards == null || rawCards.Count == 0)
+            {
+                var emergencyCard = new Card
+                {
+                    Id = "0",
+                    Set = "METW",
+                    FullCode = "Adrazar (TW)",
+                    Name = "Adrazar",
+                    Alignment = "Hero",
+                    ImageName = "metw_adrazar.jpg",
+                    Released = true
+                };
+                _cards.Clear();
+                _cardsById.Clear();
+                _cards.Add(emergencyCard);
+                _cardsById[emergencyCard.Id] = emergencyCard;
+                WarningOccurred?.Invoke(this, Messages.GetMsgBoxText("ImportCardnumCardInfo2"));
+                return;
+            }
+
+            PopulateCards(rawCards);
+        }
+
+        private void PopulateCards(List<CardnumCard> rawCards)
+        {
             InitializeFilterKeys();
 
             _cards.Clear();
@@ -2698,17 +2846,16 @@ namespace MECCG_Deck_Builder
 
                     string imageName = raw.Ice_errata == true ? $"ice-{raw.ImageName}" : raw.ImageName;
 
-                    // Normalize Tolkien lore sub-races to canonical game races
                     string rawRace = raw.Race ?? string.Empty;
                     string canonicalRace = rawRace;
-                    string subrace = string.Empty; // Defaults to empty for all cards
+                    string subrace = string.Empty;
 
                     if (rawRace.EndsWith("Elf", StringComparison.OrdinalIgnoreCase))
                     {
                         canonicalRace = "Elf";
                         if (!string.Equals(rawRace, "Elf", StringComparison.OrdinalIgnoreCase))
                         {
-                            subrace = rawRace; // Only "Silvan Elf", "Noldo Elf", "Sinda Elf", "Nando Elf"
+                            subrace = rawRace;
                         }
                     }
                     else if (rawRace.EndsWith("Dwarf", StringComparison.OrdinalIgnoreCase))
@@ -2716,7 +2863,7 @@ namespace MECCG_Deck_Builder
                         canonicalRace = "Dwarf";
                         if (!string.Equals(rawRace, "Dwarf", StringComparison.OrdinalIgnoreCase))
                         {
-                            subrace = rawRace; // Only "Longbeard Dwarf", "Firebeard Dwarf", etc.
+                            subrace = rawRace;
                         }
                     }
 
@@ -2773,6 +2920,62 @@ namespace MECCG_Deck_Builder
                     _cardsById[card.Id] = card;
                 }
             }
+        }
+
+        /// <summary>
+        /// Explicit, user-initiated database update that downloads the latest Cardnum datasets
+        /// from GitHub and saves them to the writable LocalAppData folder.
+        /// </summary>
+        public async Task<(bool Success, string Message)> UpdateDatabaseFromCardnumAsync(CancellationToken cancellationToken = default)
+        {
+            string setsJson;
+            string cardsJson;
+
+            try
+            {
+                setsJson = await s_httpClient.GetStringAsync(Constants.CardnumSetsURL, cancellationToken).ConfigureAwait(false);
+                var testSets = JsonConvert.DeserializeObject<List<CardnumSet>>(setsJson);
+                if (testSets == null || testSets.Count == 0)
+                {
+                    return (false, "Retrieved set data was empty or invalid.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to download sets from Cardnum:\n{ex.Message}");
+            }
+
+            try
+            {
+                cardsJson = await s_httpClient.GetStringAsync(Constants.CardnumCardsURL, cancellationToken).ConfigureAwait(false);
+                var testCards = JsonConvert.DeserializeObject<List<CardnumCard>>(cardsJson);
+                if (testCards == null || testCards.Count == 0)
+                {
+                    return (false, "Retrieved card data was empty or invalid.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to download cards from Cardnum:\n{ex.Message}");
+            }
+
+            string setsPath = StoragePathService.GetWritableDataFilePath(Constants.CardnumSetsFile);
+            string cardsPath = StoragePathService.GetWritableDataFilePath(Constants.CardnumCardsFile);
+
+            try
+            {
+                await File.WriteAllTextAsync(setsPath, setsJson, cancellationToken).ConfigureAwait(false);
+                await File.WriteAllTextAsync(cardsPath, cardsJson, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Failed to save database files to local storage:\n{ex.Message}");
+            }
+
+            await LoadSetsAsync(cancellationToken).ConfigureAwait(false);
+            await LoadCardsAsync(cancellationToken).ConfigureAwait(false);
+
+            return (true, $"Database successfully updated and reloaded!\n\nSets: {_sets.Count}\nCards: {_cards.Count}");
         }
 
         private void InitializeFilterKeys()
@@ -3500,7 +3703,6 @@ namespace MECCG_Deck_Builder
 {
     public class CardImageCache
     {
-        // HttpClient should be a shared, static, or long-lived instance
         private static readonly HttpClient s_httpClient = new();
 
         private readonly MemoryCache Cache = new(new MemoryCacheOptions()
@@ -3513,7 +3715,7 @@ namespace MECCG_Deck_Builder
         /// <summary>
         /// Asynchronously retrieves an image from in-memory cache, local disk, or remote Cardnum endpoint.
         /// </summary>
-        internal async Task<Bitmap> GetOrCreateAsync(string key, string setFolder, string imageName, CancellationToken cancellationToken = default)
+        internal async Task<Bitmap> GetOrCreateAsync(string key, string setCode, string imageName, CancellationToken cancellationToken = default)
         {
             // 1. Check in-memory cache
             if (Cache.TryGetValue(key, out Bitmap cacheEntry))
@@ -3521,12 +3723,12 @@ namespace MECCG_Deck_Builder
                 return cacheEntry;
             }
 
-            string filePath = Path.Combine(setFolder, imageName);
+            string readPath = StoragePathService.ResolveImageReadPath(setCode, imageName);
 
             // 2. Fall back to local disk asynchronously
-            if (File.Exists(filePath))
+            if (File.Exists(readPath))
             {
-                cacheEntry = await LoadImageNonLockingAsync(filePath, cancellationToken).ConfigureAwait(false);
+                cacheEntry = await LoadImageNonLockingAsync(readPath, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -3537,11 +3739,13 @@ namespace MECCG_Deck_Builder
                 {
                     try
                     {
+                        string writePath = StoragePathService.GetCardImagePath(setCode, imageName);
+                        string setFolder = Path.GetDirectoryName(writePath);
                         if (!Directory.Exists(setFolder))
                         {
                             Directory.CreateDirectory(setFolder);
                         }
-                        cacheEntry.Save(filePath);
+                        cacheEntry.Save(writePath);
                     }
                     catch (Exception)
                     {
@@ -3562,9 +3766,6 @@ namespace MECCG_Deck_Builder
             return cacheEntry;
         }
 
-        /// <summary>
-        /// Asynchronously downloads card image bytes and converts them into a non-locking Bitmap.
-        /// </summary>
         internal static async Task<Bitmap> CreateItemAsync(string key, CancellationToken cancellationToken = default)
         {
             try
@@ -3588,9 +3789,6 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        /// <summary>
-        /// Reads image bytes into memory asynchronously before creating a Bitmap so GDI+ does not lock the file on disk.
-        /// </summary>
         private static async Task<Bitmap> LoadImageNonLockingAsync(string filePath, CancellationToken cancellationToken = default)
         {
             try
@@ -3610,18 +3808,18 @@ namespace MECCG_Deck_Builder
 
         #region SYNCHRONOUS_METHODS
 
-        internal Bitmap GetOrCreate(string key, string setFolder, string imageName)
+        internal Bitmap GetOrCreate(string key, string setCode, string imageName)
         {
             if (Cache.TryGetValue(key, out Bitmap cacheEntry))
             {
                 return cacheEntry;
             }
 
-            string filePath = Path.Combine(setFolder, imageName);
+            string readPath = StoragePathService.ResolveImageReadPath(setCode, imageName);
 
-            if (File.Exists(filePath))
+            if (File.Exists(readPath))
             {
-                cacheEntry = LoadImageNonLocking(filePath);
+                cacheEntry = LoadImageNonLocking(readPath);
             }
             else
             {
@@ -3631,11 +3829,13 @@ namespace MECCG_Deck_Builder
                 {
                     try
                     {
+                        string writePath = StoragePathService.GetCardImagePath(setCode, imageName);
+                        string setFolder = Path.GetDirectoryName(writePath);
                         if (!Directory.Exists(setFolder))
                         {
                             Directory.CreateDirectory(setFolder);
                         }
-                        cacheEntry.Save(filePath);
+                        cacheEntry.Save(writePath);
                     }
                     catch (Exception)
                     {
@@ -4894,7 +5094,7 @@ namespace MECCG_Deck_Builder
         {
             try
             {
-                string path = Path.Combine(Application.StartupPath, "Rules_Support_Tags.json");
+                string path = StoragePathService.ResolveDataFilePath("Rules_Support_Tags.json");
                 if (File.Exists(path))
                 {
                     string json = File.ReadAllText(path);
@@ -4913,19 +5113,42 @@ namespace MECCG_Deck_Builder
 
         private void CreateMenus()
         {
+            // Keep Catalog dropdown open while ticking expansion sets
+            ToolStripMenuCatalog.DropDown.Closing += (s, e) =>
+            {
+                if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+                {
+                    e.Cancel = true;
+                }
+            };
+
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
+            ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
+
+            PopulateSetMenuItems();
+        }
+
+        private void PopulateSetMenuItems()
+        {
             _isUpdatingFilters = true;
             try
             {
-                // Prevent Set menu from auto-closing on item clicks so users can toggle multiple sets
-                ToolStripMenuSet.DropDown.Closing += (s, e) =>
+                // Remove existing set items (identified by Tag is string)
+                var existingSetItems = ToolStripMenuCatalog.DropDownItems
+                    .OfType<ToolStripMenuItem>()
+                    .Where(item => item.Tag is string)
+                    .ToList();
+
+                foreach (var item in existingSetItems)
                 {
-                    if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
-                    {
-                        e.Cancel = true;
-                    }
-                };
+                    ToolStripMenuCatalog.DropDownItems.Remove(item);
+                }
 
                 var savedSets = new HashSet<string>(UserSettingsService.Current.SelectedSets ?? [], StringComparer.OrdinalIgnoreCase);
+
+                // Insert set checkboxes right above the bottom separator
+                int insertIndex = ToolStripMenuCatalog.DropDownItems.Count - 2;
 
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
                 {
@@ -4937,7 +5160,6 @@ namespace MECCG_Deck_Builder
                     };
                     menuItem.CheckedChanged += ToolStripMenuSet_CheckedChanged;
 
-                    // Restore saved set state; if no saved sets exist yet, default to first set (METW)
                     bool shouldCheck = savedSets.Count > 0
                         ? savedSets.Contains(set.Code)
                         : (i == 0);
@@ -4948,14 +5170,13 @@ namespace MECCG_Deck_Builder
                         _currentDeck.IncludedSets.Add(set.Code);
                     }
 
-                    ToolStripMenuSet.DropDownItems.Add(menuItem);
+                    ToolStripMenuCatalog.DropDownItems.Insert(insertIndex++, menuItem);
                 }
 
-                // Fallback guarantee: if saved codes didn't match any catalog set, select the first set
                 if (_currentDeck.IncludedSets.Count == 0 && _catalogService.Sets.Count > 0)
                 {
                     var firstSet = _catalogService.Sets[0];
-                    if (ToolStripMenuSet.DropDownItems.Count > 2 && ToolStripMenuSet.DropDownItems[2] is ToolStripMenuItem firstItem)
+                    if (ToolStripMenuCatalog.DropDownItems.Count > 3 && ToolStripMenuCatalog.DropDownItems[3] is ToolStripMenuItem firstItem)
                     {
                         firstItem.Checked = true;
                     }
@@ -4966,19 +5187,6 @@ namespace MECCG_Deck_Builder
             {
                 _isUpdatingFilters = false;
             }
-
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            ToolStripMenuFilterOpen.Image = (Image)resources.GetObject("OpenToolStripMenuItem.Image");
-            ToolStripMenuFilterSave.Image = (Image)resources.GetObject("ExportToolStripMenuItem.Image");
-
-            var clearMenuItem = new ToolStripMenuItem("Clear All Filters")
-            {
-                ShortcutKeys = Keys.Control | Keys.R
-            };
-            clearMenuItem.Click += (s, e) => ResetAllFilters();
-
-            ToolStripMenuFilter.DropDownItems.Add(new ToolStripSeparator());
-            ToolStripMenuFilter.DropDownItems.Add(clearMenuItem);
         }
 
         private void PersistSelectedSets()
@@ -5146,7 +5354,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.AddCustomKeyName(result.Value.Key);
                     _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
-                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value); // Appends instead of overwriting
+                    _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -5168,7 +5376,7 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         _filterService.AddCustomKeyValue(keyName, val);
-                        _filterService.AppendCardCustomTag(card.Id, keyName, val); // Appends instead of overwriting
+                        _filterService.AppendCardCustomTag(card.Id, keyName, val);
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
                     }
@@ -5339,15 +5547,12 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+                foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                 {
-                    if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && item.Checked)
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string code && setItem.Checked)
                     {
-                        item.Checked = false;
-                        if (item.Tag is string code)
-                        {
-                            _currentDeck.IncludedSets.Remove(code);
-                        }
+                        setItem.Checked = false;
+                        _currentDeck.IncludedSets.Remove(code);
                     }
                 }
             }
@@ -5365,15 +5570,12 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                for (int i = 2; i < ToolStripMenuSet.DropDownItems.Count; i++)
+                foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                 {
-                    if (ToolStripMenuSet.DropDownItems[i] is ToolStripMenuItem item && !item.Checked)
+                    if (item is ToolStripMenuItem setItem && setItem.Tag is string code && !setItem.Checked)
                     {
-                        item.Checked = true;
-                        if (item.Tag is string code)
-                        {
-                            _currentDeck.IncludedSets.Add(code);
-                        }
+                        setItem.Checked = true;
+                        _currentDeck.IncludedSets.Add(code);
                     }
                 }
             }
@@ -5752,10 +5954,32 @@ namespace MECCG_Deck_Builder
                 DefaultExt = "json",
                 Filter = "MECCG Deck Builder Deck (*.json)|*.json",
                 FilterIndex = 1,
-                FileName = GetSafeDeckFileName() // <-- Pre-populates "Hero Dwarves of the Iron Hills.json"
+                FileName = GetSafeDeckFileName()
             };
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                _currentDeck.Title = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
+                var dto = OpenCloseDeck.FromDeck(_currentDeck);
+                string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
+                File.WriteAllText(saveFileDialog.FileName, json);
+                UpdateFormTitle();
+            }
+        }
+
+        private void SaveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using var saveFileDialog = new SaveFileDialog
+            {
+                Title = $"{Constants.AppTitle} - Save Deck As",
+                CheckPathExists = true,
+                DefaultExt = "json",
+                Filter = "MECCG Deck Builder Deck (*.json)|*.json",
+                FilterIndex = 1,
+                FileName = GetSafeDeckFileName()
+            };
+
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 _currentDeck.Title = Path.GetFileNameWithoutExtension(saveFileDialog.FileName);
                 var dto = OpenCloseDeck.FromDeck(_currentDeck);
@@ -5800,7 +6024,7 @@ namespace MECCG_Deck_Builder
                 _isUpdatingFilters = true;
                 try
                 {
-                    foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                    foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                     {
                         if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
                         {
@@ -5832,7 +6056,7 @@ namespace MECCG_Deck_Builder
                 Filter = "Tabletop Simulator (*.json)|*.json|Play MECCG (*.play)|*.play|Cardnum (*.cnum)|*.cnum|Archive (*.archive)|*.txt|Text (*.txt)|*.txt",
                 FilterIndex = 1,
                 RestoreDirectory = true,
-                FileName = GetSafeDeckFileName() // Pre-populates the deck name
+                FileName = GetSafeDeckFileName()
             };
 
             if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
@@ -5894,7 +6118,7 @@ namespace MECCG_Deck_Builder
                 var dto = JsonConvert.DeserializeObject<OpenCloseFilter>(json);
                 if (dto != null)
                 {
-                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService); // Passed _catalogService
+                    _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
                 }
@@ -5912,7 +6136,7 @@ namespace MECCG_Deck_Builder
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService); // Passed _catalogService
+                var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService);
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
             }
@@ -5922,7 +6146,7 @@ namespace MECCG_Deck_Builder
         {
             using var openFileDialog = new OpenFileDialog
             {
-                Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session", 
+                Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session",
                 DefaultExt = "json",
                 Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
@@ -5960,8 +6184,6 @@ namespace MECCG_Deck_Builder
             try
             {
                 // Pass 1: Symmetrically validate all slots against the active sets independently.
-                // Any value that does not exist in the active set(s) on its own is cleared first,
-                // preventing a dead value from falsely invalidating valid peer slots.
                 for (int i = 0; i < _filterSlots.Length; i++)
                 {
                     var slot = _filterSlots[i];
@@ -5973,7 +6195,7 @@ namespace MECCG_Deck_Builder
                     var baseValues = _filterService.GetAvailableValues(
                         _catalogService.Cards,
                         _currentDeck.IncludedSets,
-                        [], // No other criteria: test set validity only
+                        [],
                         slot.Type,
                         slot.CurrentKey);
 
@@ -6289,14 +6511,16 @@ namespace MECCG_Deck_Builder
 
                     if (string.IsNullOrEmpty(card.ImageName) || string.IsNullOrEmpty(card.Set)) continue;
 
-                    string targetPath = Path.Combine(card.Set, card.ImageName);
-                    if (File.Exists(targetPath))
+                    string readPath = StoragePathService.ResolveImageReadPath(card.Set, card.ImageName);
+                    if (File.Exists(readPath))
                     {
                         skippedCount++;
                         continue;
                     }
 
-                    if (!Directory.Exists(card.Set)) Directory.CreateDirectory(card.Set);
+                    string targetPath = StoragePathService.GetCardImagePath(card.Set, card.ImageName);
+                    string setDir = Path.GetDirectoryName(targetPath);
+                    if (!Directory.Exists(setDir)) Directory.CreateDirectory(setDir);
 
                     using var bmp = await CardImageCache.CreateItemAsync($"https://cardnum.net/img/cards/{card.Set}/{card.ImageName}");
                     if (bmp != null)
@@ -6334,6 +6558,18 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(this,
+                $"{Constants.AppTitle}\nVersion 0.5.0\n\n" +
+                "A desktop deck builder and collection manager for the Middle-earth Collectible Card Game (MECCG).\n\n" +
+                "Card data and artwork courtesy of the Cardnum Project (https://cardnum.net).\n" +
+                "MECCG is © Iron Crown Enterprises and Tolkien Enterprises.",
+                $"About {Constants.AppTitle}",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
         private void ToolStripMenuToolsGenerateDeck_Click(object sender, EventArgs e)
         {
             using var ofd = new OpenFileDialog
@@ -6357,7 +6593,6 @@ namespace MECCG_Deck_Builder
             }
             else
             {
-                // If not run yet in this session, open file picker
                 ToolStripMenuToolsGenerateDeck_Click(sender, e);
             }
         }
@@ -6425,7 +6660,7 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                foreach (ToolStripItem item in ToolStripMenuSet.DropDownItems)
+                foreach (ToolStripItem item in ToolStripMenuCatalog.DropDownItems)
                 {
                     if (item is ToolStripMenuItem setItem && setItem.Tag is string tag)
                     {
@@ -6543,16 +6778,30 @@ namespace MECCG_Deck_Builder
 
             if (sfd.ShowDialog(this) == DialogResult.OK)
             {
-                TaxonomyExtractionService.ExportTemplateDraftToCsv(_masterCards, sfd.FileName);
+                var activeAttributes = new List<string>();
+                if (!string.IsNullOrWhiteSpace(_filterSlots[0].CurrentKey)) activeAttributes.Add(_filterSlots[0].CurrentKey);
+                if (!string.IsNullOrWhiteSpace(_filterSlots[1].CurrentKey)) activeAttributes.Add(_filterSlots[1].CurrentKey);
+
+                var activeCategories = new List<string>();
+                if (!string.IsNullOrWhiteSpace(_filterSlots[2].CurrentKey)) activeCategories.Add(_filterSlots[2].CurrentKey);
+                if (!string.IsNullOrWhiteSpace(_filterSlots[3].CurrentKey)) activeCategories.Add(_filterSlots[3].CurrentKey);
+
+                TaxonomyExtractionService.ExportTemplateDraftToCsv(
+                    _masterCards,
+                    _filterService,
+                    sfd.FileName,
+                    activeAttributes,
+                    activeCategories);
 
                 MessageBox.Show(this,
-                    $"Taxonomy draft template exported successfully to:\n{sfd.FileName}\n\n" +
-                    $"Cards exported: {_masterCards.Count} (matching your active set and filter criteria).\n\n" +
+                    $"Taxonomy draft exported successfully to:\n{sfd.FileName}\n\n" +
+                    $"Cards exported: {_masterCards.Count}\n" +
+                    $"Official attribute columns: {(activeAttributes.Count > 0 ? string.Join(", ", activeAttributes) : "Primary (default)")}\n" +
+                    $"Custom category columns: {(activeCategories.Count > 0 ? string.Join(", ", activeCategories) : "[Insert Category Name] (blank draft)")}\n\n" +
                     "Workflow in Google Sheets or Excel:\n" +
-                    "1. Rename '[Insert Category Name]' to your category (e.g. 'Combat Role' or 'Faction Focus').\n" +
-                    "2. Add additional category columns if desired.\n" +
-                    "3. Enter tags for each card (use ';' for multiple tags).\n" +
-                    "4. Import back via Tools > Import Taxonomy from CSV...",
+                    "1. Review and edit tags (separate multiple tags with ';').\n" +
+                    "2. Add new category columns as needed.\n" +
+                    "3. Import changes back via Taxonomy > Import Taxonomy from CSV...",
                     Constants.AppTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
@@ -6669,51 +6918,30 @@ namespace MECCG_Deck_Builder
             TabPageSideboard = new System.Windows.Forms.TabPage();
             TabPageSites = new System.Windows.Forms.TabPage();
             MenuStrip1 = new System.Windows.Forms.MenuStrip();
-            fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuDeck = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuNew = new System.Windows.Forms.ToolStripMenuItem();
             OpenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
-            ExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             SaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            printPreviewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuTools = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGenerateDeck = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparatorDeckGen = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuToolsRerunDeckGen = new System.Windows.Forms.ToolStripMenuItem();
+            ExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuCatalog = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuTaxonomy = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuFilterManage = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsRunRules = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsExportCsv = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsImportCsv = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparatorTools = new System.Windows.Forms.ToolStripSeparator();
-            ToolStripMenuToolsGetImages = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuSet = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuSetSelectAll = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuSetClearAll = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuFilter = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuFilterManage = new System.Windows.Forms.ToolStripMenuItem();
-            ToolStripMenuFilterMerge = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             ToolStripMenuFilterOpen = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            ToolStripMenuFilterMerge = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuFilterSave = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuClearAllFilters = new System.Windows.Forms.ToolStripMenuItem();
             helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             contentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            indexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             GroupBoxCardAttributes = new System.Windows.Forms.GroupBox();
             LblSlot1Key = new System.Windows.Forms.Label();
@@ -7099,19 +7327,36 @@ namespace MECCG_Deck_Builder
             // 
             // MenuStrip1
             // 
-            MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { fileToolStripMenuItem, editToolStripMenuItem, ToolStripMenuTools, ToolStripMenuSet, ToolStripMenuFilter, helpToolStripMenuItem });
+            MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                ToolStripMenuDeck,
+                ToolStripMenuCatalog,
+                ToolStripMenuTaxonomy,
+                helpToolStripMenuItem
+            });
             MenuStrip1.Location = new System.Drawing.Point(0, 0);
             MenuStrip1.Name = "MenuStrip1";
             MenuStrip1.Size = new System.Drawing.Size(926, 24);
             MenuStrip1.TabIndex = 15;
-            MenuStrip1.Text = "File Menu";
+            MenuStrip1.Text = "Main Menu";
             // 
-            // fileToolStripMenuItem
+            // ToolStripMenuDeck
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuNew, OpenToolStripMenuItem, toolStripSeparator, ExportToolStripMenuItem, SaveToolStripMenuItem, saveAsToolStripMenuItem, toolStripSeparator1, printToolStripMenuItem, printPreviewToolStripMenuItem, toolStripSeparator2, exitToolStripMenuItem });
-            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
-            fileToolStripMenuItem.Text = "&File";
+            ToolStripMenuDeck.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                ToolStripMenuNew,
+                OpenToolStripMenuItem,
+                SaveToolStripMenuItem,
+                saveAsToolStripMenuItem,
+                new System.Windows.Forms.ToolStripSeparator(),
+                ToolStripMenuToolsGenerateDeck,
+                ToolStripMenuToolsRerunDeckGen,
+                new System.Windows.Forms.ToolStripSeparator(),
+                ExportToolStripMenuItem,
+                new System.Windows.Forms.ToolStripSeparator(),
+                exitToolStripMenuItem
+            });
+            ToolStripMenuDeck.Name = "ToolStripMenuDeck";
+            ToolStripMenuDeck.Size = new System.Drawing.Size(46, 20);
+            ToolStripMenuDeck.Text = "&Deck";
             // 
             // ToolStripMenuNew
             // 
@@ -7119,8 +7364,8 @@ namespace MECCG_Deck_Builder
             ToolStripMenuNew.ImageTransparentColor = System.Drawing.Color.Magenta;
             ToolStripMenuNew.Name = "ToolStripMenuNew";
             ToolStripMenuNew.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N;
-            ToolStripMenuNew.Size = new System.Drawing.Size(147, 22);
-            ToolStripMenuNew.Text = "&New";
+            ToolStripMenuNew.Size = new System.Drawing.Size(224, 22);
+            ToolStripMenuNew.Text = "&New Deck";
             ToolStripMenuNew.Click += NewToolStripMenu_Click;
             // 
             // OpenToolStripMenuItem
@@ -7129,274 +7374,177 @@ namespace MECCG_Deck_Builder
             OpenToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             OpenToolStripMenuItem.Name = "OpenToolStripMenuItem";
             OpenToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O;
-            OpenToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            OpenToolStripMenuItem.Text = "&Open";
+            OpenToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            OpenToolStripMenuItem.Text = "&Open Deck...";
             OpenToolStripMenuItem.Click += OpenToolStripMenuItem_Click;
             // 
-            // toolStripSeparator
+            // SaveToolStripMenuItem
             // 
-            toolStripSeparator.Name = "toolStripSeparator";
-            toolStripSeparator.Size = new System.Drawing.Size(144, 6);
+            SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
+            SaveToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
+            SaveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            SaveToolStripMenuItem.Text = "&Save Deck";
+            SaveToolStripMenuItem.Click += SaveToolStripMenuItem_Click;
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            saveAsToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            saveAsToolStripMenuItem.Text = "Save Deck &As...";
+            saveAsToolStripMenuItem.Click += SaveAsToolStripMenuItem_Click;
+            // 
+            // ToolStripMenuToolsGenerateDeck
+            // 
+            ToolStripMenuToolsGenerateDeck.Name = "ToolStripMenuToolsGenerateDeck";
+            ToolStripMenuToolsGenerateDeck.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G;
+            ToolStripMenuToolsGenerateDeck.Size = new System.Drawing.Size(224, 22);
+            ToolStripMenuToolsGenerateDeck.Text = "&Generate from Rules...";
+            ToolStripMenuToolsGenerateDeck.Click += ToolStripMenuToolsGenerateDeck_Click;
+            // 
+            // ToolStripMenuToolsRerunDeckGen
+            // 
+            ToolStripMenuToolsRerunDeckGen.Enabled = false;
+            ToolStripMenuToolsRerunDeckGen.Name = "ToolStripMenuToolsRerunDeckGen";
+            ToolStripMenuToolsRerunDeckGen.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            ToolStripMenuToolsRerunDeckGen.Size = new System.Drawing.Size(224, 22);
+            ToolStripMenuToolsRerunDeckGen.Text = "&Re-run Deck Rules";
+            ToolStripMenuToolsRerunDeckGen.Click += ToolStripMenuToolsRerunDeckGen_Click;
             // 
             // ExportToolStripMenuItem
             // 
             ExportToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("ExportToolStripMenuItem.Image");
             ExportToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             ExportToolStripMenuItem.Name = "ExportToolStripMenuItem";
-            ExportToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
-            ExportToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            ExportToolStripMenuItem.Text = "&Export";
+            ExportToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E;
+            ExportToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            ExportToolStripMenuItem.Text = "&Export Deck...";
             ExportToolStripMenuItem.Click += ExportToolStripMenuItem_Click;
-            // 
-            // SaveToolStripMenuItem
-            // 
-            SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
-            SaveToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            SaveToolStripMenuItem.Text = "&Save";
-            SaveToolStripMenuItem.Click += SaveToolStripMenuItem_Click;
-            // 
-            // saveAsToolStripMenuItem
-            // 
-            saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            saveAsToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            saveAsToolStripMenuItem.Text = "Save &As";
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(144, 6);
-            // 
-            // printToolStripMenuItem
-            // 
-            printToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("printToolStripMenuItem.Image");
-            printToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            printToolStripMenuItem.Name = "printToolStripMenuItem";
-            printToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P;
-            printToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            printToolStripMenuItem.Text = "&Print";
-            // 
-            // printPreviewToolStripMenuItem
-            // 
-            printPreviewToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("printPreviewToolStripMenuItem.Image");
-            printPreviewToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            printPreviewToolStripMenuItem.Name = "printPreviewToolStripMenuItem";
-            printPreviewToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
-            printPreviewToolStripMenuItem.Text = "Print Pre&view";
-            // 
-            // toolStripSeparator2
-            // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(144, 6);
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            exitToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
             exitToolStripMenuItem.Text = "E&xit";
+            exitToolStripMenuItem.Click += (s, e) => Close();
             // 
-            // editToolStripMenuItem
+            // ToolStripMenuCatalog
             // 
-            editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { undoToolStripMenuItem, redoToolStripMenuItem, toolStripSeparator3, cutToolStripMenuItem, copyToolStripMenuItem, pasteToolStripMenuItem, toolStripSeparator4, selectAllToolStripMenuItem });
-            editToolStripMenuItem.Name = "editToolStripMenuItem";
-            editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
-            editToolStripMenuItem.Text = "&Edit";
-            // 
-            // undoToolStripMenuItem
-            // 
-            undoToolStripMenuItem.Name = "undoToolStripMenuItem";
-            undoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z;
-            undoToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            undoToolStripMenuItem.Text = "&Undo";
-            // 
-            // redoToolStripMenuItem
-            // 
-            redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            redoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y;
-            redoToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            redoToolStripMenuItem.Text = "&Redo";
-            // 
-            // toolStripSeparator3
-            // 
-            toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new System.Drawing.Size(141, 6);
-            // 
-            // cutToolStripMenuItem
-            // 
-            cutToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("cutToolStripMenuItem.Image");
-            cutToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            cutToolStripMenuItem.Name = "cutToolStripMenuItem";
-            cutToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X;
-            cutToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            cutToolStripMenuItem.Text = "Cu&t";
-            // 
-            // copyToolStripMenuItem
-            // 
-            copyToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("copyToolStripMenuItem.Image");
-            copyToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            copyToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C;
-            copyToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            copyToolStripMenuItem.Text = "&Copy";
-            // 
-            // pasteToolStripMenuItem
-            // 
-            pasteToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("pasteToolStripMenuItem.Image");
-            pasteToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
-            pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            pasteToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V;
-            pasteToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            pasteToolStripMenuItem.Text = "&Paste";
-            // 
-            // toolStripSeparator4
-            // 
-            toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new System.Drawing.Size(141, 6);
-            // 
-            // selectAllToolStripMenuItem
-            // 
-            selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            selectAllToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            selectAllToolStripMenuItem.Text = "Select &All";
-            // 
-            // ToolStripMenuTools
-            // 
-            ToolStripMenuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                ToolStripMenuToolsGenerateDeck,
-                ToolStripMenuToolsRerunDeckGen,
-                toolStripSeparatorDeckGen,
-                ToolStripMenuToolsRunRules,
-                ToolStripMenuToolsExportCsv,
-                ToolStripMenuToolsImportCsv,
-                toolStripSeparatorTools,
+            ToolStripMenuCatalog.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                ToolStripMenuSetSelectAll,
+                ToolStripMenuSetClearAll,
+                new System.Windows.Forms.ToolStripSeparator(),
+                new System.Windows.Forms.ToolStripSeparator(),
                 ToolStripMenuToolsGetImages
-            }); 
-            ToolStripMenuTools.Name = "ToolStripMenuTools";
-            ToolStripMenuTools.Size = new System.Drawing.Size(47, 20);
-            ToolStripMenuTools.Text = "&Tools";
-            // 
-            // ToolStripMenuToolsGenerateDeck
-            // 
-            ToolStripMenuToolsGenerateDeck.Name = "ToolStripMenuToolsGenerateDeck";
-            ToolStripMenuToolsGenerateDeck.Size = new System.Drawing.Size(232, 22);
-            ToolStripMenuToolsGenerateDeck.Text = "Generate Deck from Rules...";
-            ToolStripMenuToolsGenerateDeck.Click += ToolStripMenuToolsGenerateDeck_Click;
-            // 
-            // ToolStripMenuToolsRerunDeckGen
-            // 
-            ToolStripMenuToolsRerunDeckGen.Name = "ToolStripMenuToolsRerunDeckGen";
-            ToolStripMenuToolsRerunDeckGen.Size = new System.Drawing.Size(232, 22);
-            ToolStripMenuToolsRerunDeckGen.Text = "Re-run Deck Rules";
-            ToolStripMenuToolsRerunDeckGen.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            ToolStripMenuToolsRerunDeckGen.Enabled = false;
-            ToolStripMenuToolsRerunDeckGen.Click += ToolStripMenuToolsRerunDeckGen_Click;
-            // 
-            // toolStripSeparatorDeckGen
-            // 
-            toolStripSeparatorDeckGen.Name = "toolStripSeparatorDeckGen";
-            toolStripSeparatorDeckGen.Size = new System.Drawing.Size(229, 6);
-            // 
-            // ToolStripMenuToolsRunRules
-            // 
-            ToolStripMenuToolsRunRules.Name = "ToolStripMenuToolsRunRules";
-            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(232, 22);
-            ToolStripMenuToolsRunRules.Text = "Extract Taxonomy with Rules...";
-            ToolStripMenuToolsRunRules.Click += ToolStripMenuToolsRunRules_Click;
-            // 
-            // ToolStripMenuToolsExportCsv
-            // 
-            ToolStripMenuToolsExportCsv.Name = "ToolStripMenuToolsExportCsv";
-            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(232, 22);
-            ToolStripMenuToolsExportCsv.Text = "Export Taxonomy Draft (CSV)...";
-            ToolStripMenuToolsExportCsv.Click += ToolStripMenuToolsExportCsv_Click;
-            // 
-            // ToolStripMenuToolsImportCsv
-            // 
-            ToolStripMenuToolsImportCsv.Name = "ToolStripMenuToolsImportCsv";
-            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(232, 22);
-            ToolStripMenuToolsImportCsv.Text = "Import Taxonomy from CSV...";
-            ToolStripMenuToolsImportCsv.Click += ToolStripMenuToolsImportCsv_Click;
-            // 
-            // toolStripSeparatorTools
-            // 
-            toolStripSeparatorTools.Name = "toolStripSeparatorTools";
-            toolStripSeparatorTools.Size = new System.Drawing.Size(229, 6);
-            // 
-            // ToolStripMenuToolsGetImages
-            // 
-            ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
-            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(232, 22);
-            ToolStripMenuToolsGetImages.Text = "Download Images";
-            ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
-            // 
-            // ToolStripMenuSet
-            // 
-            ToolStripMenuSet.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuSetSelectAll, ToolStripMenuSetClearAll });
-            ToolStripMenuSet.Name = "ToolStripMenuSet";
-            ToolStripMenuSet.Size = new System.Drawing.Size(35, 20);
-            ToolStripMenuSet.Text = "&Set";
+            });
+            ToolStripMenuCatalog.Name = "ToolStripMenuCatalog";
+            ToolStripMenuCatalog.Size = new System.Drawing.Size(60, 20);
+            ToolStripMenuCatalog.Text = "&Catalog";
             // 
             // ToolStripMenuSetSelectAll
             // 
             ToolStripMenuSetSelectAll.Name = "ToolStripMenuSetSelectAll";
-            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(122, 22);
-            ToolStripMenuSetSelectAll.Text = "Select All";
+            ToolStripMenuSetSelectAll.Size = new System.Drawing.Size(204, 22);
+            ToolStripMenuSetSelectAll.Text = "Select &All Expansions";
             ToolStripMenuSetSelectAll.Click += ToolStripMenuSetSelectAll_Click;
             // 
             // ToolStripMenuSetClearAll
             // 
             ToolStripMenuSetClearAll.Name = "ToolStripMenuSetClearAll";
-            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(122, 22);
-            ToolStripMenuSetClearAll.Text = "Clear All";
+            ToolStripMenuSetClearAll.Size = new System.Drawing.Size(204, 22);
+            ToolStripMenuSetClearAll.Text = "&Clear All Expansions";
             ToolStripMenuSetClearAll.Click += ToolStripMenuSetClearAll_Click;
             // 
-            // ToolStripMenuFilter
+            // ToolStripMenuToolsGetImages
             // 
-            ToolStripMenuFilter.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { ToolStripMenuFilterManage, toolStripSeparator7, ToolStripMenuFilterOpen, ToolStripMenuFilterMerge, toolStripSeparator6, ToolStripMenuFilterSave });
-            ToolStripMenuFilter.Name = "ToolStripMenuFilter";
-            ToolStripMenuFilter.Size = new System.Drawing.Size(45, 20);
-            ToolStripMenuFilter.Text = "&Filter";
+            ToolStripMenuToolsGetImages.Name = "ToolStripMenuToolsGetImages";
+            ToolStripMenuToolsGetImages.Size = new System.Drawing.Size(204, 22);
+            ToolStripMenuToolsGetImages.Text = "&Download Card Artwork...";
+            ToolStripMenuToolsGetImages.Click += ToolStripMenuToolsGetImages_Click;
+            // 
+            // ToolStripMenuTaxonomy
+            // 
+            ToolStripMenuTaxonomy.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                ToolStripMenuFilterManage,
+                new System.Windows.Forms.ToolStripSeparator(),
+                ToolStripMenuToolsRunRules,
+                new System.Windows.Forms.ToolStripSeparator(),
+                ToolStripMenuToolsExportCsv,
+                ToolStripMenuToolsImportCsv,
+                new System.Windows.Forms.ToolStripSeparator(),
+                ToolStripMenuFilterOpen,
+                ToolStripMenuFilterMerge,
+                ToolStripMenuFilterSave,
+                new System.Windows.Forms.ToolStripSeparator(),
+                ToolStripMenuClearAllFilters
+            });
+            ToolStripMenuTaxonomy.Name = "ToolStripMenuTaxonomy";
+            ToolStripMenuTaxonomy.Size = new System.Drawing.Size(73, 20);
+            ToolStripMenuTaxonomy.Text = "&Taxonomy";
             // 
             // ToolStripMenuFilterManage
             // 
             ToolStripMenuFilterManage.Name = "ToolStripMenuFilterManage";
-            ToolStripMenuFilterManage.Size = new System.Drawing.Size(198, 22);
+            ToolStripMenuFilterManage.Size = new System.Drawing.Size(237, 22);
             ToolStripMenuFilterManage.Text = "&Manage Custom Tags...";
             ToolStripMenuFilterManage.Click += ToolStripMenuFilterManage_Click;
             // 
-            // ToolStripMenuFilterMerge
+            // ToolStripMenuToolsRunRules
             // 
+            ToolStripMenuToolsRunRules.Name = "ToolStripMenuToolsRunRules";
+            ToolStripMenuToolsRunRules.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuToolsRunRules.Text = "&Extract Tags with Rules...";
+            ToolStripMenuToolsRunRules.Click += ToolStripMenuToolsRunRules_Click;
             // 
-            ToolStripMenuFilterMerge.Name = "ToolStripMenuFilterMerge";
-            ToolStripMenuFilterMerge.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterMerge.Text = "&Merge Tag Set...";
-            ToolStripMenuFilterMerge.Click += new System.EventHandler(this.ToolStripMenuFilterMerge_Click);
-            // toolStripSeparator7
+            // ToolStripMenuToolsExportCsv
             // 
-            toolStripSeparator7.Name = "toolStripSeparator7";
-            toolStripSeparator7.Size = new System.Drawing.Size(195, 6);
+            ToolStripMenuToolsExportCsv.Name = "ToolStripMenuToolsExportCsv";
+            ToolStripMenuToolsExportCsv.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuToolsExportCsv.Text = "Export Taxonomy &Draft (CSV)...";
+            ToolStripMenuToolsExportCsv.Click += ToolStripMenuToolsExportCsv_Click;
+            // 
+            // ToolStripMenuToolsImportCsv
+            // 
+            ToolStripMenuToolsImportCsv.Name = "ToolStripMenuToolsImportCsv";
+            ToolStripMenuToolsImportCsv.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuToolsImportCsv.Text = "&Import Taxonomy (CSV)...";
+            ToolStripMenuToolsImportCsv.Click += ToolStripMenuToolsImportCsv_Click;
             // 
             // ToolStripMenuFilterOpen
             // 
             ToolStripMenuFilterOpen.Name = "ToolStripMenuFilterOpen";
-            ToolStripMenuFilterOpen.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterOpen.Text = "Load Tag Set...";
+            ToolStripMenuFilterOpen.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuFilterOpen.Text = "&Load Tag Set...";
             ToolStripMenuFilterOpen.Click += OpenFilterMenuItem_Click;
             // 
-            // toolStripSeparator6
+            // ToolStripMenuFilterMerge
             // 
-            toolStripSeparator6.Name = "toolStripSeparator6";
-            toolStripSeparator6.Size = new System.Drawing.Size(195, 6);
+            ToolStripMenuFilterMerge.Name = "ToolStripMenuFilterMerge";
+            ToolStripMenuFilterMerge.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuFilterMerge.Text = "M&erge Tag Set...";
+            ToolStripMenuFilterMerge.Click += ToolStripMenuFilterMerge_Click;
             // 
             // ToolStripMenuFilterSave
             // 
             ToolStripMenuFilterSave.Name = "ToolStripMenuFilterSave";
-            ToolStripMenuFilterSave.Size = new System.Drawing.Size(198, 22);
-            ToolStripMenuFilterSave.Text = "Save Tag Set...";
+            ToolStripMenuFilterSave.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuFilterSave.Text = "&Save Tag Set...";
             ToolStripMenuFilterSave.Click += SaveFilterMenuItem_Click;
+            // 
+            // ToolStripMenuClearAllFilters
+            // 
+            ToolStripMenuClearAllFilters.Name = "ToolStripMenuClearAllFilters";
+            ToolStripMenuClearAllFilters.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R;
+            ToolStripMenuClearAllFilters.Size = new System.Drawing.Size(237, 22);
+            ToolStripMenuClearAllFilters.Text = "Clear &All Active Filters";
+            ToolStripMenuClearAllFilters.Click += (s, e) => ResetAllFilters();
             // 
             // helpToolStripMenuItem
             // 
-            helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { contentsToolStripMenuItem, indexToolStripMenuItem, searchToolStripMenuItem, toolStripSeparator5, aboutToolStripMenuItem });
+            helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                contentsToolStripMenuItem,
+                new System.Windows.Forms.ToolStripSeparator(),
+                aboutToolStripMenuItem
+            });
             helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             helpToolStripMenuItem.Text = "&Help";
@@ -7404,32 +7552,17 @@ namespace MECCG_Deck_Builder
             // contentsToolStripMenuItem
             // 
             contentsToolStripMenuItem.Name = "contentsToolStripMenuItem";
-            contentsToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            contentsToolStripMenuItem.Text = "&Contents";
+            contentsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F1;
+            contentsToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            contentsToolStripMenuItem.Text = "&Help Contents";
             contentsToolStripMenuItem.Click += ContentsToolStripMenuItem_Click;
-            // 
-            // indexToolStripMenuItem
-            // 
-            indexToolStripMenuItem.Name = "indexToolStripMenuItem";
-            indexToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            indexToolStripMenuItem.Text = "&Index";
-            // 
-            // searchToolStripMenuItem
-            // 
-            searchToolStripMenuItem.Name = "searchToolStripMenuItem";
-            searchToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            searchToolStripMenuItem.Text = "&Search";
-            // 
-            // toolStripSeparator5
-            // 
-            toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new System.Drawing.Size(119, 6);
             // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-            aboutToolStripMenuItem.Text = "&About...";
+            aboutToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            aboutToolStripMenuItem.Text = "&About MECCG Deck Builder...";
+            aboutToolStripMenuItem.Click += AboutToolStripMenuItem_Click;
             // 
             // GroupBoxCardAttributes
             // 
@@ -7677,51 +7810,43 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.TabPage TabPageSites;
         private System.Windows.Forms.MenuStrip MenuStrip1;
         private System.Windows.Forms.ListBox ListBoxPool;
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+
+        // Deck Menu
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuDeck;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuNew;
         private System.Windows.Forms.ToolStripMenuItem OpenToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
-        private System.Windows.Forms.ToolStripMenuItem ExportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem printPreviewToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripMenuItem cutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTools;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGenerateDeck;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorDeckGen;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRerunDeckGen;
+        private System.Windows.Forms.ToolStripMenuItem ExportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+
+        // Catalog Menu
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuCatalog;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
+
+        // Taxonomy Menu
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTaxonomy;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRunRules;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsExportCsv;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsImportCsv;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparatorTools;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGetImages;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSet;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetSelectAll;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuSetClearAll;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilter;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterManage;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterMerge;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterOpen;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterMerge;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuFilterSave;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuClearAllFilters;
+
+        // Help Menu
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem contentsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem searchToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+
+        // Context Menus
         private System.Windows.Forms.ContextMenuStrip ContextMenuStripTabs;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyCard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToPool;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCopyToResource;
@@ -7735,14 +7860,18 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToSideboard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabMoveToSite;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabDeleteCard;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
         private System.Windows.Forms.ContextMenuStrip ContextMenuStripMaster;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyCard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToPool;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToResource;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToHazard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSideboard;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCopyToSite;
-        private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardnumFilters;
+
+        // Bottom Filter GroupBoxes
         private System.Windows.Forms.GroupBox GroupBoxCardAttributes;
         private System.Windows.Forms.Label LblSlot1Key;
         private System.Windows.Forms.ComboBox ComboBoxKey1;
@@ -7761,11 +7890,6 @@ namespace MECCG_Deck_Builder
         private System.Windows.Forms.ComboBox ComboBoxKey4;
         private System.Windows.Forms.Label LblSlot4Value;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardnumFilters;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardnumFilters;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuTabCardname;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuMasterCardname;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRerunDeckGen;
     }
 }
 ]]>
@@ -9126,6 +9250,184 @@ namespace MECCG_Deck_Builder
 }
 ]]>
   </file>
+  <file path='.\StoragePathService.cs'>
+<![CDATA[
+using System;
+using System.IO;
+
+namespace MECCG_Deck_Builder
+{
+    public static class StoragePathService
+    {
+        private const string AppFolderName = "MECCG Deck Builder";
+        private const string PortableFlagFileName = "portable.flag";
+
+        private static readonly Lazy<bool> s_isPortable = new(() =>
+        {
+            try
+            {
+                string portableFlag = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, PortableFlagFileName);
+                return File.Exists(portableFlag);
+            }
+            catch
+            {
+                return false;
+            }
+        });
+
+        /// <summary>
+        /// True if portable.flag is present in the application directory.
+        /// </summary>
+        public static bool IsPortableMode => s_isPortable.Value;
+
+        public static string AppBaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
+
+        /// <summary>
+        /// Root storage directory: Local application directory in portable mode,
+        /// or %LOCALAPPDATA%\MECCG Deck Builder\ in standard mode.
+        /// </summary>
+        public static string StorageRootDirectory
+        {
+            get
+            {
+                if (IsPortableMode)
+                {
+                    return AppBaseDirectory;
+                }
+
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    AppFolderName);
+            }
+        }
+
+        public static string GetDataDirectory()
+        {
+            string dir = IsPortableMode
+                ? AppBaseDirectory
+                : Path.Combine(StorageRootDirectory, "Data");
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            return dir;
+        }
+
+        public static string GetImagesDirectory()
+        {
+            string dir = IsPortableMode
+                ? Path.Combine(AppBaseDirectory, "Images")
+                : Path.Combine(StorageRootDirectory, "Images");
+
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            return dir;
+        }
+
+        public static string GetSetImageDirectory(string setCode)
+        {
+            string cleanSet = string.IsNullOrWhiteSpace(setCode) ? "UNKNOWN" : setCode.Trim();
+            string dir = Path.Combine(GetImagesDirectory(), cleanSet);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            return dir;
+        }
+
+        public static string GetCardImagePath(string setCode, string imageName)
+        {
+            return Path.Combine(GetSetImageDirectory(setCode), imageName ?? string.Empty);
+        }
+
+        public static string GetWritableDataFilePath(string fileName)
+        {
+            return Path.Combine(GetDataDirectory(), fileName);
+        }
+
+        public static string GetSettingsFilePath()
+        {
+            if (IsPortableMode)
+            {
+                return Path.Combine(AppBaseDirectory, "user_settings.json");
+            }
+
+            string userDir = StorageRootDirectory;
+            if (!Directory.Exists(userDir))
+            {
+                Directory.CreateDirectory(userDir);
+            }
+            return Path.Combine(userDir, "user_settings.json");
+        }
+
+        /// <summary>
+        /// Resolves the path to read an existing data file.
+        /// Checks user LocalAppData Data directory first, then falls back to application BaseDirectory.
+        /// </summary>
+        public static string ResolveDataFilePath(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return string.Empty;
+
+            // 1. Check user data folder
+            if (!IsPortableMode)
+            {
+                string userDataPath = Path.Combine(StorageRootDirectory, "Data", fileName);
+                if (File.Exists(userDataPath))
+                {
+                    return userDataPath;
+                }
+            }
+
+            // 2. Fall back to bundled application directory
+            string appDirPath = Path.Combine(AppBaseDirectory, fileName);
+            if (File.Exists(appDirPath))
+            {
+                return appDirPath;
+            }
+
+            // 3. Fall back to writable path for creation
+            return GetWritableDataFilePath(fileName);
+        }
+
+        /// <summary>
+        /// Resolves the path to read an existing card image.
+        /// Checks user image cache first, then checks legacy/bundled set directories in application BaseDirectory.
+        /// </summary>
+        public static string ResolveImageReadPath(string setCode, string imageName)
+        {
+            if (string.IsNullOrWhiteSpace(imageName)) return string.Empty;
+
+            string cleanSet = string.IsNullOrWhiteSpace(setCode) ? "UNKNOWN" : setCode.Trim();
+
+            // 1. Check user image cache (%LOCALAPPDATA%/MECCG Deck Builder/Images/{Set}/{imageName})
+            string cachePath = GetCardImagePath(cleanSet, imageName);
+            if (File.Exists(cachePath))
+            {
+                return cachePath;
+            }
+
+            // 2. Check bundled or legacy local paths (e.g. BaseDirectory/{Set}/{imageName} or BaseDirectory/Images/{Set}/{imageName})
+            string bundledLegacyPath = Path.Combine(AppBaseDirectory, cleanSet, imageName);
+            if (File.Exists(bundledLegacyPath))
+            {
+                return bundledLegacyPath;
+            }
+
+            string bundledImagesPath = Path.Combine(AppBaseDirectory, "Images", cleanSet, imageName);
+            if (File.Exists(bundledImagesPath))
+            {
+                return bundledImagesPath;
+            }
+
+            return cachePath;
+        }
+    }
+}
+]]>
+  </file>
   <file path='.\TaxonomyExtractionService.cs'>
 <![CDATA[
 using System;
@@ -9450,23 +9752,84 @@ namespace MECCG_Deck_Builder
 
         #region CSV_EXPORT_AND_IMPORT
 
-        public static void ExportTemplateDraftToCsv(IReadOnlyList<Card> cards, string filePath)
+        public static void ExportTemplateDraftToCsv(
+            IReadOnlyList<Card> cards,
+            CardFilterService filterService,
+            string filePath,
+            IReadOnlyList<string> selectedAttributes = null,
+            IReadOnlyList<string> selectedCategories = null)
         {
             if (cards == null || cards.Count == 0) return;
 
             var sb = new StringBuilder();
-            sb.AppendLine("Card Name,Set,Primary,[Insert Category Name],Card Text");
 
+            // 1. Determine active official attribute columns (Slots 1 & 2)
+            var attributeColumns = selectedAttributes?
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? [];
+
+            if (attributeColumns.Count == 0)
+            {
+                attributeColumns.Add("Primary"); // Default reference column if none selected
+            }
+
+            // 2. Determine active custom category columns (Slots 3 & 4)
+            var categoryColumns = selectedCategories?
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? [];
+
+            bool hasCategoryColumns = categoryColumns.Count > 0;
+            if (!hasCategoryColumns)
+            {
+                categoryColumns.Add("[Insert Category Name]");
+            }
+
+            // 3. Build CSV Header
+            sb.Append("Card Name,Set");
+            foreach (var attr in attributeColumns)
+            {
+                sb.Append(',').Append(EscapeCsv(attr));
+            }
+            foreach (var cat in categoryColumns)
+            {
+                sb.Append(',').Append(EscapeCsv(cat));
+            }
+            sb.AppendLine(",Card Text");
+
+            // 4. Build Card Rows
             for (int i = 0; i < cards.Count; i++)
             {
                 var card = cards[i];
-                string tagHint = (i == 0) ? "[Insert tag (separate multiple tags with semicolon)]" : string.Empty;
-
                 sb.Append(EscapeCsv(card.Name)).Append(',');
-                sb.Append(EscapeCsv(card.Set)).Append(',');
-                sb.Append(EscapeCsv(card.Primary)).Append(',');
-                sb.Append(EscapeCsv(tagHint)).Append(',');
-                sb.AppendLine(EscapeCsv(card.Text));
+                sb.Append(EscapeCsv(card.Set));
+
+                // Official Attributes
+                foreach (var attr in attributeColumns)
+                {
+                    sb.Append(',').Append(EscapeCsv(card.GetAttribute(attr)));
+                }
+
+                // Custom Categories (live tags or placeholder hint)
+                foreach (var cat in categoryColumns)
+                {
+                    if (hasCategoryColumns && filterService != null)
+                    {
+                        var tags = filterService.GetCardTagsForCategory(card.Id, cat);
+                        string tagVal = tags.Count > 0 ? string.Join("; ", tags) : string.Empty;
+                        sb.Append(',').Append(EscapeCsv(tagVal));
+                    }
+                    else
+                    {
+                        // Blank template hint on the first row
+                        string hint = (i == 0) ? "[Insert tag (separate multiple tags with semicolon)]" : string.Empty;
+                        sb.Append(',').Append(EscapeCsv(hint));
+                    }
+                }
+
+                // Reference text
+                sb.Append(',').AppendLine(EscapeCsv(card.Text));
             }
 
             File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
@@ -9529,6 +9892,7 @@ namespace MECCG_Deck_Builder
             int setIndex = -1;
             var categoryColumnIndices = new List<(int Index, string CategoryName)>();
 
+            // 1. Map columns from header
             for (int i = 0; i < header.Count; i++)
             {
                 string col = header[i].Trim();
@@ -9544,15 +9908,16 @@ namespace MECCG_Deck_Builder
                 else if (string.Equals(col, "Primary", StringComparison.OrdinalIgnoreCase) ||
                          string.Equals(col, "Card Text", StringComparison.OrdinalIgnoreCase) ||
                          string.Equals(col, "Text", StringComparison.OrdinalIgnoreCase) ||
-                         string.Equals(col, "Id", StringComparison.OrdinalIgnoreCase))
+                         string.Equals(col, "Id", StringComparison.OrdinalIgnoreCase) ||
+                         CardCatalogService.FilterKeys.Contains(col, StringComparer.OrdinalIgnoreCase))
                 {
-                    // Skip fixed/reference columns
+                    // Skip fixed/reference columns and official database attributes
                 }
                 else if (!string.IsNullOrWhiteSpace(col))
                 {
                     if (col.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
                     {
-                        continue; // Skip placeholder template header if left untouched
+                        continue; // Skip untouched template placeholder column
                     }
                     categoryColumnIndices.Add((i, col));
                 }
@@ -9566,7 +9931,9 @@ namespace MECCG_Deck_Builder
             int cardsMatched = 0;
             int tagsAssigned = 0;
             var categoriesImportedSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var matchedCardIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+            // 2. Process each row with Authoritative Edit & Replace
             for (int r = 1; r < records.Count; r++)
             {
                 var row = records[r];
@@ -9584,18 +9951,20 @@ namespace MECCG_Deck_Builder
 
                 if (card == null) continue;
 
-                cardsMatched++;
+                if (matchedCardIds.Add(card.Id))
+                {
+                    cardsMatched++;
+                }
 
+                // Process every custom category column present in the CSV
                 foreach (var (colIdx, catName) in categoryColumnIndices)
                 {
                     if (colIdx >= row.Count) continue;
 
                     string cellValue = row[colIdx].Trim();
-                    if (string.IsNullOrWhiteSpace(cellValue)) continue;
 
-                    // Skip instructional hint if left untouched
-                    if (cellValue.Contains("[Insert", StringComparison.OrdinalIgnoreCase) ||
-                        (cellValue.StartsWith('[') && cellValue.EndsWith(']')))
+                    // Skip instructional template placeholder hint if left untouched
+                    if (cellValue.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
                     {
                         continue;
                     }
@@ -9603,14 +9972,40 @@ namespace MECCG_Deck_Builder
                     filterService.AddCustomKeyName(catName);
                     categoriesImportedSet.Add(catName);
 
-                    var tags = cellValue.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    foreach (var tag in tags)
-                    {
-                        if (string.IsNullOrWhiteSpace(tag)) continue;
-                        if (tag.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase)) continue;
+                    // Check for explicit clear command or empty cell
+                    bool isExplicitClear = string.Equals(cellValue, "[clear]", StringComparison.OrdinalIgnoreCase) ||
+                                           string.Equals(cellValue, "[none]", StringComparison.OrdinalIgnoreCase) ||
+                                           string.Equals(cellValue, "-", StringComparison.Ordinal);
 
-                        filterService.AppendCardCustomTag(card.Id, catName, tag);
-                        tagsAssigned++;
+                    if (string.IsNullOrWhiteSpace(cellValue) || isExplicitClear)
+                    {
+                        // Cell was cleared: remove this category tag from the card
+                        filterService.DeleteCardCustomTag(card.Id, catName);
+                        continue;
+                    }
+
+                    // Parse semicolon-delimited tags
+                    var tags = cellValue.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                        .Where(t => !t.StartsWith("[Insert", StringComparison.OrdinalIgnoreCase))
+                                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                                        .ToList();
+
+                    if (tags.Count > 0)
+                    {
+                        // Edit & Replace: overwrites existing tags for this category with the exact cell content
+                        string combinedTags = string.Join("; ", tags);
+                        filterService.SetCardCustomTag(card.Id, catName, combinedTags);
+
+                        // Ensure tags are added to the dropdown value registry
+                        foreach (var tag in tags)
+                        {
+                            filterService.AddCustomKeyValue(catName, tag);
+                            tagsAssigned++;
+                        }
+                    }
+                    else
+                    {
+                        filterService.DeleteCardCustomTag(card.Id, catName);
                     }
                 }
             }
@@ -9748,7 +10143,6 @@ namespace MECCG_Deck_Builder
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Windows.Forms;
 using Newtonsoft.Json;
 
 namespace MECCG_Deck_Builder
@@ -9775,7 +10169,6 @@ namespace MECCG_Deck_Builder
 
     public static class UserSettingsService
     {
-        private static readonly string SettingsFilePath = Path.Combine(Application.StartupPath, "user_settings.json");
         private static UserSettings s_current;
 
         public static UserSettings Current
@@ -9791,13 +10184,30 @@ namespace MECCG_Deck_Builder
         {
             try
             {
-                if (File.Exists(SettingsFilePath))
+                string path = StoragePathService.GetSettingsFilePath();
+                if (File.Exists(path))
                 {
-                    string json = File.ReadAllText(SettingsFilePath);
+                    string json = File.ReadAllText(path);
                     var settings = JsonConvert.DeserializeObject<UserSettings>(json);
                     if (settings != null)
                     {
                         return settings;
+                    }
+                }
+                else if (!StoragePathService.IsPortableMode)
+                {
+                    // Check legacy path in app directory for seamless migration
+                    string legacyPath = Path.Combine(StoragePathService.AppBaseDirectory, "user_settings.json");
+                    if (File.Exists(legacyPath))
+                    {
+                        string json = File.ReadAllText(legacyPath);
+                        var settings = JsonConvert.DeserializeObject<UserSettings>(json);
+                        if (settings != null)
+                        {
+                            s_current = settings; // Assign BEFORE saving to prevent recursion
+                            SaveSettings();
+                            return settings;
+                        }
                     }
                 }
             }
@@ -9811,10 +10221,15 @@ namespace MECCG_Deck_Builder
 
         public static void SaveSettings()
         {
+            // Access s_current directly to avoid re-triggering LoadSettings()
+            var settingsToSave = s_current;
+            if (settingsToSave == null) return;
+
             try
             {
-                string json = JsonConvert.SerializeObject(Current, Formatting.Indented);
-                File.WriteAllText(SettingsFilePath, json);
+                string path = StoragePathService.GetSettingsFilePath();
+                string json = JsonConvert.SerializeObject(settingsToSave, Formatting.Indented);
+                File.WriteAllText(path, json);
             }
             catch
             {

@@ -77,19 +77,19 @@ namespace MECCG_Deck_Builder
             };
 
             // ==========================================
-            // MODE 1: DYNAMIC ENTITY HARVEST
+            // MODE 1: SCAN CARD TEXT FOR ENTITIES
             // ==========================================
             _rbHarvest = new RadioButton
             {
-                Text = "Dynamic Entity Harvest (from Catalog Text):",
+                Text = "Scan Card Text for Catalog Entities:",
                 Location = new Point(12, 20),
-                Size = new Size(300, 20),
+                Size = new Size(320, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbHarvest.CheckedChanged += RuleSource_Changed;
 
             // Row 1: Source Definition
-            var lblHAttr = new Label { Text = "Harvest Entity:", Location = new Point(32, 44), Size = new Size(90, 18) };
+            var lblHAttr = new Label { Text = "Target Entity:", Location = new Point(32, 44), Size = new Size(90, 18) };
             _cmbHarvestAttribute = new ComboBox
             {
                 Location = new Point(125, 41),
@@ -111,23 +111,23 @@ namespace MECCG_Deck_Builder
             _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(145, 69), Size = new Size(307, 23) };
 
             // ==========================================
-            // MODE 2: RELATIONAL ATTRIBUTE LOOKUP
+            // MODE 2: CROSS-CARD ATTRIBUTE LOOKUP
             // ==========================================
             _rbRelational = new RadioButton
             {
-                Text = "Relational Attribute Lookup (Cross-Card Join):",
+                Text = "Cross-Card Attribute Lookup:",
                 Location = new Point(12, 100),
-                Size = new Size(330, 20),
+                Size = new Size(320, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbRelational.CheckedChanged += RuleSource_Changed;
 
-            // Row 1: Read Field -> Lookup Entity (Attribute = Value)
-            var lblRel1 = new Label { Text = "Read Field:", Location = new Point(32, 124), Size = new Size(90, 18) };
+            // Row 1: Read Attribute -> Lookup Entity (Attribute = Value)
+            var lblRel1 = new Label { Text = "Read Attribute:", Location = new Point(32, 124), Size = new Size(95, 18) };
             _cmbRelSourceAttr = new ComboBox
             {
-                Location = new Point(125, 121),
-                Size = new Size(140, 23),
+                Location = new Point(130, 121),
+                Size = new Size(135, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
@@ -151,12 +151,12 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
 
-            // Row 2: Extract Field -> Save to Category
-            var lblRel3 = new Label { Text = "Extract Field:", Location = new Point(32, 152), Size = new Size(90, 18) };
+            // Row 2: Extract Attribute -> Save to Category
+            var lblRel3 = new Label { Text = "Extract Attribute:", Location = new Point(32, 152), Size = new Size(95, 18) };
             _cmbRelTargetAttr = new ComboBox
             {
-                Location = new Point(125, 149),
-                Size = new Size(140, 23),
+                Location = new Point(130, 149),
+                Size = new Size(135, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
@@ -171,13 +171,13 @@ namespace MECCG_Deck_Builder
             };
 
             // ==========================================
-            // MODE 3: CUSTOM REGEX EXPRESSION
+            // MODE 3: CUSTOM PATTERN SEARCH (REGEX)
             // ==========================================
             _rbQuick = new RadioButton
             {
-                Text = "Custom Regex Expression:",
+                Text = "Custom Pattern Search (Regex):",
                 Location = new Point(12, 180),
-                Size = new Size(220, 20),
+                Size = new Size(250, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbQuick.CheckedChanged += RuleSource_Changed;
@@ -192,13 +192,13 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
 
-            // Row 2: Tag Name -> Save to Category
-            var lblQTag = new Label { Text = "Tag Name:", Location = new Point(32, 232), Size = new Size(65, 18) };
+            // Row 2: Assigned Tag -> Save to Category
+            var lblQTag = new Label { Text = "Assigned Tag:", Location = new Point(32, 232), Size = new Size(80, 18) };
             _txtRegexTag = new TextBox
             {
                 Text = settings.LastExtractionTag ?? "$1",
-                Location = new Point(100, 229),
-                Size = new Size(290, 23),
+                Location = new Point(115, 229),
+                Size = new Size(275, 23),
                 Enabled = false
             };
 
@@ -212,13 +212,13 @@ namespace MECCG_Deck_Builder
             };
 
             // ==========================================
-            // MODE 4: FILE
+            // MODE 4: BATCH RULES FROM FILE
             // ==========================================
             _rbFile = new RadioButton
             {
-                Text = "Load Rules from File (.json):",
+                Text = "Batch Rules from File (.json):",
                 Location = new Point(12, 260),
-                Size = new Size(220, 20),
+                Size = new Size(240, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbFile.CheckedChanged += RuleSource_Changed;

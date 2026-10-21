@@ -2,18 +2,18 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Sets &amp; Faceted Filtering</title>
+    <title>Sets &amp; Smart Filtering</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Catalog Filtering &amp; Taxonomy &gt; Sets &amp; Faceted Filtering</div>
-    <h1>Sets &amp; Faceted Filtering</h1>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Card Catalog &amp; Artwork &gt; Sets &amp; Smart Filtering</div>
+    <h1>Sets &amp; Smart Filtering</h1>
 
     <h2>Managing Expansion Sets</h2>
-    <p>Click the <strong>Set</strong> menu in the top bar to choose which expansions are active in the Master List:</p>
+    <p>Click the <strong>Catalog</strong> menu in the top bar to choose which expansions are active in the Master List:</p>
     <ul>
-        <li><strong>Select All:</strong> Enables all official sets and Dreamcard expansions.</li>
-        <li><strong>Clear All:</strong> Deselects all expansions.</li>
+        <li><strong>Select All Expansions:</strong> Enables all official sets and Dreamcard expansions.</li>
+        <li><strong>Clear All Expansions:</strong> Deselects all expansions.</li>
         <li><strong>Individual Sets:</strong> Check or uncheck individual expansions (e.g., <em>The Wizards</em>, <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>, <em>The Balrog</em>, or Dreamcard sets).</li>
     </ul>
     <div class="note">
@@ -30,7 +30,7 @@
         </tr>
         <tr>
             <td><strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)</td>
-            <td><strong>Cardnum Database:</strong> Canonical rules statistics (Primary, Alignment, Race, Skill, Mind, Prowess).</td>
+            <td><strong>Official Database:</strong> Canonical rules statistics (Primary, Alignment, Race, Skill, Mind, Prowess).</td>
             <td>Fixed, read-only rules attributes. See <a href="attributes_reference.html">Official Attributes Reference</a>.</td>
         </tr>
         <tr>
@@ -58,7 +58,7 @@
             <strong>Order-Independent Narrowing:</strong>
             You can configure filter slots in any order. For example:
             <ul>
-                <li>Enable only <em>The Wizards</em> (METW) in the <strong>Set</strong> menu.</li>
+                <li>Enable only <em>The Wizards</em> (METW) in the <strong>Catalog</strong> menu.</li>
                 <li>In Slot 1, select <strong>Attribute:</strong> <code>Primary</code>. On its own, the <strong>Value</strong> dropdown lists all 5 primary card types (<em>Character</em>, <em>Resource</em>, <em>Hazard</em>, <em>Site</em>, <em>Region</em>).</li>
                 <li>In Slot 2, select <strong>Attribute:</strong> <code>Skill</code>. On its own, the <strong>Value</strong> dropdown lists 16 skills.</li>
                 <li>Now choose <strong>Value:</strong> <code>Diplomat</code> in Slot 2.</li>
@@ -67,11 +67,11 @@
         </li>
         <li>
             <strong>Automatic Conflict Resolution (Set Deselection):</strong>
-            Because dynamic pruning only offers values and tags that currently match cards, it is impossible to manually select a zero-result combination using the dropdowns. Instead, conflicts only occur when you <strong>deselect an expansion set</strong> in the <strong>Set</strong> menu. When a set is unchecked, the engine re-evaluates all active slots simultaneously:
+            Because dynamic pruning only offers values and tags that currently match cards, it is impossible to manually select a zero-result combination using the dropdowns. Instead, conflicts only occur when you <strong>deselect an expansion set</strong> in the <strong>Catalog</strong> menu. When a set is unchecked, the engine re-evaluates all active slots simultaneously:
             <ul>
                 <li>If a currently selected Value or Tag only existed in the removed set, that slot automatically clears to blank (<code>""</code>) so you are not left viewing an empty list.</li>
                 <li>If the selection still exists in the remaining sets, it remains selected.</li>
-                <li><em>Example:</em> With both METW and METD checked, Slot 1 set to <code>Character</code>, and Slot 2 set to <code>Race = Hobbit</code>, unchecking METW causes Slot 2 to automatically clear to blank because METD contains no Hobbit characters (whereas selecting <code>Race = Dwarf</code> would remain selected).</li>
+                <li><em>Example:</em> With both METW and METD checked, Slot 1 set to <code>Primary = Character</code>, and Slot 2 set to <code>Race = Hobbit</code>, unchecking METW causes Slot 2 to automatically clear to blank because METD contains no Hobbit characters (whereas if Slot 2 were set to <code>Race = Dwarf</code>, that selection would remain intact because Dwarves also appear in METD).</li>
             </ul>
         </li>
     </ul>
@@ -85,7 +85,7 @@
         </tr>
         <tr>
             <td><strong>Global Reset</strong></td>
-            <td><strong>Filter &gt; Clear All Filters</strong> / <kbd>Ctrl+R</kbd></td>
+            <td><strong>Taxonomy &gt; Clear All Active Filters</strong> / <kbd>Ctrl+R</kbd></td>
             <td>Resets all 4 filter slots to blank instantly.</td>
         </tr>
         <tr>

@@ -10,7 +10,7 @@ namespace MECCG_Deck_Builder
     {
 #pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
         private static readonly Regex PlaceholderRegex = new(
-            @"\{([a-zA-Z0-9_]+)\.(?:Tag:([^}]+)|([a-zA-Z0-9_]+))\}",
+            @"\{([a-zA-Z0-9_]+)\.(?:(?:Category|Tag):([^}]+)|([a-zA-Z0-9_]+))\}",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 #pragma warning restore SYSLIB1045
 
@@ -132,7 +132,7 @@ namespace MECCG_Deck_Builder
                 ? new HashSet<string>(rule.Sets, StringComparer.OrdinalIgnoreCase)
                 : defaultSets;
 
-            // 1. Resolve runtime variable placeholders in Attributes & Tags
+            // 1. Resolve runtime variable placeholders in Attributes & Categories
             var resolvedAttributes = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
             if (rule.Attributes != null)
             {
@@ -144,14 +144,14 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            var resolvedTags = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
-            if (rule.Tags != null)
+            var resolvedCategories = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
+            if (rule.Categories != null)
             {
-                foreach (var (tagKey, rawVal) in rule.Tags)
+                foreach (var (catKey, rawVal) in rule.Categories)
                 {
-                    if (string.IsNullOrWhiteSpace(tagKey)) continue;
+                    if (string.IsNullOrWhiteSpace(catKey)) continue;
                     string resolved = ResolvePlaceholders(rawVal, contextVariables, filterService);
-                    resolvedTags[tagKey] = (rawVal, resolved);
+                    resolvedCategories[catKey] = (rawVal, resolved);
                 }
             }
 
@@ -166,8 +166,6 @@ namespace MECCG_Deck_Builder
                 // Attribute evaluation
                 foreach (var (attrKey, (rawTemplate, resolvedVal)) in resolvedAttributes)
                 {
-                    // If placeholder was specified (e.g. {Leader.Tag:Faction Bonus}) but resolved empty,
-                    // the dependency was not met: do not match any card.
                     if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
                     {
                         return false;
@@ -183,10 +181,10 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                // Tag evaluation
+                // Category & Tag evaluation
                 if (filterService != null)
                 {
-                    foreach (var (tagKey, (rawTemplate, resolvedVal)) in resolvedTags)
+                    foreach (var (catKey, (rawTemplate, resolvedVal)) in resolvedCategories)
                     {
                         if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
                         {
@@ -196,7 +194,7 @@ namespace MECCG_Deck_Builder
                         if (!string.IsNullOrWhiteSpace(resolvedVal))
                         {
                             var allowedTags = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            if (!allowedTags.Any(t => filterService.MatchesCustomCriterion(c.Id, tagKey, t)))
+                            if (!allowedTags.Any(t => filterService.MatchesCustomCriterion(c.Id, catKey, t)))
                             {
                                 return false;
                             }
@@ -260,8 +258,6 @@ namespace MECCG_Deck_Builder
                 ExecuteRule(rule.Fallback, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables);
                 int addedByFallback = targetSection.Count - countBefore;
 
-                // The fallback's own ExecuteRule already logged its results accurately,
-                // so return to avoid duplicate/conflicting log entries.
                 return;
             }
         }
@@ -288,7 +284,7 @@ namespace MECCG_Deck_Builder
 
                 if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
                 {
-                    // Custom taxonomy tag lookup: {Variable.Tag:Category Name}
+                    // Custom taxonomy tag lookup: {Variable.Category:Category Name} or {Variable.Tag:Category Name}
                     string category = match.Groups[2].Value.Trim();
                     if (filterService != null)
                     {
@@ -307,14 +303,13 @@ namespace MECCG_Deck_Builder
                 }
                 else if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
                 {
-                    // Official Cardnum attribute lookup: {Variable.AttributeName}
+                    // Official rules attribute lookup: {Variable.AttributeName}
                     string attrName = match.Groups[3].Value.Trim();
                     foreach (var card in cards)
                     {
                         string val = card.GetAttribute(attrName);
                         if (!string.IsNullOrWhiteSpace(val))
                         {
-                            // Also split multi-values (e.g., compound skills or dual homes)
                             var parts = val.Split([';', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                             foreach (var part in parts)
                             {

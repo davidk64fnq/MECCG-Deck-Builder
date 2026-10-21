@@ -6,11 +6,50 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="index.html">Welcome &amp; Getting Started</a> &gt; Interface Walkthrough</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; Welcome &amp; Getting Started &gt; Interface Walkthrough</div>
     <h1>User Interface Walkthrough</h1>
-    <p>The application interface is divided into four main functional zones:</p>
+    <p>The application interface consists of a top workflow menu bar and four main functional zones:</p>
 
-    <h2>1. Master Card List (Left Pane)</h2>
+    <!-- WORKFLOW MENU BAR -->
+    <h2>Workflow Menu Bar</h2>
+    <ul>
+        <li>
+            <strong>Deck Menu</strong>
+            <ul>
+                <li><em>File Operations:</em> <code>New Deck (Ctrl+N)</code>, <code>Open Deck... (Ctrl+O)</code>, <code>Save Deck (Ctrl+S)</code>, <code>Save Deck As...</code></li>
+                <li><em>Automated Generation:</em> <code>Generate from Rules... (Ctrl+G)</code>, <code>Re-run Deck Rules (F5)</code></li>
+                <li><em>Platform Export:</em> <code>Export Deck... (Ctrl+E)</code></li>
+                <li><em>Application:</em> <code>Exit</code></li>
+            </ul>
+        </li>
+        <li>
+            <strong>Catalog Menu</strong>
+            <ul>
+                <li><em>Expansion Selection:</em> <code>Select All Expansions</code>, <code>Clear All Expansions</code>, active expansion checkboxes</li>
+                <li><em>Artwork Caching:</em> <code>Download Card Artwork...</code></li>
+            </ul>
+        </li>
+        <li>
+            <strong>Taxonomy Menu</strong>
+            <ul>
+                <li><em>Tag Management:</em> <code>Manage Custom Tags...</code></li>
+                <li><em>Rules Automation:</em> <code>Extract Tags with Rules...</code></li>
+                <li><em>CSV Pipeline:</em> <code>Export Taxonomy Draft (CSV)...</code>, <code>Import Taxonomy (CSV)...</code></li>
+                <li><em>Tag Set Files:</em> <code>Load Tag Set...</code>, <code>Merge Tag Set...</code>, <code>Save Tag Set...</code></li>
+                <li><em>Catalog Filter Reset:</em> <code>Clear All Active Filters (Ctrl+R)</code></li>
+            </ul>
+        </li>
+        <li>
+            <strong>Help Menu</strong>
+            <ul>
+                <li><em>Documentation:</em> <code>Help Contents (F1)</code></li>
+                <li><em>Application Info:</em> <code>About MECCG Deck Builder...</code></li>
+            </ul>
+        </li>
+    </ul>
+
+    <!-- FUNCTIONAL ZONES -->
+    <h2>Master Card List (Left Pane)</h2>
     <p>Displays all cards matching your active expansion sets and filter criteria, sorted alphabetically.</p>
     <ul>
         <li><strong>Single-Click:</strong> Selects the card and loads its artwork into the preview panel.</li>
@@ -19,13 +58,13 @@
         <li><strong>Drag &amp; Drop:</strong> Left-click and drag the card title onto any deck listbox.</li>
     </ul>
 
-    <h2>2. Card Image Preview (Center Pane)</h2>
+    <h2>Card Image Preview (Center Pane)</h2>
     <p>Displays high-resolution card artwork downloaded on demand from <code>cardnum.net</code> and cached locally in set folders (e.g., <code>METW/</code>, <code>MEDM/</code>).</p>
     <div class="note">
         <strong>Errata Notice:</strong> Cards flagged with ICE errata automatically load their corrected image counterpart prefixed with <code>ice-</code>.
     </div>
 
-    <h2>3. Deck Tabs (Right Pane)</h2>
+    <h2>Deck Tabs (Right Pane)</h2>
     <p>Five tabbed lists representing standard MECCG deck partitions:</p>
     <table>
         <tr>
@@ -40,10 +79,10 @@
         <tr><td><code>Site</code></td><td>Sites</td><td>Site cards and movement region paths.</td></tr>
     </table>
 
-    <h2>4. Filter Bar (Bottom Panel)</h2>
+    <h2>Filter Bar (Bottom Panel)</h2>
     <p>Organized into two titled GroupBoxes providing context-sensitive faceted filtering:</p>
     <ul>
-        <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1 &amp; 2 query official Cardnum rules properties (Attribute above Value).</li>
+        <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1 &amp; 2 query official rules properties (Attribute above Value).</li>
         <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 3 &amp; 4 query your custom classification taxonomy (Category above Tag).</li>
     </ul>
 

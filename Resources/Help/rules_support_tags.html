@@ -6,24 +6,45 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_generation_engine.html">Procedural Deck Generator</a> &gt; Companion Rules Tags</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="custom_taxonomy.html">Custom Taxonomy &amp; Automation</a> &gt; Companion Rules Tags</div>
 
     <h1>Companion Rules Tag Set Reference</h1>
     <p>
-        MECCG Deck Builder includes a companion taxonomy file (<strong><code>Rules_Support_Tags.json</code></strong>) that loads automatically on startup (or via <strong>Filter &gt; Load / Merge Tag Set...</strong>).
+        MECCG Deck Builder utilizes a two-tier database architecture on startup, loading two distinct local files with zero network latency:
     </p>
-    <p>
-        Its primary purpose is to enrich the catalog with objective rules data that Cardnum lacks as structured columns—bridging descriptive rules text (such as <em>&ldquo;Any Dark-hold&rdquo;</em>), character recruiting bonuses, site automatic-attack classifications, and gameplay mechanics so they can be queried by the procedural deck generation engine and faceted filters.
-    </p>
+    <ul>
+        <li>
+            <strong><code>cards-dc.json</code> (Core Catalog):</strong> The official card database containing printed rules statistics (Primary, Alignment, Race, Skills, Mind, Prowess, etc.), originally derived from open Cardnum data with local developer corrections. This file represents the immutable card catalog.
+        </li>
+        <li>
+            <strong><code>Rules_Support_Tags.json</code> (Rules Intelligence Layer):</strong> A companion taxonomy dataset authored entirely by the developer. It bridges unstructured card text into queryable taxonomy tags—mapping site automatic attacks, character recruiting bonuses, and home site resolutions so that generic procedural deck rules can generate legal, themed decks automatically.
+        </li>
+    </ul>
 
     <div class="tip">
-        <strong>Viewing Tagged Cards In-App:</strong> Rather than consulting a static manual list, you can view the live list of cards tagged in this file at any time inside the application: in <strong>Filter Slot 3</strong> (bottom panel), select any <strong>Category</strong> from the table below. The Master List will immediately display all matching cards from your active sets.
+        <strong>Pre-Packaged Developer Baseline:</strong> All categories, tags, and site resolutions listed in this reference are <strong>already completed and pre-packaged</strong>. You do not need to run any extractions or tag any cards—the procedural deck generator and filter dropdowns can use these categories immediately upon opening the app.
     </div>
 
-    <!-- SECTION 1: CUSTOM RULES TAXONOMY TABLE -->
-    <h2 id="taxonomy-table">1. Rules Support Categories &amp; Tags</h2>
+    <!-- SECTION 1: PERSISTENCE OPTIONS -->
+    <h2>Where to Store Your Own Custom Tags</h2>
     <p>
-        The following table documents all structured rules categories and illustrative tags maintained in <code>Rules_Support_Tags.json</code>:
+        If you create your own taxonomy categories or tags using the Tag Manager or Extraction Tools, you have two choices for where to store them:
+    </p>
+    <ul>
+        <li>
+            <strong>Option 1: Merge into the Auto-Loaded Baseline (<code>Rules_Support_Tags.json</code>):</strong>
+            If you want your custom categories to load automatically every time you launch the application, choose <strong>Taxonomy &gt; Save Tag Set...</strong>, select <code>Rules_Support_Tags.json</code>, and confirm overwrite.
+        </li>
+        <li>
+            <strong>Option 2: Save to a Modular Tag File (e.g. <code>Tournament_Hazards.json</code>):</strong>
+            If you are creating specialized strategies or sharing tag sets with other players, save them to a standalone <code>.json</code> file. These files will not load automatically on launch; you pull them into your active session on demand via <strong>Taxonomy &gt; Load Tag Set...</strong> or <strong>Taxonomy &gt; Merge Tag Set...</strong>.
+        </li>
+    </ul>
+
+    <!-- SECTION 2: CUSTOM RULES TAXONOMY TABLE -->
+    <h2 id="taxonomy-table">1. Structured Rules Categories &amp; Tags</h2>
+    <p>
+        The following table documents all structured rules categories and representative tags maintained in <code>Rules_Support_Tags.json</code>:
     </p>
 
     <table>
@@ -109,7 +130,7 @@
         <tr>
             <td><code>Faction Bonus</code></td>
             <td>
-                Character recruiting bonuses granting +2 (or more) Direct Influence when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Tag:Faction Bonus}"</code>).
+                Character recruiting bonuses granting +2 (or more) Direct Influence when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Category:Faction Bonus}"</code>).
             </td>
             <td>
                 <ul>
@@ -230,8 +251,8 @@
         </tr>
     </table>
 
-    <!-- SECTION 2: USING COMPANION TAGS IN DECK RULES -->
-    <h2 id="rules-syntax">2. Using Companion Tags in Procedural Deck Rules</h2>
+    <!-- SECTION 3: USING COMPANION TAGS IN DECK RULES -->
+    <h2 id="rules-syntax">2. Using Companion Categories in Procedural Deck Rules</h2>
     <p>
         These companion categories enable rich, declarative deck generation rules:
     </p>
@@ -249,7 +270,7 @@
     "Name": "Dynamic Home Resolution Fallback",
     "Attributes": {
       "Primary": "Site",
-      "Name": "{Leader.Tag:Resolved Site}"
+      "Name": "{Leader.Category:Resolved Site}"
     }
   }
 }</code></pre>
@@ -258,7 +279,7 @@
         <strong>Execution Walkthrough:</strong>
         <ul>
             <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
-            <li><strong>Dynamic Characters (Doeth, Durthak, Gandalf, Orc Captain):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Tag:Resolved Site}</code>!</li>
+            <li><strong>Dynamic Characters (Doeth, Durthak, Gandalf, Orc Captain):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Category:Resolved Site}</code>!</li>
         </ul>
     </div>
 
@@ -273,7 +294,7 @@
   "Attributes": {
     "Primary": "Site"
   },
-  "Tags": {
+  "Categories": {
     "Automatic Attack": "Dragon"
   }
 }</code></pre>
@@ -289,17 +310,9 @@
   "Attributes": {
     "Primary": "Character"
   },
-  "Tags": {
-    "Home Region": "{Leader.Tag:Home Region}"
+  "Categories": {
+    "Home Region": "{Leader.Category:Home Region}"
   }
 }</code></pre>
-
-    <div class="tip">
-        <strong>See Also:</strong>
-        <ul>
-            <li><a href="taxonomy_extraction_tools.html"><strong>Taxonomy Extraction Tools:</strong></a> Step-by-step tutorial on harvesting card text and authoring custom regex rules.</li>
-            <li><a href="worked_example_factions.html"><strong>Worked Example: Dynamic Factions:</strong></a> End-to-end tutorial using <code>Faction Bonus</code> tags and variable interpolation.</li>
-        </ul>
-    </div>
 </body>
 </html>

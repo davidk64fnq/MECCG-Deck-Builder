@@ -1,26 +1,31 @@
-﻿# AI Development Context: MECCG Deck Builder
+﻿---
+
+### 2. Full Revised `AI_CONTEXT.md`
+
+```markdown
+# AI Development Context: MECCG Deck Builder
 
 ## Project Summary
 - Type: Windows Forms (WinForms) Desktop Application
 - Language / Framework: C# (.NET 8.0, net8.0-windows)
 - Domain: Deck Builder for Middle-earth: Collectible Card Game (MECCG) (Iron Crown Enterprises / ICE & Council of Elrond Dreamcards).
 - Primary Data Sources:
-  - Card Data: cards-dc.json (synced from GitHub rezwits/cardnum/fdata/cards-dc.json with local fallback).
-  - Set Data: sets-dc.json (synced from GitHub rezwits/cardnum/fdata/sets-dc.json with local fallback).
-  - Images: https://cardnum.net/img/cards/{set}/{imageName} (with planned PlayMECCG mirror fallback).
-- Help File: `MECCG_Deck_Builder.chm` (compiled via Microsoft HTML Help Workshop across 14 modular topic files in a 5-folder `.hhc` hierarchy).
+  - Card Data: cards-dc.json (curated local master dataset with offline-first startup; optional user-initiated sync from GitHub rezwits/cardnum/fdata/cards-dc.json).
+  - Set Data: sets-dc.json (curated local master dataset with offline-first startup; optional user-initiated sync from GitHub rezwits/cardnum/fdata/sets-dc.json).
+  - Images: https://cardnum.net/img/cards/{set}/{imageName} (on-demand download with local set disk caching).
+- Help File: `MECCG_Deck_Builder.chm` (compiled via Microsoft HTML Help Workshop across 14 modular topic files in a 4-book `.hhc` hierarchy: Welcome & Getting Started, Deck Construction & Formats, Card Catalog & Artwork, and Custom Taxonomy & Automation).
 
 ---
 
 ## Application Architecture & Core Files
 
-- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, two-tier filter GroupBoxes, menus.
-- ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags.
+- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Menu icon assignment maps floppy disk to `Save Deck` and keeps `Export Deck...` clean.
+- ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags (`Taxonomy > Manage Custom Tags...`).
 - AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
-- CardCatalogService.cs: Card catalog management, JSON syncing, filter option discovery.
-- CardFilterService.cs: Custom taxonomy management and faceted filtering engine.
+- CardCatalogService.cs: Card catalog management, local JSON loading, filter option discovery; normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
+- CardFilterService.cs: Custom taxonomy management, cascading faceted search, and authoritative edit-and-replace tagging.
 - Deck.cs: Strongly-typed deck domain model.
 - DeckSectionType.cs: Enum representing deck partitions (Pool, Resources, Hazards, Sideboard, Sites).
 - DeckExportService.cs: Decoupled deck export service (TTS, Play MECCG, Cardnum, Archive, Text).
@@ -32,12 +37,11 @@
 - OpenCloseFilter.cs: DTO used for serializing/deserializing .json custom filter sets.
 - Messages.cs: Centralized message box text helper.
 - Program.cs: WinForms entry point; registers Windows-1252 code page provider.
-- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, variable captures (`SaveAs`), and automated shortfall fallbacks (`Fallback`).
-- `DeckGenerationService.cs`: Headless procedural deck generation engine with tiered variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Tag:Cat}`), and fallback routing.
-- `TaxonomyExtractionService.cs`: Enhanced with cross-card relational attribute lookups (e.g., Character Home -> Site Region).
-- `CardCatalogService.cs`: Normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
+- `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, variable captures (`SaveAs`), automated shortfall fallbacks (`Fallback`), and symmetrical rule categories (`Categories`).
+- `DeckGenerationService.cs`: Headless procedural deck generation engine with variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Category:Cat}`), multi-card union sets, and fallback routing.
+- `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, cross-card attribute lookups, and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
-- RunTaxonomyRulesDialog.cs: Modal extraction dialog with harmonized source-to-destination data flow across all tools (Dynamic Entity Harvest, Dynamic Relational Attribute Lookup, Full-Width Custom Regex, and JSON Batch Rule Execution).
+- RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
 
 ---
 
@@ -47,13 +51,25 @@
    - Housed inside `GroupBoxCardAttributes` ("Card Attributes (Official Database)").
    - Canonical rules properties: `Attribute` (e.g. *Race*, *Skill*) and `Value` (e.g. *Dúnadan*, *Warrior*).
    - Inspected via context menu item: `Card Attributes`.
+   - Expansion sets filtered globally via top **Catalog** menu checkboxes.
 2. **Custom User Taxonomy (Filter Slots 3 & 4):**
    - Housed inside `GroupBoxCustomTags` ("Custom Tags (User Taxonomy)").
-   - User-defined taxonomy: `Category` (e.g. *Archetype*, *Role*) and `Tag` (e.g. *Ring Destruction*, *Scout Support*).
+   - User-defined taxonomy: `Category` (e.g. *Strategy*, *Role*) and `Tag` (e.g. *Ring Destruction*, *Scout Support*).
    - Inspected via context menu item: `Assigned Tags`.
    - Card tagging actions: `Assign Tag` (with `+ Author New Tag...` and `+ Add Tag...`), `Remove Tag`.
-   - Dedicated manager: `Filter > Manage Custom Tags...` (`Categories`, `Tags`, `Add...`, `Rename...`, `Delete`).
-   - Tag file persistence: `Filter > Load Tag Set...` and `Filter > Save Tag Set...`.
+   - Dedicated manager: `Taxonomy > Manage Custom Tags...` (`Categories`, `Tags`, `Add...`, `Rename...`, `Delete`).
+   - Tag file persistence: `Taxonomy > Load Tag Set...`, `Taxonomy > Merge Tag Set...`, and `Taxonomy > Save Tag Set...`.
+   - Global filter reset: `Taxonomy > Clear All Active Filters` (<kbd>Ctrl+R</kbd>).
+3. **Procedural Rule Schema Symmetry:**
+   - `"Attributes"`: Dictionary of official criteria (`Attribute: Value`, e.g. `{"Race": "Dwarf"}`).
+   - `"Categories"`: Dictionary of custom criteria (`Category: Tag`, e.g. `{"Faction Bonus": "Wood-elves"}`).
+   - Placeholders: `{Variable.AttributeName}` for official attributes, `{Variable.Category:CategoryName}` (or `{Variable.Tag:...}`) for custom tags.
+   - Multi-Card Union Sets: Rules capturing multiple cards via `SaveAs` resolve placeholders into deduplicated, semicolon-delimited `OR` lists.
+4. **Core Workflow Menu Hierarchy:**
+   - **Deck:** `New Deck` (<kbd>Ctrl+N</kbd>), `Open Deck...` (<kbd>Ctrl+O</kbd>), `Save Deck` (<kbd>Ctrl+S</kbd>), `Save Deck As...`, `Generate from Rules...` (<kbd>Ctrl+G</kbd>), `Re-run Deck Rules` (<kbd>F5</kbd>), `Export Deck...` (<kbd>Ctrl+E</kbd>), `Exit`.
+   - **Catalog:** `Select All Expansions`, `Clear All Expansions`, expansion checkboxes, `Download Card Artwork...`.
+   - **Taxonomy:** `Manage Custom Tags...`, `Extract Tags with Rules...`, `Export Taxonomy Draft (CSV)...`, `Import Taxonomy (CSV)...`, `Load Tag Set...`, `Merge Tag Set...`, `Save Tag Set...`, `Clear All Active Filters` (<kbd>Ctrl+R</kbd>).
+   - **Help:** `Help Contents` (<kbd>F1</kbd>), `About MECCG Deck Builder...`.
 
 ---
 
@@ -70,10 +86,14 @@
   - Issue #16: Decouple Custom Tag Authoring from Filter Bar (Dedicated Taxonomy Manager)
   - Issue #17: Group filter panel into titled containers with slot labels and layer demarcation
   - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
-- [ ] **v0.5.0 - Procedural Deck Generator**
-  - Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
-  - Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
-  - Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
-- Issue #24: Persist expansion set selection and extraction regex parameters across sessions
-- Issue #25: Harmonize taxonomy extraction UI layout, data flow sequencing, and documentation
+- [ ] **v0.5.0 - Procedural Deck Generator & Taxonomy Realignment**
+  - [x] Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
+  - [x] Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
+  - [x] Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
+  - [x] Issue #24: Persist expansion set selection and extraction regex parameters across sessions
+  - [x] Issue #25: Harmonize taxonomy extraction UI layout, data flow sequencing, and documentation
+  - [x] Issue #27: Dynamic CSV Taxonomy Pipeline with Symmetrical Attribute Scoping and Placeholder Protection
+  - [x] Issue #28: Menu Bar Modernization: Unified Four-Header Hierarchy and Standardized Shortcuts
+  - [x] Issue #29: Realine Help System and Documentation with Modernized Menu Bar Architecture, Symmetrical Rule Categories, and Clean Terminology
+  - [ ] Issue #30: Configurable Card Distribution Strategies in Procedural Deck Rules (`Distribution: Variety | Focused | Uniform`)
 - [ ] **v1.0.0 - First Public Release**

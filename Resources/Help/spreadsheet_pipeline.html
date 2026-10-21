@@ -6,16 +6,16 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; CSV Pipeline</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="custom_taxonomy.html">Custom Taxonomy &amp; Automation</a> &gt; CSV Pipeline</div>
     <h1>CSV Spreadsheet Pipeline</h1>
     <p>
-        MECCG Deck Builder features a two-way CSV spreadsheet pipeline via the <strong>Tools</strong> menu (<strong>Export Taxonomy Draft (CSV)...</strong> and <strong>Import Taxonomy from CSV...</strong>). This allows you to audit card taxonomy across hundreds of cards at a glance, bulk-assign tags in Microsoft Excel or Google Sheets, and perform multi-category edits in a single import.
+        MECCG Deck Builder features a two-way CSV spreadsheet pipeline via the <strong>Taxonomy</strong> menu (<strong>Export Taxonomy Draft (CSV)...</strong> and <strong>Import Taxonomy (CSV)...</strong>). This allows you to audit card taxonomy across hundreds of cards at a glance, bulk-assign tags in Microsoft Excel or Google Sheets, and perform multi-category edits in a single import.
     </p>
 
     <!-- SECTION 1: COLUMN LAYOUT -->
     <h2>1. Dynamic Spreadsheet Column Layout</h2>
     <p>
-        When you select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>, the export automatically configures its columns based on your active filter slots:
+        When you select <strong>Taxonomy &gt; Export Taxonomy Draft (CSV)...</strong>, the export automatically configures its columns based on your active filter slots:
     </p>
 
     <table>
@@ -63,7 +63,7 @@
     <!-- SECTION 2: IMPORT SYNCHRONIZATION -->
     <h2>2. Authoritative "Edit &amp; Replace" Import Behavior</h2>
     <p>
-        When you select <strong>Tools &gt; Import Taxonomy from CSV...</strong>, the importer treats the spreadsheet as the authoritative record for every custom category column included in the file:
+        When you select <strong>Taxonomy &gt; Import Taxonomy (CSV)...</strong>, the importer treats the spreadsheet as the authoritative record for every custom category column included in the file:
     </p>
 
     <ul>
@@ -98,22 +98,22 @@
 
     <h3>Scenario A: Auditing &amp; Editing Existing Tags</h3>
     <ol>
-        <li>In the main window, choose the expansion sets you want to audit in the <strong>Set</strong> menu.</li>
+        <li>In the main window, choose the expansion sets you want to audit in the <strong>Catalog</strong> menu.</li>
         <li>In <strong>Slot 3</strong> (bottom panel), select the category you want to inspect (e.g. <strong>Category:</strong> <code>Faction Focus</code>).</li>
-        <li>Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong> and save the file.</li>
+        <li>Select <strong>Taxonomy &gt; Export Taxonomy Draft (CSV)...</strong> and save the file.</li>
         <li>Open the CSV in Excel or Google Sheets. The <code>Faction Focus</code> column is already filled with all current tags. You can glance down the column, correct typos, delete tags, or add second tags with a semicolon (<code>;</code>).</li>
         <li>Save the spreadsheet as a CSV file.</li>
-        <li>In MECCG Deck Builder, select <strong>Tools &gt; Import Taxonomy from CSV...</strong> and select your edited file. Your catalog is updated instantly.</li>
+        <li>In MECCG Deck Builder, select <strong>Taxonomy &gt; Import Taxonomy (CSV)...</strong> and select your edited file. Your catalog is updated instantly.</li>
     </ol>
 
     <h3>Scenario B: Drafting Brand New Categories from Scratch</h3>
     <ol>
         <li>Filter the Master List to the cards you want to classify (for example, set Slot 1 to <code>Primary = Character</code>).</li>
-        <li>Select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
+        <li>Select <strong>Taxonomy &gt; Export Taxonomy Draft (CSV)...</strong>.</li>
         <li>Open the file in your spreadsheet editor. Replace the header <code>[Insert Category Name]</code> with your desired category name (e.g. <code>Combat Role</code>).</li>
         <li>(Optional) Add additional custom category columns next to it (e.g. <code>Expedition Priority</code>).</li>
         <li>Enter tags for each card and save as CSV.</li>
-        <li>Select <strong>Tools &gt; Import Taxonomy from CSV...</strong>. All new categories and tags are immediately registered in the application.</li>
+        <li>Select <strong>Taxonomy &gt; Import Taxonomy (CSV)...</strong>. All new categories and tags are immediately registered in the application.</li>
     </ol>
 </body>
 </html>

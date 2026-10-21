@@ -6,26 +6,25 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; Procedural Deck Generator &gt; Generator Engine</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Construction &amp; Formats</a> &gt; Generator Engine</div>
     <h1>Procedural Deck Generation Engine</h1>
     <p>
-        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates (via <strong>Tools &gt; Generate Deck from Rules...</strong> or <kbd>F5</kbd>).
+        MECCG Deck Builder features an automated generation engine that builds legal, randomized decks from declarative JSON rule templates (via <strong>Deck &gt; Generate from Rules...</strong> [<kbd>Ctrl+G</kbd>] or <kbd>F5</kbd>).
     </p>
 
     <h2>Core Generation Mechanics</h2>
     <ul>
-        <li><strong>Symmetric Filtering:</strong> Rules can query official card attributes (<code>Primary</code>, <code>Race</code>, <code>Skill</code>, <code>Name</code>) and custom user taxonomy tags (<code>Faction Focus</code>, <code>Home Region</code>).</li>
-        <li><strong>Strict Legality &amp; Copy Limits:</strong> Automatically enforces game limits: maximum 1 copy for unique cards and maximum 3 copies for non-unique cards across the entire deck.</li>
-        <li><strong>Tiered Variety-First Distribution:</strong> To maximize card variety, the engine exhausts all 0-copy (unused) cards before assigning 2nd copies, and all 2-copy cards before assigning 3rd copies.</li>
-        <li><strong>Branching Archetypes (<code>RandomChoice</code>):</strong> Author multiple company archetypes or hazard strategies in a single file with weighted random selection and dynamic title overrides.</li>
-        <li><strong>Instant Re-Run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> (<strong>Tools &gt; Re-run Deck Rules</strong>) to immediately re-run the last used rules file directly from disk without re-opening file dialogs.</li>
+        <li><strong>Unified Attribute &amp; Tag Querying:</strong> Rules can combine any official card attributes (<code>Attributes</code>) and custom user categories (<code>Categories</code>). All criteria must match, with semicolon <code>OR</code> support inside any field.</li>
+        <li><strong>Deck Copy Limits:</strong> Automatically enforces standard card copy limits: maximum 1 copy for unique cards and up to 3 copies for non-unique cards across the entire deck.</li>
+        <li><strong>Maximum Card Variety:</strong> When filling multiple card slots from a broad query, the engine prioritizes unused cards before assigning duplicate copies. To include multiple copies of a specific card, query it directly by <code>Name</code> with your desired <code>Count</code>.</li>
+        <li><strong>Randomized Thematic Branches (<code>RandomChoice</code>):</strong> Author multiple company themes or hazard packages in a single template, using weighted probability to randomly choose a theme and assign a tailored deck title.</li>
+        <li><strong>Leader &amp; Variable Capture (<code>SaveAs</code> &amp; <code>{...}</code>):</strong> Capture chosen characters into named variables (e.g. <code>"SaveAs": "Leader"</code>) and query their attributes (e.g. <code>{Leader.Home}</code>) or categories (e.g. <code>{Leader.Category:Faction Bonus}</code>) in subsequent rules.</li>
+        <li><strong>Automated Shortfall Backups (<code>Fallback</code>):</strong> Attach secondary backup rules that execute automatically if a primary query yields fewer cards than requested due to uniqueness limits or missing tags.</li>
+        <li><strong>Instant Re-Run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> (<strong>Deck &gt; Re-run Deck Rules</strong>) to immediately re-generate fresh randomized variations directly from disk without re-opening file dialogs.</li>
     </ul>
 
-    <h2>Documentation Topics</h2>
-    <ul>
-        <li><a href="deck_rules_reference.html"><strong>Deck Rules JSON Schema Reference:</strong></a> Complete technical reference for all rule properties, variables, and tokens.</li>
-        <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Canonical site and faction resolutions powering generic rule templates.</li>
-        <li><a href="worked_example_factions.html"><strong>Worked Example: Dynamic Faction Recruitment:</strong></a> Step-by-step tutorial demonstrating variable capture, targeted faction recruiting, and fallbacks.</li>
-    </ul>
+    <div class="tip">
+        <strong>Related Guides:</strong> Review the <a href="deck_rules_reference.html">JSON Schema Reference</a> for syntax specifications, or follow the step-by-step <a href="worked_example_factions.html">Dynamic Factions Worked Example</a>.
+    </div>
 </body>
 </html>

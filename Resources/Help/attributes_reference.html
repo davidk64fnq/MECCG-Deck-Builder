@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Catalog Filtering &amp; Taxonomy</a> &gt; Official Attributes Reference</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="sets_and_faceting.html">Card Catalog &amp; Artwork</a> &gt; Official Attributes Reference</div>
 
     <h1>Official Card Attributes Reference</h1>
     <p>
@@ -47,7 +47,7 @@
             <td>
                 <ul>
                     <li>Displayed in the right-click <strong>Card Attributes</strong> readout.</li>
-                    <li>Filtered globally via the top <strong>Set</strong> menu checkboxes (not via filter dropdown slots).</li>
+                    <li>Filtered globally via the top <strong>Catalog</strong> menu checkboxes (not via filter dropdown slots).</li>
                     <li>Targeted in procedural rules via the <code>"Sets"</code> array.</li>
                 </ul>
             </td>
@@ -70,7 +70,7 @@
             <td>
                 <ul>
                     <li>Visible on the card artwork in the preview pane.</li>
-                    <li>Scanned by the automated regex engine in <strong>Tools &gt; Extract Taxonomy with Rules...</strong> (with Tolkien book flavor quotes automatically stripped).</li>
+                    <li>Scanned by the automated regex engine in <strong>Taxonomy &gt; Extract Tags with Rules...</strong> (with Tolkien book flavor quotes automatically stripped).</li>
                     <li>Omitted from both the filter dropdowns and the right-click monospace readout.</li>
                 </ul>
             </td>
@@ -308,7 +308,7 @@
         </li>
         <li>
             <strong>Parenthesized Values:</strong>
-            Values in parentheses (such as <code>(1)</code> or <code>(-1)</code>) indicate conditional modifiers (e.g., <em>Warrior only</em> on <em>Valiant Sword</em>, or <em>Éowyn only</em> on <em>Helm of Her Secrecy</em>) or direct dice roll check adjustments (such as +1 to body check rolls on <em>Stabbing Tongue of Fire</em>, indexed as <code>(-1)</code> body).
+            Values in parentheses (such as <code>(1)</code> or <code>(-1)</code>) indicate conditional modifiers (e.g., <em>Warrior only</em> on <em>Valiant Sword</em>, or <em>&Eacute;owyn only</em> on <em>Helm of Her Secrecy</em>) or direct dice roll check adjustments (such as +1 to body check rolls on <em>Stabbing Tongue of Fire</em>, indexed as <code>(-1)</code> body).
         </li>
         <li>
             <strong>Creature Traits in Skills:</strong>
@@ -333,10 +333,10 @@
         The cleanest, permanent way to handle missing or unintuitive official attributes is to create local taxonomy tags:
     </p>
     <ol>
-        <li>Right-click the card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong> (or open <strong>Filter &gt; Manage Custom Tags...</strong>).</li>
+        <li>Right-click the card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong> (or open <strong>Taxonomy &gt; Manage Custom Tags...</strong>).</li>
         <li>Enter your preferred category and tag (for example, <code>Corruption Resistance: +2</code>, <code>Combat Role: Scout Support</code>, or <code>Skill Fix: Sage</code>).</li>
         <li>Filter by these terms using <strong>Custom Tags (Slots 3 &amp; 4)</strong> in the filter bar.</li>
-        <li>Back up your assignments at any time via <strong>Filter &gt; Save Tag Set...</strong> so they can be preserved or shared across machines.</li>
+        <li>Back up your assignments at any time via <strong>Taxonomy &gt; Save Tag Set...</strong> so they can be preserved or shared across machines.</li>
     </ol>
 
     <h3>D. Authoring Robust Procedural Deck Rules</h3>

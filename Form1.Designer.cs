@@ -531,6 +531,8 @@
             // 
             // SaveToolStripMenuItem
             // 
+            SaveToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("ExportToolStripMenuItem.Image");
+            SaveToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             SaveToolStripMenuItem.Name = "SaveToolStripMenuItem";
             SaveToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S;
             SaveToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
@@ -563,8 +565,6 @@
             // 
             // ExportToolStripMenuItem
             // 
-            ExportToolStripMenuItem.Image = (System.Drawing.Image)resources.GetObject("ExportToolStripMenuItem.Image");
-            ExportToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             ExportToolStripMenuItem.Name = "ExportToolStripMenuItem";
             ExportToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E;
             ExportToolStripMenuItem.Size = new System.Drawing.Size(224, 22);

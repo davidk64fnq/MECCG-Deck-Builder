@@ -6,92 +6,138 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="image_cache.html">Tools &amp; Technical Architecture</a> &gt; Taxonomy Extraction Tools</div>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="custom_taxonomy.html">Custom Taxonomy &amp; Automation</a> &gt; Taxonomy Extraction Tools</div>
     <h1>Taxonomy Extraction Tools</h1>
     <p>
-        Located under <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, this dialog provides automated classification tools scoped strictly to the cards currently visible in your Master List. It allows you to harvest card text, perform cross-card relational joins, or execute regular expressions to tag hundreds of cards in bulk.
+        Located under <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, this dialog provides automated classification tools scoped strictly to the cards currently visible in your Master List. It allows you to scan card text, cross-reference related cards, or execute text pattern rules to tag hundreds of cards in bulk.
     </p>
+
+    <div class="tip">
+        <strong>Pre-Packaged Baseline Notice:</strong> The extraction workflows demonstrated below (such as tagging Dark-holds, scanning faction recruiting bonuses, and mapping home regions) represent the <strong>exact automated methods the developer used to build <code>Rules_Support_Tags.json</code></strong>. Because these tags are already shipped with the software, you do not need to run these extractions yourself before building decks—they are documented here so you can inspect the methodology and apply it to your own custom classifications.
+    </div>
 
     <div class="note">
         <strong>Master List Scoping:</strong> All extraction tools evaluate <em>only the cards currently visible in the Master List</em>. To target specific cards (e.g. only characters or only cards from a specific expansion), set your filters in the main window before opening the dialog.
     </div>
 
-    <!-- DYNAMIC ENTITY HARVEST -->
-    <h2 id="entity-harvest">Dynamic Entity Harvest (from Catalog Text)</h2>
+    <!-- MODE: SCAN CARD TEXT FOR ENTITIES -->
+    <h2 id="entity-scan">Scan Card Text for Catalog Entities</h2>
     <p>
-        Scans the gameplay text of your scoped cards for references to published entities found across the catalog (such as factions, regions, or characters):
+        Scans the gameplay rules text of cards in scope for references to published catalog cards (such as factions, regions, or character names):
     </p>
     <ul>
-        <li><strong>Harvest Entity:</strong> Select the canonical attribute and value that defines the entities you want to search for (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The engine inspects all active sets and gathers all published names (e.g. <em>Wood-elves</em>, <em>Riders of Rohan</em>).</li>
-        <li><strong>Save to Category:</strong> Enter the custom category name where matched tags will be assigned (e.g. <code>Faction Focus</code> or <code>Recruitable Factions</code>).</li>
-        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes (enclosed in quotation marks) and book citations (e.g. <code>—LotRI</code>) are automatically stripped before evaluation, ensuring lore quotes never generate false-positive tags.</li>
+        <li><strong>Target Entity:</strong> Select the official attribute and value that defines the catalog cards you want to search for (e.g. <code>Secondary = Faction</code> or <code>Primary = Region</code>). The engine inspects all active sets and gathers all published titles (e.g. <em>Wood-elves</em>, <em>Riders of Rohan</em>).</li>
+        <li><strong>Save to Category:</strong> Enter the custom category where matching tags will be stored (e.g. <code>Faction Bonus</code>).</li>
+        <li><strong>Flavor Text Protection:</strong> All Tolkien book quotes (enclosed in quotation marks) and book citations (e.g. <code>—LotRI</code>) are automatically stripped before evaluation, ensuring lore quotes never generate false tags.</li>
     </ul>
 
-    <!-- RELATIONAL ATTRIBUTE LOOKUP -->
-    <h2 id="relational-lookup">Relational Attribute Lookup (Cross-Card Join)</h2>
+    <!-- WORKED EXAMPLE: SCANNING FACTION BONUSES -->
+    <h3 id="worked-example-factions">Worked Example: Extracting Faction Recruiting Bonuses</h3>
     <p>
-        Performs a two-step relational cross-reference between cards in scope and linked catalog cards to extract attributes into tags:
+        Many characters have rules text conferring Direct Influence bonuses when recruiting specific factions (e.g. <em>Thranduil</em> &rarr; <em>Wood-elves</em>, <em>D&aacute;in II</em> &rarr; <em>Iron Hill Dwarves</em>). We can scan the text of all characters across the catalog and tag them with their recruitable factions automatically:
+    </p>
+    <ol>
+        <li>
+            <strong>Scope the Master List:</strong> In the main window, check your active expansions in the <strong>Catalog</strong> menu. In <strong>Filter Slot 1</strong>, set <code>Attribute: Primary</code> and <code>Value: Character</code> so only character cards are evaluated.
+        </li>
+        <li>
+            <strong>Configure the Scanner:</strong> Open <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, choose <strong>Scan Card Text for Catalog Entities</strong>, and enter:
+            <ul>
+                <li><strong>Target Entity:</strong> <code>Secondary = Faction</code></li>
+                <li><strong>Save to Category:</strong> <code>Faction Bonus</code></li>
+            </ul>
+        </li>
+        <li>
+            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong> to inspect all characters whose gameplay text references a published faction title. Click <strong>Apply Tags to Catalog</strong>, then persist your tags via <strong>Taxonomy &gt; Save Tag Set...</strong> overwriting <code>Rules_Support_Tags.json</code>.
+        </li>
+    </ol>
+
+    <!-- MODE: CROSS-CARD ATTRIBUTE LOOKUP -->
+    <h2 id="relational-lookup">Cross-Card Attribute Lookup</h2>
+    <p>
+        Cross-references an attribute on cards in scope (such as a character's <code>Home</code>) against related destination cards across the catalog (such as a <code>Site</code>) to pull in a secondary attribute (such as <code>Region</code>) as a custom tag:
     </p>
     <ul>
-        <li><strong>Read Field:</strong> The attribute on cards currently in scope used as the join key (e.g. Character <code>Home</code>).</li>
-        <li><strong>Lookup Entity:</strong> The catalog criteria used to find matching destination cards (e.g. <code>Primary = Site</code> or <code>Secondary = Faction</code>).</li>
-        <li><strong>Extract Field:</strong> The attribute pulled from the matched catalog cards (e.g. Site <code>Region</code>).</li>
-        <li><strong>Save to Category:</strong> The custom category where the extracted payload is stored as a tag (e.g. <code>Home Region</code>).</li>
+        <li><strong>Read Attribute:</strong> The attribute on cards currently in scope used to match the destination card (e.g. Character <code>Home</code>).</li>
+        <li><strong>Lookup Entity:</strong> The catalog criteria used to identify the target cards (e.g. <code>Primary = Site</code>).</li>
+        <li><strong>Extract Attribute:</strong> The official attribute pulled from the matched cards (e.g. Site <code>Region</code>).</li>
+        <li><strong>Save to Category:</strong> The custom category where the extracted tag will be saved (e.g. <code>Home Region</code>).</li>
     </ul>
 
     <div class="tip">
-        <strong>Compound Token Parsing:</strong> Characters with multiple locations (e.g. <code>Rivendell, Bree</code>) automatically resolve each site individually to generate clean, semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).
+        <strong>Compound Name Handling:</strong> Characters with multiple locations (e.g. <code>Rivendell, Bree</code>) automatically resolve each site individually to generate clean, semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).
     </div>
 
-    <!-- CUSTOM REGEX EXPRESSION -->
-    <h2 id="custom-regex">Custom Regex Expression</h2>
+    <!-- WORKED EXAMPLE: CROSS-CARD REGIONS -->
+    <h3 id="worked-example-regions">Worked Example: Mapping Character Homes to Geographic Regions</h3>
     <p>
-        Evaluates custom .NET regular expressions directly against card rules text:
+        Character cards list home sites (e.g. <em>Aragorn II</em> &rarr; <code>Rivendell</code>, <em>Boromir</em> &rarr; <code>Minas Tirith</code>, <em>Th&eacute;oden</em> &rarr; <code>Edoras</code>), but lack geographic region attributes. To enable regional company recruitment rules without manual tagging:
     </p>
-    <ul>
-        <li><strong>Pattern:</strong> The regular expression evaluated against card rules text (e.g. <code>Ruins &amp; Lairs in a Wilderness</code> or <code>\b(greater)\b</code>). Case-insensitivity is enabled by default.</li>
+    <ol>
         <li>
-            <strong>Tag Name:</strong> The value assigned to matching cards. Supports three formats:
+            <strong>Scope the Master List:</strong> In the main window, check your active expansions in the <strong>Catalog</strong> menu, and set <strong>Filter Slot 1:</strong> <code>Attribute: Primary</code>, <code>Value: Character</code>.
+        </li>
+        <li>
+            <strong>Configure the Lookup:</strong> Open <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, choose <strong>Cross-Card Attribute Lookup</strong>, and enter:
             <ul>
-                <li><em>Static Value:</em> A single fixed label (e.g. <code>Cancellation</code>).</li>
-                <li><em>Multi-Tag List:</em> A semicolon-delimited string (e.g. <code>Barad-dûr; Carn Dûm; Cirith Gorgor</code>).</li>
-                <li><em>Regex Capture Group (<code>$1</code>):</em> If your pattern contains parentheses <code>(...)</code>, using <code>$1</code> dynamically assigns the exact captured word or phrase.</li>
+                <li><strong>Read Attribute:</strong> <code>Home</code></li>
+                <li><strong>Lookup Entity:</strong> <code>Primary = Site</code></li>
+                <li><strong>Extract Attribute:</strong> <code>Region</code></li>
+                <li><strong>Save to Category:</strong> <code>Home Region</code></li>
             </ul>
         </li>
-        <li><strong>Save to Category:</strong> The custom taxonomy category where extracted tags will be stored.</li>
+        <li>
+            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong>. The engine looks up each character's home site and extracts its region (e.g. <em>Rivendell</em> &rarr; <code>Rhudaur</code>, <em>Minas Tirith</em> &rarr; <code>An&oacute;rien</code>, <em>Edoras</em> &rarr; <code>Rohan</code>). Click <strong>Apply Tags to Catalog</strong> and save via <strong>Taxonomy &gt; Save Tag Set...</strong>.
+        </li>
+    </ol>
+
+    <!-- MODE: CUSTOM PATTERN SEARCH (REGEX) -->
+    <h2 id="custom-regex">Custom Pattern Search (Regex)</h2>
+    <p>
+        Searches card rules text using custom .NET regular expressions:
+    </p>
+    <ul>
+        <li><strong>Pattern:</strong> The text pattern evaluated against card rules text (e.g. <code>Ruins &amp; Lairs in a Wilderness</code> or <code>\b(greater)\b</code>). Case-insensitivity is enabled by default.</li>
+        <li>
+            <strong>Assigned Tag:</strong> The tag applied to matching cards. Supports three formats:
+            <ul>
+                <li><em>Fixed Text:</em> A single fixed tag (e.g. <code>Cancellation</code>).</li>
+                <li><em>Multi-Tag List:</em> A semicolon-delimited string (e.g. <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor</code>).</li>
+                <li><em>Capture Group (<code>$1</code>):</em> If your pattern contains parentheses <code>(...)</code>, using <code>$1</code> dynamically assigns the exact captured word or phrase.</li>
+            </ul>
+        </li>
+        <li><strong>Save to Category:</strong> The custom taxonomy category where assigned tags will be stored.</li>
     </ul>
 
     <div class="note">
-        <strong>Session Persistence:</strong> Your last-used Pattern, Tag Name, and Category are automatically remembered across application launches so you can make iterative passes without retyping.
+        <strong>Session Persistence:</strong> Your last-used Pattern, Assigned Tag, and Category are automatically remembered across application launches so you can make iterative passes without retyping.
     </div>
 
     <!-- WORKED EXAMPLE: CUSTOM REGEX -->
-    <h3 id="worked-example">Worked Example: Batch-Tagging Minion Dark-holds</h3>
+    <h3 id="worked-example-darkholds">Worked Example: Batch-Tagging Minion Dark-holds</h3>
     <p>
-        In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site (via <a href="rules_support_tags.html"><code>{Leader.Tag:Resolved Site}</code></a>), we can batch-tag all 15 characters in under 30 seconds:
+        In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site (via <a href="rules_support_tags.html"><code>{Leader.Category:Resolved Site}</code></a>), we can batch-tag all 15 characters in under 30 seconds:
     </p>
 
     <ol>
         <li>
-            <strong>Scope the Master List:</strong> In the main window, check <em>The Lidless Eye</em> (MELE) in the <strong>Set</strong> menu, and set <strong>Filter Slot 1:</strong> <code>Attribute: Home</code>, <code>Value: Any Dark-hold</code>.
+            <strong>Scope the Master List:</strong> In the main window, check <em>The Lidless Eye</em> (MELE) in the <strong>Catalog</strong> menu, and set <strong>Filter Slot 1:</strong> <code>Attribute: Home</code>, <code>Value: Any Dark-hold</code>.
         </li>
         <li>
-            <strong>Configure the Extraction Tool:</strong> Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, choose <strong>Custom Regex Expression</strong>, and enter:
+            <strong>Configure the Pattern Search:</strong> Open <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, choose <strong>Custom Pattern Search (Regex)</strong>, and enter:
             <ul>
                 <li><strong>Pattern:</strong> <code>Any Dark-hold</code></li>
-                <li><strong>Tag Name:</strong> <code>Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                <li><strong>Assigned Tag:</strong> <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
                 <li><strong>Save to Category:</strong> <code>Resolved Site</code></li>
             </ul>
         </li>
         <li>
-            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong> to verify the 15 characters, then click <strong>Apply Tags to Catalog</strong>. Persist your changes via <strong>Filter &gt; Save Tag Set...</strong> overwriting <code>Rules_Support_Tags.json</code>.
+            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong> to verify the 15 characters, then click <strong>Apply Tags to Catalog</strong>. Persist your changes via <strong>Taxonomy &gt; Save Tag Set...</strong> overwriting <code>Rules_Support_Tags.json</code>.
         </li>
     </ol>
 
-    
-
-    <!-- LOAD RULES FROM FILE -->
-    <h2 id="json-rules">Load Rules from File (.json)</h2>
+    <!-- MODE: BATCH RULES FROM FILE -->
+    <h2 id="json-rules">Batch Rules from File (.json)</h2>
     <p>
         For large-scale taxonomy extraction across multiple expansions, you can author batch extraction rule files (<code>.json</code>) containing arrays of compiled regex rules and execute them in a single operation.
     </p>
@@ -127,21 +173,24 @@
     <!-- WORKED EXAMPLE: SECTION-GUARDED BATCH RULES -->
     <h3 id="worked-example-batch">Worked Example: Sandboxed Site Automatic Attacks</h3>
     <p>
-        Site cards follow a strict top-to-bottom layout, but a naive search like <code>\bdwar(?:f|ves)\b</code> evaluates the entire card text, creating two distinct sources of false positives:
+        <strong>The Goal:</strong> We want to classify all site cards across our expansions by the guardian creature species printed in their automatic attack (tagging them as <code>Dragon</code>, <code>Orcs</code>, <code>Trolls</code>, <code>Undead</code>, or <code>Dwarves</code> under the custom category <code>Automatic Attack</code>).
+    </p>
+    <p>
+        <strong>The Challenge:</strong> Site cards print automatic attacks in the middle of their rules box, between surface entrances at the top and special site rules at the bottom. A simple text search for creature names causes two distinct false matches:
     </p>
 
     <ol>
         <li>
-            <strong>Top False Positives (Adjacent Sites / Havens):</strong> Under-deeps sites list their surface entrances at the very top. For example, <em>The Drowning-deeps</em> begins with <code>Adjacent Sites: Blue Mountain Dwarf-hold (13)...</code>, triggering a false <code>Dwarves</code> tag even though its actual attack is a <code>Drake</code>.
+            <strong>Top False Matches (Adjacent Sites / Havens):</strong> Under-deeps sites list surface entrances at the very top. For example, <em>The Drowning-deeps</em> begins with <code>Adjacent Sites: Blue Mountain Dwarf-hold (13)...</code>, triggering a false <code>Dwarves</code> tag even though its actual attack is a <code>Drake</code>.
         </li>
         <li>
-            <strong>Bottom False Positives (Special Rules):</strong> Many sites list special racial healing bonuses or movement effects at the bottom. For example, a site guarded only by <code>Orcs</code> might conclude with <code>Special: Dwarven characters receive +1 direct influence here</code>, triggering an unwanted <code>Dwarves</code> tag.
+            <strong>Bottom False Matches (Special Rules):</strong> Many sites list special racial bonuses or movement effects at the bottom. For example, a site guarded only by <code>Orcs</code> might conclude with <code>Special: Dwarven characters receive +1 direct influence here</code>, triggering an unwanted <code>Dwarves</code> tag.
         </li>
     </ol>
 
     <div class="tip">
-        <strong>Building a Two-Sided Regex Sandbox:</strong>
-        <p>You can strictly confine the search to the automatic-attack block using a tempered greedy token:</p>
+        <strong>Building a Two-Sided Search Sandbox:</strong>
+        <p>To isolate only the true automatic attack, we use a tempered regex pattern that starts at the attack header and stops before the special text:</p>
         <pre><code>(?is)Automatic-attacks?(?:(?!Special:).)*?\bdwar(?:f|ves)\b</code></pre>
         <ul>
             <li><code>(?is)Automatic-attacks?</code>: <strong>The Top Guard.</strong> Anchors to the attack header, ignoring all site names in <code>Adjacent Sites:</code> or <code>Nearest Haven:</code> above it.</li>
@@ -182,28 +231,20 @@
     <h4>2. Step-by-Step Batch Execution &amp; Audit Workflow</h4>
     <ol>
         <li>
-            <strong>Scope the Master List:</strong> In the top <strong>Set</strong> menu, check your target expansions (e.g. <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>). In <strong>Filter Slot 1</strong>, set <code>Attribute: Primary</code> and <code>Value: Site</code> so only site cards are evaluated.
+            <strong>Scope the Master List:</strong> In the top <strong>Catalog</strong> menu, check your target expansions (e.g. <em>The Dragons</em>, <em>Dark Minions</em>, <em>The Lidless Eye</em>). In <strong>Filter Slot 1</strong>, set <code>Attribute: Primary</code> and <code>Value: Site</code> so only site cards are evaluated.
         </li>
         <li>
-            <strong>Load and Run the Batch File:</strong> Open <strong>Tools &gt; Extract Taxonomy with Rules...</strong>, select <strong>Load Rules from File (.json)</strong>, browse to <code>Automatic_Attack_Rules.json</code>, and click <strong>Test / Preview Matches</strong>. Review the preview list, then click <strong>Apply Tags to Catalog</strong>.
+            <strong>Load and Run the Batch File:</strong> Open <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, select <strong>Batch Rules from File (.json)</strong>, browse to <code>Automatic_Attack_Rules.json</code>, and click <strong>Test / Preview Matches</strong>. Review the preview list, then click <strong>Apply Tags to Catalog</strong>.
         </li>
         <li>
-            <strong>Audit via Dynamic CSV Pipeline:</strong> In the main window, set <strong>Slot 3:</strong> <code>Category: Automatic Attack</code> and select <strong>Tools &gt; Export Taxonomy Draft (CSV)...</strong>.
+            <strong>Audit via CSV Spreadsheet Pipeline:</strong> In the main window, set <strong>Slot 3:</strong> <code>Category: Automatic Attack</code> and select <strong>Taxonomy &gt; Export Taxonomy Draft (CSV)...</strong>.
         </li>
         <li>
-            <strong>Review in Excel or Google Sheets:</strong> Open the CSV to glance down the pre-populated <code>Automatic Attack</code> column. Multi-attack sites (like <em>Carn Dûm</em> or <em>Moria</em>) cleanly show multiple tags (<code>Orcs; Trolls</code>), and complex edge cases can be edited directly in the spreadsheet.
+            <strong>Review in Excel or Google Sheets:</strong> Open the CSV to glance down the pre-populated <code>Automatic Attack</code> column. Multi-attack sites (like <em>Carn D&ucirc;m</em> or <em>Moria</em>) cleanly show multiple tags (<code>Orcs; Trolls</code>), and complex edge cases can be edited directly in the spreadsheet.
         </li>
         <li>
-            <strong>Sync and Persist:</strong> Save the CSV and choose <strong>Tools &gt; Import Taxonomy from CSV...</strong> to apply your authoritative edits. Finally, select <strong>Filter &gt; Save Tag Set...</strong>, choose <code>Rules_Support_Tags.json</code>, and confirm overwrite so all tags persist permanently across application launches.
+            <strong>Sync and Persist:</strong> Save the CSV and choose <strong>Taxonomy &gt; Import Taxonomy (CSV)...</strong> to apply your edits. Finally, select <strong>Taxonomy &gt; Save Tag Set...</strong>, choose <code>Rules_Support_Tags.json</code>, and confirm overwrite so all tags persist permanently across application launches.
         </li>
     </ol>
-
-    <div class="tip">
-        <strong>See Also:</strong>
-        <ul>
-            <li><a href="rules_support_tags.html"><strong>Companion Rules Tag Set Reference:</strong></a> Complete reference table of all standard rules categories and tags.</li>
-            <li><a href="spreadsheet_pipeline.html"><strong>CSV Spreadsheet Pipeline:</strong></a> Bulk-tagging and multi-column edit &amp; replace workflow using spreadsheets.</li>
-        </ul>
-    </div>
 </body>
 </html>
