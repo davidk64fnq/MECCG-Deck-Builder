@@ -174,14 +174,17 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(resolvedVal))
                     {
                         var allowedValues = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                        if (!allowedValues.Any(v => CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
+                        if (!allowedValues.Any(v =>
+                            v == "*" ||
+                            string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
+                            CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
                         {
                             return false;
                         }
                     }
                 }
 
-                // Category & Tag evaluation
+                // Enhanced Category & Tag evaluation:
                 if (filterService != null)
                 {
                     foreach (var (catKey, (rawTemplate, resolvedVal)) in resolvedCategories)
@@ -194,7 +197,10 @@ namespace MECCG_Deck_Builder
                         if (!string.IsNullOrWhiteSpace(resolvedVal))
                         {
                             var allowedTags = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            if (!allowedTags.Any(t => filterService.MatchesCustomCriterion(c.Id, catKey, t)))
+                            if (!allowedTags.Any(t =>
+                                t == "*" ||
+                                string.Equals(t, "All", StringComparison.OrdinalIgnoreCase) ||
+                                filterService.MatchesCustomCriterion(c.Id, catKey, t)))
                             {
                                 return false;
                             }

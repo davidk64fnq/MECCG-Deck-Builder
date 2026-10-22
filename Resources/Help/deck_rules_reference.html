@@ -191,41 +191,23 @@
   "Automatic Attack": "Dragon; Drake"
 }</code></pre>
 
-    <h3>B. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
+    <h3>B. Wildcard &amp; Universal Sentinel Matching (<code>*</code> and <code>All</code>)</h3>
+    <p>
+        Any query criterion in <code>Attributes</code> or <code>Categories</code> that contains <code>*</code> or <code>All</code> acts as a wildcard, satisfying that check for any card that meets the other constraints in the rule. This is particularly valuable when querying properties dynamically captured from character cards:
+    </p>
+    <pre><code>"Attributes": {
+  "Primary": "Resource",
+  "Secondary": "Faction",
+  "Name": "{Leader.Category:Faction Bonus}"
+}</code></pre>
+    <p>
+        If the captured leader is a universal diplomat like <em>Adrazar</em> (tagged <code>Faction Bonus: All</code>), the placeholder resolves to <code>"Name": "All"</code>. Rather than failing to find a card literally named "All", the engine recognizes the sentinel, treats the <code>Name</code> criterion as an open wildcard, and randomly samples from <strong>all faction cards available in your active expansions</strong>.
+    </p>
+
+    <h3>C. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
     <p>
         When a rule captures one or more cards via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query those cards' properties using bracketed tokens:
     </p>
-    <table>
-        <tr>
-            <th>Token Syntax</th>
-            <th>Target Source</th>
-            <th>Example</th>
-            <th>Resolved Output (Sample)</th>
-        </tr>
-        <tr>
-            <td><code>{Variable.AttributeName}</code></td>
-            <td>Official Card Attribute</td>
-            <td><code>{Leader.Home}</code></td>
-            <td><code>"Rivendell"</code></td>
-        </tr>
-        <tr>
-            <td><code>{Variable.Race}</code></td>
-            <td>Official Card Attribute</td>
-            <td><code>{Leader.Race}</code></td>
-            <td><code>"Elf"</code></td>
-        </tr>
-        <tr>
-            <td><code>{Variable.Category:CategoryName}</code></td>
-            <td>Custom User Taxonomy Tag</td>
-            <td><code>{Leader.Category:Faction Bonus}</code></td>
-            <td><code>"Wood-elves; Elves of Lindon"</code></td>
-        </tr>
-    </table>
-
-    <div class="note">
-        <strong>Multi-Card Collections &amp; Union Sets:</strong>
-        If a variable captures multiple cards (e.g., a rule with <code>"Count": 5</code> and <code>"SaveAs": "ExpeditionSites"</code>), any token referencing that variable (such as <code>{ExpeditionSites.Category:Automatic Attack}</code> or <code>{ExpeditionSites.Region}</code>) automatically collects the values from <strong>all captured cards</strong> into a deduplicated, semicolon-delimited string (e.g., <code>"Dragon; Orcs; Trolls; Undead"</code>). Downstream rules evaluate this as an <strong>OR</strong> query, making it straightforward to generate site-matched hazards or regionally cohesive companies.
-    </div>
 
     <div class="note">
         <strong>Unmet Dependency Handling:</strong> If a token references a category or attribute that is absent on the captured card(s), it resolves to an empty string (<code>""</code>). The rule recognizes that the dependency was not met, adds 0 cards, and cleanly hands execution over to the <code>Fallback</code> rule without interrupting generation.

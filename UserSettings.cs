@@ -12,6 +12,11 @@ namespace MECCG_Deck_Builder
         // Active mode
         public int LastExtractionMode { get; set; } = 1; // 1 = Harvest, 2 = Relational, 3 = Quick Regex, 4 = File
 
+        // Mode 1 Entity Harvest Defaults
+        public string LastHarvestAttribute { get; set; } = "Secondary";
+        public string LastHarvestValue { get; set; } = "Faction";
+        public string LastHarvestCategory { get; set; } = "Faction Focus";
+
         // Mode 2 Relational Defaults
         public string LastRelationalCategory { get; set; } = "Home Region";
         public string LastRelationalSourceAttr { get; set; } = "Home";

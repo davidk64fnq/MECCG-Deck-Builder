@@ -14,7 +14,7 @@
 
     <h2>Core Generation Mechanics</h2>
     <ul>
-        <li><strong>Unified Attribute &amp; Tag Querying:</strong> Rules can combine any official card attributes (<code>Attributes</code>) and custom user categories (<code>Categories</code>). All criteria must match, with semicolon <code>OR</code> support inside any field.</li>
+        <li><strong>Unified Attribute &amp; Tag Querying:</strong> Rules can combine any official card attributes (<code>Attributes</code>) and custom user categories (<code>Categories</code>). All criteria must match, with semicolon <code>OR</code> support inside any field and universal wildcard matching (<code>*</code> and <code>All</code>).</li>
         <li><strong>Deck Copy Limits:</strong> Automatically enforces standard card copy limits: maximum 1 copy for unique cards and up to 3 copies for non-unique cards across the entire deck.</li>
         <li><strong>Maximum Card Variety:</strong> When filling multiple card slots from a broad query, the engine prioritizes unused cards before assigning duplicate copies. To include multiple copies of a specific card, query it directly by <code>Name</code> with your desired <code>Count</code>.</li>
         <li><strong>Randomized Thematic Branches (<code>RandomChoice</code>):</strong> Author multiple company themes or hazard packages in a single template, using weighted probability to randomly choose a theme and assign a tailored deck title.</li>

@@ -205,8 +205,9 @@
         <li>
             Review the generation summary dialog to observe context-aware recruitment:
             <ul>
-                <li><strong>Scenario A (Leader has Tag):</strong> If the engine samples <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
-                <li><strong>Scenario B (Leader has no Tag):</strong> If the engine samples a leader without a bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic faction (such as <em>Blue Mountain Dwarves</em>).</li>
+                <li><strong>Scenario A (Leader has Specific Tag):</strong> If the engine samples <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
+                <li><strong>Scenario B (Leader has Universal Bonus / Wildcard):</strong> If the engine samples a universal diplomat like <em>Adrazar</em>, the token resolves to <code>Name: All</code>. The generator recognizes <code>All</code> as a wildcard and selects a random faction from any faction present in your active expansions.</li>
+                <li><strong>Scenario C (Leader has no Tag):</strong> If the engine samples a leader without a bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic faction (such as <em>Blue Mountain Dwarves</em>).</li>
             </ul>
         </li>
         <li>Press <kbd>F5</kbd> (<strong>Deck &gt; Re-run Deck Rules</strong>) to instantly re-execute the file and generate new randomized variations.</li>

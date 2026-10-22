@@ -289,8 +289,15 @@ namespace MECCG_Deck_Builder.Properties {
         </tr>
         <tr>
             <td><code>Playable</code></td>
-            <td>Summary item playability field on site cards detailing what items or special cards may be stored or played there.</td>
-            <td>Summary strings (e.g. <code>Minor</code>, <code>Major</code>, <code>Greater</code>, <code>Gold Ring</code>).</td>
+            <td>
+                Legacy composite summary string imported directly from Cardnum detailing what items, information, or special objects can be played or stored at the site.<br />
+                <em>Why strings run together:</em> Cardnum compiled this field from early text spoiler lists without punctuation between categories (e.g. physical cards print <em>"Information, Items (minor)"</em>, but the database stored <code>"Information Items (minor)"</code>). Because it is treated as an unparsed string, every combination appears as a distinct dropdown entry.<br />
+                <em>Recommended Query Practice:</em> Avoid filtering by this composite field. Use Cardnum's dedicated discrete flag attributes instead: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code> (filtering for <code>yes</code>).
+            </td>
+            <td>
+                Raw composite strings (e.g., <code>Information Items (minor)</code>, <code>Items (minor, major, gold ring)</code>, <code>Scroll of Isildur Items (minor, major)</code>).<br />
+                <em>Use discrete item attributes for searches and deck rules.</em>
+            </td>
         </tr>
         <tr>
             <td><code>Prowess</code></td>
@@ -389,6 +396,15 @@ namespace MECCG_Deck_Builder.Properties {
             <strong>Shorthand Codes:</strong>
             Site cards occasionally feature legacy shorthand classifications, such as <code>B</code> (Border-hold), <code>B F</code> (Border-hold/Free-hold), or <code>Wizardhaven</code> (Fallen-wizard havens from <em>The White Hand</em>).
         </li>
+        <li>
+            <strong>Composite <code>Playable</code> Strings vs. Discrete Item Flags:</strong>
+            On physical site cards, playable entries are comma-separated (e.g., <em>"Playable: Information, Items (minor)"</em>). In Cardnum's raw database (<code>cards-dc.json</code>), category commas were omitted, resulting in run-on strings like <code>"Information Items (minor)"</code> or <code>"Scroll of Isildur Palantiri Items (minor, major)"</code>.
+            <ul>
+                <li>Because the application indexes official attributes directly, each unique permutation appears as a single dropdown item in Filter Slots 1 &amp; 2.</li>
+                <li>Cardnum already decomposed all playability criteria into individual boolean flag attributes: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code>.</li>
+                <li>For procedural deck rules and filter searches, query the specific attribute (e.g., <code>"MinorItem": "yes"</code> or <code>"Information": "yes"</code>) rather than matching against the composite <code>Playable</code> string.</li>
+            </ul>
+        </li>
     </ul>
 
     <h3>B. Curated Local Master Dataset &amp; Data Persistence</h3>
@@ -449,16 +465,46 @@ namespace MECCG_Deck_Builder.Properties {
     </p>
 
     <!-- SECTION 1: CARD TAGGING (IN-SITU) -->
-    <h2>1. Tagging Cards &amp; Quick Authoring</h2>
+    <h2>1. Tagging Cards &amp; Rapid Authoring</h2>
     <p>
-        You can assign, toggle, or author custom tags directly on any card in the Master List or active deck tabs without disturbing your filter dropdowns:
+        You can assign, inspect, toggle, or author custom tags through two complementary interfaces:
+    </p>
+
+    <h3>A. The Card Taxonomy Inspector (Right Pane)</h3>
+    <p>
+        Click <strong>[ Card Taxonomy ]</strong> at the top of the right pane to open the dedicated metadata inspector. As you arrow or click through cards in the Master List, the inspector updates instantly:
+    </p>
+    <ul>
+        <li>
+            <strong>Live Monospace Readout:</strong> Displays all official rules attributes and assigned custom tags. Long tag lists (such as characters with multiple regions or sites) wrap cleanly under the colon using a <strong>column-aligned hanging indent</strong>, with smooth vertical mouse-wheel scrolling for dense cards.
+        </li>
+        <li>
+            <strong>Filter-Synchronized Category:</strong> When you filter by a custom category in bottom <strong>Slot 3</strong> (or Slot 4), the Quick Assign <strong>Category</strong> dropdown automatically mirrors your selection.
+        </li>
+        <li>
+            <strong>Status Checkmarks (<code>✓</code>):</strong> In the Quick Assign <strong>Tag</strong> dropdown, any tag currently held by the inspected card is prefixed with a checkmark (<code>✓</code>).
+        </li>
+        <li>
+            <strong>Single &amp; Multi-Tag Assignment (<code>+ Assign</code>):</strong> Select or type a tag and click <code>+ Assign</code> (or press <kbd>Enter</kbd>). You can assign multiple tags in one action by separating them with semicolons (e.g. <code>Cardolan; Rhudaur; The Shire</code>).
+        </li>
+        <li>
+            <strong>Targeted Removal (<code>- Remove</code>):</strong> If the Tag dropdown shows an assigned tag, clicking <code>- Remove</code> strips that specific tag. If the tag field is blank or doesn't match an assigned tag, clicking <code>- Remove</code> opens a popup menu listing all tags currently on the card for quick one-click deletion.
+        </li>
+        <li>
+            <strong>Direct Authoring (<code>New Tag...</code>):</strong> Opens the tag creation dialog, pre-seeded with the active category and pre-populated with all existing tags, to register and assign a new tag in one step.
+        </li>
+    </ul>
+
+    <h3>B. In-Situ Context Menus (Master List &amp; Deck Tabs)</h3>
+    <p>
+        You can also tag cards directly from any list without switching panes:
     </p>
     <ul>
         <li>
             <strong>Assign or Toggle a Tag:</strong> Right-click a card and navigate to <strong>Assign Tag &gt; [Category] &gt; [Tag]</strong>. Currently assigned tags display a checkmark (<kbd>&#10003;</kbd>). Clicking an already-assigned tag toggles it off.
         </li>
         <li>
-            <strong>Author a New Tag on the Fly:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>. This opens a quick prompt where you can select or type a category and tag in one action, immediately registering it in your catalog.
+            <strong>Author a New Tag on the Fly:</strong> Right-click a card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong>.
         </li>
         <li>
             <strong>Add Tag to Existing Category:</strong> Under <strong>Assign Tag &gt; [Category]</strong>, click <strong>+ Add Tag...</strong> to append a new tag value directly into that specific category.
@@ -609,7 +655,7 @@ namespace MECCG_Deck_Builder.Properties {
 
     <h2>Adding Cards</h2>
     <ul>
-        <li><strong>Fastest Method:</strong> Switch to your desired deck tab on the right, find the card in the Master List, and <strong>double-click</strong> it.</li>
+        <li><strong>Fastest Method:</strong> Switch to your desired deck tab on the right, find the card in the Master List, and <strong>double-click</strong> it. (Note: Double-clicking continues to deposit cards into your active deck partition even when the <em>Card Taxonomy</em> inspector view is currently visible).</li>
         <li><strong>Drag and Drop:</strong> Left-click and drag the card from the Master List onto any visible tab list.</li>
         <li><strong>Targeted Right-Click:</strong> Right-click a card in the Master List, open the <strong>Copy</strong> submenu, and pick the destination tab (Pool, Resources, Hazards, Sideboard, Sites). This automatically switches focus to that tab.</li>
     </ul>
@@ -1026,7 +1072,8 @@ namespace MECCG_Deck_Builder.Properties {
     <ul>
         <li><strong>Complete Offline Catalog:</strong> Launches instantly using a local, validated database of official cards and sets with zero startup latency or network dependency.</li>
         <li><strong>On-Demand Image Preview &amp; Caching:</strong> Displays high-resolution card artwork downloaded on demand and cached locally to conserve bandwidth.</li>
-        <li><strong>Five-Section Deck Partitioning:</strong> Organizes cards into standard MECCG deck sections: <em>Pool</em>, <em>Resources</em>, <em>Hazards</em>, <em>Sideboard</em>, and <em>Sites</em>.</li>
+        <li><strong>Five-Section Deck Partitioning:</strong> Organizes cards into standard MECCG deck partitions: <em>Pool</em>, <em>Resources</em>, <em>Hazards</em>, <em>Sideboard</em>, and <em>Sites</em>.</li>
+        <li><strong>Live Card Taxonomy Inspector:</strong> Inspect official rules statistics and user taxonomy live in the right pane with column-aligned wrapping, filter synchronization, checkmark status tracking, and a pinned quick-assign toolbar.</li>
         <li><strong>Dual-Layer Filtering:</strong> Filter the card catalog simultaneously by official card attributes (race, skills, items, alignments) and your own customizable user tags.</li>
         <li><strong>Automated Deck Generator:</strong> Build complete, tournament-legal decks from customizable rule templates—featuring natural card variety, branching company themes, dynamic leader recruitment, and automatic backups.</li>
         <li><strong>Multi-Platform Exporting:</strong> Directly export decks to Tabletop Simulator (TTS), Play MECCG online client, Cardnum list format, structured text archives, or plain text lists.</li>
@@ -1108,8 +1155,8 @@ namespace MECCG_Deck_Builder.Properties {
     <h2>Master Card List (Left Pane)</h2>
     <p>Displays all cards matching your active expansion sets and filter criteria, sorted alphabetically.</p>
     <ul>
-        <li><strong>Single-Click:</strong> Selects the card and loads its artwork into the preview panel.</li>
-        <li><strong>Double-Click:</strong> Appends the card to the currently selected deck tab on the right.</li>
+        <li><strong>Single-Click:</strong> Selects the card, renders its artwork in the preview pane, and updates the Card Taxonomy Inspector.</li>
+        <li><strong>Double-Click:</strong> Appends the card to the currently active deck tab on the right (even when Card Taxonomy mode is active).</li>
         <li><strong>Right-Click:</strong> Opens the master context menu to copy cards, inspect attributes, view tags, or assign custom tags.</li>
         <li><strong>Drag &amp; Drop:</strong> Left-click and drag the card title onto any deck listbox.</li>
     </ul>
@@ -1120,8 +1167,14 @@ namespace MECCG_Deck_Builder.Properties {
         <strong>Errata Notice:</strong> Cards flagged with ICE errata automatically load their corrected image counterpart prefixed with <code>ice-</code>.
     </div>
 
-    <h2>Deck Tabs (Right Pane)</h2>
-    <p>Five tabbed lists representing standard MECCG deck partitions:</p>
+    <!-- DUAL-MODE RIGHT PANE -->
+    <h2>Dual-Mode Workspace (Right Pane)</h2>
+    <p>
+        The right pane features an integrated mode switcher at the top, allowing you to alternate between constructing your deck partitions and inspecting or editing card taxonomy:
+    </p>
+
+    <h3>A. Deck Builder Mode (<code>[ Deck (Count) ]</code>)</h3>
+    <p>Displays the five standard MECCG deck partitions across wide, easy-to-read tabs:</p>
     <table>
         <tr>
             <th>Tab</th>
@@ -1131,15 +1184,43 @@ namespace MECCG_Deck_Builder.Properties {
         <tr><td><code>Pool</code></td><td>Starting Pool</td><td>Characters, starting items, and starter resources.</td></tr>
         <tr><td><code>Res</code></td><td>Resources</td><td>Resource events, allies, factions, and playable items.</td></tr>
         <tr><td><code>Haz</code></td><td>Hazards</td><td>Creatures, hazard events, and corruption cards.</td></tr>
-        <tr><td><code>Side</code></td><td>Sideboard</td><td>Reserve cards accessible during the game.</td></tr>
+        <tr><td><code>Side</code></td><td>Sideboard</td><td>Reserve cards accessible during play.</td></tr>
         <tr><td><code>Site</code></td><td>Sites</td><td>Site cards and movement region paths.</td></tr>
     </table>
 
+    <h3>B. Card Taxonomy Inspector Mode (<code>[ Card Taxonomy ]</code>)</h3>
+    <p>
+        Provides a dedicated, persistent inspection and tagging workspace for the currently selected card:
+    </p>
+    <ul>
+        <li><strong>Card Header:</strong> Displays the selected card's printed title and 4-letter set code.</li>
+        <li>
+            <strong>Live Monospace Metadata Readout:</strong>
+            A color-coded, scrollable viewer displaying all populated official attributes (slate navy) and assigned custom taxonomy tags (deep teal). Long multi-tag lists (such as <code>Home Region</code> or <code>Resolved Site</code>) and long rules descriptions wrap cleanly with a <strong>column-aligned hanging indent</strong> so colons stay strictly aligned and text is never clipped.
+        </li>
+        <li>
+            <strong>Pinned Quick Assign Bar:</strong>
+            A compact, non-scrolling tool docked at the bottom of the inspector:
+            <ul>
+                <li><strong>Category Dropdown:</strong> Automatically synchronizes with your active bottom filter criteria (Slot 3, falling back to Slot 4). Changing the category dropdown refreshes the tag list instantly.</li>
+                <li><strong>Tag Dropdown:</strong> Lists all known tags for the selected category. Any tag that the currently inspected card already possesses is prefixed with a checkmark (<code>✓</code>).</li>
+                <li><strong><code>+ Assign</code>:</strong> Assigns the selected tag (or multiple tags separated by semicolons) to the card. The closed dropdown immediately updates to display <code>✓ [Tag]</code>.</li>
+                <li><strong><code>- Remove</code>:</strong> Removes the selected tag from the card. If the tag field is empty or doesn't match an assigned tag, clicking this button opens a popup picker listing all tags currently on the card for instant removal.</li>
+                <li><strong><code>New Tag...</code>:</strong> Opens the authoring dialog, pre-seeded with the active category, to register and assign a new tag in one action.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div class="tip">
+        <strong>Dual-Action Workflow:</strong> Even while the <strong>Card Taxonomy</strong> inspector is visible, double-clicking any card in the Master List continues to deposit copies into your last-active deck tab without having to switch back to Deck Builder mode.
+    </div>
+
+    <!-- FILTER BAR -->
     <h2>Filter Bar (Bottom Panel)</h2>
     <p>Organized into two titled GroupBoxes providing context-sensitive faceted filtering:</p>
     <ul>
         <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1 &amp; 2 query official rules properties (Attribute above Value).</li>
-        <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 3 &amp; 4 query your custom classification taxonomy (Category above Tag).</li>
+        <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 3 &amp; 4 query your custom classification taxonomy (Category above Tag). Selecting categories or tags here automatically synchronizes the Quick Assign bar in the right pane.</li>
     </ul>
 
     <h2>Dynamic Title Bar Summary</h2>
@@ -2385,7 +2466,7 @@ namespace MECCG_Deck_Builder
         public string SelectedKey => _cmbKey.Text.Trim();
         public string SelectedValue => _cmbValue.Text.Trim();
 
-        private AddTagDialog(string cardName, CardFilterService filterService)
+        private AddTagDialog(string cardName, CardFilterService filterService, string initialCategory = null)
         {
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
 
@@ -2458,15 +2539,16 @@ namespace MECCG_Deck_Builder
             AcceptButton = btnOk;
             CancelButton = btnCancel;
 
-            PopulateKeys();
-
+            // Wire events BEFORE populating keys so initial selection triggers tag population
             _cmbKey.SelectedIndexChanged += (s, e) => PopulateValuesForKey();
             _cmbKey.TextChanged += (s, e) => PopulateValuesForKey();
+
+            PopulateKeys(initialCategory);
 
             Shown += (s, e) => _cmbKey.Focus();
         }
 
-        private void PopulateKeys()
+        private void PopulateKeys(string initialCategory = null)
         {
             _cmbKey.Items.Clear();
             var keys = _filterService.GetCustomKeyNames();
@@ -2478,16 +2560,34 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            if (_cmbKey.Items.Count > 0)
+            if (!string.IsNullOrWhiteSpace(initialCategory))
+            {
+                int idx = _cmbKey.FindStringExact(initialCategory);
+                if (idx >= 0)
+                {
+                    _cmbKey.SelectedIndex = idx;
+                }
+                else
+                {
+                    _cmbKey.Text = initialCategory;
+                }
+            }
+            else if (_cmbKey.Items.Count > 0)
             {
                 _cmbKey.SelectedIndex = 0;
             }
+
+            PopulateValuesForKey();
         }
 
         private void PopulateValuesForKey()
         {
             string key = _cmbKey.Text.Trim();
+            string prevTag = _cmbValue.Text.Trim();
+
             _cmbValue.Items.Clear();
+            _cmbValue.Text = string.Empty; // Explicitly clear old text
+
             if (string.IsNullOrWhiteSpace(key)) return;
 
             var values = _filterService.GetCustomKeyValues(key);
@@ -2497,6 +2597,28 @@ namespace MECCG_Deck_Builder
                 {
                     _cmbValue.Items.Add(v);
                 }
+            }
+
+            // 1. If the previous tag also exists in the new category, preserve it
+            if (!string.IsNullOrEmpty(prevTag))
+            {
+                int matchIdx = _cmbValue.FindStringExact(prevTag);
+                if (matchIdx >= 0)
+                {
+                    _cmbValue.SelectedIndex = matchIdx;
+                    return;
+                }
+            }
+
+            // 2. Otherwise snap to the first tag in the new category
+            if (_cmbValue.Items.Count > 0)
+            {
+                _cmbValue.SelectedIndex = 0;
+            }
+            else
+            {
+                _cmbValue.SelectedIndex = -1;
+                _cmbValue.Text = string.Empty;
             }
         }
 
@@ -2519,9 +2641,9 @@ namespace MECCG_Deck_Builder
             DialogResult = DialogResult.OK;
         }
 
-        public static (string Key, string Value)? Show(IWin32Window owner, string cardName, CardFilterService filterService)
+        public static (string Key, string Value)? Show(IWin32Window owner, string cardName, CardFilterService filterService, string initialCategory = null)
         {
-            using var dlg = new AddTagDialog(cardName, filterService);
+            using var dlg = new AddTagDialog(cardName, filterService, initialCategory);
             if (dlg.ShowDialog(owner) == DialogResult.OK)
             {
                 return (dlg.SelectedKey, dlg.SelectedValue);
@@ -2534,11 +2656,6 @@ namespace MECCG_Deck_Builder
   </file>
   <file path='.\AI_CONTEXT.md'>
 <![CDATA[
----
-
-### 2. Full Revised `AI_CONTEXT.md`
-
-```markdown
 # AI Development Context: MECCG Deck Builder
 
 ## Project Summary
@@ -2555,9 +2672,7 @@ namespace MECCG_Deck_Builder
 
 ## Application Architecture & Core Files
 
-- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, 5 deck tabs, two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Menu icon assignment maps floppy disk to `Save Deck` and keeps `Export Deck...` clean.
-- ManageCustomTagsForm.cs: Dedicated modal dialog for managing custom categories and tags (`Taxonomy > Manage Custom Tags...`).
-- AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
+- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, dual-mode right pane (`Deck Builder` vs `Card Taxonomy Inspector` with monospace metadata view and pinned Quick Assign bar), two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Flush height alignment across master list, card artwork, and right pane.- AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
 - CardCatalogService.cs: Card catalog management, local JSON loading, filter option discovery; normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
@@ -2632,7 +2747,25 @@ namespace MECCG_Deck_Builder
   - [x] Issue #28: Menu Bar Modernization: Unified Four-Header Hierarchy and Standardized Shortcuts
   - [x] Issue #29: Realine Help System and Documentation with Modernized Menu Bar Architecture, Symmetrical Rule Categories, and Clean Terminology
   - [ ] Issue #30: Configurable Card Distribution Strategies in Procedural Deck Rules (`Distribution: Variety | Focused | Uniform`)
+  - [x] Issue #31: Dual-Mode Right Pane with Card Taxonomy Inspector, Monospace Metadata Readout, and Pinned Quick-Assign Bar
 - [ ] **v1.0.0 - First Public Release**
+
+## Clean-Slate Schema Enrichment Pipeline
+
+To eliminate the inconsistencies, historical quirks, and unstructured text burdens of the legacy Cardnum dataset, we adopt a phased, clean-slate schema redesign:
+
+1. **Card Type Slicing:** Process cards partition-by-partition based on `Primary` card type (e.g., `Site`, `Character`, `Resource`, `Hazard`).
+2. **Catalog & Text Ingestion:** 
+   - Export minimal reference data from the app (`Card Name`, `Set`, `Card Text`).
+   - Pair with the raw `cards-dc.json` entries to cross-reference existing attributes.
+3. **Deck-Builder-First Schema Engineering:** 
+   - Extract gameplay rules into structured, unambiguous attributes (e.g., parsing composite automatic attacks, movement path structures, recruitment hooks, and conditional item restrictions).
+   - Normalize polarity (e.g., CP burden vs check resistance) and eliminate legacy shorthand codes.
+4. **Intermediate JSON Output:** Deliver an enriched, strongly-typed JSON dataset for the slice (e.g., `sites_enriched.json`).
+5. **CSV Pipeline Review:**
+   - Convert the enriched JSON into CSV.
+   - Import into MECCG Deck Builder via `Taxonomy > Import Taxonomy (CSV)...` to inspect and review the taxonomy live in the UI and filter slots.
+6. **Unified Master Schema Consolidation:** Once all partitions are finalized, consolidate the schemas into a unified local master catalog (`cards-dc.json` / `Card.cs`).
 ]]>
   </file>
   <file path='.\Card.cs'>
@@ -3157,14 +3290,54 @@ namespace MECCG_Deck_Builder
                 return values;
             }
 
+            var distinct = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            // 1. Check predefined schema filters
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
                 for (int i = 1; i < _customFilters[index].Count; i++)
                 {
-                    values.Add(_customFilters[index][i]);
+                    string val = _customFilters[index][i];
+                    if (!string.IsNullOrWhiteSpace(val))
+                    {
+                        if (val.Contains(';'))
+                        {
+                            foreach (var part in val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                            {
+                                distinct.Add(part);
+                            }
+                        }
+                        else
+                        {
+                            distinct.Add(val.Trim());
+                        }
+                    }
                 }
             }
+
+            // 2. Also harvest all tags assigned across cards for this category
+            foreach (var tags in _cardCustomTags.Values)
+            {
+                if (tags.TryGetValue(keyName, out string tagVal) && !string.IsNullOrWhiteSpace(tagVal))
+                {
+                    if (tagVal.Contains(';'))
+                    {
+                        foreach (var part in tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        {
+                            distinct.Add(part);
+                        }
+                    }
+                    else
+                    {
+                        distinct.Add(tagVal.Trim());
+                    }
+                }
+            }
+
+            var sorted = distinct.ToList();
+            sorted.Sort(StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+            values.AddRange(sorted);
             return values;
         }
 
@@ -3424,27 +3597,36 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
+            // Snap category to canonical casing if already known
+            string resolvedKey = _customFilters.FirstOrDefault(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase))?[0] ?? keyName.Trim();
+
+            // Snap tag value to canonical casing if already known
+            var knownValues = GetCustomKeyValues(resolvedKey);
+            string trimmedVal = value.Trim();
+            string canonicalVal = knownValues.FirstOrDefault(v => string.Equals(v, trimmedVal, StringComparison.OrdinalIgnoreCase));
+            string resolvedValue = !string.IsNullOrEmpty(canonicalVal) ? canonicalVal : trimmedVal;
+
             if (!_cardCustomTags.TryGetValue(cardId, out var tags))
             {
                 tags = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 _cardCustomTags[cardId] = tags;
             }
 
-            if (tags.TryGetValue(keyName, out string existing) && !string.IsNullOrWhiteSpace(existing))
+            if (tags.TryGetValue(resolvedKey, out string existing) && !string.IsNullOrWhiteSpace(existing))
             {
                 var existingList = existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
-                if (!existingList.Contains(value.Trim(), StringComparer.OrdinalIgnoreCase))
+                if (!existingList.Contains(resolvedValue, StringComparer.OrdinalIgnoreCase))
                 {
-                    existingList.Add(value.Trim());
-                    tags[keyName] = string.Join("; ", existingList);
+                    existingList.Add(resolvedValue);
+                    tags[resolvedKey] = string.Join("; ", existingList);
                 }
             }
             else
             {
-                tags[keyName] = value.Trim();
+                tags[resolvedKey] = resolvedValue;
             }
 
-            AddCustomKeyValue(keyName, value.Trim());
+            AddCustomKeyValue(resolvedKey, resolvedValue);
         }
 
         public List<string> GetCardTagsForCategory(string cardId, string keyName)
@@ -5133,6 +5315,7 @@ namespace MECCG_Deck_Builder
         private bool _isUpdatingFilters;
 
         private List<Card> _masterCards = [];
+        private Card _inspectedCard;
         private ListBox _callingListBox;
         private int _selectedMasterIndex;
         private int _selectedTabIndex;
@@ -5152,6 +5335,7 @@ namespace MECCG_Deck_Builder
             ];
 
             InitializeFilterClearing();
+            InitializeTaxonomyInspector();
 
             _catalogService.WarningOccurred += (s, msg) =>
                 MessageBox.Show(msg, Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -5170,8 +5354,10 @@ namespace MECCG_Deck_Builder
                 LoadBaselineRulesTags(); // Auto-load Rules_Support_Tags.json if present
                 CreateMenus();
                 RefreshFilterKeyDropdowns();
+                PopulateAssignCategories();
                 UpdateFacetedFilters();
                 UpdateFormTitle();
+                SetRightPaneMode(false); // Default to Deck Builder tab view
             }
             finally
             {
@@ -5224,7 +5410,6 @@ namespace MECCG_Deck_Builder
             _isUpdatingFilters = true;
             try
             {
-                // Remove existing set items (identified by Tag is string)
                 var existingSetItems = ToolStripMenuCatalog.DropDownItems
                     .OfType<ToolStripMenuItem>()
                     .Where(item => item.Tag is string)
@@ -5236,8 +5421,6 @@ namespace MECCG_Deck_Builder
                 }
 
                 var savedSets = new HashSet<string>(UserSettingsService.Current.SelectedSets ?? [], StringComparer.OrdinalIgnoreCase);
-
-                // Insert set checkboxes right above the bottom separator
                 int insertIndex = ToolStripMenuCatalog.DropDownItems.Count - 2;
 
                 for (int i = 0; i < _catalogService.Sets.Count; i++)
@@ -5328,6 +5511,619 @@ namespace MECCG_Deck_Builder
                 cb.SelectedIndex = -1;
             }
         }
+
+        #region RIGHT_PANE_MODE_AND_INSPECTOR
+
+        private void InitializeTaxonomyInspector()
+        {
+            BtnModeDeck.Click += (s, e) => SetRightPaneMode(false);
+            BtnModeTaxonomy.Click += (s, e) => SetRightPaneMode(true);
+
+            CmbAssignCategory.SelectedIndexChanged += (s, e) => PopulateAssignTagsForCategory();
+            CmbAssignCategory.TextChanged += (s, e) => PopulateAssignTagsForCategory();
+
+            // Handle <Enter> key for rapid keyboard assignment
+            CmbAssignCategory.KeyDown += CmbAssign_KeyDown;
+            CmbAssignTag.KeyDown += CmbAssign_KeyDown;
+
+            BtnAssignTag.Click += BtnAssignTag_Click;
+            BtnRemoveTag.Click += BtnRemoveTag_Click;
+            BtnAuthorTag.Click += BtnAuthorTag_Click;
+        }
+
+        private void CmbAssign_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true; // Silences the Windows ding sound
+
+                if (sender == CmbAssignCategory && string.IsNullOrWhiteSpace(CmbAssignTag.Text))
+                {
+                    // If hitting Enter on an empty Category box, jump straight to Tag
+                    CmbAssignTag.Focus();
+                }
+                else
+                {
+                    // Trigger the "+ Assign" button directly
+                    BtnAssignTag.PerformClick();
+                }
+            }
+        }
+
+        private void SetRightPaneMode(bool isTaxonomy)
+        {
+            if (isTaxonomy)
+            {
+                BtnModeTaxonomy.BackColor = SystemColors.Window;
+                BtnModeTaxonomy.Font = new Font(Font, FontStyle.Bold);
+                BtnModeDeck.BackColor = SystemColors.Control;
+                BtnModeDeck.Font = new Font(Font, FontStyle.Regular);
+
+                TabControlDeck.Visible = false;
+                PanelTaxonomy.Visible = true;
+
+                PopulateAssignCategories();
+                SyncAssignCategoryWithFilterSlots();
+                UpdateTaxonomyView(_inspectedCard);
+            }
+            else
+            {
+                BtnModeDeck.BackColor = SystemColors.Window;
+                BtnModeDeck.Font = new Font(Font, FontStyle.Bold);
+                BtnModeTaxonomy.BackColor = SystemColors.Control;
+                BtnModeTaxonomy.Font = new Font(Font, FontStyle.Regular);
+
+                PanelTaxonomy.Visible = false;
+                TabControlDeck.Visible = true;
+            }
+        }
+
+        private void SyncAssignCategoryWithFilterSlots()
+        {
+            string slot3Cat = ComboBoxKey3.Text.Trim();
+            string slot3Val = ComboBoxValue3.Text.Trim();
+            string slot4Cat = ComboBoxKey4.Text.Trim();
+            string slot4Val = ComboBoxValue4.Text.Trim();
+
+            if (!string.IsNullOrWhiteSpace(slot3Cat))
+            {
+                CmbAssignCategory.Text = slot3Cat;
+                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(slot3Val) ? slot3Val : null);
+            }
+            else if (!string.IsNullOrWhiteSpace(slot4Cat))
+            {
+                CmbAssignCategory.Text = slot4Cat;
+                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(slot4Val) ? slot4Val : null);
+            }
+        }
+
+        private void PopulateAssignCategories()
+        {
+            string prevCategory = CmbAssignCategory.Text.Trim();
+            CmbAssignCategory.Items.Clear();
+
+            var keys = _filterService.GetCustomKeyNames().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
+            foreach (var k in keys)
+            {
+                CmbAssignCategory.Items.Add(k);
+            }
+
+            // 1. Only preserve previous category if it still exists in the taxonomy!
+            var survivingCategory = keys.FirstOrDefault(k => string.Equals(k, prevCategory, StringComparison.OrdinalIgnoreCase));
+
+            if (!string.IsNullOrEmpty(survivingCategory))
+            {
+                CmbAssignCategory.Text = survivingCategory;
+            }
+            else if (keys.Count > 0)
+            {
+                // Fall back to Slot 3 (if valid), then Slot 4 (if valid), or index 0
+                string slot3 = ComboBoxKey3.Text.Trim();
+                string slot4 = ComboBoxKey4.Text.Trim();
+
+                var matchSlot3 = keys.FirstOrDefault(k => string.Equals(k, slot3, StringComparison.OrdinalIgnoreCase));
+                var matchSlot4 = keys.FirstOrDefault(k => string.Equals(k, slot4, StringComparison.OrdinalIgnoreCase));
+
+                if (!string.IsNullOrEmpty(matchSlot3))
+                {
+                    CmbAssignCategory.Text = matchSlot3;
+                }
+                else if (!string.IsNullOrEmpty(matchSlot4))
+                {
+                    CmbAssignCategory.Text = matchSlot4;
+                }
+                else
+                {
+                    CmbAssignCategory.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                CmbAssignCategory.SelectedIndex = -1;
+                CmbAssignCategory.Text = string.Empty;
+            }
+
+            PopulateAssignTagsForCategory();
+        }
+
+        private void PopulateAssignTagsForCategory(string tagToSelect = null)
+        {
+            string category = CmbAssignCategory.Text.Trim();
+            string targetTag = !string.IsNullOrWhiteSpace(tagToSelect)
+                ? tagToSelect.Trim().TrimStart('✓', ' ')
+                : CmbAssignTag.Text.Trim().TrimStart('✓', ' ');
+
+            CmbAssignTag.Items.Clear();
+
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                CmbAssignTag.SelectedIndex = -1;
+                CmbAssignTag.Text = string.Empty;
+                return;
+            }
+
+            var tags = _filterService.GetCustomKeyValues(category).Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+            var cardTags = (_inspectedCard != null)
+                ? _filterService.GetCardTagsForCategory(_inspectedCard.Id, category)
+                : [];
+
+            foreach (var t in tags)
+            {
+                bool isAssigned = cardTags.Contains(t, StringComparer.OrdinalIgnoreCase);
+                string displayTag = isAssigned ? $"✓ {t}" : t;
+                CmbAssignTag.Items.Add(displayTag);
+            }
+
+            // 1. Prioritize target tag ONLY if it exists in the surviving tags list
+            if (!string.IsNullOrEmpty(targetTag))
+            {
+                int matchIdx = -1;
+                for (int i = 0; i < CmbAssignTag.Items.Count; i++)
+                {
+                    string raw = CmbAssignTag.Items[i].ToString().TrimStart('✓', ' ');
+                    if (string.Equals(raw, targetTag, StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchIdx = i;
+                        break;
+                    }
+                }
+                if (matchIdx >= 0)
+                {
+                    CmbAssignTag.SelectedIndex = matchIdx;
+                    return;
+                }
+            }
+
+            // 2. Otherwise default to the card's first assigned tag if any
+            if (cardTags.Count > 0)
+            {
+                int matchIdx = -1;
+                for (int i = 0; i < CmbAssignTag.Items.Count; i++)
+                {
+                    string raw = CmbAssignTag.Items[i].ToString().TrimStart('✓', ' ');
+                    if (string.Equals(raw, cardTags[0], StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchIdx = i;
+                        break;
+                    }
+                }
+                if (matchIdx >= 0)
+                {
+                    CmbAssignTag.SelectedIndex = matchIdx;
+                    return;
+                }
+            }
+
+            // 3. Fall back to index 0 if tags exist, otherwise cleanly clear the box
+            if (CmbAssignTag.Items.Count > 0)
+            {
+                CmbAssignTag.SelectedIndex = 0;
+            }
+            else
+            {
+                CmbAssignTag.SelectedIndex = -1;
+                CmbAssignTag.Text = string.Empty;
+            }
+        }
+
+        private void UpdateTaxonomyView(Card card)
+        {
+            if (card == null)
+            {
+                LblTaxonomyCardTitle.Text = "(No card selected)";
+                RichTextBoxTaxonomy.Clear();
+                return;
+            }
+
+            LblTaxonomyCardTitle.Text = $"{card.Name} ({card.Set})";
+
+            RichTextBoxTaxonomy.SuspendLayout();
+            RichTextBoxTaxonomy.Clear();
+
+            Color headerColor = Color.FromArgb(26, 54, 93);    // Slate Navy #1A365D
+            Color keyColor = Color.FromArgb(74, 85, 104);       // Muted Gray #4A5568
+            Color valColor = Color.FromArgb(26, 32, 44);        // Crisp Dark #1A202C
+            Color emptyColor = Color.FromArgb(160, 174, 192);   // Italic Muted Gray #A0AEC0
+            Color tagColor = Color.FromArgb(19, 78, 74);        // Deep Teal #134E4A
+
+            using var headerFont = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+            using var monoRegularFont = new Font("Consolas", 8.25f, FontStyle.Regular);
+            using var monoBoldFont = new Font("Consolas", 8.25f, FontStyle.Bold);
+            using var italicFont = new Font("Consolas", 8.25f, FontStyle.Italic);
+
+            void AppendHeader(string text)
+            {
+                RichTextBoxTaxonomy.SelectionStart = RichTextBoxTaxonomy.TextLength;
+                RichTextBoxTaxonomy.SelectionLength = 0;
+                RichTextBoxTaxonomy.SelectionColor = headerColor;
+                RichTextBoxTaxonomy.SelectionFont = headerFont;
+                RichTextBoxTaxonomy.AppendText(text);
+            }
+
+            // --- 1. OFFICIAL ATTRIBUTES ---
+            AppendHeader("=== OFFICIAL ATTRIBUTES ===" + Environment.NewLine);
+
+            // Suppress legacy placeholder Secondary when it merely duplicates Primary (e.g., site/Site, region/Region)
+            string displaySecondary = string.Equals(card.Primary, card.Secondary, StringComparison.OrdinalIgnoreCase)
+                ? string.Empty
+                : card.Secondary;
+
+            // Suppress composite unparsed Playable string for official published sets to save vertical space;
+            // preserve it for Dreamcards that may use custom text strings.
+            string displayPlayable = card.Dreamcard
+                ? card.Playable
+                : string.Empty;
+
+            var attrPairs = new List<(string Key, string Value)>
+    {
+        ("Primary", card.Primary),
+        ("Secondary", displaySecondary),
+        ("Alignment", card.Alignment),
+        ("Race", card.Race),
+        ("Subrace", card.Subrace),
+        ("Skill", card.Skill),
+        ("Mind", card.Mind),
+        ("Direct", card.Direct),
+        ("Prowess", card.Prowess),
+        ("Body", card.Body),
+        ("Corruption", card.Corruption),
+        ("Strikes", card.Strikes),
+        ("Home", card.Home),
+        ("Site", card.Site),
+        ("Region", card.Region),
+        ("Haven", card.Haven),
+        ("MPs", card.MPs),
+        ("Unique", card.Unique),
+        ("Playable", displayPlayable),
+        ("GoldRing", card.GoldRing),
+        ("GreaterItem", card.GreaterItem),
+        ("MajorItem", card.MajorItem),
+        ("MinorItem", card.MinorItem),
+        ("Information", card.Information),
+        ("Palantiri", card.Palantiri),
+        ("Scroll", card.Scroll),
+        ("Hoard", card.Hoard),
+        ("Specific", card.Specific),
+        ("Artist", card.Artist)
+    };
+
+            var nonBlankAttrs = attrPairs.Where(p => !string.IsNullOrWhiteSpace(p.Value)).ToList();
+            if (nonBlankAttrs.Count > 0)
+            {
+                int maxKeyLen = nonBlankAttrs.Max(p => p.Key.Length);
+                foreach (var (k, v) in nonBlankAttrs)
+                {
+                    AppendWrappedMonospaceLine(k, v, maxKeyLen, keyColor, valColor, monoRegularFont, monoBoldFont);
+                }
+            }
+            else
+            {
+                AppendSingleLine("  (None)" + Environment.NewLine, emptyColor, italicFont);
+            }
+
+            AppendSingleLine(Environment.NewLine, keyColor, monoRegularFont);
+
+            // --- 2. CUSTOM TAXONOMY TAGS ---
+            AppendHeader("=== ASSIGNED CUSTOM TAGS ===" + Environment.NewLine);
+
+            var customPairs = _filterService.GetCardCustomFilterPairs(card.Id);
+            if (customPairs.Count > 0)
+            {
+                int maxCatLen = Math.Min(16, customPairs.Max(p => p.Key.Length));
+                foreach (var kvp in customPairs)
+                {
+                    AppendWrappedMonospaceLine(kvp.Key, kvp.Value, maxCatLen, keyColor, tagColor, monoRegularFont, monoBoldFont);
+                }
+            }
+            else
+            {
+                AppendSingleLine("  (No custom tags assigned)" + Environment.NewLine, emptyColor, italicFont);
+            }
+
+            RichTextBoxTaxonomy.SelectionStart = 0;
+            RichTextBoxTaxonomy.ScrollToCaret();
+            RichTextBoxTaxonomy.ResumeLayout();
+        }
+
+        private void AppendSingleLine(string text, Color color, Font font)
+        {
+            RichTextBoxTaxonomy.SelectionStart = RichTextBoxTaxonomy.TextLength;
+            RichTextBoxTaxonomy.SelectionLength = 0;
+            RichTextBoxTaxonomy.SelectionColor = color;
+            RichTextBoxTaxonomy.SelectionFont = font;
+            RichTextBoxTaxonomy.AppendText(text);
+        }
+
+        private void AppendWrappedMonospaceLine(
+            string key,
+            string value,
+            int maxKeyLen,
+            Color keyColor,
+            Color valColor,
+            Font regularFont,
+            Font boldFont)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return;
+
+            string paddedKey = key.PadRight(maxKeyLen);
+            string prefix = $"  {paddedKey} : ";
+            string indent = new(' ', prefix.Length);
+
+            // 38 characters max per line prevents horizontal clipping on 306px pane width
+            int availWidth = Math.Max(12, 38 - prefix.Length);
+            var lines = WrapTokensToLines(value, availWidth);
+
+            for (int i = 0; i < lines.Count; i++)
+            {
+                AppendSingleLine(i == 0 ? prefix : indent, keyColor, regularFont);
+                AppendSingleLine(lines[i] + Environment.NewLine, valColor, boldFont);
+            }
+        }
+
+        private static List<string> WrapTokensToLines(string text, int availWidth)
+        {
+            var lines = new List<string>();
+            if (string.IsNullOrWhiteSpace(text)) return lines;
+
+            // Semicolon-delimited lists (custom tags, resolved sites, skills)
+            if (text.Contains(';'))
+            {
+                var tokens = text.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var cur = new System.Text.StringBuilder();
+
+                for (int i = 0; i < tokens.Length; i++)
+                {
+                    string token = tokens[i];
+                    bool isLast = (i == tokens.Length - 1);
+                    string tokenWithSep = isLast ? token : token + ";";
+
+                    if (cur.Length == 0)
+                    {
+                        cur.Append(tokenWithSep);
+                    }
+                    else if (cur.Length + 1 + tokenWithSep.Length <= availWidth)
+                    {
+                        cur.Append(' ').Append(tokenWithSep);
+                    }
+                    else
+                    {
+                        lines.Add(cur.ToString());
+                        cur.Clear();
+                        cur.Append(tokenWithSep);
+                    }
+                }
+
+                if (cur.Length > 0)
+                {
+                    lines.Add(cur.ToString());
+                }
+
+                return lines;
+            }
+
+            // Word-wrap long unbroken strings (e.g. Home site, Skill descriptions)
+            var words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var wordCur = new System.Text.StringBuilder();
+
+            foreach (var w in words)
+            {
+                if (wordCur.Length == 0)
+                {
+                    wordCur.Append(w);
+                }
+                else if (wordCur.Length + 1 + w.Length <= availWidth)
+                {
+                    wordCur.Append(' ').Append(w);
+                }
+                else
+                {
+                    lines.Add(wordCur.ToString());
+                    wordCur.Clear();
+                    wordCur.Append(w);
+                }
+            }
+
+            if (wordCur.Length > 0)
+            {
+                lines.Add(wordCur.ToString());
+            }
+
+            return lines;
+        }
+
+        private void BtnAssignTag_Click(object sender, EventArgs e)
+        {
+            if (_inspectedCard == null)
+            {
+                MessageBox.Show(this, "Please select a card first.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string rawCategory = CmbAssignCategory.Text.Trim();
+            string tagInput = CmbAssignTag.Text.Trim().TrimStart('✓', ' ');
+
+            if (string.IsNullOrWhiteSpace(rawCategory))
+            {
+                MessageBox.Show(this, "Please enter or select a category.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CmbAssignCategory.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(tagInput))
+            {
+                MessageBox.Show(this, "Please enter or select a tag.", "Assign Tag", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CmbAssignTag.Focus();
+                return;
+            }
+
+            // 1. Canonicalize Category
+            var allCategories = _filterService.GetCustomKeyNames().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
+            string category = allCategories.FirstOrDefault(c => string.Equals(c, rawCategory, StringComparison.OrdinalIgnoreCase)) ?? rawCategory;
+
+            if (!allCategories.Contains(category, StringComparer.OrdinalIgnoreCase))
+            {
+                var res = MessageBox.Show(this,
+                    $"Category '{category}' does not exist in your taxonomy.\n\nDo you want to create this new category?",
+                    "New Category Confirmation",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (res != DialogResult.Yes) return;
+            }
+
+            // 2. Canonicalize each tag and guard against accidental typos
+            var knownCategoryTags = _filterService.GetCustomKeyValues(category).Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+            var rawTagParts = tagInput.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var tagsToAssign = new List<string>();
+
+            foreach (var rawTag in rawTagParts)
+            {
+                var canonicalMatch = knownCategoryTags.FirstOrDefault(t => string.Equals(t, rawTag, StringComparison.OrdinalIgnoreCase));
+                if (canonicalMatch != null)
+                {
+                    // Existing tag: snaps to official catalog casing automatically
+                    tagsToAssign.Add(canonicalMatch);
+                }
+                else
+                {
+                    // Unrecognized tag: prompt user to confirm it's intentional (not a typo)
+                    var res = MessageBox.Show(this,
+                        $"Tag '{rawTag}' is not currently registered under category '{category}'.\n\nDo you want to create and assign this new tag?",
+                        "New Tag Confirmation",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (res == DialogResult.Yes)
+                    {
+                        tagsToAssign.Add(rawTag);
+                    }
+                }
+            }
+
+            if (tagsToAssign.Count == 0) return;
+
+            // 3. Assign tags
+            foreach (var tag in tagsToAssign)
+            {
+                _filterService.AddCustomKeyName(category);
+                _filterService.AddCustomKeyValue(category, tag);
+                _filterService.AppendCardCustomTag(_inspectedCard.Id, category, tag);
+            }
+
+            RefreshFilterKeyDropdowns();
+            UpdateFacetedFilters();
+            UpdateTaxonomyView(_inspectedCard);
+            PopulateAssignCategories();
+            CmbAssignCategory.Text = category;
+
+            // Select the first assigned tag with correct checkmark and catalog casing
+            PopulateAssignTagsForCategory(tagsToAssign[0]);
+        }
+
+        private void BtnRemoveTag_Click(object sender, EventArgs e)
+        {
+            if (_inspectedCard == null) return;
+
+            string category = CmbAssignCategory.Text.Trim();
+            string tag = CmbAssignTag.Text.Trim().TrimStart('✓', ' ');
+
+            var cardTags = _filterService.GetCardTagsForCategory(_inspectedCard.Id, category);
+
+            if (!string.IsNullOrWhiteSpace(category) && !string.IsNullOrWhiteSpace(tag) && cardTags.Contains(tag, StringComparer.OrdinalIgnoreCase))
+            {
+                _filterService.RemoveCardCustomTag(_inspectedCard.Id, category, tag);
+                UpdateFacetedFilters();
+                UpdateTaxonomyView(_inspectedCard);
+
+                // Re-populate and select the tag so it displays WITHOUT '✓ '
+                PopulateAssignTagsForCategory(tag);
+                return;
+            }
+
+            // Fallback context picker listing all tags currently on the card
+            var allPairs = _filterService.GetCardCustomFilterPairs(_inspectedCard.Id);
+            if (allPairs.Count == 0)
+            {
+                MessageBox.Show(this, $"No custom tags are currently assigned to '{_inspectedCard.Name}'.", "Remove Tag", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var removeMenu = new ContextMenuStrip();
+            foreach (var (cat, val) in allPairs)
+            {
+                var catMenu = new ToolStripMenuItem(cat.Replace("&", "&&"));
+                var tagList = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (var t in tagList)
+                {
+                    var item = new ToolStripMenuItem(t.Replace("&", "&&")) { Tag = (cat, t) };
+                    item.Click += (s, ev) =>
+                    {
+                        if (((ToolStripMenuItem)s).Tag is (string c, string v))
+                        {
+                            _filterService.RemoveCardCustomTag(_inspectedCard.Id, c, v);
+                            UpdateFacetedFilters();
+                            UpdateTaxonomyView(_inspectedCard);
+                            PopulateAssignTagsForCategory();
+                        }
+                    };
+                    catMenu.DropDownItems.Add(item);
+                }
+                removeMenu.Items.Add(catMenu);
+            }
+
+            removeMenu.Show(BtnRemoveTag, new Point(0, BtnRemoveTag.Height));
+        }
+
+        private void BtnAuthorTag_Click(object sender, EventArgs e)
+        {
+            if (_inspectedCard == null)
+            {
+                MessageBox.Show(this, "Please select a card first.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Pass the currently active category into the dialog
+            string initialCategory = CmbAssignCategory.Text.Trim();
+            var result = AddTagDialog.Show(this, _inspectedCard.Name, _filterService, initialCategory);
+            if (result.HasValue)
+            {
+                _filterService.AddCustomKeyName(result.Value.Key);
+                _filterService.AddCustomKeyValue(result.Value.Key, result.Value.Value);
+                _filterService.AppendCardCustomTag(_inspectedCard.Id, result.Value.Key, result.Value.Value);
+
+                RefreshFilterKeyDropdowns();
+                UpdateFacetedFilters();
+                UpdateTaxonomyView(_inspectedCard);
+                PopulateAssignCategories();
+                CmbAssignCategory.Text = result.Value.Key;
+
+                // Re-populate and select the new tag with '✓ '
+                PopulateAssignTagsForCategory(result.Value.Value);
+            }
+        }
+
+        #endregion
 
         #region MASTER_LIST_INTERACTION
 
@@ -5447,6 +6243,8 @@ namespace MECCG_Deck_Builder
                     _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
+                    UpdateTaxonomyView(_inspectedCard);
+                    PopulateAssignCategories();
                 }
             };
             addMenu.DropDownItems.Add(addNewTagItem);
@@ -5469,6 +6267,8 @@ namespace MECCG_Deck_Builder
                         _filterService.AppendCardCustomTag(card.Id, keyName, val);
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
+                        UpdateTaxonomyView(_inspectedCard);
+                        PopulateAssignCategories();
                     }
                 };
                 keyItem.DropDownItems.Add(addNewValueItem);
@@ -5492,6 +6292,8 @@ namespace MECCG_Deck_Builder
                             string tagToToggle = ((ToolStripMenuItem)s).Tag?.ToString() ?? val;
                             _filterService.ToggleCardCustomTag(card.Id, keyName, tagToToggle);
                             UpdateFacetedFilters();
+                            UpdateTaxonomyView(_inspectedCard);
+                            PopulateAssignTagsForCategory();
                         };
                         keyItem.DropDownItems.Add(valItem);
                     }
@@ -5525,6 +6327,8 @@ namespace MECCG_Deck_Builder
                         string tagToRemove = ((ToolStripMenuItem)s).Tag?.ToString() ?? tag;
                         _filterService.RemoveCardCustomTag(card.Id, key, tagToRemove);
                         UpdateFacetedFilters();
+                        UpdateTaxonomyView(_inspectedCard);
+                        PopulateAssignTagsForCategory();
                     };
                     keyItem.DropDownItems.Add(valItem);
                 }
@@ -5545,7 +6349,7 @@ namespace MECCG_Deck_Builder
 
         #endregion
 
-        #region IMAGE_PREVIEW
+        #region IMAGE_PREVIEW_AND_SELECTION
 
         private async void ListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -5557,6 +6361,8 @@ namespace MECCG_Deck_Builder
                 {
                     _imageLoadCts?.Cancel();
                     PictureBoxCardImage.Image = null;
+                    _inspectedCard = null;
+                    UpdateTaxonomyView(null);
                 }
                 return;
             }
@@ -5581,6 +6387,10 @@ namespace MECCG_Deck_Builder
             }
 
             if (selectedCard == null) return;
+
+            _inspectedCard = selectedCard;
+            UpdateTaxonomyView(selectedCard);
+            PopulateAssignTagsForCategory();
 
             if (listBox != ListBoxMaster) ListBoxMaster.ClearSelected();
             if (listBox != ListBoxPool) ListBoxPool.ClearSelected();
@@ -5703,6 +6513,8 @@ namespace MECCG_Deck_Builder
             {
                 _imageLoadCts?.Cancel();
                 PictureBoxCardImage.Image = null;
+                _inspectedCard = null;
+                UpdateTaxonomyView(null);
                 return;
             }
 
@@ -5716,11 +6528,16 @@ namespace MECCG_Deck_Builder
             if (foundIndex >= 0)
             {
                 ListBoxMaster.SelectedIndex = foundIndex;
+                _inspectedCard = _masterCards[foundIndex];
             }
             else
             {
                 ListBoxMaster.SelectedIndex = 0;
+                _inspectedCard = _masterCards[0];
             }
+
+            UpdateTaxonomyView(_inspectedCard);
+            PopulateAssignTagsForCategory();
         }
 
         #endregion
@@ -5767,7 +6584,9 @@ namespace MECCG_Deck_Builder
             int index = ListBoxMaster.IndexFromPoint(e.Location);
             if (index >= 0 && index < _masterCards.Count)
             {
-                var currentSection = (DeckSectionType)TabControlDeck.SelectedIndex;
+                // Always add to the active deck section, even if inspecting card taxonomy
+                int tabIndex = Math.Clamp(TabControlDeck.SelectedIndex, 0, 4);
+                var currentSection = (DeckSectionType)tabIndex;
                 AddCardToSection(_masterCards[index], currentSection);
             }
         }
@@ -5802,6 +6621,14 @@ namespace MECCG_Deck_Builder
 
         private void UpdateFormTitle()
         {
+            int totalDeckCards = _currentDeck.Pool.Count +
+                                 _currentDeck.Resources.Count +
+                                 _currentDeck.Hazards.Count +
+                                 _currentDeck.Sideboard.Count +
+                                 _currentDeck.Sites.Count;
+
+            BtnModeDeck.Text = $"Deck ({totalDeckCards})";
+
             Text = $"{Constants.AppTitle} - \"{_currentDeck.Title}\" " +
                    $"({_currentDeck.Pool.Count}/" +
                    $"{_currentDeck.Resources.Count}[{_currentDeck.CountCharactersInResources()}]/" +
@@ -5838,7 +6665,7 @@ namespace MECCG_Deck_Builder
 
         private void SetToolStripMenuTabCardnumFilters(Card card)
         {
-            ToolStripMenuMasterCardnumFilters.DropDownItems.Clear();
+            ToolStripMenuTabCardnumFilters.DropDownItems.Clear();
             var pairs = new List<(string Key, string Value)>
             {
                 ("Name", card.Name),
@@ -5904,6 +6731,8 @@ namespace MECCG_Deck_Builder
                     _filterService.AppendCardCustomTag(card.Id, result.Value.Key, result.Value.Value);
                     RefreshFilterKeyDropdowns();
                     UpdateFacetedFilters();
+                    UpdateTaxonomyView(_inspectedCard);
+                    PopulateAssignCategories();
                 }
             };
             addMenu.DropDownItems.Add(addNewTagItem);
@@ -5926,6 +6755,8 @@ namespace MECCG_Deck_Builder
                         _filterService.AppendCardCustomTag(card.Id, keyName, val);
                         RefreshFilterKeyDropdowns();
                         UpdateFacetedFilters();
+                        UpdateTaxonomyView(_inspectedCard);
+                        PopulateAssignCategories();
                     }
                 };
                 keyItem.DropDownItems.Add(addNewValueItem);
@@ -5949,6 +6780,8 @@ namespace MECCG_Deck_Builder
                             string tagToToggle = ((ToolStripMenuItem)s).Tag?.ToString() ?? val;
                             _filterService.ToggleCardCustomTag(card.Id, keyName, tagToToggle);
                             UpdateFacetedFilters();
+                            UpdateTaxonomyView(_inspectedCard);
+                            PopulateAssignTagsForCategory();
                         };
                         keyItem.DropDownItems.Add(valItem);
                     }
@@ -5982,6 +6815,8 @@ namespace MECCG_Deck_Builder
                         string tagToRemove = ((ToolStripMenuItem)s).Tag?.ToString() ?? tag;
                         _filterService.RemoveCardCustomTag(card.Id, key, tagToRemove);
                         UpdateFacetedFilters();
+                        UpdateTaxonomyView(_inspectedCard);
+                        PopulateAssignTagsForCategory();
                     };
                     keyItem.DropDownItems.Add(valItem);
                 }
@@ -6190,7 +7025,9 @@ namespace MECCG_Deck_Builder
             using var dlg = new ManageCustomTagsForm(_filterService);
             dlg.ShowDialog(this);
             RefreshFilterKeyDropdowns();
+            PopulateAssignCategories();
             UpdateFacetedFilters();
+            UpdateTaxonomyView(_inspectedCard); // Immediately redraws inspector
         }
 
         private void OpenFilterMenuItem_Click(object sender, EventArgs e)
@@ -6210,6 +7047,7 @@ namespace MECCG_Deck_Builder
                 {
                     _filterService.LoadCustomFilters(dto.Filters, dto.Cards, _catalogService);
                     RefreshFilterKeyDropdowns();
+                    PopulateAssignCategories();
                     UpdateFacetedFilters();
                 }
             }
@@ -6251,6 +7089,7 @@ namespace MECCG_Deck_Builder
                     {
                         _filterService.MergeCustomFilters(dto.Filters, dto.Cards, _catalogService);
                         RefreshFilterKeyDropdowns();
+                        PopulateAssignCategories();
                         UpdateFacetedFilters();
                         MessageBox.Show(this, "Tag set merged successfully into active taxonomy.", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
@@ -6273,7 +7112,7 @@ namespace MECCG_Deck_Builder
 
             try
             {
-                // Pass 1: Symmetrically validate all slots against the active sets independently.
+                // Pass 1: Validate active slots against selected sets
                 for (int i = 0; i < _filterSlots.Length; i++)
                 {
                     var slot = _filterSlots[i];
@@ -6347,7 +7186,7 @@ namespace MECCG_Deck_Builder
                     }
                 } while (changed && --maxIterations > 0);
 
-                // Pass 3: Context-sensitive pruning: update dropdown contents for all 4 slots
+                // Pass 3: Context-sensitive pruning
                 for (int i = 0; i < _filterSlots.Length; i++)
                 {
                     var slot = _filterSlots[i];
@@ -6408,6 +7247,18 @@ namespace MECCG_Deck_Builder
                     _isUpdatingFilters = false;
                 }
 
+                // Live-sync Quick Assign to whichever custom slot you just changed
+                if (sender == ComboBoxKey3 && !string.IsNullOrWhiteSpace(ComboBoxKey3.Text))
+                {
+                    CmbAssignCategory.Text = ComboBoxKey3.Text.Trim();
+                    PopulateAssignTagsForCategory();
+                }
+                else if (sender == ComboBoxKey4 && !string.IsNullOrWhiteSpace(ComboBoxKey4.Text))
+                {
+                    CmbAssignCategory.Text = ComboBoxKey4.Text.Trim();
+                    PopulateAssignTagsForCategory();
+                }
+
                 UpdateFacetedFilters();
             }
         }
@@ -6415,6 +7266,20 @@ namespace MECCG_Deck_Builder
         private void KeyValue_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_isUpdatingFilters) return;
+
+            // Live-sync Quick Assign when changing custom tag values in Slot 3 or 4
+            if (sender == ComboBoxValue3 && !string.IsNullOrWhiteSpace(ComboBoxKey3.Text))
+            {
+                string tag = ComboBoxValue3.Text.Trim();
+                CmbAssignCategory.Text = ComboBoxKey3.Text.Trim();
+                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(tag) ? tag : null);
+            }
+            else if (sender == ComboBoxValue4 && !string.IsNullOrWhiteSpace(ComboBoxKey4.Text))
+            {
+                string tag = ComboBoxValue4.Text.Trim();
+                CmbAssignCategory.Text = ComboBoxKey4.Text.Trim();
+                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(tag) ? tag : null);
+            }
 
             UpdateFacetedFilters();
         }
@@ -6713,7 +7578,6 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // Run generation engine
             var result = DeckGenerationService.GenerateDeck(
                 _catalogService.Cards,
                 _currentDeck.IncludedSets,
@@ -6726,12 +7590,10 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // Save path for F5 re-runs and enable menu item
             _lastDeckRulesFilePath = filePath;
             ToolStripMenuToolsRerunDeckGen.Enabled = true;
             ToolStripMenuToolsRerunDeckGen.Text = $"Re-run Rules ({Path.GetFileName(filePath)})";
 
-            // Transfer generated deck to current deck
             _currentDeck.Clear();
             _currentDeck.Title = result.Deck.Title;
 
@@ -6746,7 +7608,6 @@ namespace MECCG_Deck_Builder
             _currentDeck.Sideboard.AddRange(result.Deck.Sideboard);
             _currentDeck.Sites.AddRange(result.Deck.Sites);
 
-            // Sync Set menu checkboxes if any sets were added by the rules
             _isUpdatingFilters = true;
             try
             {
@@ -6764,17 +7625,14 @@ namespace MECCG_Deck_Builder
             }
             PersistSelectedSets();
 
-            // Reset filter controls so user can freely inspect master list
             ResetAllFilters();
 
-            // Refresh deck tabs and window title
             foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
             {
                 RefreshSectionListBox(sectionType);
             }
             UpdateFormTitle();
 
-            // Display summary
             var sb = new System.Text.StringBuilder();
             sb.AppendLine($"Deck \"{_currentDeck.Title}\" generated successfully!\n");
             sb.AppendLine($"Pool: {_currentDeck.Pool.Count}");
@@ -6842,7 +7700,9 @@ namespace MECCG_Deck_Builder
             if (dlg.ShowDialog(this) == DialogResult.OK)
             {
                 RefreshFilterKeyDropdowns();
+                PopulateAssignCategories();
                 UpdateFacetedFilters();
+                UpdateTaxonomyView(_inspectedCard);
             }
         }
 
@@ -6915,7 +7775,9 @@ namespace MECCG_Deck_Builder
                         TaxonomyExtractionService.ImportFromCsv(ofd.FileName, _catalogService, _filterService);
 
                     RefreshFilterKeyDropdowns();
+                    PopulateAssignCategories();
                     UpdateFacetedFilters();
+                    UpdateTaxonomyView(_inspectedCard);
 
                     MessageBox.Show(this,
                         $"Taxonomy imported successfully.\n\nCards matched: {cardsMatched}\nCategories updated: {categoriesImported}\nTags assigned: {tagsAssigned}",
@@ -6996,17 +7858,30 @@ namespace MECCG_Deck_Builder
             ToolStripMenuTabDeleteCard = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTabCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
             PictureBoxCardImage = new System.Windows.Forms.PictureBox();
-            ListBoxPool = new System.Windows.Forms.ListBox();
-            ListBoxResources = new System.Windows.Forms.ListBox();
-            ListBoxHazards = new System.Windows.Forms.ListBox();
-            ListBoxSideboard = new System.Windows.Forms.ListBox();
-            ListBoxSites = new System.Windows.Forms.ListBox();
+            BtnModeDeck = new System.Windows.Forms.Button();
+            BtnModeTaxonomy = new System.Windows.Forms.Button();
             TabControlDeck = new System.Windows.Forms.TabControl();
             TabPagePool = new System.Windows.Forms.TabPage();
+            ListBoxPool = new System.Windows.Forms.ListBox();
             TabPageResources = new System.Windows.Forms.TabPage();
+            ListBoxResources = new System.Windows.Forms.ListBox();
             TabPageHazards = new System.Windows.Forms.TabPage();
+            ListBoxHazards = new System.Windows.Forms.ListBox();
             TabPageSideboard = new System.Windows.Forms.TabPage();
+            ListBoxSideboard = new System.Windows.Forms.ListBox();
             TabPageSites = new System.Windows.Forms.TabPage();
+            ListBoxSites = new System.Windows.Forms.ListBox();
+            PanelTaxonomy = new System.Windows.Forms.Panel();
+            LblTaxonomyCardTitle = new System.Windows.Forms.Label();
+            RichTextBoxTaxonomy = new System.Windows.Forms.RichTextBox();
+            GroupBoxQuickAssign = new System.Windows.Forms.GroupBox();
+            LblAssignCategory = new System.Windows.Forms.Label();
+            CmbAssignCategory = new System.Windows.Forms.ComboBox();
+            LblAssignTag = new System.Windows.Forms.Label();
+            CmbAssignTag = new System.Windows.Forms.ComboBox();
+            BtnAssignTag = new System.Windows.Forms.Button();
+            BtnRemoveTag = new System.Windows.Forms.Button();
+            BtnAuthorTag = new System.Windows.Forms.Button();
             MenuStrip1 = new System.Windows.Forms.MenuStrip();
             ToolStripMenuDeck = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -7060,6 +7935,8 @@ namespace MECCG_Deck_Builder
             TabPageHazards.SuspendLayout();
             TabPageSideboard.SuspendLayout();
             TabPageSites.SuspendLayout();
+            PanelTaxonomy.SuspendLayout();
+            GroupBoxQuickAssign.SuspendLayout();
             MenuStrip1.SuspendLayout();
             GroupBoxCardAttributes.SuspendLayout();
             GroupBoxCustomTags.SuspendLayout();
@@ -7069,6 +7946,7 @@ namespace MECCG_Deck_Builder
             // 
             ListBoxMaster.ContextMenuStrip = ContextMenuStripMaster;
             ListBoxMaster.FormattingEnabled = true;
+            ListBoxMaster.IntegralHeight = false;
             ListBoxMaster.ItemHeight = 15;
             ListBoxMaster.Location = new System.Drawing.Point(12, 37);
             ListBoxMaster.Name = "ListBoxMaster";
@@ -7253,97 +8131,34 @@ namespace MECCG_Deck_Builder
             // 
             // PictureBoxCardImage
             // 
-            PictureBoxCardImage.Location = new System.Drawing.Point(243, 37);
+            PictureBoxCardImage.Location = new System.Drawing.Point(232, 37);
             PictureBoxCardImage.Name = "PictureBoxCardImage";
-            PictureBoxCardImage.Size = new System.Drawing.Size(443, 505);
+            PictureBoxCardImage.Size = new System.Drawing.Size(366, 505);
             PictureBoxCardImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             PictureBoxCardImage.TabIndex = 1;
             PictureBoxCardImage.TabStop = false;
             // 
-            // ListBoxPool
+            // BtnModeDeck
             // 
-            ListBoxPool.AllowDrop = true;
-            ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxPool.FormattingEnabled = true;
-            ListBoxPool.ItemHeight = 15;
-            ListBoxPool.Location = new System.Drawing.Point(3, 3);
-            ListBoxPool.Name = "ListBoxPool";
-            ListBoxPool.Size = new System.Drawing.Size(196, 471);
-            ListBoxPool.Sorted = true;
-            ListBoxPool.TabIndex = 4;
-            ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxPool.DragDrop += ListBoxTab_DragDrop;
-            ListBoxPool.DragOver += ListBoxTab_DragOver;
-            ListBoxPool.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxPool.MouseDown += ListBoxTab_MouseDown;
+            BtnModeDeck.BackColor = System.Drawing.SystemColors.Window;
+            BtnModeDeck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            BtnModeDeck.Location = new System.Drawing.Point(608, 37);
+            BtnModeDeck.Name = "BtnModeDeck";
+            BtnModeDeck.Size = new System.Drawing.Size(151, 26);
+            BtnModeDeck.TabIndex = 2;
+            BtnModeDeck.Text = "Deck Builder";
+            BtnModeDeck.UseVisualStyleBackColor = false;
             // 
-            // ListBoxResources
+            // BtnModeTaxonomy
             // 
-            ListBoxResources.AllowDrop = true;
-            ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxResources.FormattingEnabled = true;
-            ListBoxResources.ItemHeight = 15;
-            ListBoxResources.Location = new System.Drawing.Point(3, 3);
-            ListBoxResources.Name = "ListBoxResources";
-            ListBoxResources.Size = new System.Drawing.Size(196, 471);
-            ListBoxResources.Sorted = true;
-            ListBoxResources.TabIndex = 5;
-            ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxResources.DragDrop += ListBoxTab_DragDrop;
-            ListBoxResources.DragOver += ListBoxTab_DragOver;
-            ListBoxResources.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxResources.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // ListBoxHazards
-            // 
-            ListBoxHazards.AllowDrop = true;
-            ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxHazards.FormattingEnabled = true;
-            ListBoxHazards.ItemHeight = 15;
-            ListBoxHazards.Location = new System.Drawing.Point(3, 3);
-            ListBoxHazards.Name = "ListBoxHazards";
-            ListBoxHazards.Size = new System.Drawing.Size(196, 471);
-            ListBoxHazards.Sorted = true;
-            ListBoxHazards.TabIndex = 6;
-            ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxHazards.DragDrop += ListBoxTab_DragDrop;
-            ListBoxHazards.DragOver += ListBoxTab_DragOver;
-            ListBoxHazards.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxHazards.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // ListBoxSideboard
-            // 
-            ListBoxSideboard.AllowDrop = true;
-            ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxSideboard.FormattingEnabled = true;
-            ListBoxSideboard.ItemHeight = 15;
-            ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
-            ListBoxSideboard.Name = "ListBoxSideboard";
-            ListBoxSideboard.Size = new System.Drawing.Size(196, 471);
-            ListBoxSideboard.Sorted = true;
-            ListBoxSideboard.TabIndex = 7;
-            ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxSideboard.DragDrop += ListBoxTab_DragDrop;
-            ListBoxSideboard.DragOver += ListBoxTab_DragOver;
-            ListBoxSideboard.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxSideboard.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // ListBoxSites
-            // 
-            ListBoxSites.AllowDrop = true;
-            ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxSites.FormattingEnabled = true;
-            ListBoxSites.ItemHeight = 15;
-            ListBoxSites.Location = new System.Drawing.Point(3, 3);
-            ListBoxSites.Name = "ListBoxSites";
-            ListBoxSites.Size = new System.Drawing.Size(196, 471);
-            ListBoxSites.Sorted = true;
-            ListBoxSites.TabIndex = 8;
-            ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxSites.DragDrop += ListBoxTab_DragDrop;
-            ListBoxSites.DragOver += ListBoxTab_DragOver;
-            ListBoxSites.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxSites.MouseDown += ListBoxTab_MouseDown;
+            BtnModeTaxonomy.BackColor = System.Drawing.SystemColors.Control;
+            BtnModeTaxonomy.Font = new System.Drawing.Font("Segoe UI", 9F);
+            BtnModeTaxonomy.Location = new System.Drawing.Point(761, 37);
+            BtnModeTaxonomy.Name = "BtnModeTaxonomy";
+            BtnModeTaxonomy.Size = new System.Drawing.Size(153, 26);
+            BtnModeTaxonomy.TabIndex = 3;
+            BtnModeTaxonomy.Text = "Card Taxonomy";
+            BtnModeTaxonomy.UseVisualStyleBackColor = false;
             // 
             // TabControlDeck
             // 
@@ -7352,13 +8167,13 @@ namespace MECCG_Deck_Builder
             TabControlDeck.Controls.Add(TabPageHazards);
             TabControlDeck.Controls.Add(TabPageSideboard);
             TabControlDeck.Controls.Add(TabPageSites);
-            TabControlDeck.ItemSize = new System.Drawing.Size(41, 20);
-            TabControlDeck.Location = new System.Drawing.Point(706, 37);
+            TabControlDeck.ItemSize = new System.Drawing.Size(58, 20);
+            TabControlDeck.Location = new System.Drawing.Point(608, 66);
             TabControlDeck.Name = "TabControlDeck";
             TabControlDeck.SelectedIndex = 0;
-            TabControlDeck.Size = new System.Drawing.Size(210, 505);
+            TabControlDeck.Size = new System.Drawing.Size(306, 476);
             TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            TabControlDeck.TabIndex = 2;
+            TabControlDeck.TabIndex = 4;
             // 
             // TabPagePool
             // 
@@ -7366,10 +8181,28 @@ namespace MECCG_Deck_Builder
             TabPagePool.Location = new System.Drawing.Point(4, 24);
             TabPagePool.Name = "TabPagePool";
             TabPagePool.Padding = new System.Windows.Forms.Padding(3);
-            TabPagePool.Size = new System.Drawing.Size(202, 477);
+            TabPagePool.Size = new System.Drawing.Size(298, 448);
             TabPagePool.TabIndex = 0;
             TabPagePool.Text = "Pool";
             TabPagePool.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxPool
+            // 
+            ListBoxPool.AllowDrop = true;
+            ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxPool.FormattingEnabled = true;
+            ListBoxPool.IntegralHeight = false;
+            ListBoxPool.ItemHeight = 15;
+            ListBoxPool.Location = new System.Drawing.Point(3, 3);
+            ListBoxPool.Name = "ListBoxPool";
+            ListBoxPool.Size = new System.Drawing.Size(292, 442);
+            ListBoxPool.Sorted = true;
+            ListBoxPool.TabIndex = 0;
+            ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxPool.DragDrop += ListBoxTab_DragDrop;
+            ListBoxPool.DragOver += ListBoxTab_DragOver;
+            ListBoxPool.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxPool.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageResources
             // 
@@ -7377,10 +8210,28 @@ namespace MECCG_Deck_Builder
             TabPageResources.Location = new System.Drawing.Point(4, 24);
             TabPageResources.Name = "TabPageResources";
             TabPageResources.Padding = new System.Windows.Forms.Padding(3);
-            TabPageResources.Size = new System.Drawing.Size(202, 477);
+            TabPageResources.Size = new System.Drawing.Size(298, 448);
             TabPageResources.TabIndex = 1;
             TabPageResources.Text = "Res";
             TabPageResources.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxResources
+            // 
+            ListBoxResources.AllowDrop = true;
+            ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxResources.FormattingEnabled = true;
+            ListBoxResources.IntegralHeight = false;
+            ListBoxResources.ItemHeight = 15;
+            ListBoxResources.Location = new System.Drawing.Point(3, 3);
+            ListBoxResources.Name = "ListBoxResources";
+            ListBoxResources.Size = new System.Drawing.Size(292, 442);
+            ListBoxResources.Sorted = true;
+            ListBoxResources.TabIndex = 0;
+            ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxResources.DragDrop += ListBoxTab_DragDrop;
+            ListBoxResources.DragOver += ListBoxTab_DragOver;
+            ListBoxResources.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxResources.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageHazards
             // 
@@ -7388,10 +8239,28 @@ namespace MECCG_Deck_Builder
             TabPageHazards.Location = new System.Drawing.Point(4, 24);
             TabPageHazards.Name = "TabPageHazards";
             TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
-            TabPageHazards.Size = new System.Drawing.Size(202, 477);
+            TabPageHazards.Size = new System.Drawing.Size(298, 448);
             TabPageHazards.TabIndex = 2;
             TabPageHazards.Text = "Haz";
             TabPageHazards.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxHazards
+            // 
+            ListBoxHazards.AllowDrop = true;
+            ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxHazards.FormattingEnabled = true;
+            ListBoxHazards.IntegralHeight = false;
+            ListBoxHazards.ItemHeight = 15;
+            ListBoxHazards.Location = new System.Drawing.Point(3, 3);
+            ListBoxHazards.Name = "ListBoxHazards";
+            ListBoxHazards.Size = new System.Drawing.Size(292, 442);
+            ListBoxHazards.Sorted = true;
+            ListBoxHazards.TabIndex = 0;
+            ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxHazards.DragDrop += ListBoxTab_DragDrop;
+            ListBoxHazards.DragOver += ListBoxTab_DragOver;
+            ListBoxHazards.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxHazards.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageSideboard
             // 
@@ -7399,10 +8268,28 @@ namespace MECCG_Deck_Builder
             TabPageSideboard.Location = new System.Drawing.Point(4, 24);
             TabPageSideboard.Name = "TabPageSideboard";
             TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSideboard.Size = new System.Drawing.Size(202, 477);
+            TabPageSideboard.Size = new System.Drawing.Size(298, 448);
             TabPageSideboard.TabIndex = 3;
             TabPageSideboard.Text = "Side";
             TabPageSideboard.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxSideboard
+            // 
+            ListBoxSideboard.AllowDrop = true;
+            ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxSideboard.FormattingEnabled = true;
+            ListBoxSideboard.IntegralHeight = false;
+            ListBoxSideboard.ItemHeight = 15;
+            ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
+            ListBoxSideboard.Name = "ListBoxSideboard";
+            ListBoxSideboard.Size = new System.Drawing.Size(292, 442);
+            ListBoxSideboard.Sorted = true;
+            ListBoxSideboard.TabIndex = 0;
+            ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxSideboard.DragDrop += ListBoxTab_DragDrop;
+            ListBoxSideboard.DragOver += ListBoxTab_DragOver;
+            ListBoxSideboard.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxSideboard.MouseDown += ListBoxTab_MouseDown;
             // 
             // TabPageSites
             // 
@@ -7410,10 +8297,146 @@ namespace MECCG_Deck_Builder
             TabPageSites.Location = new System.Drawing.Point(4, 24);
             TabPageSites.Name = "TabPageSites";
             TabPageSites.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSites.Size = new System.Drawing.Size(202, 477);
+            TabPageSites.Size = new System.Drawing.Size(298, 448);
             TabPageSites.TabIndex = 4;
             TabPageSites.Text = "Site";
             TabPageSites.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxSites
+            // 
+            ListBoxSites.AllowDrop = true;
+            ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxSites.FormattingEnabled = true;
+            ListBoxSites.IntegralHeight = false;
+            ListBoxSites.ItemHeight = 15;
+            ListBoxSites.Location = new System.Drawing.Point(3, 3);
+            ListBoxSites.Name = "ListBoxSites";
+            ListBoxSites.Size = new System.Drawing.Size(292, 442);
+            ListBoxSites.Sorted = true;
+            ListBoxSites.TabIndex = 0;
+            ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxSites.DragDrop += ListBoxTab_DragDrop;
+            ListBoxSites.DragOver += ListBoxTab_DragOver;
+            ListBoxSites.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxSites.MouseDown += ListBoxTab_MouseDown;
+            // 
+            // PanelTaxonomy
+            // 
+            PanelTaxonomy.Controls.Add(LblTaxonomyCardTitle);
+            PanelTaxonomy.Controls.Add(RichTextBoxTaxonomy);
+            PanelTaxonomy.Controls.Add(GroupBoxQuickAssign);
+            PanelTaxonomy.Location = new System.Drawing.Point(608, 66);
+            PanelTaxonomy.Name = "PanelTaxonomy";
+            PanelTaxonomy.Size = new System.Drawing.Size(306, 476);
+            PanelTaxonomy.TabIndex = 5;
+            PanelTaxonomy.Visible = false;
+            // 
+            // LblTaxonomyCardTitle
+            // 
+            LblTaxonomyCardTitle.AutoEllipsis = true;
+            LblTaxonomyCardTitle.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            LblTaxonomyCardTitle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            LblTaxonomyCardTitle.ForeColor = System.Drawing.SystemColors.ControlText;
+            LblTaxonomyCardTitle.Location = new System.Drawing.Point(2, 2);
+            LblTaxonomyCardTitle.Name = "LblTaxonomyCardTitle";
+            LblTaxonomyCardTitle.Padding = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            LblTaxonomyCardTitle.Size = new System.Drawing.Size(302, 22);
+            LblTaxonomyCardTitle.TabIndex = 0;
+            LblTaxonomyCardTitle.Text = "(No card selected)";
+            LblTaxonomyCardTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // RichTextBoxTaxonomy
+            // 
+            RichTextBoxTaxonomy.BackColor = System.Drawing.Color.White;
+            RichTextBoxTaxonomy.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            RichTextBoxTaxonomy.Font = new System.Drawing.Font("Consolas", 8.25F);
+            RichTextBoxTaxonomy.Location = new System.Drawing.Point(2, 26);
+            RichTextBoxTaxonomy.Name = "RichTextBoxTaxonomy";
+            RichTextBoxTaxonomy.ReadOnly = true;
+            RichTextBoxTaxonomy.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            RichTextBoxTaxonomy.Size = new System.Drawing.Size(302, 338);
+            RichTextBoxTaxonomy.TabIndex = 1;
+            RichTextBoxTaxonomy.Text = "";
+            RichTextBoxTaxonomy.WordWrap = true;
+            // 
+            // GroupBoxQuickAssign
+            // 
+            GroupBoxQuickAssign.Controls.Add(LblAssignCategory);
+            GroupBoxQuickAssign.Controls.Add(CmbAssignCategory);
+            GroupBoxQuickAssign.Controls.Add(LblAssignTag);
+            GroupBoxQuickAssign.Controls.Add(CmbAssignTag);
+            GroupBoxQuickAssign.Controls.Add(BtnAssignTag);
+            GroupBoxQuickAssign.Controls.Add(BtnRemoveTag);
+            GroupBoxQuickAssign.Controls.Add(BtnAuthorTag);
+            GroupBoxQuickAssign.Location = new System.Drawing.Point(2, 368);
+            GroupBoxQuickAssign.Name = "GroupBoxQuickAssign";
+            GroupBoxQuickAssign.Size = new System.Drawing.Size(302, 106);
+            GroupBoxQuickAssign.TabIndex = 2;
+            GroupBoxQuickAssign.TabStop = false;
+            GroupBoxQuickAssign.Text = "Quick Assign Tag";
+            // 
+            // LblAssignCategory
+            // 
+            LblAssignCategory.Location = new System.Drawing.Point(6, 24);
+            LblAssignCategory.Name = "LblAssignCategory";
+            LblAssignCategory.Size = new System.Drawing.Size(58, 16);
+            LblAssignCategory.TabIndex = 0;
+            LblAssignCategory.Text = "Category:";
+            // 
+            // CmbAssignCategory
+            // 
+            CmbAssignCategory.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            CmbAssignCategory.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            CmbAssignCategory.FormattingEnabled = true;
+            CmbAssignCategory.Location = new System.Drawing.Point(66, 21);
+            CmbAssignCategory.Name = "CmbAssignCategory";
+            CmbAssignCategory.Size = new System.Drawing.Size(228, 23);
+            CmbAssignCategory.TabIndex = 1;
+            // 
+            // LblAssignTag
+            // 
+            LblAssignTag.Location = new System.Drawing.Point(6, 51);
+            LblAssignTag.Name = "LblAssignTag";
+            LblAssignTag.Size = new System.Drawing.Size(58, 16);
+            LblAssignTag.TabIndex = 2;
+            LblAssignTag.Text = "Tag:";
+            // 
+            // CmbAssignTag
+            // 
+            CmbAssignTag.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            CmbAssignTag.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            CmbAssignTag.FormattingEnabled = true;
+            CmbAssignTag.Location = new System.Drawing.Point(66, 48);
+            CmbAssignTag.Name = "CmbAssignTag";
+            CmbAssignTag.Size = new System.Drawing.Size(228, 23);
+            CmbAssignTag.TabIndex = 3;
+            // 
+            // BtnAssignTag
+            // 
+            BtnAssignTag.Location = new System.Drawing.Point(6, 76);
+            BtnAssignTag.Name = "BtnAssignTag";
+            BtnAssignTag.Size = new System.Drawing.Size(92, 24);
+            BtnAssignTag.TabIndex = 4;
+            BtnAssignTag.Text = "+ Assign";
+            BtnAssignTag.UseVisualStyleBackColor = true;
+            // 
+            // BtnRemoveTag
+            // 
+            BtnRemoveTag.Location = new System.Drawing.Point(103, 76);
+            BtnRemoveTag.Name = "BtnRemoveTag";
+            BtnRemoveTag.Size = new System.Drawing.Size(92, 24);
+            BtnRemoveTag.TabIndex = 5;
+            BtnRemoveTag.Text = "- Remove";
+            BtnRemoveTag.UseVisualStyleBackColor = true;
+            // 
+            // BtnAuthorTag
+            // 
+            BtnAuthorTag.Location = new System.Drawing.Point(200, 76);
+            BtnAuthorTag.Name = "BtnAuthorTag";
+            BtnAuthorTag.Size = new System.Drawing.Size(94, 24);
+            BtnAuthorTag.TabIndex = 6;
+            BtnAuthorTag.Text = "New Tag...";
+            BtnAuthorTag.UseVisualStyleBackColor = true;
             // 
             // MenuStrip1
             // 
@@ -7426,7 +8449,7 @@ namespace MECCG_Deck_Builder
             MenuStrip1.Location = new System.Drawing.Point(0, 0);
             MenuStrip1.Name = "MenuStrip1";
             MenuStrip1.Size = new System.Drawing.Size(926, 24);
-            MenuStrip1.TabIndex = 15;
+            MenuStrip1.TabIndex = 6;
             MenuStrip1.Text = "Main Menu";
             // 
             // ToolStripMenuDeck
@@ -7667,7 +8690,7 @@ namespace MECCG_Deck_Builder
             GroupBoxCardAttributes.Location = new System.Drawing.Point(12, 552);
             GroupBoxCardAttributes.Name = "GroupBoxCardAttributes";
             GroupBoxCardAttributes.Size = new System.Drawing.Size(444, 118);
-            GroupBoxCardAttributes.TabIndex = 3;
+            GroupBoxCardAttributes.TabIndex = 7;
             GroupBoxCardAttributes.TabStop = false;
             GroupBoxCardAttributes.Text = "Card Attributes (Official Database)";
             // 
@@ -7766,7 +8789,7 @@ namespace MECCG_Deck_Builder
             GroupBoxCustomTags.Location = new System.Drawing.Point(470, 552);
             GroupBoxCustomTags.Name = "GroupBoxCustomTags";
             GroupBoxCustomTags.Size = new System.Drawing.Size(444, 118);
-            GroupBoxCustomTags.TabIndex = 4;
+            GroupBoxCustomTags.TabIndex = 8;
             GroupBoxCustomTags.TabStop = false;
             GroupBoxCustomTags.Text = "Custom Tags (User Taxonomy)";
             // 
@@ -7859,7 +8882,10 @@ namespace MECCG_Deck_Builder
             ClientSize = new System.Drawing.Size(926, 682);
             Controls.Add(GroupBoxCardAttributes);
             Controls.Add(GroupBoxCustomTags);
+            Controls.Add(BtnModeDeck);
+            Controls.Add(BtnModeTaxonomy);
             Controls.Add(TabControlDeck);
+            Controls.Add(PanelTaxonomy);
             Controls.Add(PictureBoxCardImage);
             Controls.Add(ListBoxMaster);
             Controls.Add(MenuStrip1);
@@ -7875,6 +8901,8 @@ namespace MECCG_Deck_Builder
             TabPageHazards.ResumeLayout(false);
             TabPageSideboard.ResumeLayout(false);
             TabPageSites.ResumeLayout(false);
+            PanelTaxonomy.ResumeLayout(false);
+            GroupBoxQuickAssign.ResumeLayout(false);
             MenuStrip1.ResumeLayout(false);
             MenuStrip1.PerformLayout();
             GroupBoxCardAttributes.ResumeLayout(false);
@@ -7888,20 +8916,35 @@ namespace MECCG_Deck_Builder
 
         private System.Windows.Forms.ListBox ListBoxMaster;
         private System.Windows.Forms.PictureBox PictureBoxCardImage;
-        private System.Windows.Forms.ListBox ListBoxResources;
-        private System.Windows.Forms.ListBox ListBoxHazards;
-        private System.Windows.Forms.ListBox ListBoxSideboard;
-        private System.Windows.Forms.ListBox ListBoxSites;
+        private System.Windows.Forms.Button BtnModeDeck;
+        private System.Windows.Forms.Button BtnModeTaxonomy;
         private System.Windows.Forms.TabControl TabControlDeck;
         private System.Windows.Forms.TabPage TabPagePool;
-        private System.Windows.Forms.TabPage TabPageResources;
-        private System.Windows.Forms.TabPage TabPageHazards;
-        private System.Windows.Forms.TabPage TabPageSideboard;
-        private System.Windows.Forms.TabPage TabPageSites;
-        private System.Windows.Forms.MenuStrip MenuStrip1;
         private System.Windows.Forms.ListBox ListBoxPool;
+        private System.Windows.Forms.TabPage TabPageResources;
+        private System.Windows.Forms.ListBox ListBoxResources;
+        private System.Windows.Forms.TabPage TabPageHazards;
+        private System.Windows.Forms.ListBox ListBoxHazards;
+        private System.Windows.Forms.TabPage TabPageSideboard;
+        private System.Windows.Forms.ListBox ListBoxSideboard;
+        private System.Windows.Forms.TabPage TabPageSites;
+        private System.Windows.Forms.ListBox ListBoxSites;
+
+        // Card Taxonomy Inspector Panel
+        private System.Windows.Forms.Panel PanelTaxonomy;
+        private System.Windows.Forms.Label LblTaxonomyCardTitle;
+        private System.Windows.Forms.RichTextBox RichTextBoxTaxonomy;
+        private System.Windows.Forms.GroupBox GroupBoxQuickAssign;
+        private System.Windows.Forms.Label LblAssignCategory;
+        private System.Windows.Forms.ComboBox CmbAssignCategory;
+        private System.Windows.Forms.Label LblAssignTag;
+        private System.Windows.Forms.ComboBox CmbAssignTag;
+        private System.Windows.Forms.Button BtnAssignTag;
+        private System.Windows.Forms.Button BtnRemoveTag;
+        private System.Windows.Forms.Button BtnAuthorTag;
 
         // Deck Menu
+        private System.Windows.Forms.MenuStrip MenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuDeck;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuNew;
         private System.Windows.Forms.ToolStripMenuItem OpenToolStripMenuItem;
@@ -8642,6 +9685,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | F5 | Global | Re-run last used deck generation rules file (Deck > Re-run Deck Rules) |
 | Ctrl + R | Global | Clear all active filter slots (Taxonomy > Clear All Active Filters) |
 | F1 | Global | Open Help documentation (Help > Help Contents) |
+| Enter | Quick Assign Tag Box | Assign tag(s) to the active card (+ Assign) |
 
 ---
 
@@ -8794,7 +9838,12 @@ namespace MECCG_Deck_Builder
 
             // Row 2: Destination Category
             var lblHCategory = new Label { Text = "Save to Category:", Location = new Point(32, 72), Size = new Size(110, 18) };
-            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(145, 69), Size = new Size(307, 23) };
+            _txtHarvestCategory = new TextBox
+            {
+                Text = settings.LastHarvestCategory ?? "Faction Focus",
+                Location = new Point(145, 69),
+                Size = new Size(307, 23)
+            };
 
             // ==========================================
             // MODE 2: CROSS-CARD ATTRIBUTE LOOKUP
@@ -9031,9 +10080,6 @@ namespace MECCG_Deck_Builder
                 _cmbRelLookupAttr.Items.Add(k);
             }
 
-            int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
-            if (defaultHarvestIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx;
-
             string savedSource = settings.LastRelationalSourceAttr ?? "Home";
             int sourceIdx = _cmbRelSourceAttr.FindStringExact(savedSource);
             _cmbRelSourceAttr.SelectedIndex = sourceIdx >= 0 ? sourceIdx : 0;
@@ -9045,6 +10091,10 @@ namespace MECCG_Deck_Builder
             string savedLookupAttr = settings.LastRelationalLookupAttr ?? "Primary";
             int lookupAttrIdx = _cmbRelLookupAttr.FindStringExact(savedLookupAttr);
             _cmbRelLookupAttr.SelectedIndex = lookupAttrIdx >= 0 ? lookupAttrIdx : 0;
+
+            string savedHarvestAttr = settings.LastHarvestAttribute ?? "Secondary";
+            int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact(savedHarvestAttr);
+            _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx >= 0 ? defaultHarvestIdx : 0;
         }
 
         private void CmbHarvestAttribute_SelectedIndexChanged(object sender, EventArgs e)
@@ -9062,7 +10112,8 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            int defaultIdx = _cmbHarvestValue.FindStringExact("Faction");
+            string savedHarvestVal = UserSettingsService.Current.LastHarvestValue ?? "Faction";
+            int defaultIdx = _cmbHarvestValue.FindStringExact(savedHarvestVal);
             if (defaultIdx >= 0) _cmbHarvestValue.SelectedIndex = defaultIdx;
             else if (_cmbHarvestValue.Items.Count > 0) _cmbHarvestValue.SelectedIndex = 0;
         }
@@ -9115,6 +10166,20 @@ namespace MECCG_Deck_Builder
         private void SaveCurrentSettings()
         {
             var settings = UserSettingsService.Current;
+
+            // Mode 1 Entity Harvest
+            if (_cmbHarvestAttribute.SelectedItem != null)
+            {
+                settings.LastHarvestAttribute = _cmbHarvestAttribute.SelectedItem.ToString();
+            }
+            if (_cmbHarvestValue.SelectedItem != null)
+            {
+                settings.LastHarvestValue = _cmbHarvestValue.SelectedItem.ToString();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtHarvestCategory.Text))
+            {
+                settings.LastHarvestCategory = _txtHarvestCategory.Text.Trim();
+            }
 
             // Mode 3 Quick Regex
             if (!string.IsNullOrWhiteSpace(_txtRegexCategory.Text))
@@ -10243,6 +11308,11 @@ namespace MECCG_Deck_Builder
 
         // Active mode
         public int LastExtractionMode { get; set; } = 1; // 1 = Harvest, 2 = Relational, 3 = Quick Regex, 4 = File
+
+        // Mode 1 Entity Harvest Defaults
+        public string LastHarvestAttribute { get; set; } = "Secondary";
+        public string LastHarvestValue { get; set; } = "Faction";
+        public string LastHarvestCategory { get; set; } = "Faction Focus";
 
         // Mode 2 Relational Defaults
         public string LastRelationalCategory { get; set; } = "Home Region";

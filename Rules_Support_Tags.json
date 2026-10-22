@@ -901,6 +901,7 @@
       "set": "MELE"
     },
     {
+      "Adjacent Sites": "Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-grottos; The Under-vaults; The Wind-deeps",
       "Automatic Attack": "Undead",
       "fullCode": "Ancient Deep-hold [B] (BA)",
       "id": "2007",
@@ -1020,6 +1021,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "Glittering Caves; The Pûkel-deeps; The Under-gates",
       "Automatic Attack": "Undead",
       "fullCode": "The Gem-deeps [H] (DM)",
       "id": "1203",
@@ -1034,6 +1036,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Glittering Caves; The Pûkel-deeps; The Under-gates",
       "Automatic Attack": "Undead",
       "fullCode": "The Gem-deeps [B] (BA)",
       "id": "2017",
@@ -1041,6 +1044,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "Mount Gram; The Iron-deeps; The Under-leas",
       "Automatic Attack": "Undead",
       "fullCode": "The Under-vaults [H] (DM)",
       "id": "1212",
@@ -1048,6 +1052,7 @@
       "set": "MEDM"
     },
     {
+      "Adjacent Sites": "Mount Gram; The Iron-deeps; The Under-leas; The Drowning-deeps",
       "Automatic Attack": "Undead",
       "fullCode": "The Under-vaults [B] (BA)",
       "id": "2027",
@@ -1279,6 +1284,7 @@
       "set": "MELE"
     },
     {
+      "Adjacent Sites": "Dunharrow; The Gem-deeps; The Sulfur-deeps",
       "Automatic Attack": "Pûkel-creatures",
       "fullCode": "The Pûkel-deeps [H] (DM)",
       "id": "1205",
@@ -1538,6 +1544,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Sites": "Goblin-gate; The Under-leas; The Under-gates",
       "Automatic Attack": "Orcs",
       "fullCode": "The Under-grottos [H] (DM)",
       "id": "1210",
@@ -1545,6 +1552,7 @@
       "set": "MEDM"
     },
     {
+      "Adjacent Sites": "Goblin-gate; The Under-leas; The Under-gates",
       "Automatic Attack": "Orcs",
       "fullCode": "The Under-grottos [B] (BA)",
       "id": "2025",
@@ -1566,6 +1574,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Mount Gundabad; The Wind-deeps; The Iron-deeps; The Under-grottos; The Under-gates; The Under-vaults",
       "Automatic Attack": "Orcs",
       "fullCode": "The Under-leas [H] (DM)",
       "id": "1211",
@@ -1573,6 +1582,7 @@
       "set": "MEDM"
     },
     {
+      "Adjacent Sites": "Mount Gundabad; The Wind-deeps; The Iron-deeps; The Under-grottos; The Under-gates; The Under-vaults",
       "Automatic Attack": "Orcs",
       "fullCode": "The Under-leas [B] (BA)",
       "id": "2026",
@@ -1594,6 +1604,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Sites": "The Wind Throne; The Under-leas; The Rusted-deeps",
       "Automatic Attack": "Orcs",
       "fullCode": "The Wind-deeps [B] (BA)",
       "id": "2028",
@@ -1636,6 +1647,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Sites": "Carn Dûm; The Under-leas; The Under-vaults",
       "Automatic Attack": "Trolls",
       "fullCode": "The Iron-deeps [B] (BA)",
       "id": "2018",
@@ -1650,6 +1662,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Carn Dûm; The Under-leas; The Under-vaults",
       "Automatic Attack": "Trolls",
       "fullCode": "The Iron-deeps [H] (DM)",
       "id": "1204",
@@ -1664,6 +1677,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Dol Guldur; The Under-gates; The Pûkel-deeps; The Under-galleries; The Under-courts",
       "Automatic Attack": "Trolls",
       "fullCode": "The Sulfur-deeps [B] (BA)",
       "id": "2021",
@@ -1671,6 +1685,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "Dol Guldur; The Under-gates; The Pûkel-deeps; The Under-galleries; The Under-courts",
       "Automatic Attack": "Trolls",
       "fullCode": "The Sulfur-deeps [H] (DM)",
       "id": "1206",
@@ -1685,6 +1700,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Barad-dûr; The Under-galleries; The Sulfur-deeps",
       "Automatic Attack": "Trolls",
       "fullCode": "The Under-courts [B] (BA)",
       "id": "2022",
@@ -1692,6 +1708,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "Barad-dûr; The Under-galleries; The Sulfur-deeps",
       "Automatic Attack": "Trolls",
       "fullCode": "The Under-courts [H] (DM)",
       "id": "1207",
@@ -1706,6 +1723,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Cirith Gorgor; The Under-courts; The Sulfur-deeps",
       "Automatic Attack": "Trolls",
       "fullCode": "The Under-galleries [H] (DM)",
       "id": "1208",
@@ -1713,6 +1731,7 @@
       "set": "MEDM"
     },
     {
+      "Adjacent Sites": "Cirith Gorgor; The Under-courts; The Sulfur-deeps",
       "Automatic Attack": "Trolls",
       "fullCode": "The Under-galleries [B] (BA)",
       "id": "2023",
@@ -1860,6 +1879,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Sites": "Dunharrow; The Gem-deeps; The Sulfur-deeps",
       "Automatic Attack": "Pûkel-creatures",
       "fullCode": "The Pûkel-deeps [B] (BA)",
       "id": "2019",
@@ -1881,6 +1901,7 @@
       "set": "MELE"
     },
     {
+      "Adjacent Sites": "The Drowning-deeps",
       "Automatic Attack": "Drake",
       "fullCode": "Remains of Thangorodrim [B] (BA)",
       "id": "2015",
@@ -1888,6 +1909,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "Blue Mountain Dwarf-hold; The Under-vaults; Remains of Thangorodrim",
       "Automatic Attack": "Drake",
       "fullCode": "The Drowning-deeps [B] (BA)",
       "id": "2016",
@@ -1895,6 +1917,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "Iron Hill Dwarf-hold; The Wind-deeps",
       "Automatic Attack": "Drake",
       "fullCode": "The Rusted-deeps [B] (BA)",
       "id": "2020",
@@ -1923,6 +1946,7 @@
       "set": "MEAS"
     },
     {
+      "Adjacent Sites": "Moria; The Gem-deeps; The Sulfur-deeps; The Under-grottos; The Under-leas",
       "Automatic Attack": "Balrog",
       "fullCode": "The Under-gates [H] (DM)",
       "id": "1209",
@@ -2690,9 +2714,61 @@
       "id": "1802",
       "name": "Wellinghall",
       "set": "MEAS"
+    },
+    {
+      "Adjacent Sites": "Moria; The Gem-deeps; The Sulfur-deeps; The Under-grottos; The Under-leas",
+      "fullCode": "The Under-gates [B] (BA)",
+      "id": "2024",
+      "name": "The Under-gates",
+      "set": "MEBA"
     }
   ],
   "Filters": [
+    [
+      "Adjacent Sites",
+      "Barad-dûr",
+      "Barad-dûr; The Under-galleries; The Sulfur-deeps",
+      "Blue Mountain Dwarf-hold",
+      "Blue Mountain Dwarf-hold; The Under-vaults; Remains of Thangorodrim",
+      "Carn Dûm",
+      "Carn Dûm; The Under-leas; The Under-vaults",
+      "Cirith Gorgor",
+      "Cirith Gorgor; The Under-courts; The Sulfur-deeps",
+      "Dol Guldur",
+      "Dol Guldur; The Under-gates; The Pûkel-deeps; The Under-galleries; The Under-courts",
+      "Dunharrow",
+      "Dunharrow; The Gem-deeps; The Sulfur-deeps",
+      "Glittering Caves",
+      "Glittering Caves; The Pûkel-deeps; The Under-gates",
+      "Goblin-gate",
+      "Goblin-gate; The Under-leas; The Under-gates",
+      "Iron Hill Dwarf-hold",
+      "Iron Hill Dwarf-hold; The Wind-deeps",
+      "Moria",
+      "Moria; The Gem-deeps; The Sulfur-deeps; The Under-grottos; The Under-leas",
+      "Mount Gram",
+      "Mount Gram; The Iron-deeps; The Under-leas",
+      "Mount Gram; The Iron-deeps; The Under-leas; The Drowning-deeps",
+      "Mount Gundabad",
+      "Mount Gundabad; The Wind-deeps; The Iron-deeps; The Under-grottos; The Under-gates; The Under-vaults",
+      "Remains of Thangorodrim",
+      "Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-grottos; The Under-vaults; The Wind-deeps",
+      "The Drowning-deeps",
+      "The Gem-deeps",
+      "The Iron-deeps",
+      "The Pûkel-deeps",
+      "The Rusted-deeps",
+      "The Sulfur-deeps",
+      "The Under-courts",
+      "The Under-galleries",
+      "The Under-gates",
+      "The Under-grottos",
+      "The Under-leas",
+      "The Under-vaults",
+      "The Wind Throne",
+      "The Wind Throne; The Under-leas; The Rusted-deeps",
+      "The Wind-deeps"
+    ],
     [
       "Automatic Attack",
       "Animals",

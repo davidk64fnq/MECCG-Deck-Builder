@@ -484,38 +484,49 @@ namespace MECCG_Deck_Builder
             // --- 1. OFFICIAL ATTRIBUTES ---
             AppendHeader("=== OFFICIAL ATTRIBUTES ===" + Environment.NewLine);
 
+            // Suppress legacy placeholder Secondary when it merely duplicates Primary (e.g., site/Site, region/Region)
+            string displaySecondary = string.Equals(card.Primary, card.Secondary, StringComparison.OrdinalIgnoreCase)
+                ? string.Empty
+                : card.Secondary;
+
+            // Suppress composite unparsed Playable string for official published sets to save vertical space;
+            // preserve it for Dreamcards that may use custom text strings.
+            string displayPlayable = card.Dreamcard
+                ? card.Playable
+                : string.Empty;
+
             var attrPairs = new List<(string Key, string Value)>
-            {
-                ("Primary", card.Primary),
-                ("Secondary", card.Secondary),
-                ("Alignment", card.Alignment),
-                ("Race", card.Race),
-                ("Subrace", card.Subrace),
-                ("Skill", card.Skill),
-                ("Mind", card.Mind),
-                ("Direct", card.Direct),
-                ("Prowess", card.Prowess),
-                ("Body", card.Body),
-                ("Corruption", card.Corruption),
-                ("Strikes", card.Strikes),
-                ("Home", card.Home),
-                ("Site", card.Site),
-                ("Region", card.Region),
-                ("Haven", card.Haven),
-                ("MPs", card.MPs),
-                ("Unique", card.Unique),
-                ("Playable", card.Playable),
-                ("GoldRing", card.GoldRing),
-                ("GreaterItem", card.GreaterItem),
-                ("MajorItem", card.MajorItem),
-                ("MinorItem", card.MinorItem),
-                ("Information", card.Information),
-                ("Palantiri", card.Palantiri),
-                ("Scroll", card.Scroll),
-                ("Hoard", card.Hoard),
-                ("Specific", card.Specific),
-                ("Artist", card.Artist)
-            };
+    {
+        ("Primary", card.Primary),
+        ("Secondary", displaySecondary),
+        ("Alignment", card.Alignment),
+        ("Race", card.Race),
+        ("Subrace", card.Subrace),
+        ("Skill", card.Skill),
+        ("Mind", card.Mind),
+        ("Direct", card.Direct),
+        ("Prowess", card.Prowess),
+        ("Body", card.Body),
+        ("Corruption", card.Corruption),
+        ("Strikes", card.Strikes),
+        ("Home", card.Home),
+        ("Site", card.Site),
+        ("Region", card.Region),
+        ("Haven", card.Haven),
+        ("MPs", card.MPs),
+        ("Unique", card.Unique),
+        ("Playable", displayPlayable),
+        ("GoldRing", card.GoldRing),
+        ("GreaterItem", card.GreaterItem),
+        ("MajorItem", card.MajorItem),
+        ("MinorItem", card.MinorItem),
+        ("Information", card.Information),
+        ("Palantiri", card.Palantiri),
+        ("Scroll", card.Scroll),
+        ("Hoard", card.Hoard),
+        ("Specific", card.Specific),
+        ("Artist", card.Artist)
+    };
 
             var nonBlankAttrs = attrPairs.Where(p => !string.IsNullOrWhiteSpace(p.Value)).ToList();
             if (nonBlankAttrs.Count > 0)

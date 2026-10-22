@@ -218,8 +218,15 @@
         </tr>
         <tr>
             <td><code>Playable</code></td>
-            <td>Summary item playability field on site cards detailing what items or special cards may be stored or played there.</td>
-            <td>Summary strings (e.g. <code>Minor</code>, <code>Major</code>, <code>Greater</code>, <code>Gold Ring</code>).</td>
+            <td>
+                Legacy composite summary string imported directly from Cardnum detailing what items, information, or special objects can be played or stored at the site.<br />
+                <em>Why strings run together:</em> Cardnum compiled this field from early text spoiler lists without punctuation between categories (e.g. physical cards print <em>"Information, Items (minor)"</em>, but the database stored <code>"Information Items (minor)"</code>). Because it is treated as an unparsed string, every combination appears as a distinct dropdown entry.<br />
+                <em>Recommended Query Practice:</em> Avoid filtering by this composite field. Use Cardnum's dedicated discrete flag attributes instead: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code> (filtering for <code>yes</code>).
+            </td>
+            <td>
+                Raw composite strings (e.g., <code>Information Items (minor)</code>, <code>Items (minor, major, gold ring)</code>, <code>Scroll of Isildur Items (minor, major)</code>).<br />
+                <em>Use discrete item attributes for searches and deck rules.</em>
+            </td>
         </tr>
         <tr>
             <td><code>Prowess</code></td>
@@ -317,6 +324,15 @@
         <li>
             <strong>Shorthand Codes:</strong>
             Site cards occasionally feature legacy shorthand classifications, such as <code>B</code> (Border-hold), <code>B F</code> (Border-hold/Free-hold), or <code>Wizardhaven</code> (Fallen-wizard havens from <em>The White Hand</em>).
+        </li>
+        <li>
+            <strong>Composite <code>Playable</code> Strings vs. Discrete Item Flags:</strong>
+            On physical site cards, playable entries are comma-separated (e.g., <em>"Playable: Information, Items (minor)"</em>). In Cardnum's raw database (<code>cards-dc.json</code>), category commas were omitted, resulting in run-on strings like <code>"Information Items (minor)"</code> or <code>"Scroll of Isildur Palantiri Items (minor, major)"</code>.
+            <ul>
+                <li>Because the application indexes official attributes directly, each unique permutation appears as a single dropdown item in Filter Slots 1 &amp; 2.</li>
+                <li>Cardnum already decomposed all playability criteria into individual boolean flag attributes: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code>.</li>
+                <li>For procedural deck rules and filter searches, query the specific attribute (e.g., <code>"MinorItem": "yes"</code> or <code>"Information": "yes"</code>) rather than matching against the composite <code>Playable</code> string.</li>
+            </ul>
         </li>
     </ul>
 

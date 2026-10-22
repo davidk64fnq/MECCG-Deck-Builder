@@ -90,4 +90,22 @@
   - [x] Issue #29: Realine Help System and Documentation with Modernized Menu Bar Architecture, Symmetrical Rule Categories, and Clean Terminology
   - [ ] Issue #30: Configurable Card Distribution Strategies in Procedural Deck Rules (`Distribution: Variety | Focused | Uniform`)
   - [x] Issue #31: Dual-Mode Right Pane with Card Taxonomy Inspector, Monospace Metadata Readout, and Pinned Quick-Assign Bar
+  - [x] Issue #32: Procedural Rule Wildcards (* / All), Faction Influence Alignment, and Lossadan Cairn Attribute Correction
 - [ ] **v1.0.0 - First Public Release**
+
+## Clean-Slate Schema Enrichment Pipeline
+
+To eliminate the inconsistencies, historical quirks, and unstructured text burdens of the legacy Cardnum dataset, we adopt a phased, clean-slate schema redesign:
+
+1. **Card Type Slicing:** Process cards partition-by-partition based on `Primary` card type (e.g., `Site`, `Character`, `Resource`, `Hazard`).
+2. **Catalog & Text Ingestion:** 
+   - Export minimal reference data from the app (`Card Name`, `Set`, `Card Text`).
+   - Pair with the raw `cards-dc.json` entries to cross-reference existing attributes.
+3. **Deck-Builder-First Schema Engineering:** 
+   - Extract gameplay rules into structured, unambiguous attributes (e.g., parsing composite automatic attacks, movement path structures, recruitment hooks, and conditional item restrictions).
+   - Normalize polarity (e.g., CP burden vs check resistance) and eliminate legacy shorthand codes.
+4. **Intermediate JSON Output:** Deliver an enriched, strongly-typed JSON dataset for the slice (e.g., `sites_enriched.json`).
+5. **CSV Pipeline Review:**
+   - Convert the enriched JSON into CSV.
+   - Import into MECCG Deck Builder via `Taxonomy > Import Taxonomy (CSV)...` to inspect and review the taxonomy live in the UI and filter slots.
+6. **Unified Master Schema Consolidation:** Once all partitions are finalized, consolidate the schemas into a unified local master catalog (`cards-dc.json` / `Card.cs`).

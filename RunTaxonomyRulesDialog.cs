@@ -108,7 +108,12 @@ namespace MECCG_Deck_Builder
 
             // Row 2: Destination Category
             var lblHCategory = new Label { Text = "Save to Category:", Location = new Point(32, 72), Size = new Size(110, 18) };
-            _txtHarvestCategory = new TextBox { Text = "Faction Focus", Location = new Point(145, 69), Size = new Size(307, 23) };
+            _txtHarvestCategory = new TextBox
+            {
+                Text = settings.LastHarvestCategory ?? "Faction Focus",
+                Location = new Point(145, 69),
+                Size = new Size(307, 23)
+            };
 
             // ==========================================
             // MODE 2: CROSS-CARD ATTRIBUTE LOOKUP
@@ -345,9 +350,6 @@ namespace MECCG_Deck_Builder
                 _cmbRelLookupAttr.Items.Add(k);
             }
 
-            int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact("Secondary");
-            if (defaultHarvestIdx >= 0) _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx;
-
             string savedSource = settings.LastRelationalSourceAttr ?? "Home";
             int sourceIdx = _cmbRelSourceAttr.FindStringExact(savedSource);
             _cmbRelSourceAttr.SelectedIndex = sourceIdx >= 0 ? sourceIdx : 0;
@@ -359,6 +361,10 @@ namespace MECCG_Deck_Builder
             string savedLookupAttr = settings.LastRelationalLookupAttr ?? "Primary";
             int lookupAttrIdx = _cmbRelLookupAttr.FindStringExact(savedLookupAttr);
             _cmbRelLookupAttr.SelectedIndex = lookupAttrIdx >= 0 ? lookupAttrIdx : 0;
+
+            string savedHarvestAttr = settings.LastHarvestAttribute ?? "Secondary";
+            int defaultHarvestIdx = _cmbHarvestAttribute.FindStringExact(savedHarvestAttr);
+            _cmbHarvestAttribute.SelectedIndex = defaultHarvestIdx >= 0 ? defaultHarvestIdx : 0;
         }
 
         private void CmbHarvestAttribute_SelectedIndexChanged(object sender, EventArgs e)
@@ -376,7 +382,8 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            int defaultIdx = _cmbHarvestValue.FindStringExact("Faction");
+            string savedHarvestVal = UserSettingsService.Current.LastHarvestValue ?? "Faction";
+            int defaultIdx = _cmbHarvestValue.FindStringExact(savedHarvestVal);
             if (defaultIdx >= 0) _cmbHarvestValue.SelectedIndex = defaultIdx;
             else if (_cmbHarvestValue.Items.Count > 0) _cmbHarvestValue.SelectedIndex = 0;
         }
@@ -429,6 +436,20 @@ namespace MECCG_Deck_Builder
         private void SaveCurrentSettings()
         {
             var settings = UserSettingsService.Current;
+
+            // Mode 1 Entity Harvest
+            if (_cmbHarvestAttribute.SelectedItem != null)
+            {
+                settings.LastHarvestAttribute = _cmbHarvestAttribute.SelectedItem.ToString();
+            }
+            if (_cmbHarvestValue.SelectedItem != null)
+            {
+                settings.LastHarvestValue = _cmbHarvestValue.SelectedItem.ToString();
+            }
+            if (!string.IsNullOrWhiteSpace(_txtHarvestCategory.Text))
+            {
+                settings.LastHarvestCategory = _txtHarvestCategory.Text.Trim();
+            }
 
             // Mode 3 Quick Regex
             if (!string.IsNullOrWhiteSpace(_txtRegexCategory.Text))
