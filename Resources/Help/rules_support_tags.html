@@ -71,59 +71,12 @@
         <tr>
             <td><code>Combat Bonus</code></td>
             <td>
-                Flags cards providing direct prowess, strike cancellation, or tactical combat bonuses against specific creature species or to company members in combat.
+                Flags cards providing direct prowess and/or opponent body reduction against specific creature species.
             </td>
             <td>
                 <ul>
-                    <li>Rangers/Warriors with bonuses vs. Orcs &rarr; <code>Orc</code></li>
+                    <li>Dwarves with bonuses vs. Orcs &rarr; <code>Orcs</code></li>
                     <li>Nazg&ucirc;l hunters &rarr; <code>Nazg&ucirc;l</code></li>
-                    <li>General company prowess boosters &rarr; <code>All</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Combat Mechanics</code></td>
-            <td>
-                Identifies special combat manipulation capabilities, specifically attack cancellations, strike avoidance, and combat evasion events.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Fog</em>, <em>Vanishment</em>, <em>Old Road</em> &rarr; <code>Cancellation</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Corruption Bonus</code></td>
-            <td>
-                Identifies characters, items, or permanent conditions that confer corruption resistance bonuses or roll adjustments protecting the bearer.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters with inherent corruption resistance bonuses &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Corruption Penalty</code></td>
-            <td>
-                Marks characters or conditions bearing an inherent drawback or penalty on their own corruption checks (vulnerable or burdened characters).
-            </td>
-            <td>
-                <ul>
-                    <li>Characters with self-inflicted corruption check penalties &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Direct Influence Bonus</code></td>
-            <td>
-                Identifies characters who receive bonus Direct Influence (DI) when controlling specific named followers or characters of a particular race.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Galadriel</em> &rarr; <code>Galadriel; Elf</code> (+DI controlling Celeborn or Elves)</li>
-                    <li><em>Aragorn II</em> &rarr; <code>Aragorn II</code> (+DI controlling D&uacute;nedain/followers)</li>
-                    <li>Dwarf company leaders &rarr; <code>Dwarf</code></li>
                 </ul>
             </td>
         </tr>
@@ -145,29 +98,6 @@
             </td>
         </tr>
         <tr>
-            <td><code>Faction Penalty</code></td>
-            <td>
-                Marks characters who suffer influence penalties or recruitment restrictions when attempting to recruit factions.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters who cannot influence or suffer -DI penalties against factions &rarr; <code>All</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Hand Mechanics</code></td>
-            <td>
-                Identifies cards that increase maximum hand size or permit retrieving cards (such as spells or events) directly from the discard pile or play deck.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Tom Bombadil</em>, <em>Promptings of Wisdom</em> &rarr; <code>Hand Size Bonus</code></li>
-                    <li><em>Gandalf</em>, <em>Voices of Malice</em> &rarr; <code>Spell Retrieval</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
             <td><code>Home Region</code></td>
             <td>
                 Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies (e.g. Eriador, Gondor, Rohan companies) or calculate movement routes.
@@ -183,50 +113,6 @@
             </td>
         </tr>
         <tr>
-            <td><code>Home Site Penalty</code></td>
-            <td>
-                Marks characters who suffer gameplay drawbacks, stat reductions, or limitations while at (or away from) their designated home site.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters with localized home penalties &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Marshalling Points Penalty</code></td>
-            <td>
-                Marks liability cards that surrender Marshalling Points (MPs) to the opponent or impose negative victory points if defeated, tapped, or corrupted.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters/items that concede negative MP burdens upon defeat &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Palant&iacute;r Mechanics</code></td>
-            <td>
-                Identifies characters or cards specifically capable of using, tapping, or gaining bonuses from Palant&iacute;ri without standard drawbacks.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Saruman</em>, <em>Denethor II</em> &rarr; <code>Use Palant&iacute;r</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Region Bonus</code></td>
-            <td>
-                Tags cards granting movement advantages, hazard cancellations, or combat bonuses when traveling through or stationed in specific region terrain types.
-            </td>
-            <td>
-                <ul>
-                    <li>Mariners and coastal travelers &rarr; <code>Coastal Sea</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
             <td><code>Resolved Site</code></td>
             <td>
                 Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).<br /><br />
@@ -237,17 +123,6 @@
                     <li><em>Doeth</em>, <em>Durthak</em> (card text <em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
                     <li><em>Gandalf</em> (card text <em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
                     <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Ring Mechanics</code></td>
-            <td>
-                Identifies characters, items, or events with dedicated mechanics for testing Gold Rings, searching for the One Ring, or modifying ring test dice rolls.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Gandalf</em>, <em>Saruman</em>, <em>Gollum</em> &rarr; <code>Test Ring</code></li>
                 </ul>
             </td>
         </tr>

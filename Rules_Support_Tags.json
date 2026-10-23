@@ -13,7 +13,6 @@
       "fullCode": "Aragorn II (TW)",
       "Home Region": "Arthedain",
       "id": "4",
-      "Marshalling Points Penalty": "Self",
       "name": "Aragorn II",
       "set": "METW"
     },
@@ -42,7 +41,6 @@
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
       "Faction Bonus": "Men of Anórien",
       "fullCode": "Boromir II (TW)",
       "Home Region": "Anórien",
@@ -51,15 +49,11 @@
       "set": "METW"
     },
     {
-      "Combat Mechanics": "Cancellation",
       "Faction Bonus": "Elves of Lindon",
       "fullCode": "Círdan (TW)",
-      "Hand Mechanics": "Hand Size Bonus",
       "Home Region": "Lindon",
       "id": "20",
-      "Marshalling Points Penalty": "Self",
       "name": "Círdan",
-      "Region Bonus": "Coastal Sea",
       "set": "METW"
     },
     {
@@ -113,7 +107,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Direct Influence Bonus": "Elf",
       "Faction Bonus": "Iron Hill Dwarves; Elf; Iron Hill Dwarves; Elf",
       "fullCode": "Gimli (TW)",
       "Home Region": "Iron Hills",
@@ -123,7 +116,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Direct Influence Bonus": "Dwarf",
       "Faction Bonus": "Blue Mountain Dwarves; Dwarf; Blue Mountain Dwarves; Dwarf",
       "fullCode": "Glóin (TW)",
       "Home Region": "Númeriador",
@@ -173,7 +165,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Direct Influence Bonus": "Dwarf",
       "Faction Bonus": "Blue Mountain Dwarves; Dwarf; Blue Mountain Dwarves; Dwarf",
       "fullCode": "Thorin II (TW)",
       "Home Region": "Númeriador",
@@ -231,7 +222,6 @@
       "set": "METW"
     },
     {
-      "Direct Influence Bonus": "Aragorn II",
       "fullCode": "Arwen (TW)",
       "Home Region": "Rhudaur",
       "id": "6",
@@ -240,7 +230,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Direct Influence Bonus": "Dwarf",
       "Faction Bonus": "Dwarf",
       "fullCode": "Balin [H] (TW)",
       "Home Region": "Númeriador",
@@ -249,8 +238,6 @@
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Barliman Butterbur (TW)",
       "Home Region": "Arthedain",
       "id": "9",
@@ -258,8 +245,6 @@
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Beregond (TW)",
       "Home Region": "Anórien",
       "id": "11",
@@ -268,8 +253,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Bifur (TW)",
       "Home Region": "Númeriador",
       "id": "14",
@@ -277,19 +260,14 @@
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Bilbo (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "15",
-      "Marshalling Points Penalty": "Self",
       "name": "Bilbo",
       "set": "METW"
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Bofur (TW)",
       "Home Region": "Númeriador",
       "id": "16",
@@ -298,8 +276,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Bombur (TW)",
       "Home Region": "Númeriador",
       "id": "17",
@@ -307,7 +283,6 @@
       "set": "METW"
     },
     {
-      "Direct Influence Bonus": "Galadriel",
       "fullCode": "Celeborn (TW)",
       "Home Region": "Wold & Foothills",
       "id": "19",
@@ -316,8 +291,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Dori (TW)",
       "Home Region": "Númeriador",
       "id": "24",
@@ -326,8 +299,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Dwalin (TW)",
       "Home Region": "Númeriador",
       "id": "25",
@@ -352,34 +323,26 @@
     },
     {
       "fullCode": "Elrond (TW)",
-      "Hand Mechanics": "Hand Size Bonus",
       "Home Region": "Rhudaur",
       "id": "28",
-      "Marshalling Points Penalty": "Self",
       "name": "Elrond",
       "set": "METW"
     },
     {
       "fullCode": "Alatar [H] (TW)",
-      "Hand Mechanics": "Hand Size Bonus",
       "Home Region": "Anfalas",
       "id": "1",
       "name": "Alatar",
       "set": "METW"
     },
     {
-      "Combat Mechanics": "Cancellation",
-      "Corruption Bonus": "Self",
       "fullCode": "Fatty Bolger (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "33",
       "name": "Fatty Bolger",
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Forlong (TW)",
       "Home Region": "Anórien",
       "id": "35",
@@ -387,19 +350,14 @@
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Frodo (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "36",
-      "Marshalling Points Penalty": "Self",
       "name": "Frodo",
       "set": "METW"
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Fíli (TW)",
       "Home Region": "Númeriador",
       "id": "34",
@@ -408,21 +366,17 @@
     },
     {
       "fullCode": "Galadriel (TW)",
-      "Hand Mechanics": "Hand Size Bonus",
       "Home Region": "Wold & Foothills",
       "id": "37",
-      "Marshalling Points Penalty": "Self",
       "name": "Galadriel",
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Gandalf [H] (TW)",
       "Home Region": "Anfalas; Lindon; Wold & Foothills; Rhudaur; Anfalas; Lindon; Wold & Foothills; Rhudaur",
       "id": "40",
       "name": "Gandalf",
       "Resolved Site": "Edhellond; Grey Havens; Lórien; Rivendell; Edhellond; Grey Havens; Lórien; Rivendell",
-      "Ring Mechanics": "Test Ring",
       "set": "METW"
     },
     {
@@ -442,7 +396,6 @@
       "set": "METW"
     },
     {
-      "Direct Influence Bonus": "Elf",
       "fullCode": "Glorfindel II (TW)",
       "Home Region": "Rhudaur",
       "id": "45",
@@ -450,8 +403,6 @@
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Haldir (TW)",
       "Home Region": "Wold & Foothills",
       "id": "48",
@@ -459,8 +410,6 @@
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Háma (TW)",
       "Home Region": "Rohan",
       "id": "49",
@@ -469,8 +418,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Kíli (TW)",
       "Home Region": "Númeriador",
       "id": "51",
@@ -478,18 +425,14 @@
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Merry (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "54",
       "name": "Merry",
       "set": "METW"
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Nori (TW)",
       "Home Region": "Númeriador",
       "id": "55",
@@ -498,8 +441,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Ori (TW)",
       "Home Region": "Númeriador",
       "id": "57",
@@ -507,8 +448,6 @@
       "set": "METW"
     },
     {
-      "Corruption Penalty": "Self",
-      "Faction Penalty": "All",
       "fullCode": "Orophin (TW)",
       "Home Region": "Wold & Foothills",
       "id": "58",
@@ -517,7 +456,6 @@
     },
     {
       "fullCode": "Pallando [H] (TW)",
-      "Hand Mechanics": "Hand Size Bonus",
       "Home Region": "Lindon",
       "id": "59",
       "name": "Pallando",
@@ -533,48 +471,38 @@
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Pippin (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "61",
       "name": "Pippin",
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Radagast [H] (TW)",
-      "Hand Mechanics": "Hand Size Bonus",
       "Home Region": "Southern Mirkwood",
       "id": "62",
       "name": "Radagast",
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Robin Smallburrow (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "63",
       "name": "Robin Smallburrow",
       "set": "METW"
     },
     {
-      "Corruption Bonus": "Self",
       "fullCode": "Sam Gamgee (TW)",
       "Home Region": "The Shire",
-      "Home Site Penalty": "Self",
       "id": "64",
       "name": "Sam Gamgee",
       "set": "METW"
     },
     {
       "fullCode": "Saruman [H] (TW)",
-      "Hand Mechanics": "Spell Retrieval",
       "Home Region": "Gap of Isen",
       "id": "65",
       "name": "Saruman",
-      "Palantír Mechanics": "Use Palantír",
       "set": "METW"
     },
     {
@@ -596,7 +524,6 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Corruption Penalty": "Self",
       "fullCode": "Óin (TW)",
       "Home Region": "Númeriador",
       "id": "56",
@@ -757,7 +684,6 @@
       "id": "1806",
       "name": "Gandalf",
       "Resolved Site": "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall; Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall; Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
-      "Ring Mechanics": "Test Ring",
       "set": "MEWH"
     },
     {
@@ -2797,25 +2723,6 @@
       "Orcs"
     ],
     [
-      "Combat Mechanics",
-      "Cancellation"
-    ],
-    [
-      "Corruption Bonus",
-      "Self"
-    ],
-    [
-      "Corruption Penalty",
-      "Self"
-    ],
-    [
-      "Direct Influence Bonus",
-      "Aragorn II",
-      "Dwarf",
-      "Elf",
-      "Galadriel"
-    ],
-    [
       "Faction Bonus",
       "All",
       "Beornings",
@@ -2846,15 +2753,6 @@
       "Wood-elves",
       "Woodmen",
       "Wose"
-    ],
-    [
-      "Faction Penalty",
-      "All"
-    ],
-    [
-      "Hand Mechanics",
-      "Hand Size Bonus",
-      "Spell Retrieval"
     ],
     [
       "Home Region",
@@ -2909,22 +2807,6 @@
       "Woodland Realm"
     ],
     [
-      "Home Site Penalty",
-      "Self"
-    ],
-    [
-      "Marshalling Points Penalty",
-      "Self"
-    ],
-    [
-      "Palantír Mechanics",
-      "Use Palantír"
-    ],
-    [
-      "Region Bonus",
-      "Coastal Sea"
-    ],
-    [
       "Resolved Site",
       "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
       "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
@@ -2937,10 +2819,6 @@
       "Edhellond; Grey Havens; Lórien; Rivendell",
       "Tharbad",
       "Variag Camp"
-    ],
-    [
-      "Ring Mechanics",
-      "Test Ring"
     ]
   ]
 }

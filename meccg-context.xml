@@ -197,8 +197,8 @@ namespace MECCG_Deck_Builder.Properties {
             </td>
             <td>
                 <code>1</code>, <code>2</code>, <code>3</code> (Item/Hazard CP burden)<br />
-                <code>-2</code>, <code>-4</code> (Character resistance, e.g. Hobbits, Frodo)<br />
-                <code>(1)</code>, <code>(-2)</code> (Conditional/event modifiers)
+                <code>-1</code>, <code>-2</code>, <code>-3</code> and <code>-4</code> (Character resistance, e.g. Hobbits, Short-event e.g. New Friendship)<br />
+                <code>1(2)</code>, <code>2(3)</code> (Conditional/event modifiers)
             </td>
         </tr>
         <tr>
@@ -615,7 +615,7 @@ namespace MECCG_Deck_Builder.Properties {
 
     <h2>Core Generation Mechanics</h2>
     <ul>
-        <li><strong>Unified Attribute &amp; Tag Querying:</strong> Rules can combine any official card attributes (<code>Attributes</code>) and custom user categories (<code>Categories</code>). All criteria must match, with semicolon <code>OR</code> support inside any field.</li>
+        <li><strong>Unified Attribute &amp; Tag Querying:</strong> Rules can combine any official card attributes (<code>Attributes</code>) and custom user categories (<code>Categories</code>). All criteria must match, with semicolon <code>OR</code> support inside any field and universal wildcard matching (<code>*</code> and <code>All</code>).</li>
         <li><strong>Deck Copy Limits:</strong> Automatically enforces standard card copy limits: maximum 1 copy for unique cards and up to 3 copies for non-unique cards across the entire deck.</li>
         <li><strong>Maximum Card Variety:</strong> When filling multiple card slots from a broad query, the engine prioritizes unused cards before assigning duplicate copies. To include multiple copies of a specific card, query it directly by <code>Name</code> with your desired <code>Count</code>.</li>
         <li><strong>Randomized Thematic Branches (<code>RandomChoice</code>):</strong> Author multiple company themes or hazard packages in a single template, using weighted probability to randomly choose a theme and assign a tailored deck title.</li>
@@ -889,41 +889,23 @@ namespace MECCG_Deck_Builder.Properties {
   "Automatic Attack": "Dragon; Drake"
 }</code></pre>
 
-    <h3>B. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
+    <h3>B. Wildcard &amp; Universal Sentinel Matching (<code>*</code> and <code>All</code>)</h3>
+    <p>
+        Any query criterion in <code>Attributes</code> or <code>Categories</code> that contains <code>*</code> or <code>All</code> acts as a wildcard, satisfying that check for any card that meets the other constraints in the rule. This is particularly valuable when querying properties dynamically captured from character cards:
+    </p>
+    <pre><code>"Attributes": {
+  "Primary": "Resource",
+  "Secondary": "Faction",
+  "Name": "{Leader.Category:Faction Bonus}"
+}</code></pre>
+    <p>
+        If the captured leader is a universal diplomat like <em>Adrazar</em> (tagged <code>Faction Bonus: All</code>), the placeholder resolves to <code>"Name": "All"</code>. Rather than failing to find a card literally named "All", the engine recognizes the sentinel, treats the <code>Name</code> criterion as an open wildcard, and randomly samples from <strong>all faction cards available in your active expansions</strong>.
+    </p>
+
+    <h3>C. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
     <p>
         When a rule captures one or more cards via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query those cards' properties using bracketed tokens:
     </p>
-    <table>
-        <tr>
-            <th>Token Syntax</th>
-            <th>Target Source</th>
-            <th>Example</th>
-            <th>Resolved Output (Sample)</th>
-        </tr>
-        <tr>
-            <td><code>{Variable.AttributeName}</code></td>
-            <td>Official Card Attribute</td>
-            <td><code>{Leader.Home}</code></td>
-            <td><code>"Rivendell"</code></td>
-        </tr>
-        <tr>
-            <td><code>{Variable.Race}</code></td>
-            <td>Official Card Attribute</td>
-            <td><code>{Leader.Race}</code></td>
-            <td><code>"Elf"</code></td>
-        </tr>
-        <tr>
-            <td><code>{Variable.Category:CategoryName}</code></td>
-            <td>Custom User Taxonomy Tag</td>
-            <td><code>{Leader.Category:Faction Bonus}</code></td>
-            <td><code>"Wood-elves; Elves of Lindon"</code></td>
-        </tr>
-    </table>
-
-    <div class="note">
-        <strong>Multi-Card Collections &amp; Union Sets:</strong>
-        If a variable captures multiple cards (e.g., a rule with <code>"Count": 5</code> and <code>"SaveAs": "ExpeditionSites"</code>), any token referencing that variable (such as <code>{ExpeditionSites.Category:Automatic Attack}</code> or <code>{ExpeditionSites.Region}</code>) automatically collects the values from <strong>all captured cards</strong> into a deduplicated, semicolon-delimited string (e.g., <code>"Dragon; Orcs; Trolls; Undead"</code>). Downstream rules evaluate this as an <strong>OR</strong> query, making it straightforward to generate site-matched hazards or regionally cohesive companies.
-    </div>
 
     <div class="note">
         <strong>Unmet Dependency Handling:</strong> If a token references a category or attribute that is absent on the captured card(s), it resolves to an empty string (<code>""</code>). The rule recognizes that the dependency was not met, adds 0 cards, and cleanly hands execution over to the <code>Fallback</code> rule without interrupting generation.
@@ -1354,97 +1336,29 @@ namespace MECCG_Deck_Builder.Properties {
         <tr>
             <td><code>Combat Bonus</code></td>
             <td>
-                Flags cards providing direct prowess, strike cancellation, or tactical combat bonuses against specific creature species or to company members in combat.
+                Flags cards providing direct prowess and/or opponent body reduction against specific creature species.
             </td>
             <td>
                 <ul>
-                    <li>Rangers/Warriors with bonuses vs. Orcs &rarr; <code>Orc</code></li>
+                    <li>Dwarves with bonuses vs. Orcs &rarr; <code>Orcs</code></li>
                     <li>Nazg&ucirc;l hunters &rarr; <code>Nazg&ucirc;l</code></li>
-                    <li>General company prowess boosters &rarr; <code>All</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Combat Mechanics</code></td>
-            <td>
-                Identifies special combat manipulation capabilities, specifically attack cancellations, strike avoidance, and combat evasion events.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Fog</em>, <em>Vanishment</em>, <em>Old Road</em> &rarr; <code>Cancellation</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Corruption Bonus</code></td>
-            <td>
-                Identifies characters, items, or permanent conditions that confer corruption resistance bonuses or roll adjustments protecting the bearer.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters with inherent corruption resistance bonuses &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Corruption Penalty</code></td>
-            <td>
-                Marks characters or conditions bearing an inherent drawback or penalty on their own corruption checks (vulnerable or burdened characters).
-            </td>
-            <td>
-                <ul>
-                    <li>Characters with self-inflicted corruption check penalties &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Direct Influence Bonus</code></td>
-            <td>
-                Identifies characters who receive bonus Direct Influence (DI) when controlling specific named followers or characters of a particular race.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Galadriel</em> &rarr; <code>Galadriel; Elf</code> (+DI controlling Celeborn or Elves)</li>
-                    <li><em>Aragorn II</em> &rarr; <code>Aragorn II</code> (+DI controlling D&uacute;nedain/followers)</li>
-                    <li>Dwarf company leaders &rarr; <code>Dwarf</code></li>
                 </ul>
             </td>
         </tr>
         <tr>
             <td><code>Faction Bonus</code></td>
             <td>
-                Character recruiting bonuses granting +2 (or more) Direct Influence when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Category:Faction Bonus}"</code>).
+                Character recruiting bonuses granting bonus Direct Influence (+1 or more, typically +1 to +3) when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Category:Faction Bonus}"</code> or <code>"Race": "{Leader.Category:Faction Bonus}"</code>).<br /><br />
+                <em>Universal Diplomats:</em> Characters with bonuses against any faction (such as <em>Adrazar</em> or <em>Peath</em>) carry the <code>All</code> tag, which acts as a wildcard across all available factions in active sets.
             </td>
             <td>
                 <ul>
                     <li><em>Thranduil</em> &rarr; <code>Wood-elves</code></li>
-                    <li><em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves; Dwarf</code></li>
+                    <li><em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves; Man</code></li>
+                    <li><em>Gimli</em> &rarr; <code>Iron Hill Dwarves; Elf</code></li>
                     <li><em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code></li>
-                    <li><em>Elrond</em> &rarr; <code>All; Elf</code></li>
+                    <li><em>Adrazar</em> &rarr; <code>All; D&uacute;nadan</code></li>
                     <li><em>Beregond</em> &rarr; <code>Tower Guard of Minas Tirith</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Faction Penalty</code></td>
-            <td>
-                Marks characters who suffer influence penalties or recruitment restrictions when attempting to recruit factions.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters who cannot influence or suffer -DI penalties against factions &rarr; <code>All</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Hand Mechanics</code></td>
-            <td>
-                Identifies cards that increase maximum hand size or permit retrieving cards (such as spells or events) directly from the discard pile or play deck.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Tom Bombadil</em>, <em>Promptings of Wisdom</em> &rarr; <code>Hand Size Bonus</code></li>
-                    <li><em>Gandalf</em>, <em>Voices of Malice</em> &rarr; <code>Spell Retrieval</code></li>
                 </ul>
             </td>
         </tr>
@@ -1464,50 +1378,6 @@ namespace MECCG_Deck_Builder.Properties {
             </td>
         </tr>
         <tr>
-            <td><code>Home Site Penalty</code></td>
-            <td>
-                Marks characters who suffer gameplay drawbacks, stat reductions, or limitations while at (or away from) their designated home site.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters with localized home penalties &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Marshalling Points Penalty</code></td>
-            <td>
-                Marks liability cards that surrender Marshalling Points (MPs) to the opponent or impose negative victory points if defeated, tapped, or corrupted.
-            </td>
-            <td>
-                <ul>
-                    <li>Characters/items that concede negative MP burdens upon defeat &rarr; <code>Self</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Palant&iacute;r Mechanics</code></td>
-            <td>
-                Identifies characters or cards specifically capable of using, tapping, or gaining bonuses from Palant&iacute;ri without standard drawbacks.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Saruman</em>, <em>Denethor II</em> &rarr; <code>Use Palant&iacute;r</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Region Bonus</code></td>
-            <td>
-                Tags cards granting movement advantages, hazard cancellations, or combat bonuses when traveling through or stationed in specific region terrain types.
-            </td>
-            <td>
-                <ul>
-                    <li>Mariners and coastal travelers &rarr; <code>Coastal Sea</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
             <td><code>Resolved Site</code></td>
             <td>
                 Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).<br /><br />
@@ -1518,17 +1388,6 @@ namespace MECCG_Deck_Builder.Properties {
                     <li><em>Doeth</em>, <em>Durthak</em> (card text <em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
                     <li><em>Gandalf</em> (card text <em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
                     <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Ring Mechanics</code></td>
-            <td>
-                Identifies characters, items, or events with dedicated mechanics for testing Gold Rings, searching for the One Ring, or modifying ring test dice rolls.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Gandalf</em>, <em>Saruman</em>, <em>Gollum</em> &rarr; <code>Test Ring</code></li>
                 </ul>
             </td>
         </tr>
@@ -2439,8 +2298,9 @@ pre {
         <li>
             Review the generation summary dialog to observe context-aware recruitment:
             <ul>
-                <li><strong>Scenario A (Leader has Tag):</strong> If the engine samples <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
-                <li><strong>Scenario B (Leader has no Tag):</strong> If the engine samples a leader without a bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic faction (such as <em>Blue Mountain Dwarves</em>).</li>
+                <li><strong>Scenario A (Leader has Specific Tag):</strong> If the engine samples <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
+                <li><strong>Scenario B (Leader has Universal Bonus / Wildcard):</strong> If the engine samples a universal diplomat like <em>Adrazar</em>, the token resolves to <code>Name: All</code>. The generator recognizes <code>All</code> as a wildcard and selects a random faction from any faction present in your active expansions.</li>
+                <li><strong>Scenario C (Leader has no Tag):</strong> If the engine samples a leader without a bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic faction (such as <em>Blue Mountain Dwarves</em>).</li>
             </ul>
         </li>
         <li>Press <kbd>F5</kbd> (<strong>Deck &gt; Re-run Deck Rules</strong>) to instantly re-execute the file and generate new randomized variations.</li>
@@ -2748,6 +2608,7 @@ namespace MECCG_Deck_Builder
   - [x] Issue #29: Realine Help System and Documentation with Modernized Menu Bar Architecture, Symmetrical Rule Categories, and Clean Terminology
   - [ ] Issue #30: Configurable Card Distribution Strategies in Procedural Deck Rules (`Distribution: Variety | Focused | Uniform`)
   - [x] Issue #31: Dual-Mode Right Pane with Card Taxonomy Inspector, Monospace Metadata Readout, and Pinned Quick-Assign Bar
+  - [x] Issue #32: Procedural Rule Wildcards (* / All), Faction Influence Alignment, and Lossadan Cairn Attribute Correction
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
@@ -5070,14 +4931,17 @@ namespace MECCG_Deck_Builder
                     if (!string.IsNullOrWhiteSpace(resolvedVal))
                     {
                         var allowedValues = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                        if (!allowedValues.Any(v => CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
+                        if (!allowedValues.Any(v =>
+                            v == "*" ||
+                            string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
+                            CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
                         {
                             return false;
                         }
                     }
                 }
 
-                // Category & Tag evaluation
+                // Enhanced Category & Tag evaluation:
                 if (filterService != null)
                 {
                     foreach (var (catKey, (rawTemplate, resolvedVal)) in resolvedCategories)
@@ -5090,7 +4954,10 @@ namespace MECCG_Deck_Builder
                         if (!string.IsNullOrWhiteSpace(resolvedVal))
                         {
                             var allowedTags = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            if (!allowedTags.Any(t => filterService.MatchesCustomCriterion(c.Id, catKey, t)))
+                            if (!allowedTags.Any(t =>
+                                t == "*" ||
+                                string.Equals(t, "All", StringComparison.OrdinalIgnoreCase) ||
+                                filterService.MatchesCustomCriterion(c.Id, catKey, t)))
                             {
                                 return false;
                             }
@@ -9658,7 +9525,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - Cardnum Deck (.cnum): Standard 1 <Code> listing format.
   - Archive Breakdown (.archive): Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - Plain Text (.txt): Formatted deck listing.
-- Procedural Deck Generator: Generate complete decks from JSON rule templates with attribute and category queries, deck copy limits, tiered variety-first duplication, and randomized thematic branches (RandomChoice). Features runtime variable capture (SaveAs), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Home}), multi-card union sets, and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G).
+- Procedural Deck Generator: Generate complete decks from JSON rule templates with attribute and category queries, deck copy limits, tiered variety-first duplication, and randomized thematic branches (RandomChoice). Features runtime variable capture (SaveAs), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Home}), universal wildcard sentinels (* and All), multi-card union sets, and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G).
 - Automated Taxonomy Extraction: Scan card rules text for catalog entities, perform cross-card attribute lookups, or execute custom regular expressions in an expanded workspace with automatic session persistence via Taxonomy > Extract Tags with Rules....
 - Two-Way CSV Spreadsheet Pipeline: Bulk audit and edit catalog taxonomy using Microsoft Excel or Google Sheets with authoritative edit-and-replace synchronization via Taxonomy > Export Taxonomy Draft (CSV)... and Taxonomy > Import Taxonomy (CSV)....
 - Session Persistence: Remembers your active expansion set selection across application restarts and preserves your last-used taxonomy extraction mode, regular expressions, and tag categories for iterative tagging workflows.
