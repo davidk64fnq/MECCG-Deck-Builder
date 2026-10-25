@@ -209,9 +209,9 @@ namespace MECCG_Deck_Builder
         #region RELATIONAL_EXTRACTION
 
         /// <summary>
-        /// Cross-references an attribute on target cards (e.g. Character 'Home') 
-        /// against matching catalog entities (e.g. Site 'Name') to extract a secondary 
-        /// attribute (e.g. Site 'Region') as a custom tag.
+        /// Cross-references an attribute or custom category on target cards (e.g. Character 'Home' or Site 'Region') 
+        /// against matching catalog entities (e.g. Site 'Name' or Region 'Name') to extract a secondary 
+        /// attribute or custom category (e.g. Site 'Region' or Region 'Region Type') as a custom tag.
         /// </summary>
         public static ExtractionResult ExecuteRelationalExtraction(
             IEnumerable<Card> targetCards,
@@ -220,7 +220,8 @@ namespace MECCG_Deck_Builder
             string lookupAttribute,
             string lookupValue,
             string targetAttribute,
-            string categoryName)
+            string categoryName,
+            CardFilterService filterService = null)
         {
             var result = new ExtractionResult();
             if (targetCards == null || catalogCards == null ||
@@ -231,21 +232,45 @@ namespace MECCG_Deck_Builder
 
             string category = string.IsNullOrWhiteSpace(categoryName) ? "Relational Tags" : categoryName.Trim();
 
-            // 1. Build lookup dictionary from catalog entities using MatchesCardnumCriterion
+            // 1. Build lookup dictionary from catalog entities (supports official criteria or custom category match)
             var lookupCards = catalogCards;
             if (!string.IsNullOrWhiteSpace(lookupAttribute) && !string.IsNullOrWhiteSpace(lookupValue))
             {
-                lookupCards = lookupCards.Where(c => CardFilterService.MatchesCardnumCriterion(c, lookupAttribute, lookupValue));
+                lookupCards = lookupCards.Where(c =>
+                    CardFilterService.MatchesCardnumCriterion(c, lookupAttribute, lookupValue) ||
+                    (filterService != null && filterService.MatchesCustomCriterion(c.Id, lookupAttribute, lookupValue)));
             }
 
-            // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"])
+            // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"], "Rohan" -> ["Wilderness"])
             var lookupMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var card in lookupCards)
             {
                 string entityName = card.Name?.Trim();
-                string targetVal = card.GetAttribute(targetAttribute)?.Trim();
+                if (string.IsNullOrEmpty(entityName))
+                {
+                    continue;
+                }
 
-                if (string.IsNullOrEmpty(entityName) || string.IsNullOrEmpty(targetVal))
+                var extractedVals = new List<string>();
+
+                // Try official attribute
+                string targetAttrVal = card.GetAttribute(targetAttribute)?.Trim();
+                if (!string.IsNullOrEmpty(targetAttrVal))
+                {
+                    extractedVals.Add(targetAttrVal);
+                }
+
+                // Try custom category
+                if (filterService != null)
+                {
+                    var catTags = filterService.GetCardTagsForCategory(card.Id, targetAttribute);
+                    if (catTags != null && catTags.Count > 0)
+                    {
+                        extractedVals.AddRange(catTags);
+                    }
+                }
+
+                if (extractedVals.Count == 0)
                 {
                     continue;
                 }
@@ -255,7 +280,21 @@ namespace MECCG_Deck_Builder
                     set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     lookupMap[entityName] = set;
                 }
-                set.Add(targetVal);
+
+                foreach (var v in extractedVals)
+                {
+                    if (v.Contains(';'))
+                    {
+                        foreach (var part in v.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        {
+                            set.Add(part);
+                        }
+                    }
+                    else
+                    {
+                        set.Add(v.Trim());
+                    }
+                }
             }
 
             if (lookupMap.Count == 0)
@@ -265,47 +304,65 @@ namespace MECCG_Deck_Builder
 
             var knownNames = lookupMap.Keys.OrderByDescending(k => k.Length).ToList();
 
-            // 2. Cross-reference target cards
+            // 2. Cross-reference target cards (evaluating source attribute or custom category)
             foreach (var card in targetCards)
             {
-                string sourceVal = card.GetAttribute(sourceAttribute);
-                if (string.IsNullOrWhiteSpace(sourceVal))
+                var sourceVals = new List<string>();
+                string sourceAttrVal = card.GetAttribute(sourceAttribute);
+                if (!string.IsNullOrWhiteSpace(sourceAttrVal))
+                {
+                    sourceVals.Add(sourceAttrVal);
+                }
+
+                if (filterService != null)
+                {
+                    var catTags = filterService.GetCardTagsForCategory(card.Id, sourceAttribute);
+                    if (catTags != null && catTags.Count > 0)
+                    {
+                        sourceVals.AddRange(catTags);
+                    }
+                }
+
+                if (sourceVals.Count == 0)
                 {
                     continue;
                 }
 
-                bool matched = false;
-
-                // Split on common list delimiters (commas, semicolons, slashes)
-                var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                foreach (var part in parts)
+                foreach (var sourceVal in sourceVals)
                 {
-                    var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    foreach (var sub in subParts)
-                    {
-                        if (lookupMap.TryGetValue(sub, out var targets))
-                        {
-                            foreach (var t in targets)
-                            {
-                                result.AddTag(card.Id, category, t);
-                                matched = true;
-                            }
-                        }
-                    }
-                }
+                    bool matched = false;
 
-                // If no exact token match, search known names with regex word boundaries (e.g. "Haven: Rivendell")
-                if (!matched)
-                {
-                    foreach (var name in knownNames)
+                    // Split on common list delimiters (commas, semicolons, slashes)
+                    var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    foreach (var part in parts)
                     {
-                        if (Regex.IsMatch(sourceVal, $@"\b{Regex.Escape(name)}\b", RegexOptions.IgnoreCase))
+                        var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        foreach (var sub in subParts)
                         {
-                            if (lookupMap.TryGetValue(name, out var targets))
+                            if (lookupMap.TryGetValue(sub, out var targets))
                             {
                                 foreach (var t in targets)
                                 {
                                     result.AddTag(card.Id, category, t);
+                                    matched = true;
+                                }
+                            }
+                        }
+                    }
+
+                    // If no exact token match, search known names with regex word boundaries (e.g. "Haven: Rivendell")
+                    if (!matched)
+                    {
+                        foreach (var name in knownNames)
+                        {
+                            if (Regex.IsMatch(sourceVal, $@"\b{Regex.Escape(name)}\b", RegexOptions.IgnoreCase))
+                            {
+                                if (lookupMap.TryGetValue(name, out var targets))
+                                {
+                                    foreach (var t in targets)
+                                    {
+                                        result.AddTag(card.Id, category, t);
+                                    }
                                 }
                             }
                         }

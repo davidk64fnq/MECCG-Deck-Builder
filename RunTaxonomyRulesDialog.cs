@@ -116,19 +116,19 @@ namespace MECCG_Deck_Builder
             };
 
             // ==========================================
-            // MODE 2: CROSS-CARD ATTRIBUTE LOOKUP
+            // MODE 2: CROSS-CARD PROPERTY LOOKUP
             // ==========================================
             _rbRelational = new RadioButton
             {
-                Text = "Cross-Card Attribute Lookup:",
+                Text = "Cross-Card Property Lookup:",
                 Location = new Point(12, 100),
                 Size = new Size(320, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbRelational.CheckedChanged += RuleSource_Changed;
 
-            // Row 1: Read Attribute -> Lookup Entity (Attribute = Value)
-            var lblRel1 = new Label { Text = "Read Attribute:", Location = new Point(32, 124), Size = new Size(95, 18) };
+            // Row 1: Read Property -> Lookup Entity (Property = Value/Tag)
+            var lblRel1 = new Label { Text = "Read Property:", Location = new Point(32, 124), Size = new Size(95, 18) };
             _cmbRelSourceAttr = new ComboBox
             {
                 Location = new Point(130, 121),
@@ -156,8 +156,8 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
 
-            // Row 2: Extract Attribute -> Save to Category
-            var lblRel3 = new Label { Text = "Extract Attribute:", Location = new Point(32, 152), Size = new Size(95, 18) };
+            // Row 2: Extract Property -> Save to Category
+            var lblRel3 = new Label { Text = "Extract Property:", Location = new Point(32, 152), Size = new Size(95, 18) };
             _cmbRelTargetAttr = new ComboBox
             {
                 Location = new Point(130, 149),
@@ -341,10 +341,28 @@ namespace MECCG_Deck_Builder
             _cmbRelTargetAttr.Items.Clear();
             _cmbRelLookupAttr.Items.Clear();
 
-            var keys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
-            foreach (var k in keys)
+            var officialKeys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
+            var customKeys = _filterService != null
+                ? _filterService.GetCustomKeyNames().Where(k => !string.IsNullOrWhiteSpace(k)).ToList()
+                : [];
+
+            var allKeys = new List<string>(officialKeys);
+            foreach (var ck in customKeys)
+            {
+                if (!allKeys.Contains(ck, StringComparer.OrdinalIgnoreCase))
+                {
+                    allKeys.Add(ck);
+                }
+            }
+            allKeys.Sort(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var k in officialKeys)
             {
                 _cmbHarvestAttribute.Items.Add(k);
+            }
+
+            foreach (var k in allKeys)
+            {
                 _cmbRelSourceAttr.Items.Add(k);
                 _cmbRelTargetAttr.Items.Add(k);
                 _cmbRelLookupAttr.Items.Add(k);
@@ -394,13 +412,35 @@ namespace MECCG_Deck_Builder
             _cmbRelLookupVal.Items.Clear();
             if (string.IsNullOrWhiteSpace(attr)) return;
 
-            var values = _catalog.GetFilterValues(attr);
-            foreach (var v in values)
+            var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var catalogVals = _catalog.GetFilterValues(attr);
+            if (catalogVals != null)
             {
-                if (!string.IsNullOrWhiteSpace(v))
+                foreach (var v in catalogVals)
                 {
-                    _cmbRelLookupVal.Items.Add(v);
+                    if (!string.IsNullOrWhiteSpace(v)) distinctValues.Add(v.Trim());
                 }
+            }
+
+            if (_filterService != null)
+            {
+                var customVals = _filterService.GetCustomKeyValues(attr);
+                if (customVals != null)
+                {
+                    foreach (var v in customVals)
+                    {
+                        if (!string.IsNullOrWhiteSpace(v)) distinctValues.Add(v.Trim());
+                    }
+                }
+            }
+
+            var sorted = distinctValues.ToList();
+            sorted.Sort(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var v in sorted)
+            {
+                _cmbRelLookupVal.Items.Add(v);
             }
 
             string savedLookupVal = UserSettingsService.Current.LastRelationalLookupVal ?? "Site";
@@ -539,7 +579,8 @@ namespace MECCG_Deck_Builder
                     lookupAttr,
                     lookupVal,
                     targetAttr,
-                    category);
+                    category,
+                    _filterService);
             }
 
             var rules = GetActiveRules();

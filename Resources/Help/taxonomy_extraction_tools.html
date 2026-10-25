@@ -52,21 +52,40 @@
         </li>
     </ol>
 
-    <!-- MODE: CROSS-CARD ATTRIBUTE LOOKUP -->
-    <h2 id="relational-lookup">Cross-Card Attribute Lookup</h2>
+    <!-- MODE: CROSS-CARD ATTRIBUTE / CATEGORY LOOKUP -->
+    <h2 id="relational-lookup">Cross-Card Property Lookup (Attributes & Categories)</h2>
     <p>
-        Cross-references an attribute on cards in scope (such as a character's <code>Home</code>) against related destination cards across the catalog (such as a <code>Site</code>) to pull in a secondary attribute (such as <code>Region</code>) as a custom tag:
+        Cross-references an official attribute or custom category on cards in scope (such as a character's <code>Home</code> or a site's <code>Region</code>) against related destination cards across the catalog (such as a <code>Site</code> or <code>Region</code> card) to pull in a secondary attribute or category (such as <code>Region</code> or <code>Region Type</code>) as a custom tag:
     </p>
     <ul>
-        <li><strong>Read Attribute:</strong> The attribute on cards currently in scope used to match the destination card (e.g. Character <code>Home</code>).</li>
-        <li><strong>Lookup Entity:</strong> The catalog criteria used to identify the target cards (e.g. <code>Primary = Site</code>).</li>
-        <li><strong>Extract Attribute:</strong> The official attribute pulled from the matched cards (e.g. Site <code>Region</code>).</li>
-        <li><strong>Save to Category:</strong> The custom category where the extracted tag will be saved (e.g. <code>Home Region</code>).</li>
+        <li><strong>Read Property:</strong> The official attribute or custom category on cards in scope used to match the destination entity (e.g. Site <code>Region</code>).</li>
+        <li><strong>Lookup Entity:</strong> The catalog criteria identifying the destination cards (e.g. <code>Primary = Region</code>). Supports matching both official properties and custom categories.</li>
+        <li><strong>Extract Property:</strong> The official attribute or custom category pulled from matched cards (e.g. custom category <code>Region Type</code>).</li>
+        <li><strong>Save to Category:</strong> The custom category where the extracted tag will be saved.</li>
     </ul>
 
-    <div class="tip">
-        <strong>Compound Name Handling:</strong> Characters with multiple locations (e.g. <code>Rivendell, Bree</code>) automatically resolve each site individually to generate clean, semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).
-    </div>
+    <!-- WORKED EXAMPLE: PROPAGATING REGION TERRAIN TO SITES -->
+    <h3 id="worked-example-region-type">Worked Example: Propagating Region Terrain Types to Sites</h3>
+    <p>
+        While region cards carry terrain classifications (<em>Wilderness</em>, <em>Shadow-land</em>, etc.), site cards only list geographic region names (e.g. <em>Rohan</em>). Once your region cards have custom tags under <code>Region Type</code>, you can propagate those terrain types down to all site cards automatically:
+    </p>
+    <ol>
+        <li>
+            <strong>Scope the Master List:</strong> In the main window, set <strong>Filter Slot 1:</strong> <code>Attribute: Primary</code>, <code>Value: Site</code> so only site cards are in scope.
+        </li>
+        <li>
+            <strong>Configure the Lookup:</strong> Open <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, choose <strong>Cross-Card Attribute Lookup</strong>, and enter:
+            <ul>
+                <li><strong>Read Attribute:</strong> <code>Region</code> *(on the site card)*</li>
+                <li><strong>Lookup Entity:</strong> <code>Primary = Region</code> *(matches region cards)*</li>
+                <li><strong>Extract Attribute:</strong> <code>Region Type</code> *(extracts the custom category from region cards)*</li>
+                <li><strong>Save to Category:</strong> <code>Region Type</code></li>
+            </ul>
+        </li>
+        <li>
+            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong>, then click <strong>Apply Tags to Catalog</strong>. Every site card across your expansions is now tagged with its terrain type, enabling dynamic queries like <code>Region Type=Wilderness</code>!
+        </li>
+    </ol>
 
     <!-- WORKED EXAMPLE: CROSS-CARD REGIONS -->
     <h3 id="worked-example-regions">Worked Example: Mapping Character Homes to Geographic Regions</h3>

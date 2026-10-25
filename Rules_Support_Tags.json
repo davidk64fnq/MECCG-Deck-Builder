@@ -691,6 +691,7 @@
       "fullCode": "Caves of Ûlund [H] (TW)",
       "id": "430",
       "name": "Caves of Ûlund",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -698,6 +699,7 @@
       "fullCode": "Caves of Ûlund [M] (LE)",
       "id": "1575",
       "name": "Caves of Ûlund",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -705,6 +707,7 @@
       "fullCode": "Dancing Spire [H] (TW)",
       "id": "432",
       "name": "Dancing Spire",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -712,6 +715,7 @@
       "fullCode": "Dancing Spire [M] (AS)",
       "id": "1770",
       "name": "Dancing Spire",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -719,6 +723,7 @@
       "fullCode": "Gold Hill [H] (TD)",
       "id": "1028",
       "name": "Gold Hill",
+      "Region Type": "Wilderness",
       "set": "METD"
     },
     {
@@ -726,6 +731,7 @@
       "fullCode": "Gold Hill [M] (AS)",
       "id": "1776",
       "name": "Gold Hill",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -733,6 +739,7 @@
       "fullCode": "Gondmaeglom [M] (LE)",
       "id": "1594",
       "name": "Gondmaeglom",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -740,6 +747,7 @@
       "fullCode": "Gondmaeglom [H] (TD)",
       "id": "1029",
       "name": "Gondmaeglom",
+      "Region Type": "Shadow-land",
       "set": "METD"
     },
     {
@@ -747,6 +755,7 @@
       "fullCode": "Irerock [H] (TW)",
       "id": "451",
       "name": "Irerock",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -754,6 +763,7 @@
       "fullCode": "Irerock [M] (AS)",
       "id": "1779",
       "name": "Irerock",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -761,6 +771,7 @@
       "fullCode": "Isle of the Ulond [M] (AS)",
       "id": "1780",
       "name": "Isle of the Ulond",
+      "Region Type": "Coastal Sea",
       "set": "MEAS"
     },
     {
@@ -768,6 +779,7 @@
       "fullCode": "Isle of the Ulond [H] (TD)",
       "id": "1030",
       "name": "Isle of the Ulond",
+      "Region Type": "Coastal Sea",
       "set": "METD"
     },
     {
@@ -775,6 +787,7 @@
       "fullCode": "Ovir Hollow [H] (TD)",
       "id": "1031",
       "name": "Ovir Hollow",
+      "Region Type": "Shadow-land",
       "set": "METD"
     },
     {
@@ -782,6 +795,7 @@
       "fullCode": "Ovir Hollow [M] (AS)",
       "id": "1785",
       "name": "Ovir Hollow",
+      "Region Type": "Shadow-land",
       "set": "MEAS"
     },
     {
@@ -789,6 +803,7 @@
       "fullCode": "The Lonely Mountain [H] (TW)",
       "id": "477",
       "name": "The Lonely Mountain",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -796,6 +811,7 @@
       "fullCode": "The Lonely Mountain [M] (LE)",
       "id": "1621",
       "name": "The Lonely Mountain",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -803,6 +819,7 @@
       "fullCode": "Zarak Dûm [H] (TD)",
       "id": "1033",
       "name": "Zarak Dûm",
+      "Region Type": "Shadow-land",
       "set": "METD"
     },
     {
@@ -810,6 +827,7 @@
       "fullCode": "Zarak Dûm [M] (LE)",
       "id": "1632",
       "name": "Zarak Dûm",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -817,6 +835,7 @@
       "fullCode": "Amon Hen [H] (TW)",
       "id": "420",
       "name": "Amon Hen",
+      "Region Type": "Border-land",
       "set": "METW"
     },
     {
@@ -824,6 +843,7 @@
       "fullCode": "Amon Hen [M] (LE)",
       "id": "1564",
       "name": "Amon Hen",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -832,6 +852,7 @@
       "fullCode": "Ancient Deep-hold [B] (BA)",
       "id": "2007",
       "name": "Ancient Deep-hold",
+      "Region Type": "Wilderness",
       "set": "MEBA"
     },
     {
@@ -839,6 +860,7 @@
       "fullCode": "Barrow-downs [H] (TW)",
       "id": "424",
       "name": "Barrow-downs",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -846,6 +868,7 @@
       "fullCode": "Barrow-downs [M] (LE)",
       "id": "1568",
       "name": "Barrow-downs",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -853,6 +876,7 @@
       "fullCode": "Dead Marshes [M] (LE)",
       "id": "1579",
       "name": "Dead Marshes",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -860,6 +884,7 @@
       "fullCode": "Dead Marshes [H] (TW)",
       "id": "433",
       "name": "Dead Marshes",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -867,6 +892,7 @@
       "fullCode": "Gladden Fields [M] (LE)",
       "id": "1590",
       "name": "Gladden Fields",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -874,6 +900,7 @@
       "fullCode": "Gladden Fields [H] (TW)",
       "id": "445",
       "name": "Gladden Fields",
+      "Region Type": "Border-land",
       "set": "METW"
     },
     {
@@ -881,6 +908,7 @@
       "fullCode": "Haudh-in-Gwanûr [M] (LE)",
       "id": "1595",
       "name": "Haudh-in-Gwanûr",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -888,6 +916,7 @@
       "fullCode": "Haudh-in-Gwanûr [H] (DM)",
       "id": "1201",
       "name": "Haudh-in-Gwanûr",
+      "Region Type": "Wilderness",
       "set": "MEDM"
     },
     {
@@ -895,6 +924,7 @@
       "fullCode": "Himring [H] (TW)",
       "id": "450",
       "name": "Himring",
+      "Region Type": "Coastal Sea",
       "set": "METW"
     },
     {
@@ -902,6 +932,7 @@
       "fullCode": "Himring [M] (AS)",
       "id": "1778",
       "name": "Himring",
+      "Region Type": "Coastal Sea",
       "set": "MEAS"
     },
     {
@@ -909,6 +940,7 @@
       "fullCode": "Isles of the Dead That Live [M] (AS)",
       "id": "1781",
       "name": "Isles of the Dead That Live",
+      "Region Type": "Coastal Sea",
       "set": "MEAS"
     },
     {
@@ -916,6 +948,7 @@
       "fullCode": "Isles of the Dead that Live [H] (TW)",
       "id": "454",
       "name": "Isles of the Dead that Live",
+      "Region Type": "Coastal Sea",
       "set": "METW"
     },
     {
@@ -923,6 +956,7 @@
       "fullCode": "Lossadan Cairn [M] (LE)",
       "id": "1602",
       "name": "Lossadan Cairn",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -930,6 +964,7 @@
       "fullCode": "Lossadan Cairn [H] (TW)",
       "id": "458",
       "name": "Lossadan Cairn",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -937,6 +972,7 @@
       "fullCode": "Minas Morgul [H] (TW)",
       "id": "460",
       "name": "Minas Morgul",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -944,6 +980,7 @@
       "fullCode": "Minas Morgul [B] (BA)",
       "id": "2013",
       "name": "Minas Morgul",
+      "Region Type": "Shadow-land",
       "set": "MEBA"
     },
     {
@@ -952,6 +989,7 @@
       "fullCode": "The Gem-deeps [H] (DM)",
       "id": "1203",
       "name": "The Gem-deeps",
+      "Region Type": "Border-land",
       "set": "MEDM"
     },
     {
@@ -960,6 +998,7 @@
       "fullCode": "The Gem-deeps [M] (AS)",
       "id": "1789",
       "name": "The Gem-deeps",
+      "Region Type": "Border-land",
       "set": "MEAS"
     },
     {
@@ -968,6 +1007,7 @@
       "fullCode": "The Gem-deeps [B] (BA)",
       "id": "2017",
       "name": "The Gem-deeps",
+      "Region Type": "Border-land",
       "set": "MEBA"
     },
     {
@@ -976,6 +1016,7 @@
       "fullCode": "The Under-vaults [H] (DM)",
       "id": "1212",
       "name": "The Under-vaults",
+      "Region Type": "Shadow-land",
       "set": "MEDM"
     },
     {
@@ -984,6 +1025,7 @@
       "fullCode": "The Under-vaults [B] (BA)",
       "id": "2027",
       "name": "The Under-vaults",
+      "Region Type": "Shadow-land",
       "set": "MEBA"
     },
     {
@@ -992,6 +1034,7 @@
       "fullCode": "The Under-vaults [M] (AS)",
       "id": "1798",
       "name": "The Under-vaults",
+      "Region Type": "Shadow-land",
       "set": "MEAS"
     },
     {
@@ -999,6 +1042,7 @@
       "fullCode": "Tolfalas [M] (AS)",
       "id": "1800",
       "name": "Tolfalas",
+      "Region Type": "Coastal Sea",
       "set": "MEAS"
     },
     {
@@ -1006,6 +1050,7 @@
       "fullCode": "Tolfalas [H] (TW)",
       "id": "482",
       "name": "Tolfalas",
+      "Region Type": "Coastal Sea",
       "set": "METW"
     },
     {
@@ -1013,6 +1058,7 @@
       "fullCode": "Bandit Lair [H] (TW)",
       "id": "422",
       "name": "Bandit Lair",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -1020,6 +1066,7 @@
       "fullCode": "Bandit Lair [M] (LE)",
       "id": "1566",
       "name": "Bandit Lair",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -1027,6 +1074,7 @@
       "fullCode": "Beorn's House [M] (LE)",
       "id": "1569",
       "name": "Beorn's House",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1034,6 +1082,7 @@
       "fullCode": "Cameth Brin [M] (LE)",
       "id": "1573",
       "name": "Cameth Brin",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1041,6 +1090,7 @@
       "fullCode": "Dale [M] (LE)",
       "id": "1578",
       "name": "Dale",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1048,6 +1098,7 @@
       "fullCode": "Dol Amroth [M] (LE)",
       "id": "1581",
       "name": "Dol Amroth",
+      "Region Type": "Free-domain",
       "set": "MELE"
     },
     {
@@ -1055,6 +1106,7 @@
       "fullCode": "Drúadan Forest [M] (LE)",
       "id": "1583",
       "name": "Drúadan Forest",
+      "Region Type": "Free-domain",
       "set": "MELE"
     },
     {
@@ -1062,6 +1114,7 @@
       "fullCode": "Dunharrow [M] (LE)",
       "id": "1584",
       "name": "Dunharrow",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1069,6 +1122,7 @@
       "fullCode": "Dunnish Clan-hold [M] (LE)",
       "id": "1585",
       "name": "Dunnish Clan-hold",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1076,6 +1130,7 @@
       "fullCode": "Easterling Camp [M] (LE)",
       "id": "1586",
       "name": "Easterling Camp",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -1083,6 +1138,7 @@
       "fullCode": "Edoras [M] (LE)",
       "id": "1587",
       "name": "Edoras",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1090,6 +1146,7 @@
       "fullCode": "Framsburg [M] (AS)",
       "id": "1773",
       "name": "Framsburg",
+      "Region Type": "Border-land",
       "set": "MEAS"
     },
     {
@@ -1097,6 +1154,7 @@
       "fullCode": "Geann a-Lisch [H] (AS)",
       "id": "1774",
       "name": "Geann a-Lisch",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1104,6 +1162,7 @@
       "fullCode": "Gobel Mírlond [M] (LE)",
       "id": "1592",
       "name": "Gobel Mírlond",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1111,6 +1170,7 @@
       "fullCode": "Gobel Mírlond [H] (AS)",
       "id": "1775",
       "name": "Gobel Mírlond",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1118,6 +1178,7 @@
       "fullCode": "Hermit's Hill [H] (DM)",
       "id": "1202",
       "name": "Hermit's Hill",
+      "Region Type": "Wilderness",
       "set": "MEDM"
     },
     {
@@ -1125,6 +1186,7 @@
       "fullCode": "Hermit's Hill [M] (LE)",
       "id": "1597",
       "name": "Hermit's Hill",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1132,6 +1194,7 @@
       "fullCode": "Lake-town [M] (LE)",
       "id": "1600",
       "name": "Lake-town",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1139,6 +1202,7 @@
       "fullCode": "Lond Galen [M] (LE)",
       "id": "1601",
       "name": "Lond Galen",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1146,6 +1210,7 @@
       "fullCode": "Lossadan Camp [M] (LE)",
       "id": "1603",
       "name": "Lossadan Camp",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1153,6 +1218,7 @@
       "fullCode": "Minas Tirith [M] (LE)",
       "id": "1605",
       "name": "Minas Tirith",
+      "Region Type": "Free-domain",
       "set": "MELE"
     },
     {
@@ -1160,6 +1226,7 @@
       "fullCode": "Nûrniag Camp [H] (AS)",
       "id": "1783",
       "name": "Nûrniag Camp",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1167,6 +1234,7 @@
       "fullCode": "Pelargir [M] (LE)",
       "id": "1612",
       "name": "Pelargir",
+      "Region Type": "Free-domain",
       "set": "MELE"
     },
     {
@@ -1174,6 +1242,7 @@
       "fullCode": "Raider-hold [M] (LE)",
       "id": "1613",
       "name": "Raider-hold",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -1181,6 +1250,7 @@
       "fullCode": "Raider-hold [H] (AS)",
       "id": "1786",
       "name": "Raider-hold",
+      "Region Type": "Shadow-land",
       "set": "MEAS"
     },
     {
@@ -1188,6 +1258,7 @@
       "fullCode": "Shrel-Kain [M] (LE)",
       "id": "1617",
       "name": "Shrel-Kain",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1195,6 +1266,7 @@
       "fullCode": "Southron Oasis [M] (LE)",
       "id": "1618",
       "name": "Southron Oasis",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1202,6 +1274,7 @@
       "fullCode": "Tharbad [H] (TD)",
       "id": "1032",
       "name": "Tharbad",
+      "Region Type": "Wilderness",
       "set": "METD"
     },
     {
@@ -1209,6 +1282,7 @@
       "fullCode": "Tharbad [M] (LE)",
       "id": "1620",
       "name": "Tharbad",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1217,6 +1291,7 @@
       "fullCode": "The Pûkel-deeps [H] (DM)",
       "id": "1205",
       "name": "The Pûkel-deeps",
+      "Region Type": "Border-land",
       "set": "MEDM"
     },
     {
@@ -1225,6 +1300,7 @@
       "fullCode": "The Pûkel-deeps [M] (AS)",
       "id": "1791",
       "name": "The Pûkel-deeps",
+      "Region Type": "Border-land",
       "set": "MEAS"
     },
     {
@@ -1232,6 +1308,7 @@
       "fullCode": "The Worthy Hills [H] (AS)",
       "id": "1799",
       "name": "The Worthy Hills",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1239,6 +1316,7 @@
       "fullCode": "The Worthy Hills [M] (LE)",
       "id": "1625",
       "name": "The Worthy Hills",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1246,6 +1324,7 @@
       "fullCode": "Vale of Erech [M] (LE)",
       "id": "1628",
       "name": "Vale of Erech",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1253,6 +1332,7 @@
       "fullCode": "Variag Camp [M] (LE)",
       "id": "1629",
       "name": "Variag Camp",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -1260,6 +1340,7 @@
       "fullCode": "Woodmen-town [M] (LE)",
       "id": "1630",
       "name": "Woodmen-town",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1267,6 +1348,7 @@
       "fullCode": "Wose Passage-hold [M] (LE)",
       "id": "1631",
       "name": "Wose Passage-hold",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1274,6 +1356,7 @@
       "fullCode": "Bag End [M] (LE)",
       "id": "1565",
       "name": "Bag End",
+      "Region Type": "Free-domain",
       "set": "MELE"
     },
     {
@@ -1281,6 +1364,7 @@
       "fullCode": "Bree [M] (LE)",
       "id": "1571",
       "name": "Bree",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1288,6 +1372,7 @@
       "fullCode": "Edhellond [M] (AS)",
       "id": "1772",
       "name": "Edhellond",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1295,6 +1380,7 @@
       "fullCode": "Henneth Annûn [M] (LE)",
       "id": "1596",
       "name": "Henneth Annûn",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1302,6 +1388,7 @@
       "fullCode": "Rivendell [M] (AS)",
       "id": "1788",
       "name": "Rivendell",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1309,6 +1396,7 @@
       "fullCode": "Barad-dûr [H] (TW)",
       "id": "423",
       "name": "Barad-dûr",
+      "Region Type": "Dark-domain",
       "set": "METW"
     },
     {
@@ -1316,6 +1404,7 @@
       "fullCode": "Barad-dûr [B] (BA)",
       "id": "2008",
       "name": "Barad-dûr",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1323,6 +1412,7 @@
       "fullCode": "Carn Dûm [H] (TW)",
       "id": "429",
       "name": "Carn Dûm",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -1330,6 +1420,7 @@
       "fullCode": "Carn Dûm [B] (BA)",
       "id": "2009",
       "name": "Carn Dûm",
+      "Region Type": "Shadow-land",
       "set": "MEBA"
     },
     {
@@ -1337,6 +1428,7 @@
       "fullCode": "Cirith Gorgor [B] (BA)",
       "id": "2010",
       "name": "Cirith Gorgor",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1344,6 +1436,7 @@
       "fullCode": "Cirith Gorgor [H] (AS)",
       "id": "1769",
       "name": "Cirith Gorgor",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1351,6 +1444,7 @@
       "fullCode": "Cirith Ungol [H] (TW)",
       "id": "431",
       "name": "Cirith Ungol",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -1358,6 +1452,7 @@
       "fullCode": "Cirith Ungol [B] (BA)",
       "id": "2011",
       "name": "Cirith Ungol",
+      "Region Type": "Shadow-land",
       "set": "MEBA"
     },
     {
@@ -1365,6 +1460,7 @@
       "fullCode": "Dimrill Dale [M] (LE)",
       "id": "1580",
       "name": "Dimrill Dale",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1372,6 +1468,7 @@
       "fullCode": "Dimrill Dale [H] (TW)",
       "id": "434",
       "name": "Dimrill Dale",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1379,6 +1476,7 @@
       "fullCode": "Dol Guldur [B] (BA)",
       "id": "2012",
       "name": "Dol Guldur",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1386,6 +1484,7 @@
       "fullCode": "Dol Guldur [H] (TW)",
       "id": "436",
       "name": "Dol Guldur",
+      "Region Type": "Dark-domain",
       "set": "METW"
     },
     {
@@ -1393,6 +1492,7 @@
       "fullCode": "Goblin-gate [H] (TW)",
       "id": "447",
       "name": "Goblin-gate",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1400,6 +1500,7 @@
       "fullCode": "Goblin-gate [M] (LE)",
       "id": "1593",
       "name": "Goblin-gate",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1407,6 +1508,7 @@
       "fullCode": "Moria [H] (TW)",
       "id": "462",
       "name": "Moria",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1414,6 +1516,7 @@
       "fullCode": "Moria [M] (LE)",
       "id": "1606",
       "name": "Moria",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1421,6 +1524,7 @@
       "fullCode": "Mount Doom [M] (LE)",
       "id": "1607",
       "name": "Mount Doom",
+      "Region Type": "Dark-domain",
       "set": "MELE"
     },
     {
@@ -1428,6 +1532,7 @@
       "fullCode": "Mount Gram [H] (TW)",
       "id": "464",
       "name": "Mount Gram",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -1435,6 +1540,7 @@
       "fullCode": "Mount Gundabad [M] (LE)",
       "id": "1609",
       "name": "Mount Gundabad",
+      "Region Type": "Dark-domain",
       "set": "MELE"
     },
     {
@@ -1442,6 +1548,7 @@
       "fullCode": "Mount Gundabad [H] (TW)",
       "id": "465",
       "name": "Mount Gundabad",
+      "Region Type": "Dark-domain",
       "set": "METW"
     },
     {
@@ -1449,6 +1556,7 @@
       "fullCode": "Sarn Goriwing [M] (LE)",
       "id": "1615",
       "name": "Sarn Goriwing",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1456,6 +1564,7 @@
       "fullCode": "Sarn Goriwing [H] (TW)",
       "id": "472",
       "name": "Sarn Goriwing",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1463,6 +1572,7 @@
       "fullCode": "Shelob's Lair [M] (LE)",
       "id": "1616",
       "name": "Shelob's Lair",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -1470,6 +1580,7 @@
       "fullCode": "Shelob's Lair [H] (TW)",
       "id": "473",
       "name": "Shelob's Lair",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -1478,6 +1589,7 @@
       "fullCode": "The Under-grottos [H] (DM)",
       "id": "1210",
       "name": "The Under-grottos",
+      "Region Type": "Wilderness",
       "set": "MEDM"
     },
     {
@@ -1486,6 +1598,7 @@
       "fullCode": "The Under-grottos [B] (BA)",
       "id": "2025",
       "name": "The Under-grottos",
+      "Region Type": "Wilderness",
       "set": "MEBA"
     },
     {
@@ -1494,6 +1607,7 @@
       "fullCode": "The Under-grottos [M] (AS)",
       "id": "1796",
       "name": "The Under-grottos",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1502,6 +1616,7 @@
       "fullCode": "The Under-leas [M] (AS)",
       "id": "1797",
       "name": "The Under-leas",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1510,6 +1625,7 @@
       "fullCode": "The Under-leas [H] (DM)",
       "id": "1211",
       "name": "The Under-leas",
+      "Region Type": "Dark-domain",
       "set": "MEDM"
     },
     {
@@ -1518,6 +1634,7 @@
       "fullCode": "The Under-leas [B] (BA)",
       "id": "2026",
       "name": "The Under-leas",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1525,6 +1642,7 @@
       "fullCode": "The Wind Throne [M] (LE)",
       "id": "1624",
       "name": "The Wind Throne",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -1532,6 +1650,7 @@
       "fullCode": "The Wind Throne [H] (TW)",
       "id": "480",
       "name": "The Wind Throne",
+      "Region Type": "Shadow-land",
       "set": "METW"
     },
     {
@@ -1540,6 +1659,7 @@
       "fullCode": "The Wind-deeps [B] (BA)",
       "id": "2028",
       "name": "The Wind-deeps",
+      "Region Type": "Shadow-land",
       "set": "MEBA"
     },
     {
@@ -1547,6 +1667,7 @@
       "fullCode": "Urlurtsu Nurn [H] (DM)",
       "id": "1213",
       "name": "Urlurtsu Nurn",
+      "Region Type": "Dark-domain",
       "set": "MEDM"
     },
     {
@@ -1554,6 +1675,7 @@
       "fullCode": "Buhr Widu [M] (LE)",
       "id": "1572",
       "name": "Buhr Widu",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1561,6 +1683,7 @@
       "fullCode": "Buhr Widu [H] (TD)",
       "id": "1025",
       "name": "Buhr Widu",
+      "Region Type": "Wilderness",
       "set": "METD"
     },
     {
@@ -1568,6 +1691,7 @@
       "fullCode": "Ettenmoors [M] (LE)",
       "id": "1588",
       "name": "Ettenmoors",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1575,6 +1699,7 @@
       "fullCode": "Ettenmoors [H] (TW)",
       "id": "444",
       "name": "Ettenmoors",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1583,6 +1708,7 @@
       "fullCode": "The Iron-deeps [B] (BA)",
       "id": "2018",
       "name": "The Iron-deeps",
+      "Region Type": "Shadow-land",
       "set": "MEBA"
     },
     {
@@ -1591,6 +1717,7 @@
       "fullCode": "The Iron-deeps [M] (AS)",
       "id": "1790",
       "name": "The Iron-deeps",
+      "Region Type": "Shadow-land",
       "set": "MEAS"
     },
     {
@@ -1599,6 +1726,7 @@
       "fullCode": "The Iron-deeps [H] (DM)",
       "id": "1204",
       "name": "The Iron-deeps",
+      "Region Type": "Shadow-land",
       "set": "MEDM"
     },
     {
@@ -1607,6 +1735,7 @@
       "fullCode": "The Sulfur-deeps [M] (AS)",
       "id": "1792",
       "name": "The Sulfur-deeps",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1615,6 +1744,7 @@
       "fullCode": "The Sulfur-deeps [B] (BA)",
       "id": "2021",
       "name": "The Sulfur-deeps",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1623,6 +1753,7 @@
       "fullCode": "The Sulfur-deeps [H] (DM)",
       "id": "1206",
       "name": "The Sulfur-deeps",
+      "Region Type": "Dark-domain",
       "set": "MEDM"
     },
     {
@@ -1631,6 +1762,7 @@
       "fullCode": "The Under-courts [M] (AS)",
       "id": "1793",
       "name": "The Under-courts",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1639,6 +1771,7 @@
       "fullCode": "The Under-courts [B] (BA)",
       "id": "2022",
       "name": "The Under-courts",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1647,6 +1780,7 @@
       "fullCode": "The Under-courts [H] (DM)",
       "id": "1207",
       "name": "The Under-courts",
+      "Region Type": "Dark-domain",
       "set": "MEDM"
     },
     {
@@ -1655,6 +1789,7 @@
       "fullCode": "The Under-galleries [M] (AS)",
       "id": "1794",
       "name": "The Under-galleries",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1663,6 +1798,7 @@
       "fullCode": "The Under-galleries [H] (DM)",
       "id": "1208",
       "name": "The Under-galleries",
+      "Region Type": "Dark-domain",
       "set": "MEDM"
     },
     {
@@ -1671,6 +1807,7 @@
       "fullCode": "The Under-galleries [B] (BA)",
       "id": "2023",
       "name": "The Under-galleries",
+      "Region Type": "Dark-domain",
       "set": "MEBA"
     },
     {
@@ -1678,6 +1815,7 @@
       "fullCode": "Old Forest [M] (AS)",
       "id": "1784",
       "name": "Old Forest",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1685,6 +1823,7 @@
       "fullCode": "Rhosgobel [M] (AS)",
       "id": "1787",
       "name": "Rhosgobel",
+      "Region Type": "Dark-domain",
       "set": "MEAS"
     },
     {
@@ -1692,6 +1831,7 @@
       "fullCode": "Blue Mountain Dwarf-hold [M] (LE)",
       "id": "1570",
       "name": "Blue Mountain Dwarf-hold",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1699,6 +1839,7 @@
       "fullCode": "Iron Hill Dwarf-hold [M] (LE)",
       "id": "1598",
       "name": "Iron Hill Dwarf-hold",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1706,6 +1847,7 @@
       "fullCode": "Eagles' Eyrie [M] (AS)",
       "id": "1771",
       "name": "Eagles' Eyrie",
+      "Region Type": "Border-land",
       "set": "MEAS"
     },
     {
@@ -1713,6 +1855,7 @@
       "fullCode": "Grey Havens [M] (AS)",
       "id": "1777",
       "name": "Grey Havens",
+      "Region Type": "Free-domain",
       "set": "MEAS"
     },
     {
@@ -1720,6 +1863,7 @@
       "fullCode": "Lórien [M] (AS)",
       "id": "1782",
       "name": "Lórien",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1727,6 +1871,7 @@
       "fullCode": "Thranduil's Halls [M] (LE)",
       "id": "1626",
       "name": "Thranduil's Halls",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1734,6 +1879,7 @@
       "fullCode": "Isengard [H] (TW)",
       "id": "453",
       "name": "Isengard",
+      "Region Type": "Border-land",
       "set": "METW"
     },
     {
@@ -1741,6 +1887,7 @@
       "fullCode": "Isengard [M] (LE)",
       "id": "1599",
       "name": "Isengard",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1748,6 +1895,7 @@
       "fullCode": "Ost-in-Edhil [H] (TW)",
       "id": "467",
       "name": "Ost-in-Edhil",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1755,6 +1903,7 @@
       "fullCode": "Ost-in-Edhil [M] (LE)",
       "id": "1611",
       "name": "Ost-in-Edhil",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1762,6 +1911,7 @@
       "fullCode": "The White Towers [M] (LE)",
       "id": "1623",
       "name": "The White Towers",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1769,6 +1919,7 @@
       "fullCode": "The White Towers [H] (TW)",
       "id": "479",
       "name": "The White Towers",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1776,6 +1927,7 @@
       "fullCode": "Weathertop [M] (AS)",
       "id": "1801",
       "name": "Weathertop",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1783,6 +1935,7 @@
       "fullCode": "Weathertop [H] (TW)",
       "id": "485",
       "name": "Weathertop",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1790,6 +1943,7 @@
       "fullCode": "Glittering Caves [M] (LE)",
       "id": "1591",
       "name": "Glittering Caves",
+      "Region Type": "Border-land",
       "set": "MELE"
     },
     {
@@ -1797,6 +1951,7 @@
       "fullCode": "Glittering Caves [H] (TW)",
       "id": "446",
       "name": "Glittering Caves",
+      "Region Type": "Border-land",
       "set": "METW"
     },
     {
@@ -1804,6 +1959,7 @@
       "fullCode": "Stone-circle [M] (LE)",
       "id": "1619",
       "name": "Stone-circle",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1811,6 +1967,7 @@
       "fullCode": "Stone-circle [H] (TW)",
       "id": "476",
       "name": "Stone-circle",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1819,6 +1976,7 @@
       "fullCode": "The Pûkel-deeps [B] (BA)",
       "id": "2019",
       "name": "The Pûkel-deeps",
+      "Region Type": "Border-land",
       "set": "MEBA"
     },
     {
@@ -1826,6 +1984,7 @@
       "fullCode": "The Stones [H] (TW)",
       "id": "478",
       "name": "The Stones",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1833,6 +1992,7 @@
       "fullCode": "The Stones [M] (LE)",
       "id": "1622",
       "name": "The Stones",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1841,6 +2001,7 @@
       "fullCode": "Remains of Thangorodrim [B] (BA)",
       "id": "2015",
       "name": "Remains of Thangorodrim",
+      "Region Type": "Wilderness",
       "set": "MEBA"
     },
     {
@@ -1849,6 +2010,7 @@
       "fullCode": "The Drowning-deeps [B] (BA)",
       "id": "2016",
       "name": "The Drowning-deeps",
+      "Region Type": "Wilderness",
       "set": "MEBA"
     },
     {
@@ -1857,6 +2019,7 @@
       "fullCode": "The Rusted-deeps [B] (BA)",
       "id": "2020",
       "name": "The Rusted-deeps",
+      "Region Type": "Wilderness",
       "set": "MEBA"
     },
     {
@@ -1864,6 +2027,7 @@
       "fullCode": "Ruined Signal Tower [M] (LE)",
       "id": "1614",
       "name": "Ruined Signal Tower",
+      "Region Type": "Wilderness",
       "set": "MELE"
     },
     {
@@ -1871,6 +2035,7 @@
       "fullCode": "Ruined Signal Tower [H] (TW)",
       "id": "471",
       "name": "Ruined Signal Tower",
+      "Region Type": "Wilderness",
       "set": "METW"
     },
     {
@@ -1879,6 +2044,7 @@
       "fullCode": "The Under-gates [M] (AS)",
       "id": "1795",
       "name": "The Under-gates",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -1887,6 +2053,7 @@
       "fullCode": "The Under-gates [H] (DM)",
       "id": "1209",
       "name": "The Under-gates",
+      "Region Type": "Wilderness",
       "set": "MEDM"
     },
     {
@@ -2635,6 +2802,7 @@
       "fullCode": "Carn Dûm [M] (LE)",
       "id": "1574",
       "name": "Carn Dûm",
+      "Region Type": "Shadow-land",
       "set": "MELE"
     },
     {
@@ -2642,6 +2810,7 @@
       "fullCode": "Urlurtsu Nurn [M] (LE)",
       "id": "1627",
       "name": "Urlurtsu Nurn",
+      "Region Type": "Dark-domain",
       "set": "MELE"
     },
     {
@@ -2649,6 +2818,7 @@
       "fullCode": "Wellinghall [M] (AS)",
       "id": "1802",
       "name": "Wellinghall",
+      "Region Type": "Wilderness",
       "set": "MEAS"
     },
     {
@@ -2656,6 +2826,7 @@
       "fullCode": "The Under-gates [B] (BA)",
       "id": "2024",
       "name": "The Under-gates",
+      "Region Type": "Wilderness",
       "set": "MEBA"
     },
     {
@@ -3034,7 +3205,344 @@
       "fullCode": "Framsburg [H] (TD)",
       "id": "1027",
       "name": "Framsburg",
+      "Region Type": "Border-land",
       "set": "METD"
+    },
+    {
+      "fullCode": "Bag End [H] (TW)",
+      "id": "421",
+      "name": "Bag End",
+      "Region Type": "Free-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Barad-dûr [M] (LE)",
+      "id": "1567",
+      "name": "Barad-dûr",
+      "Region Type": "Dark-domain",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Beorn's House [H] (TW)",
+      "id": "425",
+      "name": "Beorn's House",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Blue Mountain Dwarf-hold [H] (TW)",
+      "id": "426",
+      "name": "Blue Mountain Dwarf-hold",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Bree [H] (TW)",
+      "id": "427",
+      "name": "Bree",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Cameth Brin [H] (TW)",
+      "id": "428",
+      "name": "Cameth Brin",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Cirith Gorgor [M] (LE)",
+      "id": "1576",
+      "name": "Cirith Gorgor",
+      "Region Type": "Dark-domain",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Cirith Ungol [M] (LE)",
+      "id": "1577",
+      "name": "Cirith Ungol",
+      "Region Type": "Shadow-land",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Dale [H] (TD)",
+      "id": "1026",
+      "name": "Dale",
+      "Region Type": "Wilderness",
+      "set": "METD"
+    },
+    {
+      "fullCode": "Deep Mines (WH)",
+      "id": "1921",
+      "name": "Deep Mines",
+      "Region Type": "Border-land",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Dol Amroth [H] (TW)",
+      "id": "435",
+      "name": "Dol Amroth",
+      "Region Type": "Free-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Dol Guldur [M] (LE)",
+      "id": "1582",
+      "name": "Dol Guldur",
+      "Region Type": "Dark-domain",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Drúadan Forest [H] (TW)",
+      "id": "437",
+      "name": "Drúadan Forest",
+      "Region Type": "Free-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Dunharrow [H] (TW)",
+      "id": "438",
+      "name": "Dunharrow",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Dunnish Clan-hold [H] (TW)",
+      "id": "439",
+      "name": "Dunnish Clan-hold",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Eagles' Eyrie [H] (TW)",
+      "id": "440",
+      "name": "Eagles' Eyrie",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Easterling Camp [H] (TW)",
+      "id": "441",
+      "name": "Easterling Camp",
+      "Region Type": "Shadow-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Edhellond [H] (TW)",
+      "id": "442",
+      "name": "Edhellond",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Edoras [H] (TW)",
+      "id": "443",
+      "name": "Edoras",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Geann a-Lisch [M] (LE)",
+      "id": "1589",
+      "name": "Geann a-Lisch",
+      "Region Type": "Wilderness",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Grey Havens [H] (TW)",
+      "id": "448",
+      "name": "Grey Havens",
+      "Region Type": "Free-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Henneth Annûn [H] (TW)",
+      "id": "449",
+      "name": "Henneth Annûn",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Iron Hill Dwarf-hold [H] (TW)",
+      "id": "452",
+      "name": "Iron Hill Dwarf-hold",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Isengard [F] (WH)",
+      "id": "1922",
+      "name": "Isengard",
+      "Region Type": "Border-land",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Lake-town [H] (TW)",
+      "id": "455",
+      "name": "Lake-town",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Lond Galen [H] (TW)",
+      "id": "456",
+      "name": "Lond Galen",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Lórien [H] (TW)",
+      "id": "457",
+      "name": "Lórien",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Lossadan Camp [H] (TW)",
+      "id": "459",
+      "name": "Lossadan Camp",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Minas Morgul [M] (LE)",
+      "id": "1604",
+      "name": "Minas Morgul",
+      "Region Type": "Shadow-land",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Minas Tirith [H] (TW)",
+      "id": "461",
+      "name": "Minas Tirith",
+      "Region Type": "Free-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Moria [B] (BA)",
+      "id": "2014",
+      "name": "Moria",
+      "Region Type": "Wilderness",
+      "set": "MEBA"
+    },
+    {
+      "fullCode": "Mount Doom [H] (TW)",
+      "id": "463",
+      "name": "Mount Doom",
+      "Region Type": "Dark-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Mount Gram [M] (LE)",
+      "id": "1608",
+      "name": "Mount Gram",
+      "Region Type": "Shadow-land",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Nûrniag Camp [M] (LE)",
+      "id": "1610",
+      "name": "Nûrniag Camp",
+      "Region Type": "Dark-domain",
+      "set": "MELE"
+    },
+    {
+      "fullCode": "Old Forest [H] (TW)",
+      "id": "466",
+      "name": "Old Forest",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Pelargir [H] (TW)",
+      "id": "468",
+      "name": "Pelargir",
+      "Region Type": "Free-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Rhosgobel [H] (TW)",
+      "id": "469",
+      "name": "Rhosgobel",
+      "Region Type": "Dark-domain",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Rhosgobel [F] (WH)",
+      "id": "1923",
+      "name": "Rhosgobel",
+      "Region Type": "Dark-domain",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Rivendell [H] (TW)",
+      "id": "470",
+      "name": "Rivendell",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Shrel-Kain [H] (TW)",
+      "id": "474",
+      "name": "Shrel-Kain",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Southron Oasis [H] (TW)",
+      "id": "475",
+      "name": "Southron Oasis",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "The White Towers [F] (WH)",
+      "id": "1924",
+      "name": "The White Towers",
+      "Region Type": "Wilderness",
+      "set": "MEWH"
+    },
+    {
+      "fullCode": "Thranduil's Halls [H] (TW)",
+      "id": "481",
+      "name": "Thranduil's Halls",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Vale of Erech [H] (TW)",
+      "id": "483",
+      "name": "Vale of Erech",
+      "Region Type": "Border-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Variag Camp [H] (TW)",
+      "id": "484",
+      "name": "Variag Camp",
+      "Region Type": "Shadow-land",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Wellinghall [H] (TW)",
+      "id": "486",
+      "name": "Wellinghall",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Woodmen-town [H] (TW)",
+      "id": "487",
+      "name": "Woodmen-town",
+      "Region Type": "Wilderness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Wose Passage-hold [H] (TW)",
+      "id": "488",
+      "name": "Wose Passage-hold",
+      "Region Type": "Wilderness",
+      "set": "METW"
     }
   ],
   "Filters": [

@@ -113,6 +113,22 @@
             </td>
         </tr>
         <tr>
+            <td><code>Region Type</code></td>
+            <td>
+                Classifies the terrain symbol printed on region cards (e.g. <em>Wilderness</em>, <em>Shadow-land</em>, <em>Dark-domain</em>, <em>Free-domain</em>, <em>Border-land</em>, <em>Coastal Sea</em>). Can be joined onto site cards using the Cross-Card Lookup tool to enable dynamic regional terrain filtering (e.g. <code>Region Type=Wilderness</code>).
+            </td>
+            <td>
+                <ul>
+                    <li><em>Wilderness</em> &rarr; (Anduin Vales, Arthedain, Cardolan, etc.)</li>
+                    <li><em>Shadow-land</em> &rarr; (Ithilien, Dagorlad, Gorgoroth, etc.)</li>
+                    <li><em>Dark-domain</em> &rarr; (Ud&ucirc;n, Nurn, etc.)</li>
+                    <li><em>Free-domain</em> &rarr; (Shire, Lindon, etc.)</li>
+                    <li><em>Border-land</em> &rarr; (Rohan, An&oacute;rien, etc.)</li>
+                    <li><em>Coastal Sea</em> &rarr; (Bay of Belfalas, etc.)</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <td><code>Resolved Site</code></td>
             <td>
                 Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>). For cards with non-specific, regional, or dynamic home rules, the <code>Resolved Site</code> tag assigns dynamic rules predicates (<code>Attribute=Value</code>) that resolve against the active catalog at runtime.
