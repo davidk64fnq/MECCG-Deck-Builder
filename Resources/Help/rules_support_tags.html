@@ -56,18 +56,15 @@
         <tr>
             <td><code>Automatic Attack</code></td>
             <td>
-                Indexes guardian creature species printed on site cards using singular terms that match 100% of candidate hazard creatures (both unique individuals like <em>Bert</em> or <em>Rogrog</em> and non-unique packs like <em>Olog-hai</em>).
+                Indexes guardian creature species printed on site cards using singular terms that match 100% of candidate hazard creatures. For sites with open-ended guardian rules (e.g. <em>Framsburg</em> with attacks keyed to site types rather than species), dynamic predicates specify legal creature keys.
             </td>
             <td>
                 <ul>
                     <li><em>Dancing Spire</em>, <em>The Lonely Mountain</em> &rarr; <code>Dragon</code></li>
                     <li><em>Carn D&ucirc;m</em>, <em>Moria</em> &rarr; <code>Orc; Troll</code></li>
-                    <li><em>Barrow-downs</em>, <em>Dead Marshes</em> &rarr; <code>Undead</code></li>
+                    <li><em>Framsburg</em> &rarr; <code>Site=Ruins &amp; Lairs; Site=Shadow-hold</code></li>
                     <li><em>Barad-d&ucirc;r</em> &rarr; <code>Orc; Troll; Maia</code></li>
                     <li><em>Shelob's Lair</em> &rarr; <code>Spider</code></li>
-                    <li><em>Wellinghall</em> &rarr; <code>Awakened Plant</code></li>
-                    <li><em>Dunharrow</em> &rarr; <code>P&ucirc;kel-creature</code></li>
-                    <li><em>Rivendell</em> (Minion) &rarr; <code>Elf; D&uacute;nadan</code></li>
                 </ul>
             </td>
         </tr>
@@ -118,13 +115,18 @@
         <tr>
             <td><code>Resolved Site</code></td>
             <td>
-                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>). For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites).
+                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>). For cards with non-specific, regional, or dynamic home rules, the <code>Resolved Site</code> tag assigns dynamic rules predicates (<code>Attribute=Value</code>) that resolve against the active catalog at runtime.
             </td>
             <td>
                 <ul>
-                    <li><em>Doeth</em>, <em>Durthak</em> (<em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
-                    <li><em>Gandalf</em> (<em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
-                    <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
+                    <li><em>Gandalf</em> (<em>"Home Site: Any Haven"</em>) &rarr; <code>Site=Haven</code></li>
+                    <li><em>Doeth</em>, <em>Durthak</em> (<em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Site=Dark-hold</code></li>
+                    <li><em>Crook-legged Orc</em>, <em>Hill-troll</em> &rarr; <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code></li>
+                    <li><em>B&ucirc;rat</em> &rarr; <code>Site=Ruins &amp; Lairs &amp;&amp; Region!=Under-deeps</code></li>
+                    <li><em>Ren the Ringwraith</em> &rarr; <code>Region=Gorgoroth</code></li>
+                    <li><em>Dwar</em>, <em>Hoarm&ucirc;rath</em> &rarr; <code>Region=Ud&ucirc;n</code></li>
+                    <li><em>Ind&ucirc;r the Ringwraith</em> &rarr; <code>Region=Ud&ucirc;n; Region=Imlad Morgul</code></li>
+                    <li><em>Alatar</em> &rarr; Literal site list (retained when raw database lacks terrain flags).</li>
                 </ul>
             </td>
         </tr>
@@ -158,7 +160,7 @@
         <strong>Execution Walkthrough:</strong>
         <ul>
             <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
-            <li><strong>Dynamic Characters (Doeth, Durthak, Gandalf, Orc Captain):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Category:Resolved Site}</code>!</li>
+            <li><strong>Dynamic Characters (Doeth, Gandalf, Crook-legged Orc):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Haven"</code> or <code>"any non-Dark-hold Under-deeps site"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and dynamically evaluates the predicate from <code>{Leader.Category:Resolved Site}</code> (e.g. <code>Site=Haven</code> or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>), drawing randomly from all matching sites available in your active expansions without hardcoded site lists!</li>
         </ul>
     </div>
 

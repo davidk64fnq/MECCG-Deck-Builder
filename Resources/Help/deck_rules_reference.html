@@ -245,6 +245,51 @@
         When a rule captures one or more cards via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query those cards' properties using bracketed tokens:
     </p>
 
+    <!-- SECTION 4.F: DYNAMIC ATTRIBUTE PREDICATE SELECTORS -->
+    <h3 id="predicate-selectors">F. Dynamic Attribute Predicate Selectors (Attribute=Value)</h3>
+    <p>
+        Custom taxonomy tags and procedural generation rules support dynamic rules predicates using the <code>Attribute=Value</code> syntax:
+    </p>
+    <ul>
+        <li><code>"Site=Haven"</code> &mdash; Matches any Haven site card (e.g. <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, <em>Edhellond</em>).</li>
+        <li><code>"Site=Dark-hold"</code> &mdash; Matches any Dark-hold site card (e.g. <em>Barad-d&ucirc;r</em>, <em>Dol Guldur</em>, <em>Carn D&ucirc;m</em>).</li>
+        <li><code>"Site=Ruins &amp; Lairs"</code> &mdash; Matches site cards or creature hazards keyed to Ruins &amp; Lairs.</li>
+        <li><code>"Site=Shadow-hold"</code> &mdash; Matches site cards or creature hazards keyed to Shadow-holds.</li>
+        <li><code>"Site=Free-hold"</code> &mdash; Matches any Free-hold site card.</li>
+        <li><code>"Region=Ud&ucirc;n"</code> &mdash; Matches site cards in the Ud&ucirc;n region (e.g. <em>Cirith Gorgor</em>) with automatic diacritic resilience (matching <em>Udun</em>, <em>Ud&ucirc;n</em>, or <em>&Ucirc;dun</em>).</li>
+        <li><code>"Alignment=Neutral"</code> &mdash; Matches neutral faction, ally, or site cards.</li>
+        <li><code>"Corruption=[Blank]"</code> &mdash; Matches cards with no corruption burden.</li>
+        <li><code>"Adjacent Sites!=[Blank]"</code> &mdash; Matches cards that have at least one custom tag assigned under <em>Adjacent Sites</em> (useful for identifying Under-deeps entrances).</li>
+    </ul>
+
+    <div class="note">
+        <strong>Canonical Site Names vs. Shorthand Symbols:</strong><br />
+        Always use full canonical site names (such as <code>Site=Ruins &amp; Lairs</code>, <code>Site=Shadow-hold</code>, or <code>Site=Haven</code>) in deck rules and custom tags. Single-letter symbols (such as <code>w</code> or <code>s</code>) are disallowed in rule queries because ICE typography overloaded letters between site hold types and region terrain symbols (for example, <code>w</code> represented a <em>Wilderness</em> region symbol, whereas <code>W</code> represented a <em>Wizardhaven</em> site).
+    </div>
+
+    <p>
+        <strong>Composite Semicolon Lists &amp; Compound AND Logic:</strong><br />
+        Predicates and standard card titles can be combined in semicolon lists (<strong>OR</strong> logic). You can also chain multiple predicates together within a single token using <code>&amp;&amp;</code> (<strong>AND</strong> logic):
+    </p>
+
+    <p><em>Example A &mdash; Semicolon OR Logic:</em></p>
+    <pre><code>"Attributes": {
+  "Primary": "Site",
+  "Name": "Region=Ud&ucirc;n; The Sulfur-deeps; The Under-courts"
+}</code></pre>
+    <p>
+        A candidate card matches if it satisfies the dynamic predicate (e.g. <em>Cirith Gorgor</em> matches <code>Region=Ud&ucirc;n</code>) <strong>OR</strong> matches any of the literal card titles.
+    </p>
+
+    <p><em>Example B &mdash; Compound AND Logic (via Tag Expansion):</em></p>
+    <pre><code>"Attributes": {
+  "Primary": "Site",
+  "Name": "{Orc.Category:Resolved Site}"
+}</code></pre>
+    <p>
+        If <em>Crook-legged Orc</em> is captured as <code>{Orc}</code> and tagged with <code>Resolved Site: Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>, candidate cards must be located in the Under-deeps <strong>AND</strong> must not be a Dark-hold.
+    </p>
+
     <div class="note">
         <strong>Unmet Dependency Handling:</strong> If a token references a category or attribute that is absent on the captured card(s), it resolves to an empty string (<code>""</code>). The rule recognizes that the dependency was not met, adds 0 cards, and cleanly hands execution over to the <code>Fallback</code> rule without interrupting generation.
     </div>

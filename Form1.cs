@@ -2298,9 +2298,12 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
+            // Capture active expansion set selection prior to generation
+            var activeSetsBeforeGen = new HashSet<string>(_currentDeck.IncludedSets, StringComparer.OrdinalIgnoreCase);
+
             var result = DeckGenerationService.GenerateDeck(
                 _catalogService.Cards,
-                _currentDeck.IncludedSets,
+                activeSetsBeforeGen,
                 _filterService,
                 ruleSet);
 
@@ -2317,6 +2320,11 @@ namespace MECCG_Deck_Builder
             _currentDeck.Clear();
             _currentDeck.Title = result.Deck.Title;
 
+            // Retain all sets the user had selected, plus any additional sets introduced by the rules
+            foreach (var s in activeSetsBeforeGen)
+            {
+                _currentDeck.IncludedSets.Add(s);
+            }
             foreach (var s in result.Deck.IncludedSets)
             {
                 _currentDeck.IncludedSets.Add(s);

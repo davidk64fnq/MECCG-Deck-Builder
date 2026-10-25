@@ -14,7 +14,7 @@ namespace MECCG_Deck_Builder
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 #pragma warning restore SYSLIB1045
 
-        private static readonly HashSet<string> NumericAttributes = new(StringComparer.OrdinalIgnoreCase)
+        internal static readonly HashSet<string> NumericAttributes = new(StringComparer.OrdinalIgnoreCase)
         {
             "Prowess", "Body", "Mind", "Direct", "Corruption", "MPs", "Strikes"
         };
@@ -84,7 +84,6 @@ namespace MECCG_Deck_Builder
 
             contextVariables ??= new Dictionary<string, List<Card>>(StringComparer.OrdinalIgnoreCase);
 
-            // Handle RandomChoice / ChoiceGroup ("OR" branches)
             if (IsChoiceRule(rule))
             {
                 var validChoices = rule.Choices?.Where(c => c != null && c.Rules != null && c.Rules.Count > 0).ToList() ?? [];
@@ -125,7 +124,6 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // Standard FilterQuery Rule
             if (rule.Count <= 0) return;
 
             if (!Enum.TryParse<DeckSectionType>(rule.Section, true, out var sectionType))
@@ -137,7 +135,6 @@ namespace MECCG_Deck_Builder
                 ? new HashSet<string>(rule.Sets, StringComparer.OrdinalIgnoreCase)
                 : defaultSets;
 
-            // 1. Resolve runtime variable placeholders in Attributes & Categories
             var resolvedAttributes = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
             if (rule.Attributes != null)
             {
@@ -160,7 +157,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Filter candidate cards
             var candidates = allCards.Where(c =>
             {
                 if (ruleSets != null && ruleSets.Count > 0 && !ruleSets.Contains(c.Set))
@@ -168,7 +164,6 @@ namespace MECCG_Deck_Builder
                     return false;
                 }
 
-                // Attribute evaluation with numeric comparison and blank sentinel support
                 foreach (var (attrKey, (rawTemplate, resolvedVal)) in resolvedAttributes)
                 {
                     if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
@@ -176,13 +171,12 @@ namespace MECCG_Deck_Builder
                         return false;
                     }
 
-                    if (!EvaluateAttributeCriterion(c, attrKey, resolvedVal))
+                    if (!EvaluateAttributeCriterion(c, attrKey, resolvedVal, filterService))
                     {
                         return false;
                     }
                 }
 
-                // Category & Tag evaluation with blank sentinel support
                 if (filterService != null)
                 {
                     foreach (var (catKey, (rawTemplate, resolvedVal)) in resolvedCategories)
@@ -198,7 +192,8 @@ namespace MECCG_Deck_Builder
                             if (!allowedTags.Any(t =>
                                 t == "*" ||
                                 string.Equals(t, "All", StringComparison.OrdinalIgnoreCase) ||
-                                filterService.MatchesCustomCriterion(c.Id, catKey, t)))
+                                filterService.MatchesCustomCriterion(c.Id, catKey, t) ||
+                                (CardFilterService.TryParsePredicate(t, out _, out _, out _) && CardFilterService.MatchesPredicate(c, t, filterService))))
                             {
                                 return false;
                             }
@@ -209,7 +204,6 @@ namespace MECCG_Deck_Builder
                 return true;
             }).ToList();
 
-            // 3. Sample candidates according to configurable Distribution strategy
             int addedForThisRule = 0;
             var targetSection = deck.GetSection(sectionType);
             var newlyAdded = new List<Card>();
@@ -219,7 +213,6 @@ namespace MECCG_Deck_Builder
             if (string.Equals(distribution, "Focused", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(distribution, "Playset", StringComparison.OrdinalIgnoreCase))
             {
-                // FOCUSED: Greedily add maximum legal copies of a sampled title before picking next
                 while (addedForThisRule < rule.Count)
                 {
                     var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
@@ -252,7 +245,6 @@ namespace MECCG_Deck_Builder
             else if (string.Equals(distribution, "Uniform", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(distribution, "Random", StringComparison.OrdinalIgnoreCase))
             {
-                // UNIFORM: Pure lottery draw across all valid candidates with replacement up to limits
                 while (addedForThisRule < rule.Count)
                 {
                     var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
@@ -275,7 +267,6 @@ namespace MECCG_Deck_Builder
             }
             else
             {
-                // VARIETY (Default): Prioritize distinct titles before assigning duplicates
                 while (addedForThisRule < rule.Count)
                 {
                     var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
@@ -312,13 +303,11 @@ namespace MECCG_Deck_Builder
                 AddedCount = addedForThisRule
             });
 
-            // 4. Capture selected cards to variable context if SaveAs is specified
             if (!string.IsNullOrWhiteSpace(rule.SaveAs) && newlyAdded.Count > 0)
             {
                 contextVariables[rule.SaveAs] = newlyAdded;
             }
 
-            // 5. If shortfall occurred and a Fallback rule is defined, execute it for remaining count
             if (addedForThisRule < rule.Count && rule.Fallback != null)
             {
                 int remainingNeeded = rule.Count - addedForThisRule;
@@ -335,9 +324,21 @@ namespace MECCG_Deck_Builder
 
         #region ATTRIBUTE_EVALUATION_AND_NUMERIC_OPERATORS
 
-        private static bool EvaluateAttributeCriterion(Card card, string attrKey, string resolvedVal)
+        private static bool EvaluateAttributeCriterion(Card card, string attrKey, string resolvedVal, CardFilterService filterService)
         {
-            if (string.IsNullOrWhiteSpace(resolvedVal)) return true;
+            if (string.IsNullOrWhiteSpace(resolvedVal))
+            {
+                if (CardFilterService.TryParsePredicate(attrKey, out _, out _, out _))
+                {
+                    return CardFilterService.MatchesPredicate(card, attrKey, filterService);
+                }
+                return true;
+            }
+
+            if (CardFilterService.TryParsePredicate(attrKey, out _, out _, out _))
+            {
+                return CardFilterService.MatchesPredicate(card, attrKey, filterService);
+            }
 
             if (NumericAttributes.Contains(attrKey) && HasComparisonOperator(resolvedVal))
             {
@@ -348,19 +349,20 @@ namespace MECCG_Deck_Builder
             return allowedValues.Any(v =>
                 v == "*" ||
                 string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
-                CardFilterService.MatchesCardnumCriterion(card, attrKey, v));
+                (CardFilterService.TryParsePredicate(v, out _, out _, out _)
+                    ? CardFilterService.MatchesPredicate(card, v, filterService)
+                    : CardFilterService.MatchesCardnumCriterion(card, attrKey, v)));
         }
 
         private static bool HasComparisonOperator(string val) =>
             val.Contains('>') || val.Contains('<') || val.Contains("!=") || val.Contains('=');
 
-        private static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
+        internal static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
         {
             string rawCardVal = card.GetAttribute(attrKey);
 
             if (!TryParseCardStat(rawCardVal, out int cardStat))
             {
-                // Fallback to literal matching for non-numeric/empty values
                 var fallbackTokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 return fallbackTokens.Any(v =>
                     v == "*" ||
@@ -416,7 +418,6 @@ namespace MECCG_Deck_Builder
 
             if (parsedConditions.Count == 0) return false;
 
-            // Detect range bounding (e.g. >= 3 and <= 5)
             var lowerBounds = parsedConditions.Where(c => c.Op is ">=" or ">").ToList();
             var upperBounds = parsedConditions.Where(c => c.Op is "<=" or "<").ToList();
 
@@ -427,19 +428,16 @@ namespace MECCG_Deck_Builder
 
                 if (lb.TargetVal <= ub.TargetVal)
                 {
-                    // Bound interval AND condition
                     bool satisfiesLower = lb.Op == ">=" ? cardStat >= lb.TargetVal : cardStat > lb.TargetVal;
                     bool satisfiesUpper = ub.Op == "<=" ? cardStat <= ub.TargetVal : cardStat < ub.TargetVal;
 
                     if (satisfiesLower && satisfiesUpper) return true;
 
-                    // Evaluate any additional discrete conditions
                     var others = parsedConditions.Where(c => c != lb && c != ub).ToList();
                     return others.Any(c => EvaluateSingleCondition(cardStat, c.Op, c.TargetVal));
                 }
             }
 
-            // Standard OR evaluation across conditions
             return parsedConditions.Any(c => EvaluateSingleCondition(cardStat, c.Op, c.TargetVal));
         }
 
@@ -461,20 +459,17 @@ namespace MECCG_Deck_Builder
 
             string trimmed = cardValue.Trim();
 
-            // Strip parentheses (e.g., (-1) -> -1, (2) -> 2)
             if (trimmed.StartsWith('(') && trimmed.EndsWith(')'))
             {
                 trimmed = trimmed[1..^1].Trim();
             }
 
-            // Strip suffix parentheses (e.g. 1(2) -> 1)
             int parenIdx = trimmed.IndexOf('(');
             if (parenIdx > 0)
             {
                 trimmed = trimmed[..parenIdx].Trim();
             }
 
-            // Treat MPs "None" as 0
             if (string.Equals(trimmed, "None", StringComparison.OrdinalIgnoreCase))
             {
                 result = 0;
@@ -510,7 +505,6 @@ namespace MECCG_Deck_Builder
 
                 if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
                 {
-                    // Custom taxonomy tag lookup: {Variable.Category:Category Name} or {Variable.Tag:Category Name}
                     string category = match.Groups[2].Value.Trim();
                     if (filterService != null)
                     {
@@ -529,7 +523,6 @@ namespace MECCG_Deck_Builder
                 }
                 else if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
                 {
-                    // Official rules attribute lookup: {Variable.AttributeName}
                     string attrName = match.Groups[3].Value.Trim();
                     foreach (var card in cards)
                     {
