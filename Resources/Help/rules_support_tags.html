@@ -14,10 +14,10 @@
     </p>
     <ul>
         <li>
-            <strong><code>cards-dc.json</code> (Core Catalog):</strong> The official card database containing printed rules statistics (Primary, Alignment, Race, Skills, Mind, Prowess, etc.), originally derived from open Cardnum data with local developer corrections. This file represents the immutable card catalog.
+            <strong><code>cards-dc.json</code> (Core Catalog):</strong> The official card database containing printed rules statistics (Primary, Alignment, Race, Skills, Mind, Prowess, etc.), normalized into canonical singular creature species.
         </li>
         <li>
-            <strong><code>Rules_Support_Tags.json</code> (Rules Intelligence Layer):</strong> A companion taxonomy dataset authored entirely by the developer. It bridges unstructured card text into queryable taxonomy tags—mapping site automatic attacks, character recruiting bonuses, and home site resolutions so that generic procedural deck rules can generate legal, themed decks automatically.
+            <strong><code>Rules_Support_Tags.json</code> (Rules Intelligence Layer):</strong> A companion taxonomy dataset authored to bridge unstructured card text into queryable taxonomy tags—mapping site automatic attacks, character recruiting bonuses, and home site resolutions so that generic procedural deck rules can generate legal, themed decks automatically.
         </li>
     </ul>
 
@@ -56,15 +56,18 @@
         <tr>
             <td><code>Automatic Attack</code></td>
             <td>
-                Indexes guardian creature species printed on site cards (or created by site modifications). Differentiates true Dragon lairs from minor Drake sites and maps regional defenses (Orcs, Trolls, Undead, Elves, etc.) for hazard matching and expedition rules.
+                Indexes guardian creature species printed on site cards using singular terms that match 100% of candidate hazard creatures (both unique individuals like <em>Bert</em> or <em>Rogrog</em> and non-unique packs like <em>Olog-hai</em>).
             </td>
             <td>
                 <ul>
                     <li><em>Dancing Spire</em>, <em>The Lonely Mountain</em> &rarr; <code>Dragon</code></li>
-                    <li><em>Carn D&ucirc;m</em>, <em>Moria</em> &rarr; <code>Orcs; Trolls</code></li>
+                    <li><em>Carn D&ucirc;m</em>, <em>Moria</em> &rarr; <code>Orc; Troll</code></li>
                     <li><em>Barrow-downs</em>, <em>Dead Marshes</em> &rarr; <code>Undead</code></li>
-                    <li><em>Barad-d&ucirc;r</em> &rarr; <code>Orcs; Trolls; Maia</code></li>
-                    <li><em>Rivendell</em> (Minion) &rarr; <code>Elves; D&uacute;nedain</code></li>
+                    <li><em>Barad-d&ucirc;r</em> &rarr; <code>Orc; Troll; Maia</code></li>
+                    <li><em>Shelob's Lair</em> &rarr; <code>Spider</code></li>
+                    <li><em>Wellinghall</em> &rarr; <code>Awakened Plant</code></li>
+                    <li><em>Dunharrow</em> &rarr; <code>P&ucirc;kel-creature</code></li>
+                    <li><em>Rivendell</em> (Minion) &rarr; <code>Elf; D&uacute;nadan</code></li>
                 </ul>
             </td>
         </tr>
@@ -75,7 +78,7 @@
             </td>
             <td>
                 <ul>
-                    <li>Dwarves with bonuses vs. Orcs &rarr; <code>Orcs</code></li>
+                    <li>Dwarves with bonuses vs. Orcs &rarr; <code>Orc</code></li>
                     <li>Nazg&ucirc;l hunters &rarr; <code>Nazg&ucirc;l</code></li>
                 </ul>
             </td>
@@ -83,8 +86,8 @@
         <tr>
             <td><code>Faction Bonus</code></td>
             <td>
-                Character recruiting bonuses granting bonus Direct Influence (+1 or more, typically +1 to +3) when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Category:Faction Bonus}"</code> or <code>"Race": "{Leader.Category:Faction Bonus}"</code>).<br /><br />
-                <em>Universal Diplomats:</em> Characters with bonuses against any faction (such as <em>Adrazar</em> or <em>Peath</em>) carry the <code>All</code> tag, which acts as a wildcard across all available factions in active sets.
+                Character recruiting bonuses granting bonus Direct Influence (+1 or more, typically +1 to +3) when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Category:Faction Bonus}"</code>).<br /><br />
+                <em>Universal Diplomats:</em> Characters with bonuses against any faction (such as <em>Adrazar</em> or <em>Peath</em>) carry the <code>All</code> wildcard.
             </td>
             <td>
                 <ul>
@@ -100,7 +103,7 @@
         <tr>
             <td><code>Home Region</code></td>
             <td>
-                Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies (e.g. Eriador, Gondor, Rohan companies) or calculate movement routes.
+                Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies (e.g. Eriador, Gondor, Rohan companies).
             </td>
             <td>
                 <ul>
@@ -115,13 +118,12 @@
         <tr>
             <td><code>Resolved Site</code></td>
             <td>
-                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>), which maps 1:1 to a site card's title. Similarly, most Under-deeps sites connect directly to a named surface hold (e.g. <em>Barad-d&ucirc;r [0]</em>).<br /><br />
-                For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites).
+                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>). For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites).
             </td>
             <td>
                 <ul>
-                    <li><em>Doeth</em>, <em>Durthak</em> (card text <em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
-                    <li><em>Gandalf</em> (card text <em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
+                    <li><em>Doeth</em>, <em>Durthak</em> (<em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
+                    <li><em>Gandalf</em> (<em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
                     <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
                 </ul>
             </td>

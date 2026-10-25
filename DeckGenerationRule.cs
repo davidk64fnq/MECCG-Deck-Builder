@@ -26,6 +26,12 @@ namespace MECCG_Deck_Builder
         public string SaveAs { get; set; } = string.Empty;
         public string Section { get; set; } = "Resources";
         public int Count { get; set; } = 1;
+
+        /// <summary>
+        /// Sampling strategy: "Variety" (default), "Focused" (or "Playset"), or "Uniform" (or "Random").
+        /// </summary>
+        public string Distribution { get; set; } = "Variety";
+
         public List<string> Sets { get; set; } = [];
         public Dictionary<string, string> Attributes { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, string> Categories { get; set; } = new(StringComparer.OrdinalIgnoreCase);

@@ -955,6 +955,7 @@
       "set": "MEDM"
     },
     {
+      "Adjacent Sites": "The Pûkel-deeps; Glittering Caves; The Under-gates",
       "Automatic Attack": "Undead",
       "fullCode": "The Gem-deeps [M] (AS)",
       "id": "1789",
@@ -986,6 +987,7 @@
       "set": "MEBA"
     },
     {
+      "Adjacent Sites": "The Iron-deeps; Mount Gram; The Under-leas",
       "Automatic Attack": "Undead",
       "fullCode": "The Under-vaults [M] (AS)",
       "id": "1798",
@@ -1007,203 +1009,203 @@
       "set": "METW"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Bandit Lair [H] (TW)",
       "id": "422",
       "name": "Bandit Lair",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Bandit Lair [M] (LE)",
       "id": "1566",
       "name": "Bandit Lair",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Beorn's House [M] (LE)",
       "id": "1569",
       "name": "Beorn's House",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Cameth Brin [M] (LE)",
       "id": "1573",
       "name": "Cameth Brin",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Dale [M] (LE)",
       "id": "1578",
       "name": "Dale",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Dol Amroth [M] (LE)",
       "id": "1581",
       "name": "Dol Amroth",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Drúadan Forest [M] (LE)",
       "id": "1583",
       "name": "Drúadan Forest",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Dunharrow [M] (LE)",
       "id": "1584",
       "name": "Dunharrow",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Dunnish Clan-hold [M] (LE)",
       "id": "1585",
       "name": "Dunnish Clan-hold",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Easterling Camp [M] (LE)",
       "id": "1586",
       "name": "Easterling Camp",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Edoras [M] (LE)",
       "id": "1587",
       "name": "Edoras",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Framsburg [M] (AS)",
       "id": "1773",
       "name": "Framsburg",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Geann a-Lisch [H] (AS)",
       "id": "1774",
       "name": "Geann a-Lisch",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Gobel Mírlond [M] (LE)",
       "id": "1592",
       "name": "Gobel Mírlond",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Gobel Mírlond [H] (AS)",
       "id": "1775",
       "name": "Gobel Mírlond",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Hermit's Hill [H] (DM)",
       "id": "1202",
       "name": "Hermit's Hill",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Hermit's Hill [M] (LE)",
       "id": "1597",
       "name": "Hermit's Hill",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Lake-town [M] (LE)",
       "id": "1600",
       "name": "Lake-town",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Lond Galen [M] (LE)",
       "id": "1601",
       "name": "Lond Galen",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Lossadan Camp [M] (LE)",
       "id": "1603",
       "name": "Lossadan Camp",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men; Dúnedain",
+      "Automatic Attack": "Man; Dúnadan",
       "fullCode": "Minas Tirith [M] (LE)",
       "id": "1605",
       "name": "Minas Tirith",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Nûrniag Camp [H] (AS)",
       "id": "1783",
       "name": "Nûrniag Camp",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men; Dúnedain",
+      "Automatic Attack": "Man; Dúnadan",
       "fullCode": "Pelargir [M] (LE)",
       "id": "1612",
       "name": "Pelargir",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Raider-hold [M] (LE)",
       "id": "1613",
       "name": "Raider-hold",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Raider-hold [H] (AS)",
       "id": "1786",
       "name": "Raider-hold",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Shrel-Kain [M] (LE)",
       "id": "1617",
       "name": "Shrel-Kain",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Southron Oasis [M] (LE)",
       "id": "1618",
       "name": "Southron Oasis",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Tharbad [H] (TD)",
       "id": "1032",
       "name": "Tharbad",
       "set": "METD"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Tharbad [M] (LE)",
       "id": "1620",
       "name": "Tharbad",
@@ -1211,259 +1213,260 @@
     },
     {
       "Adjacent Sites": "Dunharrow; The Gem-deeps; The Sulfur-deeps",
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "The Pûkel-deeps [H] (DM)",
       "id": "1205",
       "name": "The Pûkel-deeps",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Adjacent Sites": "Dunharrow; The Gem-deeps; The Sulfur-deeps",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "The Pûkel-deeps [M] (AS)",
       "id": "1791",
       "name": "The Pûkel-deeps",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "The Worthy Hills [H] (AS)",
       "id": "1799",
       "name": "The Worthy Hills",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "The Worthy Hills [M] (LE)",
       "id": "1625",
       "name": "The Worthy Hills",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Vale of Erech [M] (LE)",
       "id": "1628",
       "name": "Vale of Erech",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Variag Camp [M] (LE)",
       "id": "1629",
       "name": "Variag Camp",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Woodmen-town [M] (LE)",
       "id": "1630",
       "name": "Woodmen-town",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Men",
+      "Automatic Attack": "Man",
       "fullCode": "Wose Passage-hold [M] (LE)",
       "id": "1631",
       "name": "Wose Passage-hold",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Hobbits; Dúnedain",
+      "Automatic Attack": "Hobbit; Dúnadan",
       "fullCode": "Bag End [M] (LE)",
       "id": "1565",
       "name": "Bag End",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Dúnedain",
+      "Automatic Attack": "Dúnadan",
       "fullCode": "Bree [M] (LE)",
       "id": "1571",
       "name": "Bree",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Dúnedain; Elves",
+      "Automatic Attack": "Dúnadan; Elf",
       "fullCode": "Edhellond [M] (AS)",
       "id": "1772",
       "name": "Edhellond",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Dúnedain",
+      "Automatic Attack": "Dúnadan",
       "fullCode": "Henneth Annûn [M] (LE)",
       "id": "1596",
       "name": "Henneth Annûn",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Dúnedain; Elves",
+      "Automatic Attack": "Dúnadan; Elf",
       "fullCode": "Rivendell [M] (AS)",
       "id": "1788",
       "name": "Rivendell",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Orcs; Trolls",
+      "Automatic Attack": "Orc; Troll",
       "fullCode": "Barad-dûr [H] (TW)",
       "id": "423",
       "name": "Barad-dûr",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs; Trolls; Maia",
+      "Automatic Attack": "Orc; Troll; Maia",
       "fullCode": "Barad-dûr [B] (BA)",
       "id": "2008",
       "name": "Barad-dûr",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Carn Dûm [H] (TW)",
       "id": "429",
       "name": "Carn Dûm",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs; Nazgûl",
+      "Automatic Attack": "Orc; Nazgûl",
       "fullCode": "Carn Dûm [B] (BA)",
       "id": "2009",
       "name": "Carn Dûm",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs; Trolls",
+      "Automatic Attack": "Orc; Troll",
       "fullCode": "Cirith Gorgor [B] (BA)",
       "id": "2010",
       "name": "Cirith Gorgor",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs; Trolls",
+      "Automatic Attack": "Orc; Troll",
       "fullCode": "Cirith Gorgor [H] (AS)",
       "id": "1769",
       "name": "Cirith Gorgor",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Cirith Ungol [H] (TW)",
       "id": "431",
       "name": "Cirith Ungol",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Cirith Ungol [B] (BA)",
       "id": "2011",
       "name": "Cirith Ungol",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Dimrill Dale [M] (LE)",
       "id": "1580",
       "name": "Dimrill Dale",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Dimrill Dale [H] (TW)",
       "id": "434",
       "name": "Dimrill Dale",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs; Trolls; Nazgûl",
+      "Automatic Attack": "Orc; Troll; Nazgûl",
       "fullCode": "Dol Guldur [B] (BA)",
       "id": "2012",
       "name": "Dol Guldur",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs; Trolls",
+      "Automatic Attack": "Orc; Troll",
       "fullCode": "Dol Guldur [H] (TW)",
       "id": "436",
       "name": "Dol Guldur",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Goblin-gate [H] (TW)",
       "id": "447",
       "name": "Goblin-gate",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Goblin-gate [M] (LE)",
       "id": "1593",
       "name": "Goblin-gate",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Moria [H] (TW)",
       "id": "462",
       "name": "Moria",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Moria [M] (LE)",
       "id": "1606",
       "name": "Moria",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Mount Doom [M] (LE)",
       "id": "1607",
       "name": "Mount Doom",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Mount Gram [H] (TW)",
       "id": "464",
       "name": "Mount Gram",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Mount Gundabad [M] (LE)",
       "id": "1609",
       "name": "Mount Gundabad",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Mount Gundabad [H] (TW)",
       "id": "465",
       "name": "Mount Gundabad",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Sarn Goriwing [M] (LE)",
       "id": "1615",
       "name": "Sarn Goriwing",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Sarn Goriwing [H] (TW)",
       "id": "472",
       "name": "Sarn Goriwing",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Orcs; Spiders",
+      "Automatic Attack": "Orc; Spider",
       "fullCode": "Shelob's Lair [M] (LE)",
       "id": "1616",
       "name": "Shelob's Lair",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Shelob's Lair [H] (TW)",
       "id": "473",
       "name": "Shelob's Lair",
@@ -1471,7 +1474,7 @@
     },
     {
       "Adjacent Sites": "Goblin-gate; The Under-leas; The Under-gates",
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Under-grottos [H] (DM)",
       "id": "1210",
       "name": "The Under-grottos",
@@ -1479,21 +1482,23 @@
     },
     {
       "Adjacent Sites": "Goblin-gate; The Under-leas; The Under-gates",
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Under-grottos [B] (BA)",
       "id": "2025",
       "name": "The Under-grottos",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Adjacent Sites": "Goblin-gate; The Under-leas; The Under-gates",
+      "Automatic Attack": "Orc",
       "fullCode": "The Under-grottos [M] (AS)",
       "id": "1796",
       "name": "The Under-grottos",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Adjacent Sites": "Mount Gundabad; The Iron-deeps; The Under-grottos; The Under-gates; The Under-vaults",
+      "Automatic Attack": "Orc",
       "fullCode": "The Under-leas [M] (AS)",
       "id": "1797",
       "name": "The Under-leas",
@@ -1501,7 +1506,7 @@
     },
     {
       "Adjacent Sites": "Mount Gundabad; The Wind-deeps; The Iron-deeps; The Under-grottos; The Under-gates; The Under-vaults",
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Under-leas [H] (DM)",
       "id": "1211",
       "name": "The Under-leas",
@@ -1509,21 +1514,21 @@
     },
     {
       "Adjacent Sites": "Mount Gundabad; The Wind-deeps; The Iron-deeps; The Under-grottos; The Under-gates; The Under-vaults",
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Under-leas [B] (BA)",
       "id": "2026",
       "name": "The Under-leas",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Wind Throne [M] (LE)",
       "id": "1624",
       "name": "The Wind Throne",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Wind Throne [H] (TW)",
       "id": "480",
       "name": "The Wind Throne",
@@ -1531,42 +1536,42 @@
     },
     {
       "Adjacent Sites": "The Wind Throne; The Under-leas; The Rusted-deeps",
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "The Wind-deeps [B] (BA)",
       "id": "2028",
       "name": "The Wind-deeps",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Orcs",
+      "Automatic Attack": "Orc",
       "fullCode": "Urlurtsu Nurn [H] (DM)",
       "id": "1213",
       "name": "Urlurtsu Nurn",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "Buhr Widu [M] (LE)",
       "id": "1572",
       "name": "Buhr Widu",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "Buhr Widu [H] (TD)",
       "id": "1025",
       "name": "Buhr Widu",
       "set": "METD"
     },
     {
-      "Automatic Attack": "Trolls; Wolves",
+      "Automatic Attack": "Troll; Wolf",
       "fullCode": "Ettenmoors [M] (LE)",
       "id": "1588",
       "name": "Ettenmoors",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "Ettenmoors [H] (TW)",
       "id": "444",
       "name": "Ettenmoors",
@@ -1574,14 +1579,15 @@
     },
     {
       "Adjacent Sites": "Carn Dûm; The Under-leas; The Under-vaults",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Iron-deeps [B] (BA)",
       "id": "2018",
       "name": "The Iron-deeps",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Adjacent Sites": "Carn Dûm; The Under-leas; The Under-vaults",
+      "Automatic Attack": "Troll",
       "fullCode": "The Iron-deeps [M] (AS)",
       "id": "1790",
       "name": "The Iron-deeps",
@@ -1589,14 +1595,15 @@
     },
     {
       "Adjacent Sites": "Carn Dûm; The Under-leas; The Under-vaults",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Iron-deeps [H] (DM)",
       "id": "1204",
       "name": "The Iron-deeps",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Adjacent Sites": "Dol Guldur; The Under-courts; The Pûkel-deeps; The Under-gates; The Under-galleries",
+      "Automatic Attack": "Troll",
       "fullCode": "The Sulfur-deeps [M] (AS)",
       "id": "1792",
       "name": "The Sulfur-deeps",
@@ -1604,7 +1611,7 @@
     },
     {
       "Adjacent Sites": "Dol Guldur; The Under-gates; The Pûkel-deeps; The Under-galleries; The Under-courts",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Sulfur-deeps [B] (BA)",
       "id": "2021",
       "name": "The Sulfur-deeps",
@@ -1612,14 +1619,15 @@
     },
     {
       "Adjacent Sites": "Dol Guldur; The Under-gates; The Pûkel-deeps; The Under-galleries; The Under-courts",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Sulfur-deeps [H] (DM)",
       "id": "1206",
       "name": "The Sulfur-deeps",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Adjacent Sites": "Barad-dûr; The Sulfur-deeps; The Under-galleries",
+      "Automatic Attack": "Troll",
       "fullCode": "The Under-courts [M] (AS)",
       "id": "1793",
       "name": "The Under-courts",
@@ -1627,7 +1635,7 @@
     },
     {
       "Adjacent Sites": "Barad-dûr; The Under-galleries; The Sulfur-deeps",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Under-courts [B] (BA)",
       "id": "2022",
       "name": "The Under-courts",
@@ -1635,14 +1643,15 @@
     },
     {
       "Adjacent Sites": "Barad-dûr; The Under-galleries; The Sulfur-deeps",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Under-courts [H] (DM)",
       "id": "1207",
       "name": "The Under-courts",
       "set": "MEDM"
     },
     {
-      "Automatic Attack": "Trolls",
+      "Adjacent Sites": "Cirith Gorgor; The Under-courts; The Sulfur-deeps",
+      "Automatic Attack": "Troll",
       "fullCode": "The Under-galleries [M] (AS)",
       "id": "1794",
       "name": "The Under-galleries",
@@ -1650,7 +1659,7 @@
     },
     {
       "Adjacent Sites": "Cirith Gorgor; The Under-courts; The Sulfur-deeps",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Under-galleries [H] (DM)",
       "id": "1208",
       "name": "The Under-galleries",
@@ -1658,7 +1667,7 @@
     },
     {
       "Adjacent Sites": "Cirith Gorgor; The Under-courts; The Sulfur-deeps",
-      "Automatic Attack": "Trolls",
+      "Automatic Attack": "Troll",
       "fullCode": "The Under-galleries [B] (BA)",
       "id": "2023",
       "name": "The Under-galleries",
@@ -1679,126 +1688,126 @@
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Dwarves",
+      "Automatic Attack": "Dwarf",
       "fullCode": "Blue Mountain Dwarf-hold [M] (LE)",
       "id": "1570",
       "name": "Blue Mountain Dwarf-hold",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Dwarves",
+      "Automatic Attack": "Dwarf",
       "fullCode": "Iron Hill Dwarf-hold [M] (LE)",
       "id": "1598",
       "name": "Iron Hill Dwarf-hold",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Animals",
+      "Automatic Attack": "Animal",
       "fullCode": "Eagles' Eyrie [M] (AS)",
       "id": "1771",
       "name": "Eagles' Eyrie",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Elves",
+      "Automatic Attack": "Elf",
       "fullCode": "Grey Havens [M] (AS)",
       "id": "1777",
       "name": "Grey Havens",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Elves",
+      "Automatic Attack": "Elf",
       "fullCode": "Lórien [M] (AS)",
       "id": "1782",
       "name": "Lórien",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Elves",
+      "Automatic Attack": "Elf",
       "fullCode": "Thranduil's Halls [M] (LE)",
       "id": "1626",
       "name": "Thranduil's Halls",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "Isengard [H] (TW)",
       "id": "453",
       "name": "Isengard",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "Isengard [M] (LE)",
       "id": "1599",
       "name": "Isengard",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "Ost-in-Edhil [H] (TW)",
       "id": "467",
       "name": "Ost-in-Edhil",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "Ost-in-Edhil [M] (LE)",
       "id": "1611",
       "name": "Ost-in-Edhil",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "The White Towers [M] (LE)",
       "id": "1623",
       "name": "The White Towers",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "The White Towers [H] (TW)",
       "id": "479",
       "name": "The White Towers",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "Weathertop [M] (AS)",
       "id": "1801",
       "name": "Weathertop",
       "set": "MEAS"
     },
     {
-      "Automatic Attack": "Wolves",
+      "Automatic Attack": "Wolf",
       "fullCode": "Weathertop [H] (TW)",
       "id": "485",
       "name": "Weathertop",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "Glittering Caves [M] (LE)",
       "id": "1591",
       "name": "Glittering Caves",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "Glittering Caves [H] (TW)",
       "id": "446",
       "name": "Glittering Caves",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "Stone-circle [M] (LE)",
       "id": "1619",
       "name": "Stone-circle",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "Stone-circle [H] (TW)",
       "id": "476",
       "name": "Stone-circle",
@@ -1806,21 +1815,21 @@
     },
     {
       "Adjacent Sites": "Dunharrow; The Gem-deeps; The Sulfur-deeps",
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "The Pûkel-deeps [B] (BA)",
       "id": "2019",
       "name": "The Pûkel-deeps",
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "The Stones [H] (TW)",
       "id": "478",
       "name": "The Stones",
       "set": "METW"
     },
     {
-      "Automatic Attack": "Pûkel-creatures",
+      "Automatic Attack": "Pûkel-creature",
       "fullCode": "The Stones [M] (LE)",
       "id": "1622",
       "name": "The Stones",
@@ -1851,20 +1860,21 @@
       "set": "MEBA"
     },
     {
-      "Automatic Attack": "Spiders",
+      "Automatic Attack": "Spider",
       "fullCode": "Ruined Signal Tower [M] (LE)",
       "id": "1614",
       "name": "Ruined Signal Tower",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Spiders",
+      "Automatic Attack": "Spider",
       "fullCode": "Ruined Signal Tower [H] (TW)",
       "id": "471",
       "name": "Ruined Signal Tower",
       "set": "METW"
     },
     {
+      "Adjacent Sites": "Moria; The Under-grottos; The Gem-deeps; The Sulfur-deeps; The Under-leas",
       "Automatic Attack": "Balrog",
       "fullCode": "The Under-gates [M] (AS)",
       "id": "1795",
@@ -2621,14 +2631,14 @@
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs; Trolls",
+      "Automatic Attack": "Orc; Troll",
       "fullCode": "Carn Dûm [M] (LE)",
       "id": "1574",
       "name": "Carn Dûm",
       "set": "MELE"
     },
     {
-      "Automatic Attack": "Orcs; Trolls",
+      "Automatic Attack": "Orc; Troll",
       "fullCode": "Urlurtsu Nurn [M] (LE)",
       "id": "1627",
       "name": "Urlurtsu Nurn",
@@ -2647,6 +2657,13 @@
       "id": "2024",
       "name": "The Under-gates",
       "set": "MEBA"
+    },
+    {
+      "fullCode": "Tarcil (LE)",
+      "Home Region": "Imlad Morgul",
+      "id": "1261",
+      "name": "Tarcil",
+      "set": "MELE"
     }
   ],
   "Filters": [
@@ -2697,24 +2714,24 @@
     ],
     [
       "Automatic Attack",
-      "Animals",
+      "Animal",
       "Awakened Plant",
       "Balrog",
       "Dragon",
       "Drake",
-      "Dwarves",
-      "Dúnedain",
-      "Elves",
-      "Hobbits",
+      "Dwarf",
+      "Dúnadan",
+      "Elf",
+      "Hobbit",
       "Maia",
-      "Men",
+      "Man",
       "Nazgûl",
-      "Orcs",
-      "Pûkel-creatures",
-      "Spiders",
-      "Trolls",
+      "Orc",
+      "Pûkel-creature",
+      "Spider",
+      "Troll",
       "Undead",
-      "Wolves"
+      "Wolf"
     ],
     [
       "Combat Bonus",

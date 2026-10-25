@@ -173,26 +173,7 @@ namespace MECCG_Deck_Builder
 
                     string imageName = raw.Ice_errata == true ? $"ice-{raw.ImageName}" : raw.ImageName;
 
-                    string rawRace = raw.Race ?? string.Empty;
-                    string canonicalRace = rawRace;
-                    string subrace = string.Empty;
-
-                    if (rawRace.EndsWith("Elf", StringComparison.OrdinalIgnoreCase))
-                    {
-                        canonicalRace = "Elf";
-                        if (!string.Equals(rawRace, "Elf", StringComparison.OrdinalIgnoreCase))
-                        {
-                            subrace = rawRace;
-                        }
-                    }
-                    else if (rawRace.EndsWith("Dwarf", StringComparison.OrdinalIgnoreCase))
-                    {
-                        canonicalRace = "Dwarf";
-                        if (!string.Equals(rawRace, "Dwarf", StringComparison.OrdinalIgnoreCase))
-                        {
-                            subrace = rawRace;
-                        }
-                    }
+                    var (canonicalRace, subrace) = NormalizeRace(raw.Race);
 
                     var card = new Card
                     {
@@ -250,9 +231,115 @@ namespace MECCG_Deck_Builder
         }
 
         /// <summary>
-        /// Explicit, user-initiated database update that downloads the latest Cardnum datasets
-        /// from GitHub and saves them to the writable LocalAppData folder.
+        /// Normalizes raw Cardnum race strings into clean, canonical singular terms.
+        /// Retains Tolkien lore sub-races for Elf and Dwarf while mapping creature splits and composite strings.
         /// </summary>
+        private static (string CanonicalRace, string Subrace) NormalizeRace(string rawRace)
+        {
+            if (string.IsNullOrWhiteSpace(rawRace))
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            string trimmed = rawRace.Trim();
+            string lower = trimmed.ToLowerInvariant();
+
+            // 1. Character Lore Doublets & Sub-races
+            if (lower is "elf" or "elf elves") return ("Elf", string.Empty);
+            if (trimmed.EndsWith("Elf", StringComparison.OrdinalIgnoreCase))
+            {
+                return ("Elf", trimmed);
+            }
+
+            if (lower is "dwarf" or "dwarf dwarves") return ("Dwarf", string.Empty);
+            if (trimmed.EndsWith("Dwarf", StringComparison.OrdinalIgnoreCase))
+            {
+                return ("Dwarf", trimmed);
+            }
+
+            if (lower is "dúnadan" or "dúnadan dúnedain" or "dunadan" or "dunadan dunedain")
+            {
+                return ("Dúnadan", string.Empty);
+            }
+
+            // --- MULTI-SPECIES CREATURES (Must go before single species checks!) ---
+            if (lower is "animals man men bears") return ("Animal; Man; Bear", "Beorning");
+            if (lower is "orcs man men") return ("Orc; Man", "Half-orc");
+            if (lower is "half-trolls" or "trolls men") return ("Troll; Man", "Half-troll");
+
+            // 2. Creature Species Normalization (Strict matching to prevent substring collisions)
+            if (lower is "drake" or "drakes" || lower.StartsWith("drake ") || lower.EndsWith("-drake"))
+            {
+                string sub = trimmed.Replace("Drake", "", StringComparison.OrdinalIgnoreCase)
+                                    .Replace("-drake", "", StringComparison.OrdinalIgnoreCase)
+                                    .Trim();
+                return ("Drake", !string.IsNullOrEmpty(sub) ? sub : string.Empty);
+            }
+
+            if (lower is "troll" or "trolls" || lower.EndsWith(" troll") || lower.EndsWith(" trolls"))
+            {
+                string sub = trimmed.Replace("Trolls", "", StringComparison.OrdinalIgnoreCase)
+                                    .Replace("Troll", "", StringComparison.OrdinalIgnoreCase)
+                                    .Trim();
+                return ("Troll", !string.IsNullOrEmpty(sub) ? sub : string.Empty);
+            }
+
+            if (lower is "orc" or "orcs" || lower.EndsWith(" orc") || lower.EndsWith(" orcs"))
+            {
+                string sub = trimmed.Replace("Orcs", "", StringComparison.OrdinalIgnoreCase)
+                                    .Replace("Orc", "", StringComparison.OrdinalIgnoreCase)
+                                    .Trim();
+                return ("Orc", !string.IsNullOrEmpty(sub) ? sub : string.Empty);
+            }
+
+            if (lower is "spider" or "spiders" or "spawn spider" or "spider spawn")
+            {
+                return ("Spider", string.Empty);
+            }
+
+            if (lower is "wolf" or "wolves" or "wolf wolves")
+            {
+                return ("Wolf", string.Empty);
+            }
+
+            if (lower is "animal" or "animals" or "animals vermin" || lower.StartsWith("animal "))
+            {
+                string sub = trimmed.Replace("Animals", "", StringComparison.OrdinalIgnoreCase)
+                                    .Replace("Animal", "", StringComparison.OrdinalIgnoreCase)
+                                    .Trim();
+                return ("Animal", !string.IsNullOrEmpty(sub) ? sub : string.Empty);
+            }
+
+            if (lower.StartsWith("dragon"))
+            {
+                string sub = trimmed.Replace("Dragon", "", StringComparison.OrdinalIgnoreCase).Trim();
+                return ("Dragon", !string.IsNullOrEmpty(sub) ? sub : string.Empty);
+            }
+
+            if (lower is "undead" or "special undead") return ("Undead", string.Empty);
+            if (lower is "balrog" or "balrog spawn") return ("Balrog", string.Empty);
+            if (lower is "giant" or "giants") return ("Giant", string.Empty);
+
+            // Ent (Characters/Allies/Factions) vs Awakened Plant (Hazard Creatures)
+            if (lower is "awakened plant" or "awakened plant ent")
+            {
+                return ("Awakened Plant", "Ent");
+            }
+
+            if (lower is "ent" or "ents")
+            {
+                return ("Ent", string.Empty);
+            }
+
+            if (lower is "nazgûl" or "nazgûl female" or "nazgul" or "nazgul female") return ("Nazgûl", string.Empty);
+            if (lower is "ringwraith" or "ringwraith female") return ("Ringwraith", string.Empty);
+            if (lower is "pûkel-creature" or "pukel-creature") return ("Pûkel-creature", string.Empty);
+            if (lower is "man" or "man men") return ("Man", string.Empty);
+
+            // 3. Unmodified non-creatures (Environment, Dark Enchantment, Armor, Weapon, etc.)
+            return (trimmed, string.Empty);
+        }
+
         public async Task<(bool Success, string Message)> UpdateDatabaseFromCardnumAsync(CancellationToken cancellationToken = default)
         {
             string setsJson;
@@ -321,18 +408,7 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            if (key != "Skill")
-            {
-                if (!list.Contains(value))
-                {
-                    list.Add(value);
-                    if (list.Count > 2)
-                    {
-                        list.Sort(1, list.Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
-                    }
-                }
-            }
-            else
+            if (key == "Skill")
             {
                 string[] words = value.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string word in words)
@@ -344,6 +420,33 @@ namespace MECCG_Deck_Builder
                         {
                             list.Sort(1, list.Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
                         }
+                    }
+                }
+            }
+            else if (value.Contains(';'))
+            {
+                // Split multi-values like "Animal; Man; Bear" so each appears individually in the dropdown
+                string[] parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                foreach (string part in parts)
+                {
+                    if (!list.Contains(part))
+                    {
+                        list.Add(part);
+                        if (list.Count > 2)
+                        {
+                            list.Sort(1, list.Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (!list.Contains(value))
+                {
+                    list.Add(value);
+                    if (list.Count > 2)
+                    {
+                        list.Sort(1, list.Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
                     }
                 }
             }

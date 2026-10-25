@@ -31,12 +31,12 @@
         <tr>
             <td><strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)</td>
             <td><strong>Official Database:</strong> Canonical rules statistics (Primary, Alignment, Race, Skill, Mind, Prowess).</td>
-            <td>Fixed, read-only rules attributes. See <a href="attributes_reference.html">Official Attributes Reference</a>.</td>
+            <td>Fixed, read-only rules attributes. Supports <code>[Blank]</code> for unpopulated fields. See <a href="attributes_reference.html">Official Attributes Reference</a>.</td>
         </tr>
         <tr>
             <td><strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)</td>
             <td><strong>User Taxonomy:</strong> Custom categories and tags managed locally.</td>
-            <td>Editable classification categories. See <a href="custom_taxonomy.html">Custom Taxonomy &amp; Tag Management</a>.</td>
+            <td>Editable classification categories. Supports <code>[Blank]</code> for untagged cards. See <a href="custom_taxonomy.html">Custom Taxonomy &amp; Tag Management</a>.</td>
         </tr>
     </table>
 
@@ -53,6 +53,10 @@
         <li>
             <strong>Dynamic Value &amp; Tag Pruning:</strong>
             The lower dropdowns (<strong>Value</strong> and <strong>Tag</strong>) automatically prune their lists in real time. They only show values and tags present on cards that satisfy your active expansion sets <em>and</em> the criteria in all other active filter slots.
+        </li>
+        <li>
+            <strong>Auditing Unset Attributes &amp; Untagged Cards (<code>[Blank]</code>):</strong>
+            Whenever candidate cards matching your active expansions lack a value for the selected attribute or custom category, a <code>[Blank]</code> option dynamically appears immediately below the blank reset item. Selecting <code>[Blank]</code> prunes the Master List to display cards where that field is unset (such as characters without a home site or cards awaiting classification in a custom category). If all matching cards have a non-empty value, <code>[Blank]</code> is automatically omitted.
         </li>
         <li>
             <strong>Order-Independent Narrowing:</strong>

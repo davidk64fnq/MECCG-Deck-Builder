@@ -6,7 +6,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
 
 ## Features
 
-- Curated Offline Database: Launches instantly using a local, validated card and set database (cards-dc.json, sets-dc.json) with zero startup network dependency.
+- Curated Offline Database: Launches instantly using a local, validated card and set database (cards-dc.json, sets-dc.json) with zero startup network dependency. Creature species are normalized into canonical singular nouns with multi-species support (`Animal; Man; Bear`, `Orc; Man`).
 - Five-Section Deck Partitions: Manage cards across standard competitive partitions:
   - Pool: Starting company, starter items, and opening resources.
   - Resources: Resource events, allies, factions, and items.
@@ -16,18 +16,19 @@ An offline-capable Windows desktop application for building, organizing, filteri
 - Dynamic Stats Summary: Window title bar displays live card counts per section with dedicated character counts: (Pool / Res [Characters] / Haz / Side / Site).
 - Card Artwork Preview & Caching: On-demand card artwork download from Cardnum with local disk caching (METW/, MEDM/, etc.) and an in-memory cache. ICE errata cards load corrected artwork automatically.
 - Dual-Layer Filtering:
-  - Official Card Attributes (Slots 1 & 2): Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more.
-  - Custom User Taxonomy (Slots 3 & 4): Filter by custom categories and tags (e.g., Strategy -> Ring Destruction, Role -> Scout Support). Author tags via the dedicated Manage Custom Tags dialog or right-click Assign Tag > [+ Author New Tag...] without disturbing active filter criteria.
+  - Official Card Attributes (Slots 1 & 2): Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more. Supports `[Blank]` / `[None]` to audit cards with unpopulated fields.
+  - Custom User Taxonomy (Slots 3 & 4): Filter by custom categories and tags (e.g., Strategy -> Ring Destruction, Role -> Scout Support). Supports `[Blank]` to identify untagged cards awaiting classification.
+- Live Card Taxonomy Inspector: Inspect card metadata and author custom tags in-situ with column-aligned wrapping, filter synchronization, checkmark tracking, natural alphabetical sorting, and a pinned Quick Assign toolbar.
 - Multi-Platform Export Formats:
   - Tabletop Simulator (.json): Generates ready-to-use deck files compatible with TTS MECCG mods.
   - Play MECCG (.play & .playPBEM): Native format for online play.
   - Cardnum Deck (.cnum): Standard 1 <Code> listing format.
   - Archive Breakdown (.archive): Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - Plain Text (.txt): Formatted deck listing.
-- Procedural Deck Generator: Generate complete decks from JSON rule templates with attribute and category queries, deck copy limits, tiered variety-first duplication, and randomized thematic branches (RandomChoice). Features runtime variable capture (SaveAs), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Home}), universal wildcard sentinels (* and All), multi-card union sets, and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G).
+- Procedural Deck Generator: Generate complete decks from declarative JSON rule templates with attribute and category queries, deck copy limits, and randomized thematic branches (RandomChoice). Features configurable distribution strategies (`Distribution: Variety | Focused | Uniform`), relational operators (`<`, `<=`, `>`, `>=`, `!=`) and range bounding on numeric stats, runtime variable capture (SaveAs), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Home}), universal wildcard sentinels (* and All), blank matching ([Blank]), and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G).
 - Automated Taxonomy Extraction: Scan card rules text for catalog entities, perform cross-card attribute lookups, or execute custom regular expressions in an expanded workspace with automatic session persistence via Taxonomy > Extract Tags with Rules....
 - Two-Way CSV Spreadsheet Pipeline: Bulk audit and edit catalog taxonomy using Microsoft Excel or Google Sheets with authoritative edit-and-replace synchronization via Taxonomy > Export Taxonomy Draft (CSV)... and Taxonomy > Import Taxonomy (CSV)....
-- Session Persistence: Remembers your active expansion set selection across application restarts and preserves your last-used taxonomy extraction mode, regular expressions, and tag categories for iterative tagging workflows.
+- Session Persistence: Remembers active expansion set selection across application restarts and preserves extraction regex parameters across sessions.
 
 ---
 

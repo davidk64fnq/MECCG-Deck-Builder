@@ -7,6 +7,13 @@ namespace MECCG_Deck_Builder
 {
     public sealed class CardFilterService
     {
+        public const string BlankSentinel = "[Blank]";
+        public const string NoneSentinel = "[None]";
+
+        public static bool IsBlankSentinel(string value) =>
+            string.Equals(value, BlankSentinel, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(value, NoneSentinel, StringComparison.OrdinalIgnoreCase);
+
         // Custom user filters
         private readonly List<List<string>> _customFilters = []; // [0] = keyName, [1..] = values
         private readonly Dictionary<string, Dictionary<string, string>> _cardCustomTags = new(StringComparer.OrdinalIgnoreCase); // cardId -> (tagKey -> tagValue)
@@ -152,6 +159,7 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
+            // 1. Rename inside the filter category definition
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
@@ -170,12 +178,32 @@ namespace MECCG_Deck_Builder
                 }
             }
 
+            // 2. Rename across all cards, splitting on semicolons to support compound tags (e.g. "Orcs; Trolls")
             foreach (var tags in _cardCustomTags.Values)
             {
-                if (tags.TryGetValue(keyName, out string existingVal) &&
-                    string.Equals(existingVal, oldValue, StringComparison.OrdinalIgnoreCase))
+                if (tags.TryGetValue(keyName, out string existingVal) && !string.IsNullOrWhiteSpace(existingVal))
                 {
-                    tags[keyName] = newValue;
+                    if (existingVal.Contains(';'))
+                    {
+                        var parts = existingVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        bool modified = false;
+                        for (int i = 0; i < parts.Length; i++)
+                        {
+                            if (string.Equals(parts[i], oldValue, StringComparison.OrdinalIgnoreCase))
+                            {
+                                parts[i] = newValue;
+                                modified = true;
+                            }
+                        }
+                        if (modified)
+                        {
+                            tags[keyName] = string.Join("; ", parts.Distinct(StringComparer.OrdinalIgnoreCase));
+                        }
+                    }
+                    else if (string.Equals(existingVal.Trim(), oldValue, StringComparison.OrdinalIgnoreCase))
+                    {
+                        tags[keyName] = newValue;
+                    }
                 }
             }
         }
@@ -196,17 +224,42 @@ namespace MECCG_Deck_Builder
 
         public void DeleteCustomKeyValue(string keyName, string value)
         {
+            if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            // 1. Remove from category definition
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
                 _customFilters[index].RemoveAll(v => string.Equals(v, value, StringComparison.OrdinalIgnoreCase));
             }
 
+            // 2. Remove from cards, safely trimming from compound semicolon lists
             foreach (var tags in _cardCustomTags.Values)
             {
-                if (tags.TryGetValue(keyName, out string existing) && string.Equals(existing, value, StringComparison.OrdinalIgnoreCase))
+                if (tags.TryGetValue(keyName, out string existing) && !string.IsNullOrWhiteSpace(existing))
                 {
-                    tags.Remove(keyName);
+                    if (existing.Contains(';'))
+                    {
+                        var parts = existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                        if (parts.RemoveAll(v => string.Equals(v, value, StringComparison.OrdinalIgnoreCase)) > 0)
+                        {
+                            if (parts.Count > 0)
+                            {
+                                tags[keyName] = string.Join("; ", parts);
+                            }
+                            else
+                            {
+                                tags.Remove(keyName);
+                            }
+                        }
+                    }
+                    else if (string.Equals(existing.Trim(), value, StringComparison.OrdinalIgnoreCase))
+                    {
+                        tags.Remove(keyName);
+                    }
                 }
             }
         }
@@ -224,7 +277,17 @@ namespace MECCG_Deck_Builder
                 _cardCustomTags[cardId] = tags;
             }
 
-            tags[keyName] = value ?? string.Empty;
+            // Sort semicolon-delimited tags on assignment
+            if (!string.IsNullOrWhiteSpace(value) && value.Contains(';'))
+            {
+                var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                parts.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
+                tags[keyName] = string.Join("; ", parts);
+            }
+            else
+            {
+                tags[keyName] = value ?? string.Empty;
+            }
 
             if (!string.IsNullOrWhiteSpace(value))
             {
@@ -249,21 +312,24 @@ namespace MECCG_Deck_Builder
             var pairs = new List<KeyValuePair<string, string>>();
             if (_cardCustomTags.TryGetValue(cardId, out var tags))
             {
-                foreach (var kvp in tags)
+                // 1. Sort categories alphabetically
+                var sortedCategories = tags.Keys.OrderBy(k => k, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort());
+                foreach (var cat in sortedCategories)
                 {
-                    pairs.Add(new KeyValuePair<string, string>(kvp.Key, kvp.Value));
+                    string val = tags[cat];
+
+                    // 2. Sort multi-tag values alphabetically
+                    if (!string.IsNullOrWhiteSpace(val) && val.Contains(';'))
+                    {
+                        var parts = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                        parts.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
+                        val = string.Join("; ", parts);
+                    }
+
+                    pairs.Add(new KeyValuePair<string, string>(cat, val));
                 }
             }
             return pairs;
-        }
-
-        public List<string> GetCardCustomKeyNames(string cardId)
-        {
-            if (_cardCustomTags.TryGetValue(cardId, out var tags))
-            {
-                return [.. tags.Keys];
-            }
-            return [];
         }
 
         public void LoadCustomFilters(
@@ -288,14 +354,12 @@ namespace MECCG_Deck_Builder
             {
                 string resolvedCardId = null;
 
-                // 1. Try matching by fullCode
                 if (catalog != null && dict.TryGetValue("fullCode", out string fullCode) && !string.IsNullOrWhiteSpace(fullCode))
                 {
                     var card = catalog.Cards.FirstOrDefault(c => string.Equals(c.FullCode, fullCode.Trim(), StringComparison.OrdinalIgnoreCase));
                     if (card != null) resolvedCardId = card.Id;
                 }
 
-                // 2. Try matching by name and set
                 if (resolvedCardId == null && catalog != null &&
                     dict.TryGetValue("name", out string name) && !string.IsNullOrWhiteSpace(name) &&
                     dict.TryGetValue("set", out string set) && !string.IsNullOrWhiteSpace(set))
@@ -306,7 +370,6 @@ namespace MECCG_Deck_Builder
                     if (card != null) resolvedCardId = card.Id;
                 }
 
-                // 3. Backwards-compatibility fallback: legacy runtime 'id'
                 if (resolvedCardId == null && dict.TryGetValue("id", out string legacyId))
                 {
                     resolvedCardId = legacyId;
@@ -317,7 +380,6 @@ namespace MECCG_Deck_Builder
                 var tags = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var kvp in dict)
                 {
-                    // Exclude metadata keys so they don't become custom tags
                     if (string.Equals(kvp.Key, "id", StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(kvp.Key, "name", StringComparison.OrdinalIgnoreCase) ||
                         string.Equals(kvp.Key, "set", StringComparison.OrdinalIgnoreCase) ||
@@ -340,10 +402,7 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // Snap category to canonical casing if already known
             string resolvedKey = _customFilters.FirstOrDefault(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase))?[0] ?? keyName.Trim();
-
-            // Snap tag value to canonical casing if already known
             var knownValues = GetCustomKeyValues(resolvedKey);
             string trimmedVal = value.Trim();
             string canonicalVal = knownValues.FirstOrDefault(v => string.Equals(v, trimmedVal, StringComparison.OrdinalIgnoreCase));
@@ -361,6 +420,8 @@ namespace MECCG_Deck_Builder
                 if (!existingList.Contains(resolvedValue, StringComparer.OrdinalIgnoreCase))
                 {
                     existingList.Add(resolvedValue);
+                    // Sort tags alphabetically with natural sorting
+                    existingList.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
                     tags[resolvedKey] = string.Join("; ", existingList);
                 }
             }
@@ -378,7 +439,9 @@ namespace MECCG_Deck_Builder
                 tags.TryGetValue(keyName, out string val) &&
                 !string.IsNullOrWhiteSpace(val))
             {
-                return [.. val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+                var list = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                list.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
+                return list;
             }
             return [];
         }
@@ -431,9 +494,6 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        /// <summary>
-        /// Non-destructively merges categories and tags from an external tag set into the active taxonomy.
-        /// </summary>
         public void MergeCustomFilters(
             List<List<string>> filters,
             List<SortedDictionary<string, string>> cardMappings,
@@ -471,14 +531,12 @@ namespace MECCG_Deck_Builder
 
         private static string ResolveCardIdFromDictionary(SortedDictionary<string, string> dict, CardCatalogService catalog)
         {
-            // 1. Match by fullCode
             if (catalog != null && dict.TryGetValue("fullCode", out string fullCode) && !string.IsNullOrWhiteSpace(fullCode))
             {
                 var card = catalog.Cards.FirstOrDefault(c => string.Equals(c.FullCode, fullCode.Trim(), StringComparison.OrdinalIgnoreCase));
                 if (card != null) return card.Id;
             }
 
-            // 2. Match by name and set
             if (catalog != null &&
                 dict.TryGetValue("name", out string name) && !string.IsNullOrWhiteSpace(name) &&
                 dict.TryGetValue("set", out string set) && !string.IsNullOrWhiteSpace(set))
@@ -489,7 +547,6 @@ namespace MECCG_Deck_Builder
                 if (card != null) return card.Id;
             }
 
-            // 3. Fallback: legacy runtime ID
             if (dict.TryGetValue("id", out string legacyId))
             {
                 return legacyId;
@@ -516,6 +573,12 @@ namespace MECCG_Deck_Builder
             }
 
             string cardValue = card.GetAttribute(key);
+
+            if (IsBlankSentinel(value))
+            {
+                return string.IsNullOrWhiteSpace(cardValue);
+            }
+
             if (string.IsNullOrEmpty(cardValue))
             {
                 return false;
@@ -534,6 +597,13 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
+            // Support multi-valued card attributes (e.g. Race: "Animal; Man; Bear" or Secondary: "Creature/Short-event")
+            if (cardValue.Contains(';') || (string.Equals(key, "Secondary", StringComparison.OrdinalIgnoreCase) && cardValue.Contains('/')))
+            {
+                var parts = cardValue.Split([';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return parts.Any(p => string.Equals(p, value.Trim(), StringComparison.OrdinalIgnoreCase));
+            }
+
             return string.Equals(cardValue.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase);
         }
 
@@ -544,24 +614,34 @@ namespace MECCG_Deck_Builder
                 return true;
             }
 
-            if (!_cardCustomTags.TryGetValue(cardId, out var tags))
+            // Handle [Blank] / [None] sentinel
+            if (IsBlankSentinel(value))
+            {
+                if (!_cardCustomTags.TryGetValue(cardId, out var tags))
+                {
+                    return true;
+                }
+                return !tags.TryGetValue(key, out string tagVal) || string.IsNullOrWhiteSpace(tagVal);
+            }
+
+            if (!_cardCustomTags.TryGetValue(cardId, out var customTags))
             {
                 return false;
             }
 
-            if (!tags.TryGetValue(key, out string tagVal) || string.IsNullOrEmpty(tagVal))
+            if (!customTags.TryGetValue(key, out string val) || string.IsNullOrEmpty(val))
             {
                 return false;
             }
 
-            if (string.Equals(tagVal.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(val.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            if (tagVal.Contains(';'))
+            if (val.Contains(';'))
             {
-                var split = tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var split = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 return split.Any(s => string.Equals(s, value.Trim(), StringComparison.OrdinalIgnoreCase));
             }
 
@@ -642,8 +722,9 @@ namespace MECCG_Deck_Builder
             }
 
             var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            bool hasBlank = false;
 
-            // Scan only cards matching active sets and criteria
+            // Scan cards matching active sets and criteria
             foreach (var card in sourceCards)
             {
                 if (selectedSets != null && !selectedSets.Contains(card.Set))
@@ -661,6 +742,7 @@ namespace MECCG_Deck_Builder
                     string attr = card.GetAttribute(targetKey);
                     if (string.IsNullOrWhiteSpace(attr))
                     {
+                        hasBlank = true;
                         continue;
                     }
 
@@ -672,30 +754,49 @@ namespace MECCG_Deck_Builder
                             distinctValues.Add(word.Trim());
                         }
                     }
+                    else if (attr.Contains(';'))
+                    {
+                        // Add each multi-value token individually to the dropdown (e.g. Race: Animal; Man; Bear)
+                        var parts = attr.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        foreach (var part in parts)
+                        {
+                            distinctValues.Add(part.Trim());
+                        }
+                    }
                     else
                     {
                         distinctValues.Add(attr.Trim());
                     }
                 }
-                else
+                else // targetType == FilterType.Custom
                 {
-                    if (_cardCustomTags.TryGetValue(card.Id, out var tags) &&
-                        tags.TryGetValue(targetKey, out string tagVal) &&
-                        !string.IsNullOrWhiteSpace(tagVal))
+                    if (!_cardCustomTags.TryGetValue(card.Id, out var tags) ||
+                        !tags.TryGetValue(targetKey, out string tagVal) ||
+                        string.IsNullOrWhiteSpace(tagVal))
                     {
-                        if (tagVal.Contains(';'))
+                        hasBlank = true;
+                        continue;
+                    }
+
+                    if (tagVal.Contains(';'))
+                    {
+                        // Add each custom tag individually (e.g. Automatic Attack: Orc; Troll)
+                        foreach (var part in tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                         {
-                            foreach (var part in tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-                            {
-                                distinctValues.Add(part);
-                            }
-                        }
-                        else
-                        {
-                            distinctValues.Add(tagVal.Trim());
+                            distinctValues.Add(part.Trim());
                         }
                     }
+                    else
+                    {
+                        distinctValues.Add(tagVal.Trim());
+                    }
                 }
+            }
+
+            // Sentinel [Blank] entry appears right after blank reset if untagged/empty values exist
+            if (hasBlank)
+            {
+                result.Add(BlankSentinel);
             }
 
             var sortedList = distinctValues.ToList();

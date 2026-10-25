@@ -14,6 +14,11 @@ namespace MECCG_Deck_Builder
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 #pragma warning restore SYSLIB1045
 
+        private static readonly HashSet<string> NumericAttributes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Prowess", "Body", "Mind", "Direct", "Corruption", "MPs", "Strikes"
+        };
+
         public static DeckGenerationRuleSet LoadRuleSetFromJson(string json)
         {
             if (string.IsNullOrWhiteSpace(json)) return null;
@@ -155,7 +160,7 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Filter candidates
+            // 2. Filter candidate cards
             var candidates = allCards.Where(c =>
             {
                 if (ruleSets != null && ruleSets.Count > 0 && !ruleSets.Contains(c.Set))
@@ -163,7 +168,7 @@ namespace MECCG_Deck_Builder
                     return false;
                 }
 
-                // Attribute evaluation
+                // Attribute evaluation with numeric comparison and blank sentinel support
                 foreach (var (attrKey, (rawTemplate, resolvedVal)) in resolvedAttributes)
                 {
                     if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
@@ -171,20 +176,13 @@ namespace MECCG_Deck_Builder
                         return false;
                     }
 
-                    if (!string.IsNullOrWhiteSpace(resolvedVal))
+                    if (!EvaluateAttributeCriterion(c, attrKey, resolvedVal))
                     {
-                        var allowedValues = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                        if (!allowedValues.Any(v =>
-                            v == "*" ||
-                            string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
-                            CardFilterService.MatchesCardnumCriterion(c, attrKey, v)))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
 
-                // Enhanced Category & Tag evaluation:
+                // Category & Tag evaluation with blank sentinel support
                 if (filterService != null)
                 {
                     foreach (var (catKey, (rawTemplate, resolvedVal)) in resolvedCategories)
@@ -211,37 +209,108 @@ namespace MECCG_Deck_Builder
                 return true;
             }).ToList();
 
-            // 3. Sample candidates with tiered variety-first distribution
+            // 3. Sample candidates according to configurable Distribution strategy
             int addedForThisRule = 0;
             var targetSection = deck.GetSection(sectionType);
             var newlyAdded = new List<Card>();
 
-            while (addedForThisRule < rule.Count)
+            string distribution = rule.Distribution?.Trim() ?? "Variety";
+
+            if (string.Equals(distribution, "Focused", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(distribution, "Playset", StringComparison.OrdinalIgnoreCase))
             {
-                var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
-                if (available.Count == 0) break;
+                // FOCUSED: Greedily add maximum legal copies of a sampled title before picking next
+                while (addedForThisRule < rule.Count)
+                {
+                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                    if (available.Count == 0) break;
 
-                int minCount = available.Min(c => cardCountsByName.GetValueOrDefault(c.Name, 0));
+                    var titleGroups = available.GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase).ToList();
+                    if (titleGroups.Count == 0) break;
 
-                var tierGroups = available
-                    .Where(c => cardCountsByName.GetValueOrDefault(c.Name, 0) == minCount)
-                    .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-                    .ToList();
+                    var chosenGroup = titleGroups[Random.Shared.Next(titleGroups.Count)].ToList();
+                    var sampleCard = chosenGroup[0];
 
-                if (tierGroups.Count == 0) break;
+                    int currentCount = cardCountsByName.GetValueOrDefault(sampleCard.Name, 0);
+                    int maxAllowed = IsUniqueCard(sampleCard) ? 1 : 3;
+                    int canAdd = maxAllowed - currentCount;
+                    int toAdd = Math.Min(canAdd, rule.Count - addedForThisRule);
 
-                int groupIndex = Random.Shared.Next(tierGroups.Count);
-                var matchingReprints = tierGroups[groupIndex].ToList();
-                var selectedCard = matchingReprints[Random.Shared.Next(matchingReprints.Count)];
+                    for (int i = 0; i < toAdd; i++)
+                    {
+                        var selectedCard = chosenGroup[Random.Shared.Next(chosenGroup.Count)];
+                        targetSection.Add(selectedCard);
+                        deck.IncludedSets.Add(selectedCard.Set);
+                        newlyAdded.Add(selectedCard);
 
-                targetSection.Add(selectedCard);
-                deck.IncludedSets.Add(selectedCard.Set);
-                newlyAdded.Add(selectedCard);
-
-                int currentCount = cardCountsByName.GetValueOrDefault(selectedCard.Name, 0) + 1;
-                cardCountsByName[selectedCard.Name] = currentCount;
-                addedForThisRule++;
+                        currentCount++;
+                        cardCountsByName[selectedCard.Name] = currentCount;
+                        addedForThisRule++;
+                    }
+                }
             }
+            else if (string.Equals(distribution, "Uniform", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(distribution, "Random", StringComparison.OrdinalIgnoreCase))
+            {
+                // UNIFORM: Pure lottery draw across all valid candidates with replacement up to limits
+                while (addedForThisRule < rule.Count)
+                {
+                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                    if (available.Count == 0) break;
+
+                    var titleGroups = available.GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase).ToList();
+                    if (titleGroups.Count == 0) break;
+
+                    var chosenGroup = titleGroups[Random.Shared.Next(titleGroups.Count)].ToList();
+                    var selectedCard = chosenGroup[Random.Shared.Next(chosenGroup.Count)];
+
+                    targetSection.Add(selectedCard);
+                    deck.IncludedSets.Add(selectedCard.Set);
+                    newlyAdded.Add(selectedCard);
+
+                    int currentCount = cardCountsByName.GetValueOrDefault(selectedCard.Name, 0) + 1;
+                    cardCountsByName[selectedCard.Name] = currentCount;
+                    addedForThisRule++;
+                }
+            }
+            else
+            {
+                // VARIETY (Default): Prioritize distinct titles before assigning duplicates
+                while (addedForThisRule < rule.Count)
+                {
+                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                    if (available.Count == 0) break;
+
+                    int minCount = available.Min(c => cardCountsByName.GetValueOrDefault(c.Name, 0));
+
+                    var tierGroups = available
+                        .Where(c => cardCountsByName.GetValueOrDefault(c.Name, 0) == minCount)
+                        .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    if (tierGroups.Count == 0) break;
+
+                    int groupIndex = Random.Shared.Next(tierGroups.Count);
+                    var matchingReprints = tierGroups[groupIndex].ToList();
+                    var selectedCard = matchingReprints[Random.Shared.Next(matchingReprints.Count)];
+
+                    targetSection.Add(selectedCard);
+                    deck.IncludedSets.Add(selectedCard.Set);
+                    newlyAdded.Add(selectedCard);
+
+                    int currentCount = cardCountsByName.GetValueOrDefault(selectedCard.Name, 0) + 1;
+                    cardCountsByName[selectedCard.Name] = currentCount;
+                    addedForThisRule++;
+                }
+            }
+
+            logs.Add(new DeckRuleExecutionLog
+            {
+                RuleName = !string.IsNullOrWhiteSpace(rule.Name) ? rule.Name : "(Unnamed Rule)",
+                Section = sectionType.ToString(),
+                RequestedCount = rule.Count,
+                AddedCount = addedForThisRule
+            });
 
             // 4. Capture selected cards to variable context if SaveAs is specified
             if (!string.IsNullOrWhiteSpace(rule.SaveAs) && newlyAdded.Count > 0)
@@ -260,13 +329,164 @@ namespace MECCG_Deck_Builder
                     rule.Fallback.Section = sectionType.ToString();
                 }
 
-                int countBefore = targetSection.Count;
                 ExecuteRule(rule.Fallback, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables);
-                int addedByFallback = targetSection.Count - countBefore;
-
-                return;
             }
         }
+
+        #region ATTRIBUTE_EVALUATION_AND_NUMERIC_OPERATORS
+
+        private static bool EvaluateAttributeCriterion(Card card, string attrKey, string resolvedVal)
+        {
+            if (string.IsNullOrWhiteSpace(resolvedVal)) return true;
+
+            if (NumericAttributes.Contains(attrKey) && HasComparisonOperator(resolvedVal))
+            {
+                return EvaluateNumericAttributeComparison(card, attrKey, resolvedVal);
+            }
+
+            var allowedValues = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return allowedValues.Any(v =>
+                v == "*" ||
+                string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
+                CardFilterService.MatchesCardnumCriterion(card, attrKey, v));
+        }
+
+        private static bool HasComparisonOperator(string val) =>
+            val.Contains('>') || val.Contains('<') || val.Contains("!=") || val.Contains('=');
+
+        private static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
+        {
+            string rawCardVal = card.GetAttribute(attrKey);
+
+            if (!TryParseCardStat(rawCardVal, out int cardStat))
+            {
+                // Fallback to literal matching for non-numeric/empty values
+                var fallbackTokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return fallbackTokens.Any(v =>
+                    v == "*" ||
+                    string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
+                    CardFilterService.MatchesCardnumCriterion(card, attrKey, v));
+            }
+
+            var tokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var parsedConditions = new List<(string Op, int TargetVal, bool IsWildcard, bool IsBlank)>();
+
+            foreach (var token in tokens)
+            {
+                if (token == "*" || string.Equals(token, "All", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+                if (CardFilterService.IsBlankSentinel(token))
+                {
+                    if (string.IsNullOrWhiteSpace(rawCardVal)) return true;
+                    continue;
+                }
+
+                string trimmed = token.Trim();
+                if (trimmed.StartsWith(">="))
+                {
+                    if (int.TryParse(trimmed[2..].Trim(), out int t)) parsedConditions.Add((">=", t, false, false));
+                }
+                else if (trimmed.StartsWith("<="))
+                {
+                    if (int.TryParse(trimmed[2..].Trim(), out int t)) parsedConditions.Add(("<=", t, false, false));
+                }
+                else if (trimmed.StartsWith("!="))
+                {
+                    if (int.TryParse(trimmed[2..].Trim(), out int t)) parsedConditions.Add(("!=", t, false, false));
+                }
+                else if (trimmed.StartsWith('>'))
+                {
+                    if (int.TryParse(trimmed[1..].Trim(), out int t)) parsedConditions.Add((">", t, false, false));
+                }
+                else if (trimmed.StartsWith('<'))
+                {
+                    if (int.TryParse(trimmed[1..].Trim(), out int t)) parsedConditions.Add(("<", t, false, false));
+                }
+                else if (trimmed.StartsWith('='))
+                {
+                    if (int.TryParse(trimmed[1..].Trim(), out int t)) parsedConditions.Add(("==", t, false, false));
+                }
+                else if (int.TryParse(trimmed, out int exact))
+                {
+                    parsedConditions.Add(("==", exact, false, false));
+                }
+            }
+
+            if (parsedConditions.Count == 0) return false;
+
+            // Detect range bounding (e.g. >= 3 and <= 5)
+            var lowerBounds = parsedConditions.Where(c => c.Op is ">=" or ">").ToList();
+            var upperBounds = parsedConditions.Where(c => c.Op is "<=" or "<").ToList();
+
+            if (lowerBounds.Count == 1 && upperBounds.Count == 1)
+            {
+                var lb = lowerBounds[0];
+                var ub = upperBounds[0];
+
+                if (lb.TargetVal <= ub.TargetVal)
+                {
+                    // Bound interval AND condition
+                    bool satisfiesLower = lb.Op == ">=" ? cardStat >= lb.TargetVal : cardStat > lb.TargetVal;
+                    bool satisfiesUpper = ub.Op == "<=" ? cardStat <= ub.TargetVal : cardStat < ub.TargetVal;
+
+                    if (satisfiesLower && satisfiesUpper) return true;
+
+                    // Evaluate any additional discrete conditions
+                    var others = parsedConditions.Where(c => c != lb && c != ub).ToList();
+                    return others.Any(c => EvaluateSingleCondition(cardStat, c.Op, c.TargetVal));
+                }
+            }
+
+            // Standard OR evaluation across conditions
+            return parsedConditions.Any(c => EvaluateSingleCondition(cardStat, c.Op, c.TargetVal));
+        }
+
+        private static bool EvaluateSingleCondition(int stat, string op, int target) => op switch
+        {
+            ">=" => stat >= target,
+            "<=" => stat <= target,
+            ">" => stat > target,
+            "<" => stat < target,
+            "!=" => stat != target,
+            "==" or "=" => stat == target,
+            _ => false
+        };
+
+        private static bool TryParseCardStat(string cardValue, out int result)
+        {
+            result = 0;
+            if (string.IsNullOrWhiteSpace(cardValue)) return false;
+
+            string trimmed = cardValue.Trim();
+
+            // Strip parentheses (e.g., (-1) -> -1, (2) -> 2)
+            if (trimmed.StartsWith('(') && trimmed.EndsWith(')'))
+            {
+                trimmed = trimmed[1..^1].Trim();
+            }
+
+            // Strip suffix parentheses (e.g. 1(2) -> 1)
+            int parenIdx = trimmed.IndexOf('(');
+            if (parenIdx > 0)
+            {
+                trimmed = trimmed[..parenIdx].Trim();
+            }
+
+            // Treat MPs "None" as 0
+            if (string.Equals(trimmed, "None", StringComparison.OrdinalIgnoreCase))
+            {
+                result = 0;
+                return true;
+            }
+
+            return int.TryParse(trimmed, out result);
+        }
+
+        #endregion
+
+        #region PLACEHOLDER_RESOLUTION_AND_HELPERS
 
         private static string ResolvePlaceholders(
             string template,
@@ -350,5 +570,7 @@ namespace MECCG_Deck_Builder
         {
             return string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase);
         }
+
+        #endregion
     }
 }

@@ -10,7 +10,7 @@
 
     <h1>Deck Rules JSON Schema Reference</h1>
     <p>
-        Procedural deck generation templates are declarative JSON files loaded via <strong>Deck &gt; Generate from Rules...</strong> (<kbd>Ctrl+G</kbd>, or re-run instantly with <kbd>F5</kbd>). This reference details all JSON schema elements, properties, data types, default values, multi-card collections, and token interpolation rules.
+        Procedural deck generation templates are declarative JSON files loaded via <strong>Deck &gt; Generate from Rules...</strong> (<kbd>Ctrl+G</kbd>, or re-run instantly with <kbd>F5</kbd>). This reference details all JSON schema elements, properties, data types, default values, distribution strategies, relational operators, and token interpolation rules.
     </p>
 
     <!-- ROOT OBJECT -->
@@ -32,7 +32,7 @@
             <td><code>RuleSetType</code></td>
             <td>string</td>
             <td><code>"SequentialRules"</code></td>
-            <td>Execution strategy identifier (reserved for future execution engines).</td>
+            <td>Execution strategy identifier.</td>
         </tr>
         <tr>
             <td><code>Version</code></td>
@@ -88,7 +88,20 @@
             <td>integer</td>
             <td><code>1</code></td>
             <td>
-                The total number of card copies requested by this rule. For broad queries, the engine prioritizes distinct card titles (variety-first) before assigning duplicates; for exact title queries (e.g. <code>{"Name": "Marvels Told"}</code>), it adds multiple copies of that specific card up to legal deck limits.
+                The total number of card copies requested by this rule.
+            </td>
+        </tr>
+        <tr>
+            <td><code>Distribution</code></td>
+            <td>string</td>
+            <td><code>"Variety"</code></td>
+            <td>
+                Card sampling strategy:
+                <ul>
+                    <li><code>"Variety"</code> (default): Prioritizes distinct card titles (variety-first) before assigning duplicate copies.</li>
+                    <li><code>"Focused"</code> (or <code>"Playset"</code>): Concentrates additions into full legal playsets (up to 3 copies for non-unique cards, 1 for unique) of each sampled title before picking a different card.</li>
+                    <li><code>"Uniform"</code> (or <code>"Random"</code>): Unweighted random draw with replacement from all candidates that have not yet reached copy limits.</li>
+                </ul>
             </td>
         </tr>
         <tr>
@@ -112,7 +125,7 @@
             <td>dictionary (Attribute: Value)</td>
             <td><code>{}</code></td>
             <td>
-                Key-value pairs of official card attributes and required values (e.g. <code>{"Race": "Dwarf", "Skill": "Diplomat"}</code>). Supports semicolon <code>OR</code> syntax and variable interpolation.
+                Key-value pairs of official card attributes and required values. Supports exact strings, semicolon <code>OR</code> logic, relational operators (<code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>!=</code>), <code>"[Blank]"</code>, and variable interpolation.
             </td>
         </tr>
         <tr>
@@ -120,7 +133,7 @@
             <td>dictionary (Category: Tag)</td>
             <td><code>{}</code></td>
             <td>
-                Key-value pairs of custom taxonomy categories and required tags (e.g. <code>{"Faction Bonus": "Wood-elves", "Automatic Attack": "Dragon"}</code>). Supports semicolon <code>OR</code> syntax and variable interpolation.
+                Key-value pairs of custom taxonomy categories and required tags. Supports semicolon <code>OR</code> logic, <code>"[Blank]"</code>, and variable interpolation.
             </td>
         </tr>
         <tr>
@@ -165,7 +178,7 @@
             <td>integer</td>
             <td><code>1</code></td>
             <td>
-                Relative lottery weight. Selection probability equals <code>Weight / Total Weights</code> (e.g., choices weighted <code>1</code> and <code>3</code> yield 25% and 75% selection chances).
+                Relative lottery weight. Selection probability equals <code>Weight / Total Weights</code>.
             </td>
         </tr>
         <tr>
@@ -177,9 +190,32 @@
     </table>
 
     <!-- QUERY & INTERPOLATION -->
-    <h2 id="query-syntax">4. Query &amp; Placeholder Interpolation Rules</h2>
+    <h2 id="query-syntax">4. Query Syntax, Relational Operators &amp; Placeholder Interpolation Rules</h2>
 
-    <h3>A. Semicolon Multi-Value OR Logic</h3>
+    <h3>A. Numeric Relational Operators (&gt;, &gt;=, &lt;, &lt;=, !=)</h3>
+    <p>
+        For integer attributes (<code>Prowess</code>, <code>Body</code>, <code>Mind</code>, <code>Direct</code>, <code>Corruption</code>, <code>MPs</code>, <code>Strikes</code>), prefix numbers with relational operators:
+    </p>
+    <ul>
+        <li><code>"Prowess": "&gt;= 6"</code> &mdash; Characters with prowess 6 or higher.</li>
+        <li><code>"Mind": "&lt;= 3"</code> &mdash; Low-mind starting companions.</li>
+        <li><code>"Corruption": "&lt; 0"</code> &mdash; Corruption-resistant characters (Hobbits, Dwarves).</li>
+        <li><code>"MPs": "!= 0"</code> &mdash; Cards worth non-zero victory points.</li>
+        <li><code>"Mind": "&gt;= 3; &lt;= 5"</code> &mdash; Range query matching characters between 3 and 5 mind.</li>
+        <li><code>"Prowess": "&gt;= 7; 1"</code> &mdash; Tiered query matching warriors of prowess 7+ OR a 1-prowess scout.</li>
+    </ul>
+
+    <h3>B. Blank &amp; Missing Value Matching (<code>"[Blank]"</code>)</h3>
+    <p>
+        To query cards that have no value assigned for an attribute or category (such as corruption-free items, untagged cards, or characters without home restrictions), use <code>"[Blank]"</code>:
+    </p>
+    <pre><code>"Attributes": {
+  "Primary": "Resource",
+  "Secondary": "Major Item",
+  "Corruption": "[Blank]"
+}</code></pre>
+
+    <h3>C. Semicolon Multi-Value OR Logic</h3>
     <p>
         Any string inside <code>Attributes</code> or <code>Categories</code> can contain multiple semicolon-delimited values. A card matches if it satisfies <strong>any</strong> of the values:
     </p>
@@ -191,7 +227,7 @@
   "Automatic Attack": "Dragon; Drake"
 }</code></pre>
 
-    <h3>B. Wildcard &amp; Universal Sentinel Matching (<code>*</code> and <code>All</code>)</h3>
+    <h3>D. Wildcard &amp; Universal Sentinel Matching (<code>*</code> and <code>All</code>)</h3>
     <p>
         Any query criterion in <code>Attributes</code> or <code>Categories</code> that contains <code>*</code> or <code>All</code> acts as a wildcard, satisfying that check for any card that meets the other constraints in the rule. This is particularly valuable when querying properties dynamically captured from character cards:
     </p>
@@ -204,7 +240,7 @@
         If the captured leader is a universal diplomat like <em>Adrazar</em> (tagged <code>Faction Bonus: All</code>), the placeholder resolves to <code>"Name": "All"</code>. Rather than failing to find a card literally named "All", the engine recognizes the sentinel, treats the <code>Name</code> criterion as an open wildcard, and randomly samples from <strong>all faction cards available in your active expansions</strong>.
     </p>
 
-    <h3>C. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
+    <h3>E. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
     <p>
         When a rule captures one or more cards via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query those cards' properties using bracketed tokens:
     </p>

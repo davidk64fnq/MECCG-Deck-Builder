@@ -85,8 +85,9 @@
     </p>
 
     <div class="note" id="stat-modifiers-note">
-        <strong>Stat Modifiers &amp; Parentheses Notation:</strong>
-        Plain values represent direct, unconditional modifiers to the attribute itself (e.g., <code>-1 body</code> or flat armor bonuses). Values enclosed in parentheses (e.g., <code>(1)</code> or <code>(-1)</code>) denote <strong>conditional modifiers</strong> (such as bonuses restricted to a specific character or class like <em>Warrior only</em>, or temporary combat effects) as well as <strong>direct dice roll adjustments</strong> (such as <code>+1 to body checks</code>).<br />
+        <strong>Stat Modifiers, Relational Operators &amp; <code>[Blank]</code> Filtering:</strong><br />
+        Plain values represent direct, unconditional modifiers to the attribute itself. In procedural deck generation rules, numeric attributes (<code>Prowess</code>, <code>Body</code>, <code>Mind</code>, <code>Direct</code>, <code>Corruption</code>, <code>MPs</code>, <code>Strikes</code>) support relational operators (<code>&gt;</code>, <code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>!=</code>), range bounding (e.g. <code>"Mind": "&gt;= 3; &lt;= 5"</code>), and sentinel blank checks (<code>"[Blank]"</code>).<br />
+        <em>Filtering for Unset Fields:</em> Whenever matching cards in scope lack an attribute value (such as characters without a <code>Home</code> site or items without <code>Corruption</code>), a dedicated <code>[Blank]</code> sentinel appears at the top of the <strong>Value</strong> dropdown.<br />
         <em>Attribute Polarity:</em> Modifiers reflect net impact on the stat total—most notably in <code>Corruption</code>, where character resistance bonuses (e.g. <code>+2</code> printed on Hobbits) are indexed as negative numbers (<code>-2</code>) because they reduce the character's net corruption burden.
     </div>
 
@@ -102,8 +103,8 @@
                 Card loyalty, alignment framework, and player faction:
                 <ul>
                     <li><strong>Standard Alignments:</strong> <code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, and <code>Neutral</code>.</li>
-                    <li><strong><code>Fallen/Lord</code>:</strong> Stage resource cards from <em>The White Hand</em> playable by both Fallen-wizards and Fallen-wizards pursuing Ring-lord strategies (e.g., <em>A Merrier World</em>, <em>Deep Mines</em>).</li>
-                    <li><strong><code>Dual</code>:</strong> Crossover cards legal in both Hero and Minion decks with dual-use rules (e.g., <em>Beasts of the Wood</em>, <em>Deadly Dart</em>).</li>
+                    <li><strong><code>Fallen/Lord</code>:</strong> Stage resource cards from <em>The White Hand</em> playable by both Fallen-wizards and Fallen-wizards pursuing Ring-lord strategies.</li>
+                    <li><strong><code>Dual</code>:</strong> Crossover cards legal in both Hero and Minion decks with dual-use rules.</li>
                 </ul>
             </td>
             <td><code>Hero</code>, <code>Minion</code>, <code>Fallen-wizard</code>, <code>Balrog</code>, <code>Neutral</code>, <code>Fallen/Lord</code>, <code>Dual</code></td>
@@ -115,30 +116,31 @@
         </tr>
         <tr>
             <td><code>Body</code></td>
-            <td>The defensive resilience rating for characters and creatures. An attack roll exceeding this stat wounds or defeats the card.</td>
-            <td>Base ratings: <code>1</code> to <code>12</code> (or <code>-</code>).<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+            <td>The defensive resilience rating for characters and creatures. An attack roll exceeding this stat wounds or defeats the card. Supports numeric operators in procedural rules.</td>
+            <td>Base ratings: <code>1</code> to <code>12</code> (or <code>-</code>, <code>[Blank]</code>).</td>
         </tr>
         <tr>
             <td><code>Corruption</code></td>
             <td>
                 The corruption points (CP) an item/hazard inflicts, or a character's inherent resistance modifier.<br />
-                <em>Note on Sign Inversion:</em> In Cardnum, positive numbers represent corruption <strong>burden</strong> (e.g. <code>1</code>, <code>2</code> CP), while negative numbers represent corruption <strong>resistance</strong> (e.g. Hobbits with printed <code>+2</code> or <code>+4</code> bonuses are indexed as <code>-2</code> and <code>-4</code> because they reduce the net corruption threat).
+                <em>Note on Sign Inversion:</em> In Cardnum, positive numbers represent corruption <strong>burden</strong> (e.g. <code>1</code>, <code>2</code> CP), while negative numbers represent corruption <strong>resistance</strong> (e.g. Hobbits are indexed as <code>-2</code> and Frodo as <code>-4</code>). Filter for <code>[Blank]</code> to find safe, zero-burden items.
             </td>
             <td>
                 <code>1</code>, <code>2</code>, <code>3</code> (Item/Hazard CP burden)<br />
-                <code>-1</code>, <code>-2</code>, <code>-3</code> and <code>-4</code> (Character resistance, e.g. Hobbits, Short-event e.g. New Friendship)<br />
-                <code>1(2)</code>, <code>2(3)</code> (Conditional/event modifiers)
+                <code>-1</code>, <code>-2</code>, <code>-3</code> and <code>-4</code> (Character resistance)<br />
+                <code>1(2)</code>, <code>2(3)</code> (Conditional/event modifiers)<br />
+                <code>[Blank]</code> (Items/cards with no corruption points)
             </td>
         </tr>
         <tr>
             <td><code>Direct</code></td>
             <td>Direct Influence (DI) points used by characters to control followers or recruit factions.</td>
-            <td>Base ratings: <code>0</code> to <code>12</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+            <td>Base ratings: <code>0</code> to <code>12</code>.</td>
         </tr>
         <tr>
             <td><code>GoldRing</code></td>
             <td>Site item-playability flag indicating whether a Gold Ring item may be tested or played at this site.</td>
-            <td><code>yes</code>, or blank.</td>
+            <td><code>yes</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>GreaterItem</code></td>
@@ -150,7 +152,7 @@
                     <li><strong>Lossadan Cairn (both versions):</strong> Although the card face prints &ldquo;greater* (* &mdash; Palant&iacute;ri only)&rdquo;, Cardnum leaves <code>GreaterItem</code> <strong>blank</strong> and indexes it under <code>Palantiri: yes</code> instead, preventing false matches when searching for general Greater Item sites.</li>
                 </ul>
             </td>
-            <td><code>yes</code>, or blank.</td>
+            <td><code>yes</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Haven</code></td>
@@ -176,37 +178,37 @@
                     <li><strong>Conditional Hoard Play:</strong> Sites whose rules text specifically allows playing a hoard item under special conditions (e.g., <em>Hermit's Hill</em>).</li>
                 </ul>
             </td>
-            <td><code>yes</code>, or blank.</td>
+            <td><code>yes</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Home</code></td>
-            <td>Designated starting, recruiting, or healing site(s) for character cards. Multiple homes are split and indexed individually.</td>
-            <td><code>Rivendell</code>, <code>Bree</code>, <code>Edoras</code>, <code>L&oacute;rien</code>, <code>Pelargir</code>, <code>Woodland Realm</code>, etc.</td>
+            <td>Designated starting, recruiting, or healing site(s) for character cards. Multiple homes are split and indexed individually. Filter for <code>[Blank]</code> to audit characters with dynamic or regional home rules.</td>
+            <td><code>Rivendell</code>, <code>Bree</code>, <code>Edoras</code>, <code>L&oacute;rien</code>, <code>Pelargir</code>, <code>Woodland Realm</code>, <code>[Blank]</code></td>
         </tr>
         <tr>
             <td><code>Information</code></td>
             <td>Site flag indicating whether Information resource events or cards may be played at this site.</td>
-            <td><code>Y</code>, specific requirements, or blank.</td>
+            <td><code>Y</code>, specific requirements, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>MajorItem</code></td>
             <td>Site item-playability flag indicating whether a Major Item may be played at this site.</td>
-            <td><code>Y</code>, conditions, or blank.</td>
+            <td><code>Y</code>, conditions, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Mind</code></td>
-            <td>The general influence required to maintain a character in a company, or the threshold resistance against corruption checks.</td>
-            <td>Base ratings: <code>1</code> to <code>10</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+            <td>The general influence required to maintain a character in a company, or the threshold resistance against corruption checks. Supports relational operators (e.g. <code>"&lt;= 3"</code> or <code>"&gt;= 3; &lt;= 5"</code>) in deck generation rules.</td>
+            <td>Base ratings: <code>1</code> to <code>10</code>.</td>
         </tr>
         <tr>
             <td><code>MinorItem</code></td>
             <td>Site item-playability flag indicating whether a Minor Item may be played at this site.</td>
-            <td><code>Y</code>, conditions, or blank.</td>
+            <td><code>Y</code>, conditions, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>MPs</code></td>
             <td>Marshalling points (victory points) awarded by the card upon scoring or eliminating it.</td>
-            <td>Numeric victory point values (e.g. <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, <code>5</code>), negative point values (e.g. <code>-1</code>, <code>-2</code>), or <code>None</code>.</td>
+            <td>Numeric victory point values (<code>1</code> to <code>5</code>), negative values, <code>None</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Palantiri</code></td>
@@ -214,7 +216,7 @@
                 Site flag indicating whether a Palant&iacute;r item may be played at this site.<br />
                 <em>Note:</em> Both Hero and Minion printings of <em>Lossadan Cairn</em> are indexed here as <code>yes</code> because their printed &ldquo;greater*&rdquo; slot is strictly restricted to Palant&iacute;ri.
             </td>
-            <td><code>yes</code>, or blank.</td>
+            <td><code>yes</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Playable</code></td>
@@ -230,8 +232,8 @@
         </tr>
         <tr>
             <td><code>Prowess</code></td>
-            <td>The combat offensive rating (base combat strength roll) for characters and creatures.</td>
-            <td>Base ratings: <code>0</code> to <code>19</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+            <td>The base combat offensive rating (base combat strength roll) for characters and creatures. Supports relational operators (e.g. <code>"&gt;= 6"</code>) in procedural rules.</td>
+            <td>Base ratings: <code>0</code> to <code>19</code>.</td>
         </tr>
         <tr>
             <td><code>Primary</code></td>
@@ -240,8 +242,11 @@
         </tr>
         <tr>
             <td><code>Race</code></td>
-            <td>Character, creature, or faction species. Lore sub-races are canonically normalized to clean game types (e.g. <em>Silvan Elf</em> &rarr; <code>Elf</code>, <em>Longbeard Dwarf</em> &rarr; <code>Dwarf</code>).</td>
-            <td><code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Dragon</code>, <code>Nazg&ucirc;l</code>, <code>Ent</code>, <code>Undead</code>, <code>Maia</code>, etc.</td>
+            <td>
+                Character, creature, or faction species. Normalized to canonical singular nouns on application launch for 100% consistent matching across unique individuals and non-unique packs.<br />
+                <em>Multi-Species Creatures:</em> Creatures with multiple printed keywords (such as <em>Beorning Skin-changers</em> with printed <code>Animals. Men. Bears.</code>, or <em>Half-orcs</em> with <code>Orcs. Men.</code>) carry composite semicolon lists (<code>Animal; Man; Bear</code>, <code>Orc; Man</code>) and are filterable under each individual species.
+            </td>
+            <td><code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Spider</code>, <code>Wolf</code>, <code>Animal</code>, <code>Bear</code>, <code>Dragon</code>, <code>Drake</code>, <code>Giant</code>, <code>Undead</code>, <code>Nazg&ucirc;l</code>, <code>Ent</code>, <code>Awakened Plant</code>, <code>P&ucirc;kel-creature</code></td>
         </tr>
         <tr>
             <td><code>Region</code></td>
@@ -251,7 +256,7 @@
         <tr>
             <td><code>Scroll</code></td>
             <td>Site flag indicating whether Scroll items (e.g. <em>Scroll of Isildur</em>) may be played at this site.</td>
-            <td><code>Y</code>, conditions, or blank.</td>
+            <td><code>Y</code>, conditions, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Secondary</code></td>
@@ -261,35 +266,32 @@
         <tr>
             <td><code>Site</code></td>
             <td>The structural hold type or classification of a site card.</td>
-            <td><code>Free-hold</code>, <code>Border-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Shadow-hold</code>, <code>Dark-hold</code>, <code>Haven</code>, <code>Wizardhaven</code>, plus database shorthand codes (<code>B</code>, <code>B F</code>, <code>B R</code>).</td>
+            <td><code>Free-hold</code>, <code>Border-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Shadow-hold</code>, <code>Dark-hold</code>, <code>Haven</code>, <code>Wizardhaven</code></td>
         </tr>
         <tr>
             <td><code>Skill</code></td>
             <td>Character classes and creature tactical abilities. Compound skills (e.g. <em>Warrior/Scout</em>) are split on whitespace and indexed as individual values. Creature traits stored in this Cardnum field are also filterable here.</td>
-            <td>
-                <strong>Character Skills:</strong> <code>Warrior</code>, <code>Scout</code>, <code>Ranger</code>, <code>Sage</code>, <code>Diplomat</code><br />
-                <strong>Creature/Hazard Traits:</strong> <code>Flying</code>, <code>Ringwraith</code>, <code>Undead</code>, <code>Drake</code>, <code>Giant</code>, etc.
-            </td>
+            <td><code>Warrior</code>, <code>Scout</code>, <code>Ranger</code>, <code>Sage</code>, <code>Diplomat</code>, <code>Flying</code>, <code>Ringwraith</code></td>
         </tr>
         <tr>
             <td><code>Specific</code></td>
             <td>Designates unique cards, rings, or quest objectives specifically playable only at this site.</td>
-            <td>Named cards (e.g. <code>The One Ring</code>, <code>Iron Crown</code>) or special quest requirements.</td>
+            <td>Named cards (e.g. <code>The One Ring</code>, <code>Iron Crown</code>), or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Strikes</code></td>
             <td>The number of individual combat strikes delivered by a creature hazard against an opposing company.</td>
-            <td>Base ratings: <code>0</code> to <code>6</code> and <code>15</code>.<br />For modifier syntax, see <a href="#stat-modifiers-note">Stat Modifiers Note</a>.</td>
+            <td>Base ratings: <code>0</code> to <code>6</code>, <code>15</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Subrace</code></td>
             <td>Preserves specific Tolkien sub-races split during catalog normalization for deep lore queries. Blank for non-Elf and non-Dwarf cards.</td>
-            <td><code>Silvan Elf</code>, <code>Noldo Elf</code>, <code>Sinda Elf</code>, <code>Longbeard Dwarf</code>, <code>Firebeard Dwarf</code>, etc.</td>
+            <td><code>Silvan Elf</code>, <code>Noldo Elf</code>, <code>Sinda Elf</code>, <code>Longbeard Dwarf</code>, <code>Firebeard Dwarf</code>, or <code>[Blank]</code>.</td>
         </tr>
         <tr>
             <td><code>Unique</code></td>
             <td>The uniqueness status governing copy limits in deck building (1 copy for unique cards, up to 3 for non-unique).</td>
-            <td><code>Unique</code>, <code>Non-unique</code> (or blank).</td>
+            <td><code>Unique</code>, <code>Non-unique</code>, or <code>[Blank]</code>.</td>
         </tr>
     </table>
 
@@ -310,12 +312,21 @@
             <ul>
                 <li>Items and hazards that inflict corruption points (CP) are positive (e.g. <code>1</code>, <code>2</code>, <code>3</code> CP).</li>
                 <li>Character resistance bonuses that reduce the risk of corruption are indexed as <strong>negative values</strong> (e.g. <code>-2</code> for Hobbits, <code>-4</code> for Frodo) because mathematically, +2 to the check roll equals -2 to the net corruption burden.</li>
-                <li>To find corruption-resistant characters, filter for negative values like <code>-2</code> rather than <code>+2</code>.</li>
+                <li>To find corruption-resistant characters, filter for negative values like <code>-2</code> or query <code>"Corruption": "&lt; 0"</code> in procedural generation rules.</li>
             </ul>
         </li>
         <li>
             <strong>Parenthesized Values:</strong>
-            Values in parentheses (such as <code>(1)</code> or <code>(-1)</code>) indicate conditional modifiers (e.g., <em>Warrior only</em> on <em>Valiant Sword</em>, or <em>&Eacute;owyn only</em> on <em>Helm of Her Secrecy</em>) or direct dice roll check adjustments (such as +1 to body check rolls on <em>Stabbing Tongue of Fire</em>, indexed as <code>(-1)</code> body).
+            Values in parentheses (such as <code>(1)</code> or <code>(-1)</code>) indicate conditional modifiers (e.g., <em>Warrior only</em> on <em>Valiant Sword</em>, or <em>&Eacute;owyn only</em> on <em>Helm of Her Secrecy</em>) or direct dice roll check adjustments. The procedural engine's numeric parser automatically strips parentheses to evaluate the underlying stat cleanly without error.
+        </li>
+        <li>
+            <strong>Creature Race Normalization &amp; Species Exceptions:</strong>
+            Cardnum originally split creature species between singular unique individuals (<em>Troll</em> for Bert) and plural packs (<em>Trolls</em> for Olog-hai), along with composite strings (<em>Wolf Wolves</em>, <em>Man Men</em>, <em>Drake Sand-drake</em>). MECCG Deck Builder normalizes all creature races on startup to singular nouns (<code>Troll</code>, <code>Orc</code>, <code>Spider</code>, <code>Wolf</code>, <code>Animal</code>, <code>Dragon</code>, <code>Drake</code>):
+            <ul>
+                <li><strong>Cave-drake as a Dragon:</strong> Although titled with "-drake", <em>Cave-drake</em> (METW/MELE) prints the literal rules keyword <em>Dragon.</em> (published before the Drake keyword was introduced in METD) and is classified under <code>Race: Dragon</code> per official ICE and Council of Elrond tournament rulings.</li>
+                <li><strong>Awakened Plant vs. Ent:</strong> Hazard creatures (*Old Man Willow*, *Huorn*, *Ent in Search of the Entwives*) literally print the keyword <em>Awakened Plant.</em> and are classified as <code>Race: Awakened Plant</code> to align with <em>Wellinghall</em>'s automatic attack, while <code>Race: Ent</code> is reserved for Hero characters, allies, and factions.</li>
+                <li><strong>Multi-Species Creatures:</strong> Creatures with multiple printed keywords (such as <em>Beorning Skin-changers</em> with <code>Animals. Men. Bears.</code>) are indexed as composite multi-values (<code>Animal; Man; Bear</code>), allowing them to match under any of their individual component species.</li>
+            </ul>
         </li>
         <li>
             <strong>Creature Traits in Skills:</strong>
@@ -360,6 +371,10 @@
         Because upstream open databases are maintained by community volunteers and could experience structural updates (or transition to alternative mirrors such as Play MECCG), author your procedural generation JSON templates defensively:
     </p>
     <ul>
+        <li>
+            <strong>Use Numeric Operators:</strong>
+            Query ranges and stat thresholds directly (e.g. <code>"Mind": "&gt;= 3; &lt;= 5"</code> or <code>"Prowess": "&gt;= 6"</code>) rather than enumerating every possible integer.
+        </li>
         <li>
             <strong>Use Semicolon OR Logic:</strong>
             Match multiple related variations where appropriate (e.g., <code>"Skill": "Diplomat; Sage"</code> or <code>"Corruption": "-2; -4"</code>).

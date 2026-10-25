@@ -13,7 +13,7 @@
     </p>
 
     <div class="tip">
-        <strong>Pre-Packaged Baseline Notice:</strong> The extraction workflows demonstrated below (such as tagging Dark-holds, scanning faction recruiting bonuses, and mapping home regions) represent the <strong>exact automated methods the developer used to build <code>Rules_Support_Tags.json</code></strong>. Because these tags are already shipped with the software, you do not need to run these extractions yourself before building decks—they are documented here so you can inspect the methodology and apply it to your own custom classifications.
+        <strong>Pre-Packaged Baseline Notice:</strong> The extraction workflows demonstrated below (such as tagging Dark-holds, scanning faction recruiting bonuses, and mapping home regions) represent the <strong>exact automated methods used to build <code>Rules_Support_Tags.json</code></strong>. Because these tags are already shipped with the software, you do not need to run these extractions yourself before building decks—they are documented here so you can inspect the methodology and apply it to your own custom classifications.
     </div>
 
     <div class="note">
@@ -116,7 +116,7 @@
     <!-- WORKED EXAMPLE: CUSTOM REGEX -->
     <h3 id="worked-example-darkholds">Worked Example: Batch-Tagging Minion Dark-holds</h3>
     <p>
-        In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site (via <a href="rules_support_tags.html"><code>{Leader.Category:Resolved Site}</code></a>), we can batch-tag all 15 characters in under 30 seconds:
+        In <em>The Lidless Eye</em>, 15 Minion Orcs, Trolls, and Half-orcs (such as <em>Doeth</em>, <em>Orc Captain</em>, and <em>Troll Lout</em>) have the non-specific home rule <code>Home Site: Any Dark-hold</code>. To allow procedural deck rules to recruit these characters and automatically assign them a valid starting site, we can batch-tag all 15 characters in under 30 seconds:
     </p>
 
     <ol>
@@ -165,7 +165,7 @@
             <td><code>TagTemplate</code></td>
             <td>string</td>
             <td>
-                The tag assigned upon match. Can be a fixed string (e.g. <code>"Dwarves"</code>) or a capture group token (e.g. <code>"$1"</code>).
+                The tag assigned upon match. Can be a fixed string (e.g. <code>"Dwarf"</code>) or a capture group token (e.g. <code>"$1"</code>).
             </td>
         </tr>
     </table>
@@ -173,7 +173,7 @@
     <!-- WORKED EXAMPLE: SECTION-GUARDED BATCH RULES -->
     <h3 id="worked-example-batch">Worked Example: Sandboxed Site Automatic Attacks</h3>
     <p>
-        <strong>The Goal:</strong> We want to classify all site cards across our expansions by the guardian creature species printed in their automatic attack (tagging them as <code>Dragon</code>, <code>Orcs</code>, <code>Trolls</code>, <code>Undead</code>, or <code>Dwarves</code> under the custom category <code>Automatic Attack</code>).
+        <strong>The Goal:</strong> We want to classify all site cards across our expansions by the guardian creature species printed in their automatic attack (tagging them as <code>Dragon</code>, <code>Orc</code>, <code>Troll</code>, <code>Undead</code>, or <code>Dwarf</code> under the custom category <code>Automatic Attack</code>).
     </p>
     <p>
         <strong>The Challenge:</strong> Site cards print automatic attacks in the middle of their rules box, between surface entrances at the top and special site rules at the bottom. A simple text search for creature names causes two distinct false matches:
@@ -181,10 +181,10 @@
 
     <ol>
         <li>
-            <strong>Top False Matches (Adjacent Sites / Havens):</strong> Under-deeps sites list surface entrances at the very top. For example, <em>The Drowning-deeps</em> begins with <code>Adjacent Sites: Blue Mountain Dwarf-hold (13)...</code>, triggering a false <code>Dwarves</code> tag even though its actual attack is a <code>Drake</code>.
+            <strong>Top False Matches (Adjacent Sites / Havens):</strong> Under-deeps sites list surface entrances at the very top. For example, <em>The Drowning-deeps</em> begins with <code>Adjacent Sites: Blue Mountain Dwarf-hold (13)...</code>, triggering a false <code>Dwarf</code> tag even though its actual attack is a <code>Drake</code>.
         </li>
         <li>
-            <strong>Bottom False Matches (Special Rules):</strong> Many sites list special racial bonuses or movement effects at the bottom. For example, a site guarded only by <code>Orcs</code> might conclude with <code>Special: Dwarven characters receive +1 direct influence here</code>, triggering an unwanted <code>Dwarves</code> tag.
+            <strong>Bottom False Matches (Special Rules):</strong> Many sites list special racial bonuses or movement effects at the bottom. For example, a site guarded only by <code>Orc</code> might conclude with <code>Special: Dwarven characters receive +1 direct influence here</code>, triggering an unwanted <code>Dwarf</code> tag.
         </li>
     </ol>
 
@@ -204,7 +204,7 @@
   {
     "Category": "Automatic Attack",
     "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\bdwar(?:f|ves)\\b",
-    "TagTemplate": "Dwarves"
+    "TagTemplate": "Dwarf"
   },
   {
     "Category": "Automatic Attack",
@@ -214,12 +214,12 @@
   {
     "Category": "Automatic Attack",
     "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\borcs?\\b",
-    "TagTemplate": "Orcs"
+    "TagTemplate": "Orc"
   },
   {
     "Category": "Automatic Attack",
     "Pattern": "(?is)Automatic-attacks?(?:(?!Special:).)*?\\btrolls?\\b",
-    "TagTemplate": "Trolls"
+    "TagTemplate": "Troll"
   },
   {
     "Category": "Automatic Attack",
@@ -240,7 +240,7 @@
             <strong>Audit via CSV Spreadsheet Pipeline:</strong> In the main window, set <strong>Slot 3:</strong> <code>Category: Automatic Attack</code> and select <strong>Taxonomy &gt; Export Taxonomy Draft (CSV)...</strong>.
         </li>
         <li>
-            <strong>Review in Excel or Google Sheets:</strong> Open the CSV to glance down the pre-populated <code>Automatic Attack</code> column. Multi-attack sites (like <em>Carn D&ucirc;m</em> or <em>Moria</em>) cleanly show multiple tags (<code>Orcs; Trolls</code>), and complex edge cases can be edited directly in the spreadsheet.
+            <strong>Review in Excel or Google Sheets:</strong> Open the CSV to glance down the pre-populated <code>Automatic Attack</code> column. Multi-attack sites (like <em>Carn D&ucirc;m</em> or <em>Moria</em>) cleanly show multiple tags (<code>Orc; Troll</code>), and complex edge cases can be edited directly in the spreadsheet.
         </li>
         <li>
             <strong>Sync and Persist:</strong> Save the CSV and choose <strong>Taxonomy &gt; Import Taxonomy (CSV)...</strong> to apply your edits. Finally, select <strong>Taxonomy &gt; Save Tag Set...</strong>, choose <code>Rules_Support_Tags.json</code>, and confirm overwrite so all tags persist permanently across application launches.
