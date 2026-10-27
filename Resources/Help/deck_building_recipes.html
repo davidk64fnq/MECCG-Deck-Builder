@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Deck Construction Recipes &amp; Patterns</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Construction &amp; Formats</a> &gt; Recipes &amp; Patterns</div>
+
+    <h1>Deck Construction Recipes &amp; Patterns</h1>
+    <p>
+        While the <a href="deck_rules_reference.html">Rules Schema Reference</a> details the raw JSON query syntax, this guide provides a cookbook of practical deck-building snippets and strategic patterns for authoring automated generation rules and organizing manual decks.
+    </p>
+
+    <!-- RECIPE 1: ITEM DRAFTING -->
+    <h2>1. Fine-Tuning Item Drafts (Weapons, Armor &amp; Lost Knowledge)</h2>
+    <p>
+        In Cardnum, the <code>Race</code> attribute on Resource cards is overloaded to categorize item sub-types. You can use this to draft specific gear categories rather than drawing random items:
+    </p>
+
+    <h3>A. Martial Combat Gear (Weapons &amp; Armor Only)</h3>
+    <p>
+        Draft combat-ready gear while excluding tomes, rings, and cloaks:
+    </p>
+    <pre><code>{
+  "Name": "Warrior Equipment",
+  "Section": "Resources",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Major Item; Minor Item",
+    "Race": "Weapon; Armor"
+  }
+}</code></pre>
+
+    <h3>B. Lore &amp; Quest Tomes (Lost Knowledge)</h3>
+    <p>
+        Certain quest strategies (such as destroying items in Mount Doom or scoring lore victory points) require ancient writings. Query the <code>Lost Knowledge</code> keyword directly:
+    </p>
+    <pre><code>{
+  "Name": "Ancient Lore Tomes",
+  "Section": "Resources",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Resource",
+    "Race": "Lost Knowledge"
+  }
+}</code></pre>
+
+    <!-- RECIPE 2: ZERO CORRUPTION GEAR -->
+    <h2>2. The Zero-Corruption Gear Package</h2>
+    <p>
+        Heavy items often inflict corruption points (CP) that burden characters with corruption checks. Use the blank sentinel (<code>"[Blank]"</code>) to draft risk-free weapons, shields, and cloaks:
+    </p>
+    <pre><code>{
+  "Name": "Safe Utility Items",
+  "Section": "Resources",
+  "Count": 4,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Minor Item; Major Item",
+    "Corruption": "[Blank]"
+  }
+}</code></pre>
+
+    <!-- RECIPE 3: GOLD RINGS & SITES -->
+    <h2>3. Automated Ring Expeditions (Items &amp; Sites)</h2>
+    <p>
+        Gold Ring items do not have fixed play sites; they are playable at any site that prints a gold ring in its playable box. Pair rings with suitable destination sites dynamically:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Testing Rings",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Gold Ring Item"
+    }
+  },
+  {
+    "Name": "Ring Testing Sites",
+    "Section": "Sites",
+    "Count": 3,
+    "Attributes": {
+      "Primary": "Site",
+      "GoldRing": "yes"
+    }
+  }
+]</code></pre>
+
+    <!-- RECIPE 4: DRAGON LAIRS & HOARD ITEMS -->
+    <h2>4. Dragon Lair Expeditions &amp; Hoard Relics</h2>
+    <p>
+        Hoard items (such as <em>Glamdring</em>, <em>Orcrist</em>, or <em>The Arkenstone</em>) can only be played at sites that contain a dragon hoard. Guarantee that your deck draws legal destination sites:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Dragon Hoard Items",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Hoard": "yes"
+    }
+  },
+  {
+    "Name": "Hoard Lair Destinations",
+    "Section": "Sites",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Site",
+      "Hoard": "yes",
+      "Automatic Attack": "Dragon"
+    }
+  }
+]</code></pre>
+
+    <!-- RECIPE 5: RECRUITING DIPLOMATS & SPECIES FACTIONS -->
+    <h2>5. Aligning Diplomats with Corresponding Factions</h2>
+    <p>
+        When capturing a diplomat leader via <code>"SaveAs": "Leader"</code>, query their associated faction bonus using dynamic predicates. Using <code>Race=Elf</code> or <code>Race=Man</code> ensures species-wide diplomatic bonuses recruit matching factions:
+    </p>
+    <pre><code>{
+  "Name": "Leader's Associated Faction",
+  "Section": "Resources",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Faction",
+    "Name": "{Leader.Category:Faction Bonus}"
+  },
+  "Fallback": {
+    "Name": "Generic Faction by Race",
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Faction",
+      "Race": "{Leader.Race}"
+    }
+  }
+}</code></pre>
+
+    <!-- RECIPE 6: REGIONAL COMPANY DESIGN -->
+    <h2>6. Regionally Cohesive Company Recruitment</h2>
+    <p>
+        Avoid scattered companies by recruiting backup companions whose home site is located in the same geographic region as your leader:
+    </p>
+    <pre><code>{
+  "Name": "Regional Starting Companions",
+  "Section": "Pool",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Character"
+  },
+  "Categories": {
+    "Home Region": "{Leader.Category:Home Region}"
+  }
+}</code></pre>
+    <!-- RECIPE 7: DUAL-MODE CARDS -->
+    <h2>7. Handling Dual-Mode Cards (Creature / Events)</h2>
+    <p>
+        Several hazards (like the Nazgûl) possess dual secondary types (e.g., <code>Creature/Permanent-event</code>). Often, their Creature mode is restricted to specific geographic regions (e.g., <em>Gorgoroth</em>, <em>Khand</em>), while their Event mode is playable anywhere.
+    </p>
+    <p>
+        <strong>Tagging Best Practice:</strong> Only tag the strict creature regions in your custom taxonomy (e.g., <code>Playable Region: Gorgoroth; Khand</code>). Do not add "All" or "Anywhere" for the event side, as that would cause the generator to falsely draft them as creatures in illegal regions like the Shire.
+    </p>
+    <p>
+        <strong>Querying Best Practice:</strong> When drafting creatures, include your region constraints. When drafting events, omit the region constraint entirely and rely on the <code>Role</code> tag. The engine will safely draft the card as an event globally.
+    </p>
+
+    <h3>A. Drafting the Card as a Creature (Strictly Regional)</h3>
+    <pre><code>{
+  "Name": "Gorgoroth Guardians",
+  "Section": "Hazards",
+  "Count": 2,
+  "Attributes": {
+    "Secondary": "Creature"
+  },
+  "Categories": {
+    "Playable Region": "Gorgoroth"
+  }
+}</code></pre>
+
+    <h3>B. Drafting the Card as an Event (Globally Available)</h3>
+    <pre><code>{
+  "Name": "Exhaustion Hazard Events",
+  "Section": "Hazards",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Role": "Exhaustion"
+  }
+}</code></pre>
+</body>
+</html>

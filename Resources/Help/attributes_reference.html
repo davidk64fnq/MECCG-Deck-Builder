@@ -243,10 +243,14 @@
         <tr>
             <td><code>Race</code></td>
             <td>
-                Character, creature, or faction species. Normalized to canonical singular nouns on application launch for 100% consistent matching across unique individuals and non-unique packs.<br />
+                Character, creature, or faction species. Normalized to canonical singular nouns on application launch for 100% consistent matching across unique individuals and non-unique packs.<br /><br />
+                <em>Item Keywords &amp; Sub-types (Overloaded Attribute):</em> Because items lack biological species, Cardnum repurposes this field on Resource items to store functional sub-classifications and rules keywords: <code>Weapon</code>, <code>Armor</code>, <code>Palant&iacute;r</code>, <code>Lost Knowledge</code> (quest tomes and scrolls), <code>Treasure</code>, and <code>Hoard Jewel</code>.<br /><br />
                 <em>Multi-Species Creatures:</em> Creatures with multiple printed keywords (such as <em>Beorning Skin-changers</em> with printed <code>Animals. Men. Bears.</code>, or <em>Half-orcs</em> with <code>Orcs. Men.</code>) carry composite semicolon lists (<code>Animal; Man; Bear</code>, <code>Orc; Man</code>) and are filterable under each individual species.
             </td>
-            <td><code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Spider</code>, <code>Wolf</code>, <code>Animal</code>, <code>Bear</code>, <code>Dragon</code>, <code>Drake</code>, <code>Giant</code>, <code>Undead</code>, <code>Nazg&ucirc;l</code>, <code>Ent</code>, <code>Awakened Plant</code>, <code>P&ucirc;kel-creature</code></td>
+            <td>
+                <strong>Characters / Hazards:</strong> <code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Spider</code>, <code>Wolf</code>, <code>Animal</code>, <code>Dragon</code>, <code>Drake</code>, <code>Giant</code>, <code>Undead</code>, <code>Nazg&ucirc;l</code><br />
+                <strong>Items (Overloaded):</strong> <code>Weapon</code>, <code>Armor</code>, <code>Palant&iacute;r</code>, <code>Lost Knowledge</code>, <code>Treasure</code>, <code>Hoard Jewel</code>
+            </td>
         </tr>
         <tr>
             <td><code>Region</code></td>
@@ -343,6 +347,16 @@
                 <li>Because the application indexes official attributes directly, each unique permutation appears as a single dropdown item in Filter Slots 1 &amp; 2.</li>
                 <li>Cardnum already decomposed all playability criteria into individual boolean flag attributes: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code>.</li>
                 <li>For procedural deck rules and filter searches, query the specific attribute (e.g., <code>"MinorItem": "yes"</code> or <code>"Information": "yes"</code>) rather than matching against the composite <code>Playable</code> string.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Item Sub-types Overloaded into the <code>Race</code> Field:</strong>
+            Under official MECCG rules, items and resources do not have a biological race. However, early database spoiler compilers chose to overload the <code>Race</code> attribute on item cards to store functional item classifications:
+            <ul>
+                <li><strong>Weapons &amp; Armor:</strong> Items that grant combat bonuses or body protection are cataloged under <code>Race: Weapon</code> (e.g. <em>Glamdring</em>, <em>Orcrist</em>) and <code>Race: Armor</code> (e.g. <em>The Mithril-coat</em>).</li>
+                <li><strong><code>Lost Knowledge</code> (Lore &amp; Quest Tomes):</strong> Cards representing historical records, scrolls, and ancient tomes—such as <em>Scroll of Isildur</em>, <em>Book of Mazarbul</em>, <em>Lost Tome</em>, and <em>Forgotten Scrolls</em>—carry the official rules keyword <code>Lost Knowledge</code>, which is required by specific quests and events (such as <em>Into the Smoking Cone</em> or <em>Fate of the Ithil Stone</em>). Cardnum indexes this keyword under <code>Race: Lost Knowledge</code>.</li>
+                <li><strong>Seeing Stones &amp; Relics:</strong> Palant&iacute;ri are indexed under <code>Race: Palant&iacute;r</code>, while dragon hoard riches are indexed under <code>Race: Treasure</code> or <code>Race: Hoard Jewel</code> (e.g. <em>The Arkenstone</em>).</li>
+                <li>To query specific categories of gear in procedural deck rules, filter by <code>Race</code> alongside <code>Secondary</code> (e.g. <code>"Secondary": "Major Item; Minor Item", "Race": "Weapon; Armor"</code>).</li>
             </ul>
         </li>
     </ul>

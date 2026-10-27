@@ -41,6 +41,10 @@
 			<param name="Name" value="Deck Rules JSON Schema Reference">
 			<param name="Local" value="deck_rules_reference.html">
 			</OBJECT>
+        <li><object type="text/sitemap">
+            <param name="Name" value="Deck Construction Recipes &amp; Patterns">
+            <param name="Local" value="deck_building_recipes.html">
+        </object></li>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Worked Example: Dynamic Faction Recruitment">
 			<param name="Local" value="worked_example_factions.html">

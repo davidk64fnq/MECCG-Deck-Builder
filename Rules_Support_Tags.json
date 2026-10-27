@@ -73,7 +73,7 @@
       "set": "METW"
     },
     {
-      "Faction Bonus": "Man",
+      "Faction Bonus": "Race=Man",
       "fullCode": "Dáin II (TW)",
       "Home Region": "Iron Hills",
       "id": "21",
@@ -107,7 +107,7 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Faction Bonus": "Iron Hill Dwarves; Elf; Iron Hill Dwarves; Elf",
+      "Faction Bonus": "Iron Hill Dwarves; Race=Elf",
       "fullCode": "Gimli (TW)",
       "Home Region": "Iron Hills",
       "id": "43",
@@ -116,7 +116,7 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Faction Bonus": "Blue Mountain Dwarves; Dwarf; Blue Mountain Dwarves; Dwarf",
+      "Faction Bonus": "Blue Mountain Dwarves; Race=Dwarf",
       "fullCode": "Glóin (TW)",
       "Home Region": "Númeriador",
       "id": "44",
@@ -165,7 +165,7 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Faction Bonus": "Blue Mountain Dwarves; Dwarf; Blue Mountain Dwarves; Dwarf",
+      "Faction Bonus": "Blue Mountain Dwarves; Race=Dwarf",
       "fullCode": "Thorin II (TW)",
       "Home Region": "Númeriador",
       "id": "67",
@@ -230,7 +230,7 @@
     },
     {
       "Combat Bonus": "Orcs",
-      "Faction Bonus": "Dwarf",
+      "Faction Bonus": "Race=Dwarf",
       "fullCode": "Balin [H] (TW)",
       "Home Region": "Númeriador",
       "id": "7",
@@ -380,7 +380,7 @@
       "set": "METW"
     },
     {
-      "Faction Bonus": "Wose",
+      "Faction Bonus": "Race=Wose",
       "fullCode": "Ghân-buri-Ghân (TW)",
       "Home Region": "Anórien",
       "id": "41",
@@ -3543,6 +3543,451 @@
       "name": "Wose Passage-hold",
       "Region Type": "Wilderness",
       "set": "METW"
+    },
+    {
+      "fullCode": "Bill the Pony (TW)",
+      "id": "249",
+      "name": "Bill the Pony",
+      "Playable Region": "Arthedain; The Shire",
+      "Playable Site": "Bag End; Bree",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Goldberry (TW)",
+      "id": "295",
+      "name": "Goldberry",
+      "Playable Region": "Cardolan",
+      "Playable Site": "Old Forest",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Gollum (TW)",
+      "id": "296",
+      "name": "Gollum",
+      "Playable Region": "High Pass; Redhorn Gate",
+      "Playable Site": "Goblin-gate; Moria",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Gwaihir (TW)",
+      "id": "301",
+      "name": "Gwaihir",
+      "Playable Region": "Anduin Vales",
+      "Playable Site": "Eagles' Eyrie",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Leaflock (TW)",
+      "id": "315",
+      "name": "Leaflock",
+      "Playable Region": "Fangorn",
+      "Playable Site": "Wellinghall",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Quickbeam (TW)",
+      "id": "357",
+      "name": "Quickbeam",
+      "Playable Region": "Fangorn",
+      "Playable Site": "Wellinghall",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Roäc the Raven (TW)",
+      "id": "369",
+      "name": "Roäc the Raven",
+      "Playable Region": "Northern Rhovanian",
+      "Playable Site": "Region=Northern Rhovanian",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Shadowfax (TW)",
+      "id": "375",
+      "name": "Shadowfax",
+      "Playable Region": "Rohan",
+      "Playable Site": "Dunharrow; Edoras",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Skinbark (TW)",
+      "id": "377",
+      "name": "Skinbark",
+      "Playable Region": "Fangorn",
+      "Playable Site": "Wellinghall",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Tom Bombadil (TW)",
+      "id": "399",
+      "name": "Tom Bombadil",
+      "Playable Region": "Cardolan",
+      "Playable Site": "Old Forest",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Treebeard (TW)",
+      "id": "402",
+      "name": "Treebeard",
+      "Playable Region": "Fangorn",
+      "Playable Site": "Wellinghall",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Clouds (TW)",
+      "id": "92",
+      "name": "Clouds",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Fell Winter (TW)",
+      "id": "105",
+      "name": "Fell Winter",
+      "Role": "Automatic Attack; Terrain",
+      "set": "METW",
+      "Target Site": "Border-hold",
+      "Target Species": "Wolf"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Foul Fumes (TW)",
+      "id": "106",
+      "name": "Foul Fumes",
+      "Role": "Movement; Site",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Long Winter (TW)",
+      "id": "120",
+      "name": "Long Winter",
+      "Role": "Movement; Site",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night; Gates of Morning",
+      "fullCode": "Moon (TW)",
+      "id": "335",
+      "name": "Moon",
+      "Role": "Terrain",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Morgul Night (TW)",
+      "id": "133",
+      "name": "Morgul Night",
+      "Role": "Terrain",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Night (TW)",
+      "id": "141",
+      "name": "Night",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Dúnadan; Man"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Snowstorm (TW)",
+      "id": "162",
+      "name": "Snowstorm",
+      "Role": "Movement",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Storms of Ossë (TW)",
+      "id": "163",
+      "name": "Storms of Ossë",
+      "Role": "Site",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Gates of Morning",
+      "fullCode": "Clear Skies (TW)",
+      "id": "255",
+      "name": "Clear Skies",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Gates of Morning",
+      "fullCode": "Fog (TW)",
+      "id": "291",
+      "name": "Fog",
+      "Role": "Terrain",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Gates of Morning",
+      "fullCode": "Sun (TW)",
+      "id": "384",
+      "name": "Sun",
+      "Role": "Automatic Attack; Combat",
+      "set": "METW",
+      "Target Species": "Dúnadan; Man"
+    },
+    {
+      "fullCode": "Awaken Denizens (TW)",
+      "id": "80",
+      "name": "Awaken Denizens",
+      "Role": "Automatic Attack",
+      "set": "METW",
+      "Target Site": "Ruins & Lairs"
+    },
+    {
+      "fullCode": "Awaken Minions (TW)",
+      "id": "81",
+      "name": "Awaken Minions",
+      "Role": "Automatic Attack",
+      "set": "METW",
+      "Target Site": "Dark-hold; Shadow-hold"
+    },
+    {
+      "fullCode": "Eye of Sauron (TW)",
+      "id": "102",
+      "name": "Eye of Sauron",
+      "Role": "Automatic Attack",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Elf-song (TW)",
+      "id": "274",
+      "name": "Elf-song",
+      "Role": "Corruption; Protection",
+      "set": "METW",
+      "Target Site": "Haven"
+    },
+    {
+      "fullCode": "Lapse of Will (TW)",
+      "id": "314",
+      "name": "Lapse of Will",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Nazgûl"
+    },
+    {
+      "fullCode": "Minions Stir (TW)",
+      "id": "132",
+      "name": "Minions Stir",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Orc; Troll"
+    },
+    {
+      "fullCode": "Plague of Wights (TW)",
+      "id": "152",
+      "name": "Plague of Wights",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Undead"
+    },
+    {
+      "fullCode": "The Balance of Things (TW)",
+      "id": "164",
+      "name": "The Balance of Things",
+      "Role": "Corruption",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Wake of War (TW)",
+      "id": "179",
+      "name": "Wake of War",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Animal; Spider; Wolf"
+    },
+    {
+      "fullCode": "Adûnaphel (TW)",
+      "id": "73",
+      "name": "Adûnaphel",
+      "Playable Region": "Brown Lands; Dagorlad; Gorgoroth; Western Mirkwood",
+      "Role": "Readiness",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Akhôrahil (TW)",
+      "id": "75",
+      "name": "Akhôrahil",
+      "Playable Region": "Gorgoroth; Harondor; Horse Plains; Khand",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Align Palantír (TW)",
+      "id": "241",
+      "name": "Align Palantír",
+      "Role": "Item; Quest",
+      "set": "METW",
+      "Target Species": "Palantír"
+    },
+    {
+      "fullCode": "Andúril, the Flame of the West (TW)",
+      "id": "243",
+      "name": "Andúril, the Flame of the West",
+      "Playable Site": "Information!=[Blank]",
+      "Role": "Combat; Influence; Quest; Readiness",
+      "set": "METW",
+      "Target Species": "Dúnadan"
+    },
+    {
+      "fullCode": "Balrog of Moria (TW)",
+      "id": "83",
+      "name": "Balrog of Moria",
+      "Role": "Automatic Attack; Site",
+      "set": "METW",
+      "Target Region": "Hollin; Redhorn Gate; Wold & Foothills",
+      "Target Site": "Moria"
+    },
+    {
+      "fullCode": "Bane of the Ithil-stone (TW)",
+      "id": "84",
+      "name": "Bane of the Ithil-stone",
+      "Role": "Corruption; Deck",
+      "set": "METW",
+      "Target Species": "Palantír"
+    },
+    {
+      "fullCode": "Despair of the Heart (TW)",
+      "id": "97",
+      "name": "Despair of the Heart",
+      "Role": "Corruption",
+      "set": "METW"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Doors of Night (TW)",
+      "id": "98",
+      "name": "Doors of Night",
+      "Role": "Environment",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Dreams of Lore (TW)",
+      "id": "261",
+      "name": "Dreams of Lore",
+      "Playable Site": "Information!=[Blank]",
+      "Role": "Quest",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Dwar of Waw (TW)",
+      "id": "101",
+      "name": "Dwar of Waw",
+      "Playable Region": "Gorgoroth; Harondor; Imlad Morgul; Ithilien",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Animal; Spider; Wolf"
+    },
+    {
+      "fullCode": "Fellowship (TW)",
+      "id": "290",
+      "name": "Fellowship",
+      "Role": "Combat; Corruption",
+      "set": "METW",
+      "Target Site": "Haven"
+    },
+    {
+      "fullCode": "Gates of Morning (TW)",
+      "id": "293",
+      "name": "Gates of Morning",
+      "Role": "Environment",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Hoarmûrath of Dír (TW)",
+      "id": "115",
+      "name": "Hoarmûrath of Dír",
+      "Playable Region": "Dagorlad; Gorgoroth; Ithilien; Khand",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Indûr Dawndeath (TW)",
+      "id": "117",
+      "name": "Indûr Dawndeath",
+      "Playable Region": "Gorgoroth; Harondor; Imlad Morgul; Khand",
+      "Role": "Item",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Khamûl the Easterling (TW)",
+      "id": "118",
+      "name": "Khamûl the Easterling",
+      "Playable Region": "Gorgoroth; Harondor; Imlad Morgul; Khand",
+      "Role": "Hand",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Lure of Creation (TW)",
+      "id": "127",
+      "name": "Lure of Creation",
+      "Role": "Corruption",
+      "set": "METW",
+      "Target Site": "Haven",
+      "Target Species": "Wizard"
+    },
+    {
+      "fullCode": "Lure of Expedience (TW)",
+      "id": "128",
+      "name": "Lure of Expedience",
+      "Role": "Corruption",
+      "set": "METW",
+      "Target Species": "Race!=Hobbit && Race!=Wizard"
+    },
+    {
+      "fullCode": "Lure of Nature (TW)",
+      "id": "129",
+      "name": "Lure of Nature",
+      "Role": "Corruption",
+      "set": "METW",
+      "Target Species": "Race!=Hobbit && Race!=Dwarf && Race!=Orc && Race!=Nazgûl"
+    },
+    {
+      "fullCode": "Lure of Power (TW)",
+      "id": "130",
+      "name": "Lure of Power",
+      "Role": "Corruption",
+      "set": "METW",
+      "Target Species": "Race!=Hobbit"
+    },
+    {
+      "fullCode": "Lure of the Senses (TW)",
+      "id": "131",
+      "name": "Lure of the Senses",
+      "Role": "Corruption",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Morannon (TW)",
+      "id": "336",
+      "name": "Morannon",
+      "Playable Region": "Dagorlad",
+      "Role": "Movement; Site",
+      "set": "METW",
+      "Target Region": "Udûn",
+      "Target Site": "Dark-hold"
+    },
+    {
+      "fullCode": "Morgul-knife (TW)",
+      "id": "135",
+      "name": "Morgul-knife",
+      "Role": "Combat; Corruption",
+      "set": "METW",
+      "Target Species": "Nazgûl"
+    },
+    {
+      "fullCode": "Reforging (TW)",
+      "id": "363",
+      "name": "Reforging",
+      "Playable Site": "Information!=[Blank]",
+      "Role": "Item; Quest",
+      "set": "METW",
+      "Target Site": "Haven"
     }
   ],
   "Filters": [
@@ -3620,9 +4065,13 @@
     ],
     [
       "Combat Bonus",
-      "All",
       "Nazgûl",
       "Orcs"
+    ],
+    [
+      "Environment Stance",
+      "Doors of Night",
+      "Gates of Morning"
     ],
     [
       "Faction Bonus",
@@ -3646,6 +4095,10 @@
       "Men of Dorwinion",
       "Men of Lamedon",
       "Men of Lebennin",
+      "Race=Dwarf",
+      "Race=Elf",
+      "Race=Man",
+      "Race=Wose",
       "Rangers of Ithilien",
       "Rangers of the North",
       "Riders of Rohan",
@@ -3724,6 +4177,41 @@
       "Woodland Realm"
     ],
     [
+      "Playable Region",
+      "Anduin Vales",
+      "Arthedain",
+      "Brown Lands",
+      "Cardolan",
+      "Dagorlad",
+      "Fangorn",
+      "Gorgoroth",
+      "Harondor",
+      "High Pass",
+      "Horse Plains",
+      "Imlad Morgul",
+      "Ithilien",
+      "Khand",
+      "Northern Rhovanian",
+      "Redhorn Gate",
+      "Rohan",
+      "The Shire",
+      "Western Mirkwood"
+    ],
+    [
+      "Playable Site",
+      "Bag End",
+      "Bree",
+      "Dunharrow",
+      "Eagles' Eyrie",
+      "Edoras",
+      "Goblin-gate",
+      "Information!=[Blank]",
+      "Moria",
+      "Old Forest",
+      "Region=Northern Rhovanian",
+      "Wellinghall"
+    ],
+    [
       "Region Type",
       "Border-land",
       "Coastal Sea",
@@ -3755,6 +4243,56 @@
       "Site=Ruins & Lairs && Region!=Under-deeps",
       "Tharbad",
       "Variag Camp"
+    ],
+    [
+      "Role",
+      "Automatic Attack",
+      "Combat",
+      "Corruption",
+      "Deck",
+      "Environment",
+      "Hand",
+      "Influence",
+      "Item",
+      "Movement",
+      "Protection",
+      "Quest",
+      "Readiness",
+      "Site",
+      "Terrain"
+    ],
+    [
+      "Target Region",
+      "Hollin",
+      "Redhorn Gate",
+      "Udûn",
+      "Wold & Foothills"
+    ],
+    [
+      "Target Site",
+      "Border-hold",
+      "Dark-hold",
+      "Haven",
+      "Moria",
+      "Ruins & Lairs",
+      "Shadow-hold"
+    ],
+    [
+      "Target Species",
+      "Animal",
+      "Dúnadan",
+      "Man",
+      "Nazgûl",
+      "Orc",
+      "Palantír",
+      "Race!=Hobbit",
+      "Race!=Hobbit && Race!=Dwarf && Race!=Orc && Race!=Nazgûl",
+      "Race!=Hobbit && Race!=Wizard",
+      "Spider",
+      "Troll",
+      "Undead",
+      "Wizard",
+      "Wolf"
     ]
   ]
 }

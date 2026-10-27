@@ -314,10 +314,14 @@ namespace MECCG_Deck_Builder.Properties {
         <tr>
             <td><code>Race</code></td>
             <td>
-                Character, creature, or faction species. Normalized to canonical singular nouns on application launch for 100% consistent matching across unique individuals and non-unique packs.<br />
+                Character, creature, or faction species. Normalized to canonical singular nouns on application launch for 100% consistent matching across unique individuals and non-unique packs.<br /><br />
+                <em>Item Keywords &amp; Sub-types (Overloaded Attribute):</em> Because items lack biological species, Cardnum repurposes this field on Resource items to store functional sub-classifications and rules keywords: <code>Weapon</code>, <code>Armor</code>, <code>Palant&iacute;r</code>, <code>Lost Knowledge</code> (quest tomes and scrolls), <code>Treasure</code>, and <code>Hoard Jewel</code>.<br /><br />
                 <em>Multi-Species Creatures:</em> Creatures with multiple printed keywords (such as <em>Beorning Skin-changers</em> with printed <code>Animals. Men. Bears.</code>, or <em>Half-orcs</em> with <code>Orcs. Men.</code>) carry composite semicolon lists (<code>Animal; Man; Bear</code>, <code>Orc; Man</code>) and are filterable under each individual species.
             </td>
-            <td><code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Spider</code>, <code>Wolf</code>, <code>Animal</code>, <code>Bear</code>, <code>Dragon</code>, <code>Drake</code>, <code>Giant</code>, <code>Undead</code>, <code>Nazg&ucirc;l</code>, <code>Ent</code>, <code>Awakened Plant</code>, <code>P&ucirc;kel-creature</code></td>
+            <td>
+                <strong>Characters / Hazards:</strong> <code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>, <code>Orc</code>, <code>Troll</code>, <code>Spider</code>, <code>Wolf</code>, <code>Animal</code>, <code>Dragon</code>, <code>Drake</code>, <code>Giant</code>, <code>Undead</code>, <code>Nazg&ucirc;l</code><br />
+                <strong>Items (Overloaded):</strong> <code>Weapon</code>, <code>Armor</code>, <code>Palant&iacute;r</code>, <code>Lost Knowledge</code>, <code>Treasure</code>, <code>Hoard Jewel</code>
+            </td>
         </tr>
         <tr>
             <td><code>Region</code></td>
@@ -414,6 +418,16 @@ namespace MECCG_Deck_Builder.Properties {
                 <li>Because the application indexes official attributes directly, each unique permutation appears as a single dropdown item in Filter Slots 1 &amp; 2.</li>
                 <li>Cardnum already decomposed all playability criteria into individual boolean flag attributes: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code>.</li>
                 <li>For procedural deck rules and filter searches, query the specific attribute (e.g., <code>"MinorItem": "yes"</code> or <code>"Information": "yes"</code>) rather than matching against the composite <code>Playable</code> string.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Item Sub-types Overloaded into the <code>Race</code> Field:</strong>
+            Under official MECCG rules, items and resources do not have a biological race. However, early database spoiler compilers chose to overload the <code>Race</code> attribute on item cards to store functional item classifications:
+            <ul>
+                <li><strong>Weapons &amp; Armor:</strong> Items that grant combat bonuses or body protection are cataloged under <code>Race: Weapon</code> (e.g. <em>Glamdring</em>, <em>Orcrist</em>) and <code>Race: Armor</code> (e.g. <em>The Mithril-coat</em>).</li>
+                <li><strong><code>Lost Knowledge</code> (Lore &amp; Quest Tomes):</strong> Cards representing historical records, scrolls, and ancient tomes—such as <em>Scroll of Isildur</em>, <em>Book of Mazarbul</em>, <em>Lost Tome</em>, and <em>Forgotten Scrolls</em>—carry the official rules keyword <code>Lost Knowledge</code>, which is required by specific quests and events (such as <em>Into the Smoking Cone</em> or <em>Fate of the Ithil Stone</em>). Cardnum indexes this keyword under <code>Race: Lost Knowledge</code>.</li>
+                <li><strong>Seeing Stones &amp; Relics:</strong> Palant&iacute;ri are indexed under <code>Race: Palant&iacute;r</code>, while dragon hoard riches are indexed under <code>Race: Treasure</code> or <code>Race: Hoard Jewel</code> (e.g. <em>The Arkenstone</em>).</li>
+                <li>To query specific categories of gear in procedural deck rules, filter by <code>Race</code> alongside <code>Secondary</code> (e.g. <code>"Secondary": "Major Item; Minor Item", "Race": "Weapon; Armor"</code>).</li>
             </ul>
         </li>
     </ul>
@@ -612,6 +626,208 @@ namespace MECCG_Deck_Builder.Properties {
 </html>
 ]]>
   </file>
+  <file path='.\Resources\Help\deck_building_recipes.html'>
+<![CDATA[
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Deck Construction Recipes &amp; Patterns</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="deck_operations.html">Deck Construction &amp; Formats</a> &gt; Recipes &amp; Patterns</div>
+
+    <h1>Deck Construction Recipes &amp; Patterns</h1>
+    <p>
+        While the <a href="deck_rules_reference.html">Rules Schema Reference</a> details the raw JSON query syntax, this guide provides a cookbook of practical deck-building snippets and strategic patterns for authoring automated generation rules and organizing manual decks.
+    </p>
+
+    <!-- RECIPE 1: ITEM DRAFTING -->
+    <h2>1. Fine-Tuning Item Drafts (Weapons, Armor &amp; Lost Knowledge)</h2>
+    <p>
+        In Cardnum, the <code>Race</code> attribute on Resource cards is overloaded to categorize item sub-types. You can use this to draft specific gear categories rather than drawing random items:
+    </p>
+
+    <h3>A. Martial Combat Gear (Weapons &amp; Armor Only)</h3>
+    <p>
+        Draft combat-ready gear while excluding tomes, rings, and cloaks:
+    </p>
+    <pre><code>{
+  "Name": "Warrior Equipment",
+  "Section": "Resources",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Major Item; Minor Item",
+    "Race": "Weapon; Armor"
+  }
+}</code></pre>
+
+    <h3>B. Lore &amp; Quest Tomes (Lost Knowledge)</h3>
+    <p>
+        Certain quest strategies (such as destroying items in Mount Doom or scoring lore victory points) require ancient writings. Query the <code>Lost Knowledge</code> keyword directly:
+    </p>
+    <pre><code>{
+  "Name": "Ancient Lore Tomes",
+  "Section": "Resources",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Resource",
+    "Race": "Lost Knowledge"
+  }
+}</code></pre>
+
+    <!-- RECIPE 2: ZERO CORRUPTION GEAR -->
+    <h2>2. The Zero-Corruption Gear Package</h2>
+    <p>
+        Heavy items often inflict corruption points (CP) that burden characters with corruption checks. Use the blank sentinel (<code>"[Blank]"</code>) to draft risk-free weapons, shields, and cloaks:
+    </p>
+    <pre><code>{
+  "Name": "Safe Utility Items",
+  "Section": "Resources",
+  "Count": 4,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Minor Item; Major Item",
+    "Corruption": "[Blank]"
+  }
+}</code></pre>
+
+    <!-- RECIPE 3: GOLD RINGS & SITES -->
+    <h2>3. Automated Ring Expeditions (Items &amp; Sites)</h2>
+    <p>
+        Gold Ring items do not have fixed play sites; they are playable at any site that prints a gold ring in its playable box. Pair rings with suitable destination sites dynamically:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Testing Rings",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Gold Ring Item"
+    }
+  },
+  {
+    "Name": "Ring Testing Sites",
+    "Section": "Sites",
+    "Count": 3,
+    "Attributes": {
+      "Primary": "Site",
+      "GoldRing": "yes"
+    }
+  }
+]</code></pre>
+
+    <!-- RECIPE 4: DRAGON LAIRS & HOARD ITEMS -->
+    <h2>4. Dragon Lair Expeditions &amp; Hoard Relics</h2>
+    <p>
+        Hoard items (such as <em>Glamdring</em>, <em>Orcrist</em>, or <em>The Arkenstone</em>) can only be played at sites that contain a dragon hoard. Guarantee that your deck draws legal destination sites:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Dragon Hoard Items",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Hoard": "yes"
+    }
+  },
+  {
+    "Name": "Hoard Lair Destinations",
+    "Section": "Sites",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Site",
+      "Hoard": "yes",
+      "Automatic Attack": "Dragon"
+    }
+  }
+]</code></pre>
+
+    <!-- RECIPE 5: RECRUITING DIPLOMATS & SPECIES FACTIONS -->
+    <h2>5. Aligning Diplomats with Corresponding Factions</h2>
+    <p>
+        When capturing a diplomat leader via <code>"SaveAs": "Leader"</code>, query their associated faction bonus using dynamic predicates. Using <code>Race=Elf</code> or <code>Race=Man</code> ensures species-wide diplomatic bonuses recruit matching factions:
+    </p>
+    <pre><code>{
+  "Name": "Leader's Associated Faction",
+  "Section": "Resources",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Faction",
+    "Name": "{Leader.Category:Faction Bonus}"
+  },
+  "Fallback": {
+    "Name": "Generic Faction by Race",
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Faction",
+      "Race": "{Leader.Race}"
+    }
+  }
+}</code></pre>
+
+    <!-- RECIPE 6: REGIONAL COMPANY DESIGN -->
+    <h2>6. Regionally Cohesive Company Recruitment</h2>
+    <p>
+        Avoid scattered companies by recruiting backup companions whose home site is located in the same geographic region as your leader:
+    </p>
+    <pre><code>{
+  "Name": "Regional Starting Companions",
+  "Section": "Pool",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Character"
+  },
+  "Categories": {
+    "Home Region": "{Leader.Category:Home Region}"
+  }
+}</code></pre>
+    <!-- RECIPE 7: DUAL-MODE CARDS -->
+    <h2>7. Handling Dual-Mode Cards (Creature / Events)</h2>
+    <p>
+        Several hazards (like the Nazgûl) possess dual secondary types (e.g., <code>Creature/Permanent-event</code>). Often, their Creature mode is restricted to specific geographic regions (e.g., <em>Gorgoroth</em>, <em>Khand</em>), while their Event mode is playable anywhere.
+    </p>
+    <p>
+        <strong>Tagging Best Practice:</strong> Only tag the strict creature regions in your custom taxonomy (e.g., <code>Playable Region: Gorgoroth; Khand</code>). Do not add "All" or "Anywhere" for the event side, as that would cause the generator to falsely draft them as creatures in illegal regions like the Shire.
+    </p>
+    <p>
+        <strong>Querying Best Practice:</strong> When drafting creatures, include your region constraints. When drafting events, omit the region constraint entirely and rely on the <code>Role</code> tag. The engine will safely draft the card as an event globally.
+    </p>
+
+    <h3>A. Drafting the Card as a Creature (Strictly Regional)</h3>
+    <pre><code>{
+  "Name": "Gorgoroth Guardians",
+  "Section": "Hazards",
+  "Count": 2,
+  "Attributes": {
+    "Secondary": "Creature"
+  },
+  "Categories": {
+    "Playable Region": "Gorgoroth"
+  }
+}</code></pre>
+
+    <h3>B. Drafting the Card as an Event (Globally Available)</h3>
+    <pre><code>{
+  "Name": "Exhaustion Hazard Events",
+  "Section": "Hazards",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Role": "Exhaustion"
+  }
+}</code></pre>
+</body>
+</html>
+]]>
+  </file>
   <file path='.\Resources\Help\deck_generation_engine.html'>
 <![CDATA[
 <!DOCTYPE html>
@@ -646,6 +862,7 @@ namespace MECCG_Deck_Builder.Properties {
         <li><strong>Leader &amp; Variable Capture (<code>SaveAs</code> &amp; <code>{...}</code>):</strong> Capture chosen characters into named variables (e.g. <code>"SaveAs": "Leader"</code>) and query their attributes (e.g. <code>{Leader.Home}</code>) or categories (e.g. <code>{Leader.Category:Faction Bonus}</code>) in subsequent rules.</li>
         <li><strong>Automated Shortfall Backups (<code>Fallback</code>):</strong> Attach secondary backup rules that execute automatically if a primary query yields fewer cards than requested due to uniqueness limits or missing tags.</li>
         <li><strong>Instant Re-Run (<kbd>F5</kbd>):</strong> Press <kbd>F5</kbd> (<strong>Deck &gt; Re-run Deck Rules</strong>) to immediately re-generate fresh randomized variations directly from disk without re-opening file dialogs.</li>
+        <li><strong>Dynamic Attribute Predicate Selectors (<code>Attribute=Value</code>):</strong> Query dynamic criteria (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, <code>Site=Ruins &amp; Lairs</code>, <code>Region=Ud&ucirc;n</code>, <code>Alignment=Neutral</code>) directly in custom tags or rule queries, with automatic diacritic resilience and hold-type normalization.</li>
     </ul>
 
     <div class="tip">
@@ -965,6 +1182,51 @@ namespace MECCG_Deck_Builder.Properties {
     <h3>E. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
     <p>
         When a rule captures one or more cards via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query those cards' properties using bracketed tokens:
+    </p>
+
+    <!-- SECTION 4.F: DYNAMIC ATTRIBUTE PREDICATE SELECTORS -->
+    <h3 id="predicate-selectors">F. Dynamic Attribute Predicate Selectors (Attribute=Value)</h3>
+    <p>
+        Custom taxonomy tags and procedural generation rules support dynamic rules predicates using the <code>Attribute=Value</code> syntax:
+    </p>
+    <ul>
+        <li><code>"Site=Haven"</code> &mdash; Matches any Haven site card (e.g. <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, <em>Edhellond</em>).</li>
+        <li><code>"Site=Dark-hold"</code> &mdash; Matches any Dark-hold site card (e.g. <em>Barad-d&ucirc;r</em>, <em>Dol Guldur</em>, <em>Carn D&ucirc;m</em>).</li>
+        <li><code>"Site=Ruins &amp; Lairs"</code> &mdash; Matches site cards or creature hazards keyed to Ruins &amp; Lairs.</li>
+        <li><code>"Site=Shadow-hold"</code> &mdash; Matches site cards or creature hazards keyed to Shadow-holds.</li>
+        <li><code>"Site=Free-hold"</code> &mdash; Matches any Free-hold site card.</li>
+        <li><code>"Region=Ud&ucirc;n"</code> &mdash; Matches site cards in the Ud&ucirc;n region (e.g. <em>Cirith Gorgor</em>) with automatic diacritic resilience (matching <em>Udun</em>, <em>Ud&ucirc;n</em>, or <em>&Ucirc;dun</em>).</li>
+        <li><code>"Alignment=Neutral"</code> &mdash; Matches neutral faction, ally, or site cards.</li>
+        <li><code>"Corruption=[Blank]"</code> &mdash; Matches cards with no corruption burden.</li>
+        <li><code>"Adjacent Sites!=[Blank]"</code> &mdash; Matches cards that have at least one custom tag assigned under <em>Adjacent Sites</em> (useful for identifying Under-deeps entrances).</li>
+    </ul>
+
+    <div class="note">
+        <strong>Canonical Site Names vs. Shorthand Symbols:</strong><br />
+        Always use full canonical site names (such as <code>Site=Ruins &amp; Lairs</code>, <code>Site=Shadow-hold</code>, or <code>Site=Haven</code>) in deck rules and custom tags. Single-letter symbols (such as <code>w</code> or <code>s</code>) are disallowed in rule queries because ICE typography overloaded letters between site hold types and region terrain symbols (for example, <code>w</code> represented a <em>Wilderness</em> region symbol, whereas <code>W</code> represented a <em>Wizardhaven</em> site).
+    </div>
+
+    <p>
+        <strong>Composite Semicolon Lists &amp; Compound AND Logic:</strong><br />
+        Predicates and standard card titles can be combined in semicolon lists (<strong>OR</strong> logic). You can also chain multiple predicates together within a single token using <code>&amp;&amp;</code> (<strong>AND</strong> logic):
+    </p>
+
+    <p><em>Example A &mdash; Semicolon OR Logic:</em></p>
+    <pre><code>"Attributes": {
+  "Primary": "Site",
+  "Name": "Region=Ud&ucirc;n; The Sulfur-deeps; The Under-courts"
+}</code></pre>
+    <p>
+        A candidate card matches if it satisfies the dynamic predicate (e.g. <em>Cirith Gorgor</em> matches <code>Region=Ud&ucirc;n</code>) <strong>OR</strong> matches any of the literal card titles.
+    </p>
+
+    <p><em>Example B &mdash; Compound AND Logic (via Tag Expansion):</em></p>
+    <pre><code>"Attributes": {
+  "Primary": "Site",
+  "Name": "{Orc.Category:Resolved Site}"
+}</code></pre>
+    <p>
+        If <em>Crook-legged Orc</em> is captured as <code>{Orc}</code> and tagged with <code>Resolved Site: Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>, candidate cards must be located in the Under-deeps <strong>AND</strong> must not be a Dark-hold.
     </p>
 
     <div class="note">
@@ -1379,20 +1641,28 @@ namespace MECCG_Deck_Builder.Properties {
             <th style="width: 35%;">Representative Card(s) &amp; Tag Values</th>
         </tr>
         <tr>
+            <td><code>Adjacent Sites</code></td>
+            <td>
+                Surface connections for Under-deeps sites (or <code>[Blank]</code> for surface sites). Enables dynamic pathing rules.
+            </td>
+            <td>
+                <ul>
+                    <li><em>The Drowning-deeps</em> &rarr; <code>Blue Mountain Dwarf-hold</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <td><code>Automatic Attack</code></td>
             <td>
-                Indexes guardian creature species printed on site cards using singular terms that match 100% of candidate hazard creatures (both unique individuals like <em>Bert</em> or <em>Rogrog</em> and non-unique packs like <em>Olog-hai</em>).
+                Indexes guardian creature species printed on site cards using singular terms that match 100% of candidate hazard creatures. For sites with open-ended guardian rules, dynamic predicates specify legal creature keys.
             </td>
             <td>
                 <ul>
                     <li><em>Dancing Spire</em>, <em>The Lonely Mountain</em> &rarr; <code>Dragon</code></li>
                     <li><em>Carn D&ucirc;m</em>, <em>Moria</em> &rarr; <code>Orc; Troll</code></li>
-                    <li><em>Barrow-downs</em>, <em>Dead Marshes</em> &rarr; <code>Undead</code></li>
+                    <li><em>Framsburg</em> &rarr; <code>Site=Ruins &amp; Lairs; Site=Shadow-hold</code></li>
                     <li><em>Barad-d&ucirc;r</em> &rarr; <code>Orc; Troll; Maia</code></li>
                     <li><em>Shelob's Lair</em> &rarr; <code>Spider</code></li>
-                    <li><em>Wellinghall</em> &rarr; <code>Awakened Plant</code></li>
-                    <li><em>Dunharrow</em> &rarr; <code>P&ucirc;kel-creature</code></li>
-                    <li><em>Rivendell</em> (Minion) &rarr; <code>Elf; D&uacute;nadan</code></li>
                 </ul>
             </td>
         </tr>
@@ -1409,47 +1679,162 @@ namespace MECCG_Deck_Builder.Properties {
             </td>
         </tr>
         <tr>
+            <td><code>Environment Stance</code></td>
+            <td>
+                Indexes dependency on the global light/shadow weather axis: cards that require or are enhanced by <em>Gates of Morning</em> (Light) versus <em>Doors of Night</em> (Shadow). Allows deck generation templates to stock weather-engine anchors alongside synergistic environment events.
+            </td>
+            <td>
+                <ul>
+                    <li><code>Gates of Morning</code> &rarr; <em>Clear Skies</em>, <em>Sun</em></li>
+                    <li><code>Doors of Night</code> &rarr; <em>Foul Fumes</em>, <em>Shelob</em>, <em>The Will of Sauron</em></li>
+                    <li><code>Gates of Morning; Doors of Night</code> &rarr; <em>Moon</em></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <td><code>Faction Bonus</code></td>
             <td>
-                Character recruiting bonuses granting bonus Direct Influence (+1 or more, typically +1 to +3) when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules (<code>"Name": "{Leader.Category:Faction Bonus}"</code>).<br /><br />
+                Character recruiting bonuses granting bonus Direct Influence when influencing specific named faction cards or species factions. Powers dynamic recruiting in deck generation rules.<br /><br />
                 <em>Universal Diplomats:</em> Characters with bonuses against any faction (such as <em>Adrazar</em> or <em>Peath</em>) carry the <code>All</code> wildcard.
             </td>
             <td>
                 <ul>
                     <li><em>Thranduil</em> &rarr; <code>Wood-elves</code></li>
                     <li><em>D&aacute;in II</em> &rarr; <code>Iron Hill Dwarves; Man</code></li>
-                    <li><em>Gimli</em> &rarr; <code>Iron Hill Dwarves; Elf</code></li>
                     <li><em>Th&eacute;oden</em> &rarr; <code>Riders of Rohan</code></li>
                     <li><em>Adrazar</em> &rarr; <code>All; D&uacute;nadan</code></li>
-                    <li><em>Beregond</em> &rarr; <code>Tower Guard of Minas Tirith</code></li>
                 </ul>
             </td>
         </tr>
         <tr>
             <td><code>Home Region</code></td>
             <td>
-                Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies (e.g. Eriador, Gondor, Rohan companies).
+                Relational join mapping character home sites directly to the site's geographic territory. Enables deck generators to build regionally cohesive companies.
             </td>
             <td>
                 <ul>
                     <li><em>Aragorn II</em> (Rivendell) &rarr; <code>Rhudaur</code></li>
                     <li><em>Boromir</em> (Minas Tirith) &rarr; <code>An&oacute;rien</code></li>
                     <li><em>Th&eacute;oden</em> (Edoras) &rarr; <code>Rohan</code></li>
-                    <li><em>Gimli</em> (Blue Mountain Dwarf-hold) &rarr; <code>Lindon</code></li>
-                    <li><em>Robin Smallburrow</em> &rarr; <code>The Shire; Arthedain</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Playable Region</code></td>
+            <td>
+                Geographic territories that allow a specific card to enter play.<br /><br />
+                <em>Dual-Mode Best Practice:</em> For cards that act as both regional Creatures and global Events (e.g. Nazg&ucirc;l), only tag the regions where they can be played as a creature. This prevents the generator from falsely drafting them as creatures in illegal regions.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Akh&ocirc;rahil</em> &rarr; <code>Harondor; Horse Plains; Gorgoroth; Khand</code></li>
+                    <li><em>Shelob</em> &rarr; <code>Imlad Morgul; Gorgoroth</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Playable Site</code></td>
+            <td>
+                Specific named sites that allow a specific card to enter play.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Bill the Pony</em> &rarr; <code>Bree; Bag End</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Region Type</code></td>
+            <td>
+                Classifies the terrain symbol printed on region cards. Can be joined onto site cards using the Cross-Card Lookup tool to enable dynamic regional terrain filtering.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Wilderness</em> &rarr; (Anduin Vales, Arthedain, Cardolan)</li>
+                    <li><em>Shadow-land</em> &rarr; (Ithilien, Dagorlad, Gorgoroth)</li>
+                    <li><em>Dark-domain</em> &rarr; (Ud&ucirc;n, Nurn)</li>
+                    <li><em>Free-domain</em> &rarr; (Shire, Lindon)</li>
                 </ul>
             </td>
         </tr>
         <tr>
             <td><code>Resolved Site</code></td>
             <td>
-                Over 95% of characters have a specific named location printed as their home site (e.g. <em>Aragorn</em> &rarr; <code>Rivendell</code>). For cards with non-specific, dynamic, or regional locations, the <code>Resolved Site</code> tag assigns a concrete site (or semicolon-delimited list of eligible sites).
+                Over 95% of characters have a specific named location printed as their home site. For cards with non-specific, regional, or dynamic home rules, the <code>Resolved Site</code> tag assigns dynamic rules predicates that resolve against the active catalog at runtime.
             </td>
             <td>
                 <ul>
-                    <li><em>Doeth</em>, <em>Durthak</em> (<em>"Home Site: Any Dark-hold"</em>) &rarr; <code>Barad-d&ucirc;r; Carn D&ucirc;m; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn</code></li>
-                    <li><em>Gandalf</em> (<em>"Home Site: Any Haven"</em>) &rarr; <code>Edhellond; Grey Havens; L&oacute;rien; Rivendell</code></li>
-                    <li>Free-hold dynamic characters &rarr; <code>Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; L&oacute;rien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall</code></li>
+                    <li><em>Gandalf</em> (<em>"Any Haven"</em>) &rarr; <code>Site=Haven</code></li>
+                    <li><em>Durthak</em> (<em>"Any Dark-hold"</em>) &rarr; <code>Site=Dark-hold</code></li>
+                    <li><em>Hill-troll</em> &rarr; <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code></li>
+                    <li><em>Ren the Ringwraith</em> &rarr; <code>Region=Gorgoroth</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Role</code></td>
+            <td>
+                Classifies the primary game mechanism a card executes. Symmetrical across card alignments—the card's <code>Primary</code> type (<em>Resource</em> vs. <em>Hazard</em>) naturally dictates whether the mechanism aids the company or hinders the opponent.
+                <ul style="margin-top: 6px; font-size: 9pt;">
+                    <li><strong>Automatic-attack:</strong> Modifies/creates site guardians (<em>Balrog of Moria</em>, <em>Siege</em>).</li>
+                    <li><strong>Combat:</strong> Modifies prowess, strikes, or dice (<em>Akh&ocirc;rahil</em>, <em>The Pale Sword</em>).</li>
+                    <li><strong>Corruption:</strong> Inflicts or heals CP (<em>Despair of the Heart</em>, <em>Lure of Creation</em>).</li>
+                    <li><strong>Deck:</strong> Searching, retrieving, or shuffling (<em>Align Palant&iacute;r</em>, <em>Reforging</em>).</li>
+                    <li><strong>Duration:</strong> Extends the life of events in play (<em>The Will of Sauron</em>).</li>
+                    <li><strong>Environment:</strong> Global weather anchors/cancellers (<em>Doors of Night</em>).</li>
+                    <li><strong>Faction:</strong> Interacts with faction recruitment (<em>Stone of Erech</em>).</li>
+                    <li><strong>Hand:</strong> Card draw, searching, or forcing hand discard (<em>Kham&ucirc;l the Easterling</em>).</li>
+                    <li><strong>Influence:</strong> Direct influence/recruitment modifiers (<em>Return of the King</em>).</li>
+                    <li><strong>Item:</strong> Retrieves, transfers, protects, or forces the discard/loss of items (<em>Align Palant&iacute;r</em>, <em>Ind&ucirc;r Dawndeath</em>).</li>
+                    <li><strong>Movement:</strong> Modifies travel, pathing, or forces return (<em>Morannon</em>).</li>
+                    <li><strong>Protection:</strong> Immunizes against effects or attacks (<em>Sacrifice of Form</em>).</li>
+                    <li><strong>Quest:</strong> Triggers/advances quest conditions (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>).</li>
+                    <li><strong>Readiness:</strong> Tapping, untapping, or healing. <em>Effect polarity determined by Hazard vs. Resource</em> (<em>Ad&ucirc;naphel</em>).</li>
+                    <li><strong>Site:</strong> Alters site status or hold types (<em>Witch-king of Angmar</em>, <em>The White Tree</em>).</li>
+                    <li><strong>Terrain:</strong> Converts region path symbols between hostile and safe.</li>
+                </ul>
+            </td>
+            <td><em>See descriptions on the left for specific examples.</em></td>
+        </tr>
+        <tr>
+            <td><code>Target Region</code></td>
+            <td>
+                Identifies which named geographic territories a card explicitly buffs, alters, or modifies.
+            </td>
+            <td>
+                <ul>
+                    <li><em>Balrog of Moria</em> &rarr; <code>Hollin; Redhorn Gate; Wold &amp; Foothills</code></li>
+                    <li><em>Morannon</em> &rarr; <code>Dagorlad; Ud&ucirc;n</code></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Target Site</code></td>
+            <td>
+                Identifies which official site hold types an event specifically interacts with, modifies, or requires. <br /><br />
+                <em>Note:</em> Expanded to explicitly include specific named sites to support exact destination querying.
+            </td>
+            <td>
+                <ul>
+                    <li><code>Shadow-hold; Dark-hold</code> &rarr; <em>Witch-king of Angmar</em></li>
+                    <li><code>Haven</code> &rarr; <em>Dreams of Lore</em>, <em>The Pale Sword</em></li>
+                    <li><code>Moria</code> &rarr; <em>Balrog of Moria</em></li>
+                    <li><code>Minas Tirith</code> &rarr; <em>The White Tree</em></li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Target Species</code></td>
+            <td>
+                Identifies which creature or character races an event specifically modifies. <br /><br />
+                <em>Note on Overloading:</em> This field is intentionally overloaded to include item gear sub-types (e.g., <code>Palant&iacute;r</code>, <code>Weapon</code>, <code>Armor</code>, <code>Lost Knowledge</code>) to seamlessly align with Cardnum's overloaded <code>Race</code> attribute on item cards.
+            </td>
+            <td>
+                <ul>
+                    <li><code>Palant&iacute;r</code> &rarr; <em>Align Palant&iacute;r</em></li>
+                    <li><code>Weapon; Armor</code> &rarr; <em>Reforging</em></li>
+                    <li><code>Nazg&ucirc;l</code> &rarr; <em>The Pale Sword</em></li>
+                    <li><code>Wizard</code> &rarr; <em>Lure of Creation</em></li>
                 </ul>
             </td>
         </tr>
@@ -1483,7 +1868,7 @@ namespace MECCG_Deck_Builder.Properties {
         <strong>Execution Walkthrough:</strong>
         <ul>
             <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
-            <li><strong>Dynamic Characters (Doeth, Durthak, Gandalf, Orc Captain):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Dark-hold"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and randomly draws one of the legal sites from <code>{Leader.Category:Resolved Site}</code>!</li>
+            <li><strong>Dynamic Characters (Doeth, Gandalf, Crook-legged Orc):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Haven"</code> or <code>"any non-Dark-hold Under-deeps site"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and dynamically evaluates the predicate from <code>{Leader.Category:Resolved Site}</code> (e.g. <code>Site=Haven</code> or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>), drawing randomly from all matching sites available in your active expansions without hardcoded site lists!</li>
         </ul>
     </div>
 
@@ -1516,6 +1901,22 @@ namespace MECCG_Deck_Builder.Properties {
   },
   "Categories": {
     "Home Region": "{Leader.Category:Home Region}"
+  }
+}</code></pre>
+
+    <h3>D. Drafting Dual-Mode Hazards as Events by Role</h3>
+    <p>
+        By relying on the <code>Role</code> category, you can safely draft dual-mode cards (like Nazg&ucirc;l) as globally available events without worrying about their regional creature restrictions:
+    </p>
+    <pre><code>{
+  "Name": "Exhaustion Hazard Events",
+  "Section": "Hazards",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Role": "Readiness"
   }
 }</code></pre>
 </body>
@@ -1957,21 +2358,40 @@ pre {
         </li>
     </ol>
 
-    <!-- MODE: CROSS-CARD ATTRIBUTE LOOKUP -->
-    <h2 id="relational-lookup">Cross-Card Attribute Lookup</h2>
+    <!-- MODE: CROSS-CARD ATTRIBUTE / CATEGORY LOOKUP -->
+    <h2 id="relational-lookup">Cross-Card Property Lookup (Attributes & Categories)</h2>
     <p>
-        Cross-references an attribute on cards in scope (such as a character's <code>Home</code>) against related destination cards across the catalog (such as a <code>Site</code>) to pull in a secondary attribute (such as <code>Region</code>) as a custom tag:
+        Cross-references an official attribute or custom category on cards in scope (such as a character's <code>Home</code> or a site's <code>Region</code>) against related destination cards across the catalog (such as a <code>Site</code> or <code>Region</code> card) to pull in a secondary attribute or category (such as <code>Region</code> or <code>Region Type</code>) as a custom tag:
     </p>
     <ul>
-        <li><strong>Read Attribute:</strong> The attribute on cards currently in scope used to match the destination card (e.g. Character <code>Home</code>).</li>
-        <li><strong>Lookup Entity:</strong> The catalog criteria used to identify the target cards (e.g. <code>Primary = Site</code>).</li>
-        <li><strong>Extract Attribute:</strong> The official attribute pulled from the matched cards (e.g. Site <code>Region</code>).</li>
-        <li><strong>Save to Category:</strong> The custom category where the extracted tag will be saved (e.g. <code>Home Region</code>).</li>
+        <li><strong>Read Property:</strong> The official attribute or custom category on cards in scope used to match the destination entity (e.g. Site <code>Region</code>).</li>
+        <li><strong>Lookup Entity:</strong> The catalog criteria identifying the destination cards (e.g. <code>Primary = Region</code>). Supports matching both official properties and custom categories.</li>
+        <li><strong>Extract Property:</strong> The official attribute or custom category pulled from matched cards (e.g. custom category <code>Region Type</code>).</li>
+        <li><strong>Save to Category:</strong> The custom category where the extracted tag will be saved.</li>
     </ul>
 
-    <div class="tip">
-        <strong>Compound Name Handling:</strong> Characters with multiple locations (e.g. <code>Rivendell, Bree</code>) automatically resolve each site individually to generate clean, semicolon-delimited multi-tags (<code>Arthedain; Rhudaur</code>).
-    </div>
+    <!-- WORKED EXAMPLE: PROPAGATING REGION TERRAIN TO SITES -->
+    <h3 id="worked-example-region-type">Worked Example: Propagating Region Terrain Types to Sites</h3>
+    <p>
+        While region cards carry terrain classifications (<em>Wilderness</em>, <em>Shadow-land</em>, etc.), site cards only list geographic region names (e.g. <em>Rohan</em>). Once your region cards have custom tags under <code>Region Type</code>, you can propagate those terrain types down to all site cards automatically:
+    </p>
+    <ol>
+        <li>
+            <strong>Scope the Master List:</strong> In the main window, set <strong>Filter Slot 1:</strong> <code>Attribute: Primary</code>, <code>Value: Site</code> so only site cards are in scope.
+        </li>
+        <li>
+            <strong>Configure the Lookup:</strong> Open <strong>Taxonomy &gt; Extract Tags with Rules...</strong>, choose <strong>Cross-Card Attribute Lookup</strong>, and enter:
+            <ul>
+                <li><strong>Read Attribute:</strong> <code>Region</code> *(on the site card)*</li>
+                <li><strong>Lookup Entity:</strong> <code>Primary = Region</code> *(matches region cards)*</li>
+                <li><strong>Extract Attribute:</strong> <code>Region Type</code> *(extracts the custom category from region cards)*</li>
+                <li><strong>Save to Category:</strong> <code>Region Type</code></li>
+            </ul>
+        </li>
+        <li>
+            <strong>Preview and Apply:</strong> Click <strong>Test / Preview Matches</strong>, then click <strong>Apply Tags to Catalog</strong>. Every site card across your expansions is now tagged with its terrain type, enabling dynamic queries like <code>Region Type=Wilderness</code>!
+        </li>
+    </ol>
 
     <!-- WORKED EXAMPLE: CROSS-CARD REGIONS -->
     <h3 id="worked-example-regions">Worked Example: Mapping Character Homes to Geographic Regions</h3>
@@ -2602,7 +3022,7 @@ namespace MECCG_Deck_Builder
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
 - CardCatalogService.cs: Card catalog management, local JSON loading, filter option discovery; normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
-- CardFilterService.cs: Custom taxonomy management, cascading faceted search, and authoritative edit-and-replace tagging.
+- CardFilterService.cs: Custom taxonomy management, cascading faceted search, authoritative edit-and-replace tagging, diacritic-resilient matching, site hold-type normalization, and dynamic attribute predicate evaluation (`Attribute=Value`, `&&`, `!=[Blank]`).
 - Deck.cs: Strongly-typed deck domain model.
 - DeckSectionType.cs: Enum representing deck partitions (Pool, Resources, Hazards, Sideboard, Sites).
 - DeckExportService.cs: Decoupled deck export service (TTS, Play MECCG, Cardnum, Archive, Text).
@@ -2616,7 +3036,7 @@ namespace MECCG_Deck_Builder
 - Program.cs: WinForms entry point; registers Windows-1252 code page provider.
 - `DeckGenerationRule.cs`: Domain DTOs for deck generation schemas, choice branches, variable captures (`SaveAs`), automated shortfall fallbacks (`Fallback`), and symmetrical rule categories (`Categories`).
 - `DeckGenerationService.cs`: Headless procedural deck generation engine with variety-first sampling, copy limits, branching choice groups, dynamic variable interpolation (`{Var.Attr}`, `{Var.Category:Cat}`), multi-card union sets, and fallback routing.
-- `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, cross-card attribute lookups, and two-way CSV spreadsheet pipeline.
+- `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, dual-source cross-card attribute/category lookups (supporting official attributes and custom taxonomy), and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 - RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
 
@@ -2641,6 +3061,7 @@ namespace MECCG_Deck_Builder
    - `"Attributes"`: Dictionary of official criteria (`Attribute: Value`, e.g. `{"Race": "Dwarf"}`).
    - `"Categories"`: Dictionary of custom criteria (`Category: Tag`, e.g. `{"Faction Bonus": "Wood-elves"}`).
    - Placeholders: `{Variable.AttributeName}` for official attributes, `{Variable.Category:CategoryName}` (or `{Variable.Tag:...}`) for custom tags.
+   - Dynamic Predicates: Evaluates `Attribute=Value`, `Attribute!=Value`, and compound `&&` logic (e.g. `Region=Under-deeps && Site!=Dark-hold`, `Site=Haven`, `Adjacent Sites!=[Blank]`) against candidate cards dynamically, with diacritic resilience and canonical hold-type normalization.
    - Multi-Card Union Sets: Rules capturing multiple cards via `SaveAs` resolve placeholders into deduplicated, semicolon-delimited `OR` lists.
 4. **Core Workflow Menu Hierarchy:**
    - **Deck:** `New Deck` (<kbd>Ctrl+N</kbd>), `Open Deck...` (<kbd>Ctrl+O</kbd>), `Save Deck` (<kbd>Ctrl+S</kbd>), `Save Deck As...`, `Generate from Rules...` (<kbd>Ctrl+G</kbd>), `Re-run Deck Rules` (<kbd>F5</kbd>), `Export Deck...` (<kbd>Ctrl+E</kbd>), `Exit`.
@@ -2663,7 +3084,7 @@ namespace MECCG_Deck_Builder
   - Issue #16: Decouple Custom Tag Authoring from Filter Bar (Dedicated Taxonomy Manager)
   - Issue #17: Group filter panel into titled containers with slot labels and layer demarcation
   - Issue #18: Standardize taxonomy and filtering terminology across UI, dialogs, and help documentation
-- [ ] **v0.5.0 - Procedural Deck Generator & Taxonomy Realignment**
+- [x] **v0.5.0 - Procedural Deck Generator & Taxonomy Realignment** (100% complete)
   - [x] Issue #20: Procedural Deck Generation Engine, Relational Taxonomy Extraction, and Filter Normalization
   - [x] Issue #21: Rule Variable Capture, Shortfall Fallback Mechanics, and Modular Help System Overhaul
   - [x] Issue #23: Symmetric Filter Invalidation Fix, Attribute Reference Overhaul, and Concurrent Tag Set Merging
@@ -2678,7 +3099,8 @@ namespace MECCG_Deck_Builder
   - [x] Issue #33: Add Numeric Comparison Operators (<, <=, >, >=, !=) to Procedural Deck Generation Rules
   - [x] Issue #34: Support Filtering for Blank / Unset Attributes and Custom Tags ([Blank] / [None])
   - [x] Issue #35: Normalize Creature Race Attributes to Singular in CardCatalogService and Align Automatic Attack Tags
-  - [ ] Issue #36: Support Dynamic Attribute Predicate Selectors (Attribute=Value) in Custom Taxonomy Tags and Deck Generation
+  - [x] Issue #36: Support Dynamic Attribute Predicate Selectors (Attribute=Value) in Custom Taxonomy Tags and Deck Generation
+  - [x] Issue #37: Broaden Cross-Card Lookup to Support Custom Categories and Region Type Taxonomy
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
@@ -3291,7 +3713,9 @@ namespace MECCG_Deck_Builder
 <![CDATA[
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using NaturalSort.Extension;
 
 namespace MECCG_Deck_Builder
@@ -3305,9 +3729,202 @@ namespace MECCG_Deck_Builder
             string.Equals(value, BlankSentinel, StringComparison.OrdinalIgnoreCase) ||
             string.Equals(value, NoneSentinel, StringComparison.OrdinalIgnoreCase);
 
+        public static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return text ?? string.Empty;
+            var normalized = text.Normalize(NormalizationForm.FormD);
+            var sb = new StringBuilder(normalized.Length);
+            foreach (char c in normalized)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        public static bool EqualsWithDiacriticFallback(string a, string b)
+        {
+            if (string.Equals(a, b, StringComparison.OrdinalIgnoreCase)) return true;
+            if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return false;
+            return string.Equals(RemoveDiacritics(a), RemoveDiacritics(b), StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static string NormalizeSiteType(string raw, bool allowSingleLetterShorthand = false)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+            string trimmed = raw.Trim().ToLowerInvariant();
+
+            // Only allow single-letter codes when parsing legacy card database attributes
+            if (allowSingleLetterShorthand)
+            {
+                switch (trimmed)
+                {
+                    case "h": return "Haven";
+                    case "f": return "Free-hold";
+                    case "b": return "Border-hold";
+                    case "r": return "Ruins & Lairs";
+                    case "s": return "Shadow-hold";
+                    case "d": return "Dark-hold";
+                    case "w": return "Wizardhaven";
+                }
+            }
+
+            return trimmed switch
+            {
+                "haven" => "Haven",
+                "free-hold" or "freehold" or "free hold" => "Free-hold",
+                "border-hold" or "borderhold" or "border hold" => "Border-hold",
+                "ruins & lairs" or "ruins and lairs" or "ruins & lair" or "ruins and lair" => "Ruins & Lairs",
+                "shadow-hold" or "shadowhold" or "shadow hold" => "Shadow-hold",
+                "dark-hold" or "darkhold" or "dark hold" => "Dark-hold",
+                "wizardhaven" or "wizard-haven" => "Wizardhaven",
+                _ => raw.Trim()
+            };
+        }
+
+        public static List<string> SplitSiteTypes(string text)
+        {
+            var list = new List<string>();
+            if (string.IsNullOrWhiteSpace(text)) return list;
+
+            var parts = text.Split([';', '/', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var part in parts)
+            {
+                var tokens = part.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (tokens.Length > 1 && tokens.All(t => t.Length == 1))
+                {
+                    foreach (var tok in tokens)
+                    {
+                        list.Add(tok);
+                    }
+                }
+                else
+                {
+                    list.Add(part);
+                }
+            }
+            return list;
+        }
+
+        public static bool MatchesSiteType(string cardSite, string targetSite)
+        {
+            if (string.IsNullOrWhiteSpace(cardSite) || string.IsNullOrWhiteSpace(targetSite)) return false;
+
+            // Card database entries may contain legacy shorthand (e.g. "B" or "B F")
+            var cardTypes = SplitSiteTypes(cardSite)
+                .Select(t => NormalizeSiteType(t, allowSingleLetterShorthand: true))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // User queries in deck rules and tags require full canonical names
+            var targetTypes = SplitSiteTypes(targetSite)
+                .Select(t => NormalizeSiteType(t, allowSingleLetterShorthand: false))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            return targetTypes.Overlaps(cardTypes);
+        }
+
+        public static bool TryParsePredicate(string input, out string attrName, out string op, out string attrVal)
+        {
+            attrName = null;
+            op = null;
+            attrVal = null;
+
+            if (string.IsNullOrWhiteSpace(input)) return false;
+
+            string trimmed = input.Trim();
+
+            string[] ops = [">=", "<=", "!=", "==", "=", ">", "<"];
+            foreach (var candidateOp in ops)
+            {
+                int idx = trimmed.IndexOf(candidateOp, StringComparison.Ordinal);
+                if (idx > 0)
+                {
+                    string left = trimmed[..idx].Trim();
+                    string right = trimmed[(idx + candidateOp.Length)..].Trim();
+
+                    if (!string.IsNullOrEmpty(left) && left.All(c => char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == ' '))
+                    {
+                        attrName = left;
+                        op = candidateOp;
+                        attrVal = right;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool MatchesPredicate(Card card, string predicate, CardFilterService filterService)
+        {
+            if (card == null || string.IsNullOrWhiteSpace(predicate)) return false;
+
+            // Support compound AND predicates (e.g., "Region=Under-deeps && Site!=Dark-hold")
+            if (predicate.Contains("&&"))
+            {
+                var subPredicates = predicate.Split("&&", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return subPredicates.All(sub => MatchesPredicate(card, sub, filterService));
+            }
+
+            if (!TryParsePredicate(predicate, out string attrName, out string op, out string attrVal))
+            {
+                return false;
+            }
+
+            // --- UPDATED BLANK CHECK ---
+            if (IsBlankSentinel(attrVal) || string.IsNullOrWhiteSpace(attrVal))
+            {
+                string curVal = card.GetAttribute(attrName);
+                bool isBlank = string.IsNullOrWhiteSpace(curVal);
+
+                // If it's blank in official attributes, check custom tags!
+                if (isBlank && filterService != null)
+                {
+                    var customTags = filterService.GetCardTagsForCategory(card.Id, attrName);
+                    isBlank = customTags.Count == 0;
+                }
+
+                return op == "!=" ? !isBlank : isBlank;
+            }
+
+            if (attrVal == "*" || string.Equals(attrVal, "All", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (DeckGenerationService.NumericAttributes.Contains(attrName) ||
+                (int.TryParse(attrVal, out _) && (op is ">=" or "<=" or ">" or "<" or "!=" or "==" or "=")))
+            {
+                string numericQuery = (op is "==" or "=") ? attrVal : op + " " + attrVal;
+                return DeckGenerationService.EvaluateNumericAttributeComparison(card, attrName, numericQuery);
+            }
+
+            if (string.Equals(attrName, "Site", StringComparison.OrdinalIgnoreCase))
+            {
+                bool siteMatch = MatchesSiteType(card.Site, attrVal);
+                return op == "!=" ? !siteMatch : siteMatch;
+            }
+
+            string cardVal = card.GetAttribute(attrName);
+            bool matched = false;
+
+            if (!string.IsNullOrEmpty(cardVal))
+            {
+                matched = MatchesCardnumCriterion(card, attrName, attrVal);
+            }
+            else if (filterService != null)
+            {
+                matched = filterService.MatchesCustomCriterion(card.Id, attrName, attrVal);
+            }
+
+            return op == "!=" ? !matched : matched;
+        }
+
         // Custom user filters
-        private readonly List<List<string>> _customFilters = []; // [0] = keyName, [1..] = values
-        private readonly Dictionary<string, Dictionary<string, string>> _cardCustomTags = new(StringComparer.OrdinalIgnoreCase); // cardId -> (tagKey -> tagValue)
+        private readonly List<List<string>> _customFilters = [];
+        private readonly Dictionary<string, Dictionary<string, string>> _cardCustomTags = new(StringComparer.OrdinalIgnoreCase);
 
         public IReadOnlyList<List<string>> CustomFilters => _customFilters;
         public IReadOnlyDictionary<string, Dictionary<string, string>> CardCustomTags => _cardCustomTags;
@@ -3316,7 +3933,7 @@ namespace MECCG_Deck_Builder
 
         public List<string> GetCustomKeyNames()
         {
-            var names = new List<string> { "" }; // Index 0 is blank
+            var names = new List<string> { "" };
             var sortedNames = _customFilters.Select(f => f[0]).ToList();
             sortedNames.Sort(StringComparer.Ordinal);
             names.AddRange(sortedNames);
@@ -3333,7 +3950,6 @@ namespace MECCG_Deck_Builder
 
             var distinct = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // 1. Check predefined schema filters
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
@@ -3357,7 +3973,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Also harvest all tags assigned across cards for this category
             foreach (var tags in _cardCustomTags.Values)
             {
                 if (tags.TryGetValue(keyName, out string tagVal) && !string.IsNullOrWhiteSpace(tagVal))
@@ -3407,10 +4022,22 @@ namespace MECCG_Deck_Builder
                 index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             }
 
-            if (index != -1 && !_customFilters[index].Contains(value, StringComparer.OrdinalIgnoreCase))
+            if (index != -1)
             {
-                _customFilters[index].Add(value);
-                if (_customFilters[index].Count > 2)
+                // Ensure incoming strings are split so dropdowns don't get populated with giant literal strings
+                var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                bool added = false;
+
+                foreach (var part in parts)
+                {
+                    if (!_customFilters[index].Contains(part, StringComparer.OrdinalIgnoreCase))
+                    {
+                        _customFilters[index].Add(part);
+                        added = true;
+                    }
+                }
+
+                if (added && _customFilters[index].Count > 2)
                 {
                     _customFilters[index].Sort(1, _customFilters[index].Count - 1, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
                 }
@@ -3450,7 +4077,6 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // 1. Rename inside the filter category definition
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
@@ -3469,7 +4095,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Rename across all cards, splitting on semicolons to support compound tags (e.g. "Orcs; Trolls")
             foreach (var tags in _cardCustomTags.Values)
             {
                 if (tags.TryGetValue(keyName, out string existingVal) && !string.IsNullOrWhiteSpace(existingVal))
@@ -3520,14 +4145,12 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // 1. Remove from category definition
             int index = _customFilters.FindIndex(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase));
             if (index >= 0)
             {
                 _customFilters[index].RemoveAll(v => string.Equals(v, value, StringComparison.OrdinalIgnoreCase));
             }
 
-            // 2. Remove from cards, safely trimming from compound semicolon lists
             foreach (var tags in _cardCustomTags.Values)
             {
                 if (tags.TryGetValue(keyName, out string existing) && !string.IsNullOrWhiteSpace(existing))
@@ -3568,10 +4191,12 @@ namespace MECCG_Deck_Builder
                 _cardCustomTags[cardId] = tags;
             }
 
-            // Sort semicolon-delimited tags on assignment
             if (!string.IsNullOrWhiteSpace(value) && value.Contains(';'))
             {
-                var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                // Split, deduplicate, and natural sort
+                var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                 .Distinct(StringComparer.OrdinalIgnoreCase)
+                                 .ToList();
                 parts.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
                 tags[keyName] = string.Join("; ", parts);
             }
@@ -3603,13 +4228,11 @@ namespace MECCG_Deck_Builder
             var pairs = new List<KeyValuePair<string, string>>();
             if (_cardCustomTags.TryGetValue(cardId, out var tags))
             {
-                // 1. Sort categories alphabetically
                 var sortedCategories = tags.Keys.OrderBy(k => k, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort());
                 foreach (var cat in sortedCategories)
                 {
                     string val = tags[cat];
 
-                    // 2. Sort multi-tag values alphabetically
                     if (!string.IsNullOrWhiteSpace(val) && val.Contains(';'))
                     {
                         var parts = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
@@ -3694,10 +4317,6 @@ namespace MECCG_Deck_Builder
             }
 
             string resolvedKey = _customFilters.FirstOrDefault(f => string.Equals(f[0], keyName, StringComparison.OrdinalIgnoreCase))?[0] ?? keyName.Trim();
-            var knownValues = GetCustomKeyValues(resolvedKey);
-            string trimmedVal = value.Trim();
-            string canonicalVal = knownValues.FirstOrDefault(v => string.Equals(v, trimmedVal, StringComparison.OrdinalIgnoreCase));
-            string resolvedValue = !string.IsNullOrEmpty(canonicalVal) ? canonicalVal : trimmedVal;
 
             if (!_cardCustomTags.TryGetValue(cardId, out var tags))
             {
@@ -3705,23 +4324,29 @@ namespace MECCG_Deck_Builder
                 _cardCustomTags[cardId] = tags;
             }
 
+            var incomingTags = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var existingList = new List<string>();
+
             if (tags.TryGetValue(resolvedKey, out string existing) && !string.IsNullOrWhiteSpace(existing))
             {
-                var existingList = existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+                existingList = [.. existing.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)];
+            }
+
+            foreach (var incomingTag in incomingTags)
+            {
+                var knownValues = GetCustomKeyValues(resolvedKey);
+                string canonicalVal = knownValues.FirstOrDefault(v => string.Equals(v, incomingTag, StringComparison.OrdinalIgnoreCase));
+                string resolvedValue = !string.IsNullOrEmpty(canonicalVal) ? canonicalVal : incomingTag;
+
                 if (!existingList.Contains(resolvedValue, StringComparer.OrdinalIgnoreCase))
                 {
                     existingList.Add(resolvedValue);
-                    // Sort tags alphabetically with natural sorting
-                    existingList.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
-                    tags[resolvedKey] = string.Join("; ", existingList);
+                    AddCustomKeyValue(resolvedKey, resolvedValue);
                 }
             }
-            else
-            {
-                tags[resolvedKey] = resolvedValue;
-            }
 
-            AddCustomKeyValue(resolvedKey, resolvedValue);
+            existingList.Sort(StringComparison.CurrentCultureIgnoreCase.WithNaturalSort());
+            tags[resolvedKey] = string.Join("; ", existingList);
         }
 
         public List<string> GetCardTagsForCategory(string cardId, string keyName)
@@ -3880,7 +4505,7 @@ namespace MECCG_Deck_Builder
                 string[] skills = cardValue.Split([' ', '/'], StringSplitOptions.RemoveEmptyEntries);
                 foreach (var s in skills)
                 {
-                    if (string.Equals(s, value, StringComparison.OrdinalIgnoreCase))
+                    if (EqualsWithDiacriticFallback(s, value))
                     {
                         return true;
                     }
@@ -3888,14 +4513,20 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            // Support multi-valued card attributes (e.g. Race: "Animal; Man; Bear" or Secondary: "Creature/Short-event")
-            if (cardValue.Contains(';') || (string.Equals(key, "Secondary", StringComparison.OrdinalIgnoreCase) && cardValue.Contains('/')))
+            if (string.Equals(key, "Site", StringComparison.OrdinalIgnoreCase))
             {
-                var parts = cardValue.Split([';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                return parts.Any(p => string.Equals(p, value.Trim(), StringComparison.OrdinalIgnoreCase));
+                return MatchesSiteType(cardValue, value);
             }
 
-            return string.Equals(cardValue.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase);
+            if (cardValue.Contains(';') ||
+                (string.Equals(key, "Secondary", StringComparison.OrdinalIgnoreCase) && cardValue.Contains('/')) ||
+                (string.Equals(key, "Region", StringComparison.OrdinalIgnoreCase) && cardValue.Contains('/')))
+            {
+                var parts = cardValue.Split([';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return parts.Any(p => EqualsWithDiacriticFallback(p, value.Trim()));
+            }
+
+            return EqualsWithDiacriticFallback(cardValue.Trim(), value.Trim());
         }
 
         public bool MatchesCustomCriterion(string cardId, string key, string value)
@@ -3905,7 +4536,6 @@ namespace MECCG_Deck_Builder
                 return true;
             }
 
-            // Handle [Blank] / [None] sentinel
             if (IsBlankSentinel(value))
             {
                 if (!_cardCustomTags.TryGetValue(cardId, out var tags))
@@ -3925,7 +4555,7 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            if (string.Equals(val.Trim(), value.Trim(), StringComparison.OrdinalIgnoreCase))
+            if (EqualsWithDiacriticFallback(val.Trim(), value.Trim()))
             {
                 return true;
             }
@@ -3933,7 +4563,7 @@ namespace MECCG_Deck_Builder
             if (val.Contains(';'))
             {
                 var split = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                return split.Any(s => string.Equals(s, value.Trim(), StringComparison.OrdinalIgnoreCase));
+                return split.Any(s => EqualsWithDiacriticFallback(s, value.Trim()));
             }
 
             return false;
@@ -3999,11 +4629,11 @@ namespace MECCG_Deck_Builder
         }
 
         public List<string> GetAvailableValues(
-    IEnumerable<Card> sourceCards,
-    ISet<string> selectedSets,
-    IReadOnlyList<FilterCriterion> otherCriteria,
-    FilterType targetType,
-    string targetKey)
+            IEnumerable<Card> sourceCards,
+            ISet<string> selectedSets,
+            IReadOnlyList<FilterCriterion> otherCriteria,
+            FilterType targetType,
+            string targetKey)
         {
             var result = new List<string> { "" };
 
@@ -4015,7 +4645,6 @@ namespace MECCG_Deck_Builder
             var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             bool hasBlank = false;
 
-            // Scan cards matching active sets and criteria
             foreach (var card in sourceCards)
             {
                 if (selectedSets != null && !selectedSets.Contains(card.Set))
@@ -4047,8 +4676,15 @@ namespace MECCG_Deck_Builder
                     }
                     else if (attr.Contains(';'))
                     {
-                        // Add each multi-value token individually to the dropdown (e.g. Race: Animal; Man; Bear)
                         var parts = attr.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        foreach (var part in parts)
+                        {
+                            distinctValues.Add(part.Trim());
+                        }
+                    }
+                    else if (string.Equals(targetKey, "Site", StringComparison.OrdinalIgnoreCase) && attr.Contains('/'))
+                    {
+                        var parts = attr.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         foreach (var part in parts)
                         {
                             distinctValues.Add(part.Trim());
@@ -4059,7 +4695,7 @@ namespace MECCG_Deck_Builder
                         distinctValues.Add(attr.Trim());
                     }
                 }
-                else // targetType == FilterType.Custom
+                else
                 {
                     if (!_cardCustomTags.TryGetValue(card.Id, out var tags) ||
                         !tags.TryGetValue(targetKey, out string tagVal) ||
@@ -4071,7 +4707,6 @@ namespace MECCG_Deck_Builder
 
                     if (tagVal.Contains(';'))
                     {
-                        // Add each custom tag individually (e.g. Automatic Attack: Orc; Troll)
                         foreach (var part in tagVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                         {
                             distinctValues.Add(part.Trim());
@@ -4084,7 +4719,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // Sentinel [Blank] entry appears right after blank reset if untagged/empty values exist
             if (hasBlank)
             {
                 result.Add(BlankSentinel);
@@ -5051,7 +5685,7 @@ namespace MECCG_Deck_Builder
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 #pragma warning restore SYSLIB1045
 
-        private static readonly HashSet<string> NumericAttributes = new(StringComparer.OrdinalIgnoreCase)
+        internal static readonly HashSet<string> NumericAttributes = new(StringComparer.OrdinalIgnoreCase)
         {
             "Prowess", "Body", "Mind", "Direct", "Corruption", "MPs", "Strikes"
         };
@@ -5121,7 +5755,6 @@ namespace MECCG_Deck_Builder
 
             contextVariables ??= new Dictionary<string, List<Card>>(StringComparer.OrdinalIgnoreCase);
 
-            // Handle RandomChoice / ChoiceGroup ("OR" branches)
             if (IsChoiceRule(rule))
             {
                 var validChoices = rule.Choices?.Where(c => c != null && c.Rules != null && c.Rules.Count > 0).ToList() ?? [];
@@ -5162,7 +5795,6 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // Standard FilterQuery Rule
             if (rule.Count <= 0) return;
 
             if (!Enum.TryParse<DeckSectionType>(rule.Section, true, out var sectionType))
@@ -5174,7 +5806,6 @@ namespace MECCG_Deck_Builder
                 ? new HashSet<string>(rule.Sets, StringComparer.OrdinalIgnoreCase)
                 : defaultSets;
 
-            // 1. Resolve runtime variable placeholders in Attributes & Categories
             var resolvedAttributes = new Dictionary<string, (string RawTemplate, string ResolvedValue)>(StringComparer.OrdinalIgnoreCase);
             if (rule.Attributes != null)
             {
@@ -5197,7 +5828,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Filter candidate cards
             var candidates = allCards.Where(c =>
             {
                 if (ruleSets != null && ruleSets.Count > 0 && !ruleSets.Contains(c.Set))
@@ -5205,7 +5835,6 @@ namespace MECCG_Deck_Builder
                     return false;
                 }
 
-                // Attribute evaluation with numeric comparison and blank sentinel support
                 foreach (var (attrKey, (rawTemplate, resolvedVal)) in resolvedAttributes)
                 {
                     if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
@@ -5213,13 +5842,12 @@ namespace MECCG_Deck_Builder
                         return false;
                     }
 
-                    if (!EvaluateAttributeCriterion(c, attrKey, resolvedVal))
+                    if (!EvaluateAttributeCriterion(c, attrKey, resolvedVal, filterService))
                     {
                         return false;
                     }
                 }
 
-                // Category & Tag evaluation with blank sentinel support
                 if (filterService != null)
                 {
                     foreach (var (catKey, (rawTemplate, resolvedVal)) in resolvedCategories)
@@ -5235,7 +5863,8 @@ namespace MECCG_Deck_Builder
                             if (!allowedTags.Any(t =>
                                 t == "*" ||
                                 string.Equals(t, "All", StringComparison.OrdinalIgnoreCase) ||
-                                filterService.MatchesCustomCriterion(c.Id, catKey, t)))
+                                filterService.MatchesCustomCriterion(c.Id, catKey, t) ||
+                                (CardFilterService.TryParsePredicate(t, out _, out _, out _) && CardFilterService.MatchesPredicate(c, t, filterService))))
                             {
                                 return false;
                             }
@@ -5246,7 +5875,6 @@ namespace MECCG_Deck_Builder
                 return true;
             }).ToList();
 
-            // 3. Sample candidates according to configurable Distribution strategy
             int addedForThisRule = 0;
             var targetSection = deck.GetSection(sectionType);
             var newlyAdded = new List<Card>();
@@ -5256,7 +5884,6 @@ namespace MECCG_Deck_Builder
             if (string.Equals(distribution, "Focused", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(distribution, "Playset", StringComparison.OrdinalIgnoreCase))
             {
-                // FOCUSED: Greedily add maximum legal copies of a sampled title before picking next
                 while (addedForThisRule < rule.Count)
                 {
                     var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
@@ -5289,7 +5916,6 @@ namespace MECCG_Deck_Builder
             else if (string.Equals(distribution, "Uniform", StringComparison.OrdinalIgnoreCase) ||
                      string.Equals(distribution, "Random", StringComparison.OrdinalIgnoreCase))
             {
-                // UNIFORM: Pure lottery draw across all valid candidates with replacement up to limits
                 while (addedForThisRule < rule.Count)
                 {
                     var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
@@ -5312,7 +5938,6 @@ namespace MECCG_Deck_Builder
             }
             else
             {
-                // VARIETY (Default): Prioritize distinct titles before assigning duplicates
                 while (addedForThisRule < rule.Count)
                 {
                     var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
@@ -5349,13 +5974,11 @@ namespace MECCG_Deck_Builder
                 AddedCount = addedForThisRule
             });
 
-            // 4. Capture selected cards to variable context if SaveAs is specified
             if (!string.IsNullOrWhiteSpace(rule.SaveAs) && newlyAdded.Count > 0)
             {
                 contextVariables[rule.SaveAs] = newlyAdded;
             }
 
-            // 5. If shortfall occurred and a Fallback rule is defined, execute it for remaining count
             if (addedForThisRule < rule.Count && rule.Fallback != null)
             {
                 int remainingNeeded = rule.Count - addedForThisRule;
@@ -5372,9 +5995,21 @@ namespace MECCG_Deck_Builder
 
         #region ATTRIBUTE_EVALUATION_AND_NUMERIC_OPERATORS
 
-        private static bool EvaluateAttributeCriterion(Card card, string attrKey, string resolvedVal)
+        private static bool EvaluateAttributeCriterion(Card card, string attrKey, string resolvedVal, CardFilterService filterService)
         {
-            if (string.IsNullOrWhiteSpace(resolvedVal)) return true;
+            if (string.IsNullOrWhiteSpace(resolvedVal))
+            {
+                if (CardFilterService.TryParsePredicate(attrKey, out _, out _, out _))
+                {
+                    return CardFilterService.MatchesPredicate(card, attrKey, filterService);
+                }
+                return true;
+            }
+
+            if (CardFilterService.TryParsePredicate(attrKey, out _, out _, out _))
+            {
+                return CardFilterService.MatchesPredicate(card, attrKey, filterService);
+            }
 
             if (NumericAttributes.Contains(attrKey) && HasComparisonOperator(resolvedVal))
             {
@@ -5385,19 +6020,20 @@ namespace MECCG_Deck_Builder
             return allowedValues.Any(v =>
                 v == "*" ||
                 string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
-                CardFilterService.MatchesCardnumCriterion(card, attrKey, v));
+                (CardFilterService.TryParsePredicate(v, out _, out _, out _)
+                    ? CardFilterService.MatchesPredicate(card, v, filterService)
+                    : CardFilterService.MatchesCardnumCriterion(card, attrKey, v)));
         }
 
         private static bool HasComparisonOperator(string val) =>
             val.Contains('>') || val.Contains('<') || val.Contains("!=") || val.Contains('=');
 
-        private static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
+        internal static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
         {
             string rawCardVal = card.GetAttribute(attrKey);
 
             if (!TryParseCardStat(rawCardVal, out int cardStat))
             {
-                // Fallback to literal matching for non-numeric/empty values
                 var fallbackTokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 return fallbackTokens.Any(v =>
                     v == "*" ||
@@ -5453,7 +6089,6 @@ namespace MECCG_Deck_Builder
 
             if (parsedConditions.Count == 0) return false;
 
-            // Detect range bounding (e.g. >= 3 and <= 5)
             var lowerBounds = parsedConditions.Where(c => c.Op is ">=" or ">").ToList();
             var upperBounds = parsedConditions.Where(c => c.Op is "<=" or "<").ToList();
 
@@ -5464,19 +6099,16 @@ namespace MECCG_Deck_Builder
 
                 if (lb.TargetVal <= ub.TargetVal)
                 {
-                    // Bound interval AND condition
                     bool satisfiesLower = lb.Op == ">=" ? cardStat >= lb.TargetVal : cardStat > lb.TargetVal;
                     bool satisfiesUpper = ub.Op == "<=" ? cardStat <= ub.TargetVal : cardStat < ub.TargetVal;
 
                     if (satisfiesLower && satisfiesUpper) return true;
 
-                    // Evaluate any additional discrete conditions
                     var others = parsedConditions.Where(c => c != lb && c != ub).ToList();
                     return others.Any(c => EvaluateSingleCondition(cardStat, c.Op, c.TargetVal));
                 }
             }
 
-            // Standard OR evaluation across conditions
             return parsedConditions.Any(c => EvaluateSingleCondition(cardStat, c.Op, c.TargetVal));
         }
 
@@ -5498,20 +6130,17 @@ namespace MECCG_Deck_Builder
 
             string trimmed = cardValue.Trim();
 
-            // Strip parentheses (e.g., (-1) -> -1, (2) -> 2)
             if (trimmed.StartsWith('(') && trimmed.EndsWith(')'))
             {
                 trimmed = trimmed[1..^1].Trim();
             }
 
-            // Strip suffix parentheses (e.g. 1(2) -> 1)
             int parenIdx = trimmed.IndexOf('(');
             if (parenIdx > 0)
             {
                 trimmed = trimmed[..parenIdx].Trim();
             }
 
-            // Treat MPs "None" as 0
             if (string.Equals(trimmed, "None", StringComparison.OrdinalIgnoreCase))
             {
                 result = 0;
@@ -5547,7 +6176,6 @@ namespace MECCG_Deck_Builder
 
                 if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
                 {
-                    // Custom taxonomy tag lookup: {Variable.Category:Category Name} or {Variable.Tag:Category Name}
                     string category = match.Groups[2].Value.Trim();
                     if (filterService != null)
                     {
@@ -5566,7 +6194,6 @@ namespace MECCG_Deck_Builder
                 }
                 else if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
                 {
-                    // Official rules attribute lookup: {Variable.AttributeName}
                     string attrName = match.Groups[3].Value.Trim();
                     foreach (var card in cards)
                     {
@@ -7947,9 +8574,12 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
+            // Capture active expansion set selection prior to generation
+            var activeSetsBeforeGen = new HashSet<string>(_currentDeck.IncludedSets, StringComparer.OrdinalIgnoreCase);
+
             var result = DeckGenerationService.GenerateDeck(
                 _catalogService.Cards,
-                _currentDeck.IncludedSets,
+                activeSetsBeforeGen,
                 _filterService,
                 ruleSet);
 
@@ -7966,6 +8596,11 @@ namespace MECCG_Deck_Builder
             _currentDeck.Clear();
             _currentDeck.Title = result.Deck.Title;
 
+            // Retain all sets the user had selected, plus any additional sets introduced by the rules
+            foreach (var s in activeSetsBeforeGen)
+            {
+                _currentDeck.IncludedSets.Add(s);
+            }
             foreach (var s in result.Deck.IncludedSets)
             {
                 _currentDeck.IncludedSets.Add(s);
@@ -10028,9 +10663,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - Cardnum Deck (.cnum): Standard 1 <Code> listing format.
   - Archive Breakdown (.archive): Categorized breakdown (Items, Events, Characters by race, Sites by type).
   - Plain Text (.txt): Formatted deck listing.
-- Procedural Deck Generator: Generate complete decks from declarative JSON rule templates with attribute and category queries, deck copy limits, and randomized thematic branches (RandomChoice). Features configurable distribution strategies (`Distribution: Variety | Focused | Uniform`), relational operators (`<`, `<=`, `>`, `>=`, `!=`) and range bounding on numeric stats, runtime variable capture (SaveAs), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Home}), universal wildcard sentinels (* and All), blank matching ([Blank]), and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G).
-- Automated Taxonomy Extraction: Scan card rules text for catalog entities, perform cross-card attribute lookups, or execute custom regular expressions in an expanded workspace with automatic session persistence via Taxonomy > Extract Tags with Rules....
-- Two-Way CSV Spreadsheet Pipeline: Bulk audit and edit catalog taxonomy using Microsoft Excel or Google Sheets with authoritative edit-and-replace synchronization via Taxonomy > Export Taxonomy Draft (CSV)... and Taxonomy > Import Taxonomy (CSV)....
+- Procedural Deck Generator: Generate complete decks from declarative JSON rule templates with attribute and category queries, deck copy limits, and randomized thematic branches (RandomChoice). Features configurable distribution strategies (`Distribution: Variety | Focused | Uniform`), relational operators (`<`, `<=`, `>`, `>=`, `!=`) and range bounding on numeric stats, dynamic attribute predicate selectors (`Attribute=Value`, `&&`, e.g. `Site=Haven`, `Site=Dark-hold`, `Site=Ruins & Lairs`, `Region=Udûn`, `Region=Under-deeps && Site!=Dark-hold`, `Adjacent Sites!=[Blank]`), runtime variable capture (SaveAs), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Home}, {Leader.Category:Resolved Site}), universal wildcard sentinels (* and All), blank matching ([Blank]), and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G). Active expansion sets in the Catalog menu are preserved across generation runs.- Two-Way CSV Spreadsheet Pipeline: Bulk audit and edit catalog taxonomy using Microsoft Excel or Google Sheets with authoritative edit-and-replace synchronization via Taxonomy > Export Taxonomy Draft (CSV)... and Taxonomy > Import Taxonomy (CSV)....
 - Session Persistence: Remembers active expansion set selection across application restarts and preserves extraction regex parameters across sessions.
 
 ---
@@ -10216,19 +10849,19 @@ namespace MECCG_Deck_Builder
             };
 
             // ==========================================
-            // MODE 2: CROSS-CARD ATTRIBUTE LOOKUP
+            // MODE 2: CROSS-CARD PROPERTY LOOKUP
             // ==========================================
             _rbRelational = new RadioButton
             {
-                Text = "Cross-Card Attribute Lookup:",
+                Text = "Cross-Card Property Lookup:",
                 Location = new Point(12, 100),
                 Size = new Size(320, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _rbRelational.CheckedChanged += RuleSource_Changed;
 
-            // Row 1: Read Attribute -> Lookup Entity (Attribute = Value)
-            var lblRel1 = new Label { Text = "Read Attribute:", Location = new Point(32, 124), Size = new Size(95, 18) };
+            // Row 1: Read Property -> Lookup Entity (Property = Value/Tag)
+            var lblRel1 = new Label { Text = "Read Property:", Location = new Point(32, 124), Size = new Size(95, 18) };
             _cmbRelSourceAttr = new ComboBox
             {
                 Location = new Point(130, 121),
@@ -10256,8 +10889,8 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
 
-            // Row 2: Extract Attribute -> Save to Category
-            var lblRel3 = new Label { Text = "Extract Attribute:", Location = new Point(32, 152), Size = new Size(95, 18) };
+            // Row 2: Extract Property -> Save to Category
+            var lblRel3 = new Label { Text = "Extract Property:", Location = new Point(32, 152), Size = new Size(95, 18) };
             _cmbRelTargetAttr = new ComboBox
             {
                 Location = new Point(130, 149),
@@ -10441,10 +11074,28 @@ namespace MECCG_Deck_Builder
             _cmbRelTargetAttr.Items.Clear();
             _cmbRelLookupAttr.Items.Clear();
 
-            var keys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
-            foreach (var k in keys)
+            var officialKeys = _catalog.GetFilterKeys().Where(k => !string.IsNullOrWhiteSpace(k)).ToList();
+            var customKeys = _filterService != null
+                ? _filterService.GetCustomKeyNames().Where(k => !string.IsNullOrWhiteSpace(k)).ToList()
+                : [];
+
+            var allKeys = new List<string>(officialKeys);
+            foreach (var ck in customKeys)
+            {
+                if (!allKeys.Contains(ck, StringComparer.OrdinalIgnoreCase))
+                {
+                    allKeys.Add(ck);
+                }
+            }
+            allKeys.Sort(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var k in officialKeys)
             {
                 _cmbHarvestAttribute.Items.Add(k);
+            }
+
+            foreach (var k in allKeys)
+            {
                 _cmbRelSourceAttr.Items.Add(k);
                 _cmbRelTargetAttr.Items.Add(k);
                 _cmbRelLookupAttr.Items.Add(k);
@@ -10494,13 +11145,35 @@ namespace MECCG_Deck_Builder
             _cmbRelLookupVal.Items.Clear();
             if (string.IsNullOrWhiteSpace(attr)) return;
 
-            var values = _catalog.GetFilterValues(attr);
-            foreach (var v in values)
+            var distinctValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            var catalogVals = _catalog.GetFilterValues(attr);
+            if (catalogVals != null)
             {
-                if (!string.IsNullOrWhiteSpace(v))
+                foreach (var v in catalogVals)
                 {
-                    _cmbRelLookupVal.Items.Add(v);
+                    if (!string.IsNullOrWhiteSpace(v)) distinctValues.Add(v.Trim());
                 }
+            }
+
+            if (_filterService != null)
+            {
+                var customVals = _filterService.GetCustomKeyValues(attr);
+                if (customVals != null)
+                {
+                    foreach (var v in customVals)
+                    {
+                        if (!string.IsNullOrWhiteSpace(v)) distinctValues.Add(v.Trim());
+                    }
+                }
+            }
+
+            var sorted = distinctValues.ToList();
+            sorted.Sort(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var v in sorted)
+            {
+                _cmbRelLookupVal.Items.Add(v);
             }
 
             string savedLookupVal = UserSettingsService.Current.LastRelationalLookupVal ?? "Site";
@@ -10639,7 +11312,8 @@ namespace MECCG_Deck_Builder
                     lookupAttr,
                     lookupVal,
                     targetAttr,
-                    category);
+                    category,
+                    _filterService);
             }
 
             var rules = GetActiveRules();
@@ -11166,9 +11840,9 @@ namespace MECCG_Deck_Builder
         #region RELATIONAL_EXTRACTION
 
         /// <summary>
-        /// Cross-references an attribute on target cards (e.g. Character 'Home') 
-        /// against matching catalog entities (e.g. Site 'Name') to extract a secondary 
-        /// attribute (e.g. Site 'Region') as a custom tag.
+        /// Cross-references an attribute or custom category on target cards (e.g. Character 'Home' or Site 'Region') 
+        /// against matching catalog entities (e.g. Site 'Name' or Region 'Name') to extract a secondary 
+        /// attribute or custom category (e.g. Site 'Region' or Region 'Region Type') as a custom tag.
         /// </summary>
         public static ExtractionResult ExecuteRelationalExtraction(
             IEnumerable<Card> targetCards,
@@ -11177,7 +11851,8 @@ namespace MECCG_Deck_Builder
             string lookupAttribute,
             string lookupValue,
             string targetAttribute,
-            string categoryName)
+            string categoryName,
+            CardFilterService filterService = null)
         {
             var result = new ExtractionResult();
             if (targetCards == null || catalogCards == null ||
@@ -11188,21 +11863,45 @@ namespace MECCG_Deck_Builder
 
             string category = string.IsNullOrWhiteSpace(categoryName) ? "Relational Tags" : categoryName.Trim();
 
-            // 1. Build lookup dictionary from catalog entities using MatchesCardnumCriterion
+            // 1. Build lookup dictionary from catalog entities (supports official criteria or custom category match)
             var lookupCards = catalogCards;
             if (!string.IsNullOrWhiteSpace(lookupAttribute) && !string.IsNullOrWhiteSpace(lookupValue))
             {
-                lookupCards = lookupCards.Where(c => CardFilterService.MatchesCardnumCriterion(c, lookupAttribute, lookupValue));
+                lookupCards = lookupCards.Where(c =>
+                    CardFilterService.MatchesCardnumCriterion(c, lookupAttribute, lookupValue) ||
+                    (filterService != null && filterService.MatchesCustomCriterion(c.Id, lookupAttribute, lookupValue)));
             }
 
-            // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"])
+            // Map: Entity Name -> Set of extracted values (e.g. "Rivendell" -> ["Rhudaur"], "Rohan" -> ["Wilderness"])
             var lookupMap = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var card in lookupCards)
             {
                 string entityName = card.Name?.Trim();
-                string targetVal = card.GetAttribute(targetAttribute)?.Trim();
+                if (string.IsNullOrEmpty(entityName))
+                {
+                    continue;
+                }
 
-                if (string.IsNullOrEmpty(entityName) || string.IsNullOrEmpty(targetVal))
+                var extractedVals = new List<string>();
+
+                // Try official attribute
+                string targetAttrVal = card.GetAttribute(targetAttribute)?.Trim();
+                if (!string.IsNullOrEmpty(targetAttrVal))
+                {
+                    extractedVals.Add(targetAttrVal);
+                }
+
+                // Try custom category
+                if (filterService != null)
+                {
+                    var catTags = filterService.GetCardTagsForCategory(card.Id, targetAttribute);
+                    if (catTags != null && catTags.Count > 0)
+                    {
+                        extractedVals.AddRange(catTags);
+                    }
+                }
+
+                if (extractedVals.Count == 0)
                 {
                     continue;
                 }
@@ -11212,7 +11911,21 @@ namespace MECCG_Deck_Builder
                     set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                     lookupMap[entityName] = set;
                 }
-                set.Add(targetVal);
+
+                foreach (var v in extractedVals)
+                {
+                    if (v.Contains(';'))
+                    {
+                        foreach (var part in v.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        {
+                            set.Add(part);
+                        }
+                    }
+                    else
+                    {
+                        set.Add(v.Trim());
+                    }
+                }
             }
 
             if (lookupMap.Count == 0)
@@ -11222,47 +11935,65 @@ namespace MECCG_Deck_Builder
 
             var knownNames = lookupMap.Keys.OrderByDescending(k => k.Length).ToList();
 
-            // 2. Cross-reference target cards
+            // 2. Cross-reference target cards (evaluating source attribute or custom category)
             foreach (var card in targetCards)
             {
-                string sourceVal = card.GetAttribute(sourceAttribute);
-                if (string.IsNullOrWhiteSpace(sourceVal))
+                var sourceVals = new List<string>();
+                string sourceAttrVal = card.GetAttribute(sourceAttribute);
+                if (!string.IsNullOrWhiteSpace(sourceAttrVal))
+                {
+                    sourceVals.Add(sourceAttrVal);
+                }
+
+                if (filterService != null)
+                {
+                    var catTags = filterService.GetCardTagsForCategory(card.Id, sourceAttribute);
+                    if (catTags != null && catTags.Count > 0)
+                    {
+                        sourceVals.AddRange(catTags);
+                    }
+                }
+
+                if (sourceVals.Count == 0)
                 {
                     continue;
                 }
 
-                bool matched = false;
-
-                // Split on common list delimiters (commas, semicolons, slashes)
-                var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                foreach (var part in parts)
+                foreach (var sourceVal in sourceVals)
                 {
-                    var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    foreach (var sub in subParts)
-                    {
-                        if (lookupMap.TryGetValue(sub, out var targets))
-                        {
-                            foreach (var t in targets)
-                            {
-                                result.AddTag(card.Id, category, t);
-                                matched = true;
-                            }
-                        }
-                    }
-                }
+                    bool matched = false;
 
-                // If no exact token match, search known names with regex word boundaries (e.g. "Haven: Rivendell")
-                if (!matched)
-                {
-                    foreach (var name in knownNames)
+                    // Split on common list delimiters (commas, semicolons, slashes)
+                    var parts = sourceVal.Split([',', ';', '/'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    foreach (var part in parts)
                     {
-                        if (Regex.IsMatch(sourceVal, $@"\b{Regex.Escape(name)}\b", RegexOptions.IgnoreCase))
+                        var subParts = part.Split([" or ", " and "], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        foreach (var sub in subParts)
                         {
-                            if (lookupMap.TryGetValue(name, out var targets))
+                            if (lookupMap.TryGetValue(sub, out var targets))
                             {
                                 foreach (var t in targets)
                                 {
                                     result.AddTag(card.Id, category, t);
+                                    matched = true;
+                                }
+                            }
+                        }
+                    }
+
+                    // If no exact token match, search known names with regex word boundaries (e.g. "Haven: Rivendell")
+                    if (!matched)
+                    {
+                        foreach (var name in knownNames)
+                        {
+                            if (Regex.IsMatch(sourceVal, $@"\b{Regex.Escape(name)}\b", RegexOptions.IgnoreCase))
+                            {
+                                if (lookupMap.TryGetValue(name, out var targets))
+                                {
+                                    foreach (var t in targets)
+                                    {
+                                        result.AddTag(card.Id, category, t);
+                                    }
                                 }
                             }
                         }
