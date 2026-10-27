@@ -133,26 +133,22 @@
             </td>
         </tr>
         <tr>
-            <td><code>Playable Region</code></td>
+            <td><code>Region Requirement</code></td>
             <td>
-                Geographic territories that allow a specific card to enter play.<br /><br />
+                Consolidates all card-to-region relationships into a single queryable category. Identifies:
+                <ol style="margin-top: 4px; padding-left: 18px;">
+                    <li>Geographic territories required to bring a card into play (e.g. hazard creatures or events restricted to specific regions), and</li>
+                    <li>Territories an ongoing event explicitly buffs, alters, or affects (e.g. regional combat bonuses, movement paths).</li>
+                </ol>
+                Supports named regions and dynamic terrain predicates (e.g. <code>Region Type=Wilderness</code>).<br /><br />
                 <em>Dual-Mode Best Practice:</em> For cards that act as both regional Creatures and global Events (e.g. Nazg&ucirc;l), only tag the regions where they can be played as a creature. This prevents the generator from falsely drafting them as creatures in illegal regions.
             </td>
             <td>
                 <ul>
                     <li><em>Akh&ocirc;rahil</em> &rarr; <code>Harondor; Horse Plains; Gorgoroth; Khand</code></li>
                     <li><em>Shelob</em> &rarr; <code>Imlad Morgul; Gorgoroth</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Playable Site</code></td>
-            <td>
-                Specific named sites that allow a specific card to enter play.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Bill the Pony</em> &rarr; <code>Bree; Bag End</code></li>
+                    <li><em>Morannon</em> &rarr; <code>Dagorlad; Ud&ucirc;n</code></li>
+                    <li><em>Balrog of Moria</em> &rarr; <code>Wold &amp; Foothills; Fangorn; Redhorn Gate</code></li>
                 </ul>
             </td>
         </tr>
@@ -210,29 +206,24 @@
             <td><em>See descriptions on the left for specific examples.</em></td>
         </tr>
         <tr>
-            <td><code>Target Region</code></td>
+            <td><code>Site Requirement</code></td>
             <td>
-                Identifies which named geographic territories a card explicitly buffs, alters, or modifies.
+                Consolidates all card-to-site relationships into a single queryable category. Identifies:
+                <ol style="margin-top: 4px; padding-left: 18px;">
+                    <li>The specific site(s) or hold type(s) where a company must be located to play the card (items, allies, factions, and site-phase events), and</li>
+                    <li>The specific site(s) or hold type(s) an event attaches to, targets, or modifies.</li>
+                </ol>
+                Supports specific named sites (e.g. <code>Minas Tirith</code>, <code>Moria</code>), dynamic hold-type predicates (e.g. <code>Site=Dark-hold</code>, <code>Site=Shadow-hold</code>, <code>Site=Free-hold</code>), and regional site filters (e.g. <code>Region=Dagorlad</code>).
             </td>
             <td>
                 <ul>
-                    <li><em>Balrog of Moria</em> &rarr; <code>Hollin; Redhorn Gate; Wold &amp; Foothills</code></li>
-                    <li><em>Morannon</em> &rarr; <code>Dagorlad; Ud&ucirc;n</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td><code>Target Site</code></td>
-            <td>
-                Identifies which official site hold types an event specifically interacts with, modifies, or requires. <br /><br />
-                <em>Note:</em> Expanded to explicitly include specific named sites to support exact destination querying.
-            </td>
-            <td>
-                <ul>
-                    <li><code>Shadow-hold; Dark-hold</code> &rarr; <em>Witch-king of Angmar</em></li>
-                    <li><code>Haven</code> &rarr; <em>Dreams of Lore</em>, <em>The Pale Sword</em></li>
-                    <li><code>Moria</code> &rarr; <em>Balrog of Moria</em></li>
-                    <li><code>Minas Tirith</code> &rarr; <em>The White Tree</em></li>
+                    <li><em>Rescue Prisoners</em> &rarr; <code>Site=Dark-hold; Site=Shadow-hold</code></li>
+                    <li><em>Bill the Pony</em> &rarr; <code>Bree; Rivendell; Bag End</code></li>
+                    <li><em>The White Tree</em> &rarr; <code>Minas Tirith</code></li>
+                    <li><em>Old Friendship</em> &rarr; <code>Site=Free-hold; Site=Border-hold</code></li>
+                    <li><em>Siege</em> &rarr; <code>Site=Border-hold; Site=Free-hold; Site=Ruins &amp; Lairs</code></li>
+                    <li><em>Balrog of Moria</em> &rarr; <code>Moria; L&oacute;rien</code></li>
+                    <li><em>Morannon</em> &rarr; <code>Region=Dagorlad</code></li>
                 </ul>
             </td>
         </tr>
@@ -285,7 +276,35 @@
         </ul>
     </div>
 
-    <h3>B. Targeted Dragon Lair Expedition</h3>
+    <h3>B. Automated Destination Sites for Quest Events (Site Requirement)</h3>
+    <p>
+        When your deck includes site-specific quest events (such as <em>Rescue Prisoners</em> or <em>The White Tree</em>), capture the event into a variable and draft destination sites dynamically using the unified <code>Site Requirement</code> tag:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Rescue Prisoners Quest",
+    "SaveAs": "RescueQuest",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Name": "Rescue Prisoners"
+    }
+  },
+  {
+    "Name": "Rescue Destination Sites",
+    "Section": "Sites",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{RescueQuest.Category:Site Requirement}"
+    }
+  }
+]</code></pre>
+    <p>
+        Because <em>Rescue Prisoners</em> is tagged with <code>Site Requirement: Site=Dark-hold; Site=Shadow-hold</code>, the generator expands the predicate and automatically drafts two legal Dark-holds or Shadow-holds into your Sites partition.
+    </p>
+
+    <h3>C. Targeted Dragon Lair Expedition</h3>
     <p>
         Recruit destination sites specifically guarded by true Dragons without hardcoding site names:
     </p>
@@ -301,7 +320,7 @@
   }
 }</code></pre>
 
-    <h3>C. Regional Themed Recruitment</h3>
+    <h3>D. Regional Themed Recruitment</h3>
     <p>
         Recruit backup characters whose home site is located in the same geographic region as the company leader:
     </p>
@@ -317,19 +336,19 @@
   }
 }</code></pre>
 
-    <h3>D. Drafting Dual-Mode Hazards as Events by Role</h3>
+    <h3>E. Drafting Regional Hazards (Region Requirement)</h3>
     <p>
-        By relying on the <code>Role</code> category, you can safely draft dual-mode cards (like Nazg&ucirc;l) as globally available events without worrying about their regional creature restrictions:
+        Draft hazard creatures keyed strictly to a specific geographic region (such as Gorgoroth) using <code>Region Requirement</code>:
     </p>
     <pre><code>{
-  "Name": "Exhaustion Hazard Events",
+  "Name": "Gorgoroth Guardians",
   "Section": "Hazards",
-  "Count": 2,
+  "Count": 3,
   "Attributes": {
-    "Primary": "Hazard"
+    "Secondary": "Creature"
   },
   "Categories": {
-    "Role": "Readiness"
+    "Region Requirement": "Gorgoroth"
   }
 }</code></pre>
 </body>

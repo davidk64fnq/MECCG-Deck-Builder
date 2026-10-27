@@ -163,7 +163,7 @@
         Several hazards (like the Nazgûl) possess dual secondary types (e.g., <code>Creature/Permanent-event</code>). Often, their Creature mode is restricted to specific geographic regions (e.g., <em>Gorgoroth</em>, <em>Khand</em>), while their Event mode is playable anywhere.
     </p>
     <p>
-        <strong>Tagging Best Practice:</strong> Only tag the strict creature regions in your custom taxonomy (e.g., <code>Playable Region: Gorgoroth; Khand</code>). Do not add "All" or "Anywhere" for the event side, as that would cause the generator to falsely draft them as creatures in illegal regions like the Shire.
+        <strong>Tagging Best Practice:</strong> Only tag the strict creature regions in your custom taxonomy (e.g., <code>Region Requirement: Gorgoroth; Khand</code>). Do not add "All" or "Anywhere" for the event side, as that would cause the generator to falsely draft them as creatures in illegal regions like the Shire.
     </p>
     <p>
         <strong>Querying Best Practice:</strong> When drafting creatures, include your region constraints. When drafting events, omit the region constraint entirely and rely on the <code>Role</code> tag. The engine will safely draft the card as an event globally.
@@ -178,7 +178,7 @@
     "Secondary": "Creature"
   },
   "Categories": {
-    "Playable Region": "Gorgoroth"
+    "Region Requirement": "Gorgoroth"
   }
 }</code></pre>
 
