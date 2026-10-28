@@ -3787,7 +3787,7 @@
       "name": "Align Palantír",
       "Role": "Item; Quest",
       "set": "METW",
-      "Target Species": "Palantír"
+      "Target Item": "Palantír"
     },
     {
       "fullCode": "Andúril, the Flame of the West (TW)",
@@ -3796,6 +3796,7 @@
       "Role": "Combat; Influence; Quest; Readiness",
       "set": "METW",
       "Site Requirement": "Information!=[Blank]",
+      "Target Item": "Narsil",
       "Target Species": "Dúnadan"
     },
     {
@@ -3813,21 +3814,21 @@
       "name": "Bane of the Ithil-stone",
       "Role": "Corruption; Deck",
       "set": "METW",
-      "Target Species": "Palantír"
+      "Target Item": "Palantír"
     },
     {
       "fullCode": "Despair of the Heart (TW)",
       "id": "97",
       "name": "Despair of the Heart",
       "Role": "Corruption",
-      "set": "METW"
+      "set": "METW",
+      "Target Species": "Race!=Hobbit && Race!=Wizard"
     },
     {
       "Environment Stance": "Doors of Night",
       "fullCode": "Doors of Night (TW)",
       "id": "98",
       "name": "Doors of Night",
-      "Role": "Environment",
       "set": "METW"
     },
     {
@@ -3856,10 +3857,10 @@
       "Site Requirement": "Haven"
     },
     {
+      "Environment Stance": "Gates of Morning",
       "fullCode": "Gates of Morning (TW)",
       "id": "293",
       "name": "Gates of Morning",
-      "Role": "Environment",
       "set": "METW"
     },
     {
@@ -3867,6 +3868,7 @@
       "id": "115",
       "name": "Hoarmûrath of Dír",
       "Region Requirement": "Dagorlad; Gorgoroth; Ithilien; Khand",
+      "Role": "Combat",
       "set": "METW"
     },
     {
@@ -3881,7 +3883,7 @@
       "fullCode": "Khamûl the Easterling (TW)",
       "id": "118",
       "name": "Khamûl the Easterling",
-      "Region Requirement": "Gorgoroth; Harondor; Imlad Morgul; Khand",
+      "Region Requirement": "Brown Lands; Gorgoroth; Heart of Mirkwood; Southern Mirkwood",
       "Role": "Hand",
       "set": "METW"
     },
@@ -3949,6 +3951,30 @@
       "Role": "Item; Quest",
       "set": "METW",
       "Site Requirement": "Haven; Information!=[Blank]"
+    },
+    {
+      "fullCode": "Ren the Unclean (TW)",
+      "id": "154",
+      "name": "Ren the Unclean",
+      "Region Requirement": "Dagorlad; Gorgoroth; Horse Plains; Ithilien",
+      "Role": "Corruption",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Rescue Prisoners (TW)",
+      "id": "364",
+      "name": "Rescue Prisoners",
+      "Role": "Quest",
+      "set": "METW",
+      "Site Requirement": "Border-hold; Dark-hold; Free-hold; Haven; Shadow-hold"
+    },
+    {
+      "fullCode": "Return of the King (TW)",
+      "id": "365",
+      "name": "Return of the King",
+      "Role": "Influence",
+      "set": "METW",
+      "Site Requirement": "Minas Tirith"
     }
   ],
   "Filters": [
@@ -4147,6 +4173,7 @@
       "Fangorn",
       "Gorgoroth",
       "Harondor",
+      "Heart of Mirkwood",
       "High Pass",
       "Hollin",
       "Horse Plains",
@@ -4156,6 +4183,7 @@
       "Northern Rhovanian",
       "Redhorn Gate",
       "Rohan",
+      "Southern Mirkwood",
       "The Shire",
       "Udûn",
       "Western Mirkwood",
@@ -4176,7 +4204,6 @@
       "Combat",
       "Corruption",
       "Deck",
-      "Environment",
       "Hand",
       "Influence",
       "Item",
@@ -4196,9 +4223,11 @@
       "Dunharrow",
       "Eagles' Eyrie",
       "Edoras",
+      "Free-hold",
       "Goblin-gate",
       "Haven",
       "Information!=[Blank]",
+      "Minas Tirith",
       "Moria",
       "Old Forest",
       "Region=Northern Rhovanian",
@@ -4207,13 +4236,17 @@
       "Wellinghall"
     ],
     [
+      "Target Item",
+      "Narsil",
+      "Palantír"
+    ],
+    [
       "Target Species",
       "Animal",
       "Dúnadan",
       "Man",
       "Nazgûl",
       "Orc",
-      "Palantír",
       "Race!=Hobbit",
       "Race!=Hobbit && Race!=Dwarf && Race!=Orc && Race!=Nazgûl",
       "Race!=Hobbit && Race!=Wizard",

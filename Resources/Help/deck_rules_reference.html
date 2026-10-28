@@ -207,8 +207,13 @@
 
     <h3>B. Blank &amp; Missing Value Matching (<code>"[Blank]"</code>)</h3>
     <p>
-        To query cards that have no value assigned for an attribute or category (such as corruption-free items, untagged cards, or characters without home restrictions), use <code>"[Blank]"</code>:
+        To query cards that have no value assigned for an attribute or category, use <code>"[Blank]"</code>:
     </p>
+    <ul>
+        <li><code>"Corruption": "[Blank]"</code> &mdash; Corruption-free weapons and items.</li>
+        <li><code>"Home": "[Blank]"</code> &mdash; Characters with open starting and healing options.</li>
+        <li><code>"Specific": "[Blank]"</code> &mdash; Generic events and items that are not locked to a specific named character or site.</li>
+    </ul>
     <pre><code>"Attributes": {
   "Primary": "Resource",
   "Secondary": "Major Item",

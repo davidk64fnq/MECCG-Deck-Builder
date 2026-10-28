@@ -10,7 +10,7 @@
     <h1>Worked Example: Dynamic Faction Recruitment</h1>
 
     <p>
-        This end-to-end tutorial demonstrates how to build context-aware procedural deck generation templates using branching company themes, variable capture, dynamic placeholders, and automated shortfall fallbacks.
+        This end-to-end tutorial demonstrates how to build context-aware procedural deck generation templates using branching company themes, variable capture, dynamic placeholders, signature character queries, and automated shortfall fallbacks.
     </p>
 
     <!-- SECTION 1: THE GOAL -->
@@ -22,14 +22,16 @@
         We want to create an automated deck rule template that:
     </p>
     <ol>
-        <li>Randomly selects a company theme (e.g. <strong>Dwarf Company</strong> vs. <strong>Elf Company</strong>).</li>
+        <li>Randomly selects a company theme (<strong>Dwarf Company</strong>, <strong>Elf Company</strong>, or <strong>D&uacute;nadan Company</strong>).</li>
         <li>Selects an appropriate starting diplomat leader for that company and captures them into an in-memory variable (<code>"SaveAs": "Leader"</code>).</li>
         <li><strong>Dynamically recruits the specific faction</strong> our leader specializes in influencing by matching the card's title to the leader's tagged bonus (<code>"Name": "{Leader.Category:Faction Bonus}"</code>).</li>
-        <li><strong>Gracefully falls back:</strong> If the randomly chosen leader has no specific faction bonus (e.g. <em>Balin</em>), the generator must detect the shortfall and automatically fall back to recruiting any faction matching that leader's race (<code>"Race": "{Leader.Race}"</code>).</li>
+        <li><strong>Gracefully falls back:</strong> If the randomly chosen leader has no specific faction bonus (e.g. <em>Balin</em>), the generator automatically falls back to recruiting any faction matching that leader's race (<code>"Race": "{Leader.Race}"</code>).</li>
+        <li><strong>Drafts character-specific signature cards:</strong> Dynamically recruits cards tied to the leader using the official <code>Specific</code> attribute (e.g. <em>Return of the King</em> for <em>Aragorn II</em>), while safeguarding generic item queries with <code>"Specific": "[Blank]"</code>.</li>
+        <li><strong>Ensures a legal starting site:</strong> Automatically resolves the leader's origin using <code>"Name": "{Leader.Home}"</code>.</li>
     </ol>
 
     <div class="tip">
-        <strong>Tag Availability Notice:</strong> Character recruiting bonuses are pre-cataloged in the baseline taxonomy file (<code>Rules_Support_Tags.json</code>) loaded automatically on launch. If you want to learn how to scan card text and create these tags yourself, see <a href="taxonomy_extraction_tools.html#worked-example-harvest">Taxonomy Extraction Tools: Extracting Faction Bonuses</a>.
+        <strong>Tag Availability Notice:</strong> Character recruiting bonuses are pre-cataloged in the baseline taxonomy file (<code>Rules_Support_Tags.json</code>) loaded automatically on launch. If you want to learn how to scan card text and create these tags yourself, see <a href="taxonomy_extraction_tools.html#worked-example-factions">Taxonomy Extraction Tools: Extracting Faction Bonuses</a>.
     </div>
 
     <!-- SECTION 2: THE JSON RULE TEMPLATE -->
@@ -156,16 +158,91 @@
               }
             }
           ]
+        },
+        {
+          "Name": "D&uacute;nadan Company",
+          "DeckTitle": "Hero D&uacute;nedain of the North",
+          "Weight": 1,
+          "Rules": [
+            {
+              "Name": "Starting D&uacute;nadan Leader",
+              "SaveAs": "Leader",
+              "Section": "Pool",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "D&uacute;nadan",
+                "Skill": "Diplomat; Ranger"
+              }
+            },
+            {
+              "Name": "D&uacute;nadan Company Members",
+              "Section": "Pool",
+              "Count": 4,
+              "Attributes": {
+                "Primary": "Character",
+                "Race": "D&uacute;nadan"
+              }
+            },
+            {
+              "Name": "Leader's Associated Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Name": "{Leader.Category:Faction Bonus}"
+              },
+              "Fallback": {
+                "Name": "Fallback D&uacute;nadan Faction",
+                "Attributes": {
+                  "Primary": "Resource",
+                  "Secondary": "Faction",
+                  "Race": "{Leader.Race}"
+                }
+              }
+            },
+            {
+              "Name": "Secondary D&uacute;nadan Faction",
+              "Section": "Resources",
+              "Count": 1,
+              "Attributes": {
+                "Primary": "Resource",
+                "Secondary": "Faction",
+                "Race": "D&uacute;nadan"
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "Name": "Standard Resource Items",
+      "Name": "Leader's Signature Card",
       "Section": "Resources",
-      "Count": 8,
+      "Count": 1,
       "Attributes": {
         "Primary": "Resource",
-        "Secondary": "Major Item; Minor Item"
+        "Specific": "{Leader.Name}"
+      },
+      "Fallback": {
+        "Name": "Fallback Open Resource",
+        "Attributes": {
+          "Primary": "Resource",
+          "Specific": "[Blank]"
+        },
+        "Categories": {
+          "Role": "Influence"
+        }
+      }
+    },
+    {
+      "Name": "Standard Resource Items",
+      "Section": "Resources",
+      "Count": 7,
+      "Attributes": {
+        "Primary": "Resource",
+        "Secondary": "Major Item; Minor Item",
+        "Specific": "[Blank]"
       }
     },
     {
@@ -178,9 +255,18 @@
       }
     },
     {
+      "Name": "Leader's Starting Site",
+      "Section": "Sites",
+      "Count": 1,
+      "Attributes": {
+        "Primary": "Site",
+        "Name": "{Leader.Home}"
+      }
+    },
+    {
       "Name": "Movement Sites",
       "Section": "Sites",
-      "Count": 15,
+      "Count": 14,
       "Attributes": {
         "Primary": "Site"
       }
@@ -191,10 +277,12 @@
     <div class="note">
         <strong>Template Mechanics Walkthrough:</strong>
         <ul>
-            <li><strong>Randomized Thematic Branches (<code>RandomChoice</code>):</strong> Evaluates a weighted random choice between Dwarf and Elf companies, applying the selected branch's rules and updating the deck title dynamically.</li>
-            <li><strong>Variable Capture (<code>"SaveAs": "Leader"</code>):</strong> Captures whichever diplomat is randomly selected into an execution context for downstream rules.</li>
+            <li><strong>Randomized Thematic Branches (<code>RandomChoice</code>):</strong> Evaluates a weighted random choice among Dwarf, Elf, and D&uacute;nadan companies, updating the deck title dynamically.</li>
+            <li><strong>Variable Capture (<code>"SaveAs": "Leader"</code>):</strong> Captures whichever diplomat is sampled into an execution context for downstream queries.</li>
             <li><strong>Querying Card Titles (<code>"Name": "{Leader.Category:Faction Bonus}"</code>):</strong> Queries published faction cards by title using the captured leader's assigned category tag.</li>
-            <li><strong>Automated Shortfall Fallbacks (<code>Fallback</code>):</strong> If the captured leader has no bonus tag, the query returns 0 cards; the engine detects the shortfall and immediately executes the fallback rule for the remaining count (recruiting a faction by <code>{Leader.Race}</code>).</li>
+            <li><strong>Dynamic Signature Recruitment (<code>"Specific": "{Leader.Name}"</code>):</strong> If <em>Aragorn II</em> is selected as the D&uacute;nadan leader, the rule automatically drafts <em>Return of the King</em>. If the leader has no signature cards, the shortfall fallback drafts a general influence resource instead.</li>
+            <li><strong>Blank Filtering (<code>"Specific": "[Blank]"</code>):</strong> Prevents non-matching companies from accidentally drawing signature cards in open item queries.</li>
+            <li><strong>Universal Starting Site (<code>"Name": "{Leader.Home}"</code>):</strong> Evaluates the leader's home (whether a fixed haven or dynamic predicate) to guarantee the starting site is in the deck.</li>
         </ul>
     </div>
 
@@ -206,8 +294,9 @@
             Review the generation summary dialog to observe context-aware recruitment:
             <ul>
                 <li><strong>Scenario A (Leader has Specific Tag):</strong> If the engine samples <em>D&aacute;in II</em>, the primary rule resolves <code>Name: Iron Hill Dwarves</code> and adds it directly to Resources.</li>
-                <li><strong>Scenario B (Leader has Universal Bonus / Wildcard):</strong> If the engine samples a universal diplomat like <em>Adrazar</em>, the token resolves to <code>Name: All</code>. The generator recognizes <code>All</code> as a wildcard and selects a random faction from any faction present in your active expansions.</li>
+                <li><strong>Scenario B (Leader has Universal Bonus / Wildcard):</strong> If the engine chooses the D&uacute;nadan company and samples a universal diplomat like <em>Adrazar</em>, the token resolves to <code>Name: All</code>. The generator recognizes <code>All</code> as a wildcard and selects a random faction from any faction present in your active expansions.</li>
                 <li><strong>Scenario C (Leader has no Tag):</strong> If the engine samples a leader without a bonus tag (such as <em>Balin</em>), the primary rule resolves to blank, adds 0 cards, and immediately hands off to the <code>Fallback</code> rule. The fallback resolves <code>Race: Dwarf</code> and recruits a generic faction (such as <em>Blue Mountain Dwarves</em>).</li>
+                <li><strong>Scenario D (Leader has Signature Card):</strong> If the engine chooses the D&uacute;nadan company and rolls <em>Aragorn II</em>, <code>Specific: {Leader.Name}</code> matches and drafts <em>Return of the King</em> into Resources, alongside his starting site <em>Rivendell</em> (via <code>{Leader.Home}</code>).</li>
             </ul>
         </li>
         <li>Press <kbd>F5</kbd> (<strong>Deck &gt; Re-run Deck Rules</strong>) to instantly re-execute the file and generate new randomized variations.</li>

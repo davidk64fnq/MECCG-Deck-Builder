@@ -191,5 +191,51 @@
     "Role": "Exhaustion"
   }
 }</code></pre>
+    <!-- RECIPE 8: CHARACTER SIGNATURE CARDS -->
+    <h2>8. Dynamic Leader Signature Cards (Using <code>Specific</code>)</h2>
+    <p>
+        Certain powerful resource cards can only be played if a specific unique character is in your company (such as <em>Return of the King</em> for <em>Aragorn II</em>). You can dynamically draft signature cards tailored to whatever leader is randomly chosen—without hardcoding card titles:
+    </p>
+
+    <h3>A. Dynamic Signature Event Recruitment</h3>
+    <pre><code>{
+  "Name": "Leader's Unique Signature Card",
+  "Section": "Resources",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Resource",
+    "Specific": "{Leader.Name}"
+  },
+  "Fallback": {
+    "Name": "Generic Utility Influence",
+    "Attributes": {
+      "Primary": "Resource",
+      "Specific": "[Blank]"
+    },
+    "Categories": {
+      "Role": "Influence"
+    }
+  }
+}</code></pre>
+    <p>
+        If the captured leader is <em>Aragorn II</em>, <code>{Leader.Name}</code> resolves to <code>"Aragorn II"</code>, matching and drafting <em>Return of the King</em>. If the leader has no signature cards (such as <em>Balin</em>), the query finds 0 matches and cleanly executes the fallback.
+    </p>
+
+    <h3>B. Excluding Signature Cards from Generic Draws</h3>
+    <p>
+        To prevent a generic resource query from accidentally drafting <em>Return of the King</em> into a deck led by <em>Gimli</em>, query <code>"Specific": "[Blank]"</code>:
+    </p>
+    <pre><code>{
+  "Name": "Open Utility Resources",
+  "Section": "Resources",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Resource",
+    "Specific": "[Blank]"
+  },
+  "Categories": {
+    "Role": "Influence"
+  }
+}</code></pre>
 </body>
 </html>
