@@ -182,8 +182,15 @@
         </tr>
         <tr>
             <td><code>Home</code></td>
-            <td>Designated starting, recruiting, or healing site(s) for character cards. Multiple homes are split and indexed individually. Filter for <code>[Blank]</code> to audit characters with dynamic or regional home rules.</td>
-            <td><code>Rivendell</code>, <code>Bree</code>, <code>Edoras</code>, <code>L&oacute;rien</code>, <code>Pelargir</code>, <code>Woodland Realm</code>, <code>[Blank]</code></td>
+            <td>
+                Designated starting, recruiting, or healing site(s) for character cards. Multiple homes are split and indexed individually.<br /><br />
+                <em>Structured Home Predicates:</em> Standard characters store exact site names (e.g. <code>Rivendell</code>, <code>Minas Tirith</code>). Dynamic characters with open starting conditions store machine-actionable rules predicates directly in this field (e.g. <code>Site=Haven</code> for Wizards, <code>Site=Dark-hold</code> for Minion Orcs, <code>Region=Nurn</code> for Akh&ocirc;rahil, or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code> for Under-deeps creatures). This enables procedural deck templates to query <code>"Name": "{Leader.Home}"</code> universally without fallback rules.
+            </td>
+            <td>
+                <code>Rivendell</code>, <code>Bree</code>, <code>Edoras</code>, <code>Pelargir</code><br />
+                <code>Site=Haven</code>, <code>Site=Dark-hold</code>, <code>Region=Nurn</code><br />
+                <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>, <code>[Blank]</code>
+            </td>
         </tr>
         <tr>
             <td><code>Information</code></td>

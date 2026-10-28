@@ -281,13 +281,13 @@
         A candidate card matches if it satisfies the dynamic predicate (e.g. <em>Cirith Gorgor</em> matches <code>Region=Ud&ucirc;n</code>) <strong>OR</strong> matches any of the literal card titles.
     </p>
 
-    <p><em>Example B &mdash; Compound AND Logic (via Tag Expansion):</em></p>
+    <p><em>Example B &mdash; Compound AND Logic (via Predicate Expansion):</em></p>
     <pre><code>"Attributes": {
   "Primary": "Site",
-  "Name": "{Orc.Category:Resolved Site}"
+  "Name": "{Orc.Home}"
 }</code></pre>
     <p>
-        If <em>Crook-legged Orc</em> is captured as <code>{Orc}</code> and tagged with <code>Resolved Site: Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>, candidate cards must be located in the Under-deeps <strong>AND</strong> must not be a Dark-hold.
+        If <em>Crook-legged Orc</em> is captured as <code>{Orc}</code> and carries <code>Home: Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>, candidate cards must be located in the Under-deeps <strong>AND</strong> must not be a Dark-hold.
     </p>
 
     <div class="note">

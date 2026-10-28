@@ -376,7 +376,6 @@
       "Home Region": "Anfalas; Lindon; Rhudaur; Wold & Foothills",
       "id": "40",
       "name": "Gandalf",
-      "Resolved Site": "Site=Haven",
       "set": "METW"
     },
     {
@@ -563,7 +562,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1804",
       "name": "Doeth - Durthak",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MEWH"
     },
     {
@@ -571,7 +569,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1805",
       "name": "Euog - Ulzog",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MEWH"
     },
     {
@@ -579,7 +576,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1233",
       "name": "Horseman in the Night",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -587,7 +583,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1807",
       "name": "Ill-favoured Fellow",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MEWH"
     },
     {
@@ -595,7 +590,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1247",
       "name": "Old Troll",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -603,7 +597,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1248",
       "name": "Orc Brawler",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -611,7 +604,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1249",
       "name": "Orc Captain",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -619,7 +611,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1250",
       "name": "Orc Chieftain",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -627,7 +618,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1251",
       "name": "Orc Sniffler",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -635,7 +625,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1252",
       "name": "Orc Tracker",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -643,7 +632,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1253",
       "name": "Orc Veteran",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -651,7 +639,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1812",
       "name": "Sly Southerner",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MEWH"
     },
     {
@@ -659,7 +646,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1813",
       "name": "Squint-eyed Brute",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MEWH"
     },
     {
@@ -667,7 +653,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1265",
       "name": "Troll Lout",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -675,7 +660,6 @@
       "Home Region": "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
       "id": "1266",
       "name": "Troll-chief",
-      "Resolved Site": "Site=Dark-hold",
       "set": "MELE"
     },
     {
@@ -683,7 +667,6 @@
       "Home Region": "Anduin Vales; Anórien; Arthedain; Belfalas; Fangorn; High Pass; Iron Hills; Lebennin; Lindon; Rohan; Woodland Realm",
       "id": "1806",
       "name": "Gandalf",
-      "Resolved Site": "Site=Free-hold",
       "set": "MEWH"
     },
     {
@@ -2642,7 +2625,6 @@
       "Home Region": "Andrast; Arthedain; Cardolan; Enedhwaith; Forochel; Harondor; Heart of Mirkwood; Hollin; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Wold & Foothills",
       "id": "1803",
       "name": "Alatar",
-      "Resolved Site": "Site=Ruins & Lairs && Automatic Attack!=Dragon && Region Type=Wilderness",
       "set": "MEWH"
     },
     {
@@ -2650,7 +2632,6 @@
       "Home Region": "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
       "id": "1633",
       "name": "Bûrat",
-      "Resolved Site": "Site=Ruins & Lairs && Region!=Under-deeps",
       "set": "MEAS"
     },
     {
@@ -2658,7 +2639,6 @@
       "Home Region": "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
       "id": "1637",
       "name": "Tûma",
-      "Resolved Site": "Site=Ruins & Lairs && Region!=Under-deeps",
       "set": "MEAS"
     },
     {
@@ -2666,7 +2646,6 @@
       "Home Region": "Andrast; Anduin Vales; Arthedain; Brown Lands; Cardolan; Dagorlad; Elven Shores; Enedhwaith; Eriadoran Coast; Forochel; Gap of Isen; Grey Mountain Narrows; Harondor; Heart of Mirkwood; Hollin; Horse Plains; Mouths of the Anduin; Northern Rhovanion; Old Pûkel Gap; Redhorn Gate; Rhudaur; Southern Rhovanion; Withered Heath; Wold & Foothills",
       "id": "1638",
       "name": "Wûluag",
-      "Resolved Site": "Site=Ruins & Lairs && Region!=Under-deeps",
       "set": "MEAS"
     },
     {
@@ -2674,7 +2653,6 @@
       "Home Region": "Under-deeps",
       "id": "1928",
       "name": "Crook-legged Orc",
-      "Resolved Site": "Region=Under-deeps && Site!=Dark-hold",
       "set": "MEBA"
     },
     {
@@ -2682,7 +2660,6 @@
       "Home Region": "Under-deeps",
       "id": "1929",
       "name": "Hill-troll",
-      "Resolved Site": "Region=Under-deeps && Site!=Dark-hold",
       "set": "MEBA"
     },
     {
@@ -2690,7 +2667,6 @@
       "Home Region": "Under-deeps",
       "id": "1930",
       "name": "Mountain-maggot",
-      "Resolved Site": "Region=Under-deeps && Site!=Dark-hold",
       "set": "MEBA"
     },
     {
@@ -2698,7 +2674,6 @@
       "Home Region": "Udûn",
       "id": "1225",
       "name": "Dwar the Ringwraith",
-      "Resolved Site": "Region=Udûn",
       "set": "MELE"
     },
     {
@@ -2706,7 +2681,6 @@
       "Home Region": "Udûn",
       "id": "1232",
       "name": "Hoarmûrath the Ringwraith",
-      "Resolved Site": "Region=Udûn",
       "set": "MELE"
     },
     {
@@ -2714,7 +2688,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1228",
       "name": "Grishnákh",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2722,7 +2695,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1237",
       "name": "Lagduf",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2730,7 +2702,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1243",
       "name": "Muzgash",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2738,7 +2709,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1256",
       "name": "Radbug",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2746,7 +2716,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1260",
       "name": "Snaga",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2754,7 +2723,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1263",
       "name": "The Witch-king",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2762,7 +2730,6 @@
       "Home Region": "Imlad Morgul",
       "id": "1269",
       "name": "Ufthak",
-      "Resolved Site": "Region=Imlad Morgul",
       "set": "MELE"
     },
     {
@@ -2770,7 +2737,6 @@
       "Home Region": "Imlad Morgul; Udûn",
       "id": "1234",
       "name": "Indûr the Ringwraith",
-      "Resolved Site": "Region=Imlad Morgul; Region=Udûn",
       "set": "MELE"
     },
     {
@@ -2778,7 +2744,6 @@
       "Home Region": "Gorgoroth",
       "id": "1257",
       "name": "Ren the Ringwraith",
-      "Resolved Site": "Region=Gorgoroth",
       "set": "MELE"
     },
     {
@@ -2786,7 +2751,6 @@
       "Home Region": "Anfalas; Lindon; Rhudaur; Wold & Foothills",
       "id": "857",
       "name": "Thráin II",
-      "Resolved Site": "Site=Haven",
       "set": "METD"
     },
     {
@@ -2794,7 +2758,6 @@
       "Home Region": "Khand",
       "id": "1271",
       "name": "Ûvatha the Ringwraith",
-      "Resolved Site": "Region=Khand",
       "set": "MELE"
     },
     {
@@ -3548,89 +3511,89 @@
       "fullCode": "Bill the Pony (TW)",
       "id": "249",
       "name": "Bill the Pony",
-      "Playable Region": "Arthedain; The Shire",
-      "Playable Site": "Bag End; Bree",
-      "set": "METW"
+      "Region Requirement": "Arthedain; The Shire",
+      "set": "METW",
+      "Site Requirement": "Bag End; Bree"
     },
     {
       "fullCode": "Goldberry (TW)",
       "id": "295",
       "name": "Goldberry",
-      "Playable Region": "Cardolan",
-      "Playable Site": "Old Forest",
-      "set": "METW"
+      "Region Requirement": "Cardolan",
+      "set": "METW",
+      "Site Requirement": "Old Forest"
     },
     {
       "fullCode": "Gollum (TW)",
       "id": "296",
       "name": "Gollum",
-      "Playable Region": "High Pass; Redhorn Gate",
-      "Playable Site": "Goblin-gate; Moria",
-      "set": "METW"
+      "Region Requirement": "High Pass; Redhorn Gate",
+      "set": "METW",
+      "Site Requirement": "Goblin-gate; Moria"
     },
     {
       "fullCode": "Gwaihir (TW)",
       "id": "301",
       "name": "Gwaihir",
-      "Playable Region": "Anduin Vales",
-      "Playable Site": "Eagles' Eyrie",
-      "set": "METW"
+      "Region Requirement": "Anduin Vales",
+      "set": "METW",
+      "Site Requirement": "Eagles' Eyrie"
     },
     {
       "fullCode": "Leaflock (TW)",
       "id": "315",
       "name": "Leaflock",
-      "Playable Region": "Fangorn",
-      "Playable Site": "Wellinghall",
-      "set": "METW"
+      "Region Requirement": "Fangorn",
+      "set": "METW",
+      "Site Requirement": "Wellinghall"
     },
     {
       "fullCode": "Quickbeam (TW)",
       "id": "357",
       "name": "Quickbeam",
-      "Playable Region": "Fangorn",
-      "Playable Site": "Wellinghall",
-      "set": "METW"
+      "Region Requirement": "Fangorn",
+      "set": "METW",
+      "Site Requirement": "Wellinghall"
     },
     {
       "fullCode": "Roäc the Raven (TW)",
       "id": "369",
       "name": "Roäc the Raven",
-      "Playable Region": "Northern Rhovanian",
-      "Playable Site": "Region=Northern Rhovanian",
-      "set": "METW"
+      "Region Requirement": "Northern Rhovanian",
+      "set": "METW",
+      "Site Requirement": "Region=Northern Rhovanian"
     },
     {
       "fullCode": "Shadowfax (TW)",
       "id": "375",
       "name": "Shadowfax",
-      "Playable Region": "Rohan",
-      "Playable Site": "Dunharrow; Edoras",
-      "set": "METW"
+      "Region Requirement": "Rohan",
+      "set": "METW",
+      "Site Requirement": "Dunharrow; Edoras"
     },
     {
       "fullCode": "Skinbark (TW)",
       "id": "377",
       "name": "Skinbark",
-      "Playable Region": "Fangorn",
-      "Playable Site": "Wellinghall",
-      "set": "METW"
+      "Region Requirement": "Fangorn",
+      "set": "METW",
+      "Site Requirement": "Wellinghall"
     },
     {
       "fullCode": "Tom Bombadil (TW)",
       "id": "399",
       "name": "Tom Bombadil",
-      "Playable Region": "Cardolan",
-      "Playable Site": "Old Forest",
-      "set": "METW"
+      "Region Requirement": "Cardolan",
+      "set": "METW",
+      "Site Requirement": "Old Forest"
     },
     {
       "fullCode": "Treebeard (TW)",
       "id": "402",
       "name": "Treebeard",
-      "Playable Region": "Fangorn",
-      "Playable Site": "Wellinghall",
-      "set": "METW"
+      "Region Requirement": "Fangorn",
+      "set": "METW",
+      "Site Requirement": "Wellinghall"
     },
     {
       "Environment Stance": "Doors of Night",
@@ -3647,7 +3610,7 @@
       "name": "Fell Winter",
       "Role": "Automatic Attack; Terrain",
       "set": "METW",
-      "Target Site": "Border-hold",
+      "Site Requirement": "Border-hold",
       "Target Species": "Wolf"
     },
     {
@@ -3738,7 +3701,7 @@
       "name": "Awaken Denizens",
       "Role": "Automatic Attack",
       "set": "METW",
-      "Target Site": "Ruins & Lairs"
+      "Site Requirement": "Ruins & Lairs"
     },
     {
       "fullCode": "Awaken Minions (TW)",
@@ -3746,7 +3709,7 @@
       "name": "Awaken Minions",
       "Role": "Automatic Attack",
       "set": "METW",
-      "Target Site": "Dark-hold; Shadow-hold"
+      "Site Requirement": "Dark-hold; Shadow-hold"
     },
     {
       "fullCode": "Eye of Sauron (TW)",
@@ -3761,7 +3724,7 @@
       "name": "Elf-song",
       "Role": "Corruption; Protection",
       "set": "METW",
-      "Target Site": "Haven"
+      "Site Requirement": "Haven"
     },
     {
       "fullCode": "Lapse of Will (TW)",
@@ -3806,7 +3769,7 @@
       "fullCode": "Adûnaphel (TW)",
       "id": "73",
       "name": "Adûnaphel",
-      "Playable Region": "Brown Lands; Dagorlad; Gorgoroth; Western Mirkwood",
+      "Region Requirement": "Brown Lands; Dagorlad; Gorgoroth; Western Mirkwood",
       "Role": "Readiness",
       "set": "METW"
     },
@@ -3814,7 +3777,7 @@
       "fullCode": "Akhôrahil (TW)",
       "id": "75",
       "name": "Akhôrahil",
-      "Playable Region": "Gorgoroth; Harondor; Horse Plains; Khand",
+      "Region Requirement": "Gorgoroth; Harondor; Horse Plains; Khand",
       "Role": "Combat",
       "set": "METW"
     },
@@ -3830,19 +3793,19 @@
       "fullCode": "Andúril, the Flame of the West (TW)",
       "id": "243",
       "name": "Andúril, the Flame of the West",
-      "Playable Site": "Information!=[Blank]",
       "Role": "Combat; Influence; Quest; Readiness",
       "set": "METW",
+      "Site Requirement": "Information!=[Blank]",
       "Target Species": "Dúnadan"
     },
     {
       "fullCode": "Balrog of Moria (TW)",
       "id": "83",
       "name": "Balrog of Moria",
+      "Region Requirement": "Hollin; Redhorn Gate; Wold & Foothills",
       "Role": "Automatic Attack; Site",
       "set": "METW",
-      "Target Region": "Hollin; Redhorn Gate; Wold & Foothills",
-      "Target Site": "Moria"
+      "Site Requirement": "Moria"
     },
     {
       "fullCode": "Bane of the Ithil-stone (TW)",
@@ -3871,15 +3834,15 @@
       "fullCode": "Dreams of Lore (TW)",
       "id": "261",
       "name": "Dreams of Lore",
-      "Playable Site": "Information!=[Blank]",
       "Role": "Quest",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Information!=[Blank]"
     },
     {
       "fullCode": "Dwar of Waw (TW)",
       "id": "101",
       "name": "Dwar of Waw",
-      "Playable Region": "Gorgoroth; Harondor; Imlad Morgul; Ithilien",
+      "Region Requirement": "Gorgoroth; Harondor; Imlad Morgul; Ithilien",
       "Role": "Combat",
       "set": "METW",
       "Target Species": "Animal; Spider; Wolf"
@@ -3890,7 +3853,7 @@
       "name": "Fellowship",
       "Role": "Combat; Corruption",
       "set": "METW",
-      "Target Site": "Haven"
+      "Site Requirement": "Haven"
     },
     {
       "fullCode": "Gates of Morning (TW)",
@@ -3903,14 +3866,14 @@
       "fullCode": "Hoarmûrath of Dír (TW)",
       "id": "115",
       "name": "Hoarmûrath of Dír",
-      "Playable Region": "Dagorlad; Gorgoroth; Ithilien; Khand",
+      "Region Requirement": "Dagorlad; Gorgoroth; Ithilien; Khand",
       "set": "METW"
     },
     {
       "fullCode": "Indûr Dawndeath (TW)",
       "id": "117",
       "name": "Indûr Dawndeath",
-      "Playable Region": "Gorgoroth; Harondor; Imlad Morgul; Khand",
+      "Region Requirement": "Gorgoroth; Harondor; Imlad Morgul; Khand",
       "Role": "Item",
       "set": "METW"
     },
@@ -3918,7 +3881,7 @@
       "fullCode": "Khamûl the Easterling (TW)",
       "id": "118",
       "name": "Khamûl the Easterling",
-      "Playable Region": "Gorgoroth; Harondor; Imlad Morgul; Khand",
+      "Region Requirement": "Gorgoroth; Harondor; Imlad Morgul; Khand",
       "Role": "Hand",
       "set": "METW"
     },
@@ -3928,7 +3891,7 @@
       "name": "Lure of Creation",
       "Role": "Corruption",
       "set": "METW",
-      "Target Site": "Haven",
+      "Site Requirement": "Haven",
       "Target Species": "Wizard"
     },
     {
@@ -3966,11 +3929,10 @@
       "fullCode": "Morannon (TW)",
       "id": "336",
       "name": "Morannon",
-      "Playable Region": "Dagorlad",
+      "Region Requirement": "Dagorlad; Udûn",
       "Role": "Movement; Site",
       "set": "METW",
-      "Target Region": "Udûn",
-      "Target Site": "Dark-hold"
+      "Site Requirement": "Dark-hold"
     },
     {
       "fullCode": "Morgul-knife (TW)",
@@ -3984,10 +3946,9 @@
       "fullCode": "Reforging (TW)",
       "id": "363",
       "name": "Reforging",
-      "Playable Site": "Information!=[Blank]",
       "Role": "Item; Quest",
       "set": "METW",
-      "Target Site": "Haven"
+      "Site Requirement": "Haven; Information!=[Blank]"
     }
   ],
   "Filters": [
@@ -4177,7 +4138,7 @@
       "Woodland Realm"
     ],
     [
-      "Playable Region",
+      "Region Requirement",
       "Anduin Vales",
       "Arthedain",
       "Brown Lands",
@@ -4187,6 +4148,7 @@
       "Gorgoroth",
       "Harondor",
       "High Pass",
+      "Hollin",
       "Horse Plains",
       "Imlad Morgul",
       "Ithilien",
@@ -4195,21 +4157,9 @@
       "Redhorn Gate",
       "Rohan",
       "The Shire",
-      "Western Mirkwood"
-    ],
-    [
-      "Playable Site",
-      "Bag End",
-      "Bree",
-      "Dunharrow",
-      "Eagles' Eyrie",
-      "Edoras",
-      "Goblin-gate",
-      "Information!=[Blank]",
-      "Moria",
-      "Old Forest",
-      "Region=Northern Rhovanian",
-      "Wellinghall"
+      "Udûn",
+      "Western Mirkwood",
+      "Wold & Foothills"
     ],
     [
       "Region Type",
@@ -4219,30 +4169,6 @@
       "Free-domain",
       "Shadow-land",
       "Wilderness"
-    ],
-    [
-      "Resolved Site",
-      "Ancient Deep-hold; Remains of Thangorodrim; The Drowning-deeps; The Gem-deeps; The Pûkel-deeps; The Rusted-deeps; The Under-gates; The Under-grottos; The Under-leas; The Under-vaults; The Wind-deeps",
-      "Bag End; Beorn's House; Blue Mountain Dwarf-hold; Dol Amroth; Eagles' Eyrie; Edhellond; Edoras; Grey Havens; Iron Hill Dwarf-hold; Lórien; Minas Tirith; Pelargir; Rhosgobel; Rivendell; Thranduil's Halls; Wellinghall",
-      "Bandit Lair; Barrow-downs; Buhr Widu; Caves of Ülund; Dancing Spire; Dead Marshes; Dimrill Dale; Ettenmoors; Framsburg; Gladden Fields; Glittering Caves; Gold Hill; Haudh-in-Gwanûr; Hermit's Hill; Himring; Irerock; Isles of the Dead that Live; Lossadan Cairn; Old Forest; Ost-in-Edhil; Raider-hold; Ruined Signal Tower; Sarn Goriwing; Stone-circle; Tharbad; The Lonely Mountain; The Stones; The Wind Throne; The Worthy Hills; Tolfalas; Weathertop",
-      "Barad-dûr; Carn Dûm; Cirith Gorgor; Cirith Ungol; Dol Guldur; Minas Morgul; Urlurtsu Nurn",
-      "Barad-dûr; Mount Doom",
-      "Cirith Gorgor",
-      "Cirith Gorgor; Cirith Ungol; Minas Morgul; Shelob's Lair",
-      "Cirith Ungol; Minas Morgul; Shelob's Lair",
-      "Edhellond; Grey Havens; Lórien; Rivendell",
-      "Region=Gorgoroth",
-      "Region=Imlad Morgul",
-      "Region=Khand",
-      "Region=Udûn",
-      "Region=Under-deeps && Site!=Dark-hold",
-      "Site=Dark-hold",
-      "Site=Free-hold",
-      "Site=Haven",
-      "Site=Ruins & Lairs && Automatic Attack!=Dragon && Region Type=Wilderness",
-      "Site=Ruins & Lairs && Region!=Under-deeps",
-      "Tharbad",
-      "Variag Camp"
     ],
     [
       "Role",
@@ -4262,20 +4188,23 @@
       "Terrain"
     ],
     [
-      "Target Region",
-      "Hollin",
-      "Redhorn Gate",
-      "Udûn",
-      "Wold & Foothills"
-    ],
-    [
-      "Target Site",
+      "Site Requirement",
+      "Bag End",
       "Border-hold",
+      "Bree",
       "Dark-hold",
+      "Dunharrow",
+      "Eagles' Eyrie",
+      "Edoras",
+      "Goblin-gate",
       "Haven",
+      "Information!=[Blank]",
       "Moria",
+      "Old Forest",
+      "Region=Northern Rhovanian",
       "Ruins & Lairs",
-      "Shadow-hold"
+      "Shadow-hold",
+      "Wellinghall"
     ],
     [
       "Target Species",

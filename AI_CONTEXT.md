@@ -56,9 +56,9 @@
 3. **Procedural Rule Schema Symmetry:**
    - `"Attributes"`: Dictionary of official criteria (`Attribute: Value`, e.g. `{"Race": "Dwarf"}`).
    - `"Categories"`: Dictionary of custom criteria (`Category: Tag`, e.g. `{"Faction Bonus": "Wood-elves"}`).
-   - Placeholders: `{Variable.AttributeName}` for official attributes, `{Variable.Category:CategoryName}` (or `{Variable.Tag:...}`) for custom tags.
-   - Dynamic Predicates: Evaluates `Attribute=Value`, `Attribute!=Value`, and compound `&&` logic (e.g. `Region=Under-deeps && Site!=Dark-hold`, `Site=Haven`, `Adjacent Sites!=[Blank]`) against candidate cards dynamically, with diacritic resilience and canonical hold-type normalization.
-   - Multi-Card Union Sets: Rules capturing multiple cards via `SaveAs` resolve placeholders into deduplicated, semicolon-delimited `OR` lists.
+   - Placeholders: `{Variable.AttributeName}` for official attributes (including `{Variable.Home}` resolving both named sites and dynamic predicates), `{Variable.Category:CategoryName}` (or `{Variable.Tag:...}`) for custom tags.
+   - Dynamic Predicates: Evaluates `Attribute=Value`, `Attribute!=Value`, and compound `&&` logic (e.g. `Region=Under-deeps && Site!=Dark-hold`, `Site=Haven`, `Site=Dark-hold`, `Adjacent Sites!=[Blank]`) against candidate cards dynamically, with diacritic resilience and canonical hold-type normalization.
+   - Consolidated Geography Categories: Location rules unified into `Site Requirement` and `Region Requirement` for cards in scope, with `Home Region` preserved for character origin joins.
 4. **Core Workflow Menu Hierarchy:**
    - **Deck:** `New Deck` (<kbd>Ctrl+N</kbd>), `Open Deck...` (<kbd>Ctrl+O</kbd>), `Save Deck` (<kbd>Ctrl+S</kbd>), `Save Deck As...`, `Generate from Rules...` (<kbd>Ctrl+G</kbd>), `Re-run Deck Rules` (<kbd>F5</kbd>), `Export Deck...` (<kbd>Ctrl+E</kbd>), `Exit`.
    - **Catalog:** `Select All Expansions`, `Clear All Expansions`, expansion checkboxes, `Download Card Artwork...`.
@@ -97,6 +97,7 @@
   - [x] Issue #35: Normalize Creature Race Attributes to Singular in CardCatalogService and Align Automatic Attack Tags
   - [x] Issue #36: Support Dynamic Attribute Predicate Selectors (Attribute=Value) in Custom Taxonomy Tags and Deck Generation
   - [x] Issue #37: Broaden Cross-Card Lookup to Support Custom Categories and Region Type Taxonomy
+  - [x] Issue #38: Consolidate Site/Region Requirement Taxonomy and Model Dynamic Character Homes as Native Predicates
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

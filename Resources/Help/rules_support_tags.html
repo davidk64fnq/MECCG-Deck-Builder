@@ -14,15 +14,15 @@
     </p>
     <ul>
         <li>
-            <strong><code>cards-dc.json</code> (Core Catalog):</strong> The official card database containing printed rules statistics (Primary, Alignment, Race, Skills, Mind, Prowess, etc.), normalized into canonical singular creature species.
+            <strong><code>cards-dc.json</code> (Core Catalog):</strong> The official card database containing printed rules statistics (Primary, Alignment, Race, Skills, Mind, Prowess, etc.), with normalized creature species and structured, machine-actionable <code>Home</code> site predicates.
         </li>
         <li>
-            <strong><code>Rules_Support_Tags.json</code> (Rules Intelligence Layer):</strong> A companion taxonomy dataset authored to bridge unstructured card text into queryable taxonomy tags—mapping site automatic attacks, character recruiting bonuses, and home site resolutions so that generic procedural deck rules can generate legal, themed decks automatically.
+            <strong><code>Rules_Support_Tags.json</code> (Rules Intelligence Layer):</strong> A companion taxonomy dataset authored to bridge unstructured card text into queryable taxonomy tags—mapping site automatic attacks, character recruiting bonuses, and event requirements so that generic procedural deck rules can generate legal, themed decks automatically.
         </li>
     </ul>
 
     <div class="tip">
-        <strong>Pre-Packaged Developer Baseline:</strong> All categories, tags, and site resolutions listed in this reference are <strong>already completed and pre-packaged</strong>. You do not need to run any extractions or tag any cards—the procedural deck generator and filter dropdowns can use these categories immediately upon opening the app.
+        <strong>Pre-Packaged Developer Baseline:</strong> All categories and tags listed in this reference are <strong>already completed and pre-packaged</strong>. You do not need to run any extractions or tag any cards—the procedural deck generator and filter dropdowns can use these categories immediately upon opening the app.
     </div>
 
     <!-- SECTION 1: PERSISTENCE OPTIONS -->
@@ -167,20 +167,6 @@
             </td>
         </tr>
         <tr>
-            <td><code>Resolved Site</code></td>
-            <td>
-                Over 95% of characters have a specific named location printed as their home site. For cards with non-specific, regional, or dynamic home rules, the <code>Resolved Site</code> tag assigns dynamic rules predicates that resolve against the active catalog at runtime.
-            </td>
-            <td>
-                <ul>
-                    <li><em>Gandalf</em> (<em>"Any Haven"</em>) &rarr; <code>Site=Haven</code></li>
-                    <li><em>Durthak</em> (<em>"Any Dark-hold"</em>) &rarr; <code>Site=Dark-hold</code></li>
-                    <li><em>Hill-troll</em> &rarr; <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code></li>
-                    <li><em>Ren the Ringwraith</em> &rarr; <code>Region=Gorgoroth</code></li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
             <td><code>Role</code></td>
             <td>
                 Classifies the primary game mechanism a card executes. Symmetrical across card alignments—the card's <code>Primary</code> type (<em>Resource</em> vs. <em>Hazard</em>) naturally dictates whether the mechanism aids the company or hinders the opponent.
@@ -251,6 +237,9 @@
     </p>
 
     <h3>A. Universal Starting Site Rule (Handling Standard &amp; Dynamic Characters)</h3>
+    <p>
+        Because dynamic home rules are modeled directly as predicates in the official <code>Home</code> attribute (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>), a single rule recruits legal starting sites for 100% of characters with zero boilerplate:
+    </p>
     <pre><code>{
   "Name": "Leader's Starting Site",
   "Section": "Sites",
@@ -258,27 +247,20 @@
   "Attributes": {
     "Primary": "Site",
     "Name": "{Leader.Home}"
-  },
-  "Fallback": {
-    "Name": "Dynamic Home Resolution Fallback",
-    "Attributes": {
-      "Primary": "Site",
-      "Name": "{Leader.Category:Resolved Site}"
-    }
   }
 }</code></pre>
 
     <div class="note">
         <strong>Execution Walkthrough:</strong>
         <ul>
-            <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The primary rule finds the site and succeeds; the fallback is skipped.</li>
-            <li><strong>Dynamic Characters (Doeth, Gandalf, Crook-legged Orc):</strong> <code>{Leader.Home}</code> resolves to a generic description (e.g. <code>"Any Haven"</code> or <code>"any non-Dark-hold Under-deeps site"</code>), matching 0 cards. The engine catches the shortfall, triggers the <code>Fallback</code>, and dynamically evaluates the predicate from <code>{Leader.Category:Resolved Site}</code> (e.g. <code>Site=Haven</code> or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>), drawing randomly from all matching sites available in your active expansions without hardcoded site lists!</li>
+            <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The rule finds the site and succeeds.</li>
+            <li><strong>Dynamic Characters (Gandalf, Doeth, Crook-legged Orc):</strong> <code>{Leader.Home}</code> resolves to the predicate (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>). The engine evaluates the predicate on the fly and draws randomly from all matching sites in your active expansions!</li>
         </ul>
     </div>
 
     <h3>B. Automated Destination Sites for Quest Events (Site Requirement)</h3>
     <p>
-        When your deck includes site-specific quest events (such as <em>Rescue Prisoners</em> or <em>The White Tree</em>), capture the event into a variable and draft destination sites dynamically using the unified <code>Site Requirement</code> tag:
+        When your deck includes site-specific quest events (such as <em>Rescue Prisoners</em> or <em>The White Tree</em>), capture the event into a variable and draft destination sites dynamically using <code>Site Requirement</code>:
     </p>
     <pre><code>[
   {
@@ -300,9 +282,6 @@
     }
   }
 ]</code></pre>
-    <p>
-        Because <em>Rescue Prisoners</em> is tagged with <code>Site Requirement: Site=Dark-hold; Site=Shadow-hold</code>, the generator expands the predicate and automatically drafts two legal Dark-holds or Shadow-holds into your Sites partition.
-    </p>
 
     <h3>C. Targeted Dragon Lair Expedition</h3>
     <p>
@@ -338,7 +317,7 @@
 
     <h3>E. Drafting Regional Hazards (Region Requirement)</h3>
     <p>
-        Draft hazard creatures keyed strictly to a specific geographic region (such as Gorgoroth) using <code>Region Requirement</code>:
+        Draft hazard creatures keyed strictly to a specific geographic region using <code>Region Requirement</code>:
     </p>
     <pre><code>{
   "Name": "Gorgoroth Guardians",
