@@ -73,6 +73,7 @@
       "set": "METW"
     },
     {
+      "Combat Bonus": "Orc",
       "Faction Bonus": "Race=Man",
       "fullCode": "Dáin II (TW)",
       "Home Region": "Iron Hills",
@@ -106,7 +107,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "Faction Bonus": "Iron Hill Dwarves; Race=Elf",
       "fullCode": "Gimli (TW)",
       "Home Region": "Iron Hills",
@@ -115,7 +116,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "Faction Bonus": "Blue Mountain Dwarves; Race=Dwarf",
       "fullCode": "Glóin (TW)",
       "Home Region": "Númeriador",
@@ -164,7 +165,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "Faction Bonus": "Blue Mountain Dwarves; Race=Dwarf",
       "fullCode": "Thorin II (TW)",
       "Home Region": "Númeriador",
@@ -229,7 +230,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "Faction Bonus": "Race=Dwarf",
       "fullCode": "Balin [H] (TW)",
       "Home Region": "Númeriador",
@@ -252,7 +253,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Bifur (TW)",
       "Home Region": "Númeriador",
       "id": "14",
@@ -267,7 +268,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Bofur (TW)",
       "Home Region": "Númeriador",
       "id": "16",
@@ -275,7 +276,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Bombur (TW)",
       "Home Region": "Númeriador",
       "id": "17",
@@ -290,7 +291,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Dori (TW)",
       "Home Region": "Númeriador",
       "id": "24",
@@ -298,7 +299,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Dwalin (TW)",
       "Home Region": "Númeriador",
       "id": "25",
@@ -306,7 +307,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Elladan (TW)",
       "Home Region": "Rhudaur",
       "id": "26",
@@ -314,7 +315,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Elrohir (TW)",
       "Home Region": "Rhudaur",
       "id": "27",
@@ -357,7 +358,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Fíli (TW)",
       "Home Region": "Númeriador",
       "id": "34",
@@ -387,7 +388,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Gildor Inglorion (TW)",
       "Home Region": "Rhudaur",
       "id": "42",
@@ -416,7 +417,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Kíli (TW)",
       "Home Region": "Númeriador",
       "id": "51",
@@ -431,7 +432,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Nori (TW)",
       "Home Region": "Númeriador",
       "id": "55",
@@ -439,7 +440,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Ori (TW)",
       "Home Region": "Númeriador",
       "id": "57",
@@ -522,7 +523,7 @@
       "set": "METW"
     },
     {
-      "Combat Bonus": "Orcs",
+      "Combat Bonus": "Orc",
       "fullCode": "Óin (TW)",
       "Home Region": "Númeriador",
       "id": "56",
@@ -4053,7 +4054,7 @@
     [
       "Combat Bonus",
       "Nazgûl",
-      "Orcs"
+      "Orc"
     ],
     [
       "Environment Stance",
