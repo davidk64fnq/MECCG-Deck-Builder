@@ -85,3 +85,61 @@
 - Indentation: 4 spaces (no tabs in C# source files; tabs permitted only in generated export templates if required by format specification like Tabletop Simulator JSON).
 - Line Endings: CRLF (\r\n) for Windows compatibility.
 - Warnings as Errors: Aim for zero compiler warnings and zero Roslyn analyzer warnings on Release builds.
+
+---
+
+## 9. Help System & HTML Documentation Guidelines (CHM & Markdown)
+
+### 9.1 CHM Viewer Constraints & Layout Architecture
+- **Narrow Viewport Awareness:** Microsoft HTML Help (`.chm`) viewer panes default to 600–800px in width. Designs must flow vertically and remain fully readable without horizontal scrolling.
+- **Avoid Wide Monolithic Tables:** Never use 3- or 4-column tables to hold long descriptions, multi-bullet lists, or code queries. Tables must be reserved for compact summary indexes.
+- **The "Matrix + Reference Cards" Pattern:** For detailed topic references (e.g. attributes, categories, recipes):
+  1. **Top:** A lightweight, 3-column **At-a-Glance Matrix** or **Recipe Directory** table (Name, Scope, 1-line Purpose) with deep-anchor links (`<a href="#id">`).
+  2. **Body:** Individual full-width **Reference Cards** headed by `<h3 id="..." class="entry-heading">` containing metadata badges, descriptive text, notes, and bulleted examples.
+
+---
+
+### 9.2 Visual Hierarchy & CSS Class Discipline
+- **Never Wrap Headings in `<code>`:** Do not wrap `<h3>` text in `<code>...</code>`. Doing so reduces the heading font size to 9.5pt and applies an inline grey background that clashes with headings and badges. Use `h3.entry-heading` instead.
+- **Structural Metadata vs. Game Tags:** Maintain strict visual separation between metadata and actual card values:
+  - **Card Scopes / Structural Metadata:** Use `<span class="scope-pill">` (clean blue Segoe UI pill) inside `<div class="scope-badge">`.
+  - **Literal Game Tags / Card Attributes / Code:** Use `<code>...</code>` (Consolas monospace grey box).
+  - *Rule of Thumb:* If it is a string a player types into a query or tag box, it belongs in `<code>`. If it is category scope or UI instruction, use a span/badge.
+
+---
+
+### 9.3 List Consistency: The "Tag-First" Dictionary Pattern
+- **Strict Left-to-Right Directionality:** In all reference lists, the tag or query value must anchor the left side:
+  - **Correct:** `<code>[Tag Value]</code> &rarr; Description / Example Cards (<em>Card Title</em>)`
+  - **Incorrect:** `<em>Card Title</em> &rarr; <code>[Tag Value]</code>`
+- **Predictable Scanning Rhythm:** Never invert directionality between categories. Readers scan down the page looking for the tag to use; having the tag consistently on the left creates an effortless dictionary format.
+
+---
+
+### 9.4 Typography, Tolkien Entities & Expansion Conventions
+- **Card Titles:** Always italicize card names using `<em>Title</em>` (e.g. *The Lonely Mountain*, *D&aacute;in II*).
+- **Expansion Set Annotations:** The baseline default is *The Wizards* (`METW`). When citing cards introduced in later expansions, explicitly suffix the set code in parentheses:
+  - *Example:* *The Drowning-deeps* (MEBA), *Framsburg* (METD).
+- **Tolkien Diacritics & Accents:** Preserve all canon Tolkien accents using HTML entities:
+  - `Barad-d&ucirc;r`, `D&aacute;in II`, `Ud&ucirc;n`, `Nazg&ucirc;l`, `Th&eacute;oden`, `Akh&ocirc;rahil`.
+- **Special HTML Entities:** Use standard named entities for symbols:
+  - `&rarr;` for arrows ($\rightarrow$)
+  - `&bull;` for bullet dividers (&bull;)
+  - `&mdash;` for em-dashes (&mdash;)
+
+---
+
+### 9.5 Language, Terminology & Tone
+- **Player-First over Engine-First:** Explain mechanics in clear, functional MECCG gameplay terms rather than internal code jargon:
+  - *Avoid:* "Dynamic predicates specify legal creature keys."
+  - *Prefer:* "Site predicates (e.g. `Site=Ruins & Lairs`) define which hazard creatures can attack there."
+- **Avoid Banned Buzzwords:**
+  - Do not use corporate or game-design jargon like *"synergistic"*, *"environmental anchors"*, or *"light/shadow weather axis"*.
+  - Do not label user-extensible taxonomies as *"Closed vs. Open Vocabulary"* (which falsely implies the app locks users out of authoring new tags). Use intuitive headings like `Baseline Roles (Pre-packaged Dataset):` versus `Representative Examples:`.
+
+---
+
+### 9.6 Markdown (`.md`) Angle-Bracket Safety
+- **No Raw Angle-Bracket Placeholders:** In GitHub Markdown files (`README.md`, `CODING_STANDARDS.md`), never write unescaped angle brackets around words (such as `<Code>` or `<Tag>`). 
+- **The HTML Collision Bug:** GitHub's markdown parser evaluates angle brackets as raw HTML. Case-insensitive tags like `<Code>` are parsed as unclosed `<code>` elements, corrupting the layout of all subsequent text.
+- **Escape Pattern:** Always wrap placeholders in backticks (e.g. `` `1 <Code>` `` or `` `<Tag>` ``) or escape them as `&lt;Code&gt;`.

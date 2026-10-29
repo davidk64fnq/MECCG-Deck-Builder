@@ -139,15 +139,23 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Site</span>
     </div>
     <p>
-        Indexes guardian creature species printed on site cards using singular, normalized nouns that match 100% of candidate hazard creatures. For sites with dynamic or variable guardians, dynamic predicates specify legal creature keys.
+        Indexes guardian creature species printed on site cards using singular terms
+        (e.g. <code>Orc</code>, not <code>Orcs</code>) to align directly with hazard creature
+        race attributes. For sites that allow open attacks (e.g. <em>
+            "opponent may play any creature
+            keyed to Ruins &amp; Lairs"
+        </em>), site predicates (e.g. <code>Site=Ruins &amp; Lairs</code>)
+        define which hazard creatures can attack there.
     </p>
+    <div class="note">
+        <strong>Sites vs. Events/Hazards:</strong> <code>Automatic Attack</code> is reserved strictly for <strong>site cards</strong> to record their native guardians. For resource or hazard events that create, modify, or cancel automatic attacks (such as <em>Siege</em> or <em>Balrog of Moria</em>), use <code>Role: Automatic-attack</code>.
+    </div>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Dragon</code> &rarr; <em>Dancing Spire</em>, <em>The Lonely Mountain</em></li>
-        <li><code>Orc; Troll</code> &rarr; <em>Carn D&ucirc;m</em>, <em>Moria</em></li>
-        <li><code>Spider</code> &rarr; <em>Shelob's Lair</em></li>
-        <li><code>Orc; Troll; Maia</code> &rarr; <em>Barad-d&ucirc;r</em></li>
-        <li><code>Site=Ruins &amp; Lairs; Site=Shadow-hold</code> &rarr; <em>Framsburg</em> (dynamic hold predicate)</li>
+        <li><code>Orc; Troll</code> &rarr; <em>Barad-d&ucirc;r</em>, <em>Dol Guldur</em></li>
+        <li><code>Spider</code> &rarr; <em>Ruined Signal Tower</em></li>
+        <li><code>Site=Ruins &amp; Lairs; Site=Shadow-hold</code> &rarr; <em>Framsburg</em> (METD &mdash; dynamic hold predicate)</li>
     </ul>
 
     <h3 id="combat-bonus" class="entry-heading">Combat Bonus</h3>
@@ -168,12 +176,16 @@
 
     <h3 id="environment-stance" class="entry-heading">Environment Stance</h3>
     <div class="scope-badge">
-        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span> (Events, Environment, Weather)
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span> (Events &amp; Creatures)
     </div>
     <p>
-        Indexes dependency on the global light/shadow weather axis: cards that require, amplify, or are enhanced by <em>Gates of Morning</em> (Light) versus <em>Doors of Night</em> (Shadow). Allows procedural deck rules to draft environmental anchors alongside synergistic events.
+        Tracks whether a card requires or benefits from <em>Gates of Morning</em> (Light) or <em>Doors of Night</em> (Shadow) being in play. (Items and allies do not use this tag, as environmental conditions only affect events and certain nocturnal creatures.) This supports two primary workflows:
     </p>
-    <strong>Weather Stance Values:</strong>
+    <ul>
+        <li><strong>Dedicated Strategy (Top-Down):</strong> When building a dedicated <em>Gates of Morning</em> or <em>Doors of Night</em> deck, filtering by this category quickly gathers all matching resource events, hazard events, and creatures that support that strategy.</li>
+        <li><strong>Automated Prerequisite Support (Bottom-Up):</strong> When procedural deck rules draft cards that depend on day or night, the generator can automatically include <em>Gates of Morning</em> or <em>Doors of Night</em> in the deck so those cards can actually be played.</li>
+    </ul>
+    <strong>Stance Values:</strong>
     <ul>
         <li><code>Gates of Morning</code> &rarr; Light-dependent cards (<em>Clear Skies</em>, <em>Sun</em>)</li>
         <li><code>Doors of Night</code> &rarr; Shadow-dependent cards (<em>Foul Fumes</em>, <em>Shelob</em>, <em>The Will of Sauron</em>)</li>
