@@ -57,9 +57,9 @@
             <td>Preventing regional creatures from drafting in illegal regions</td>
         </tr>
         <tr>
-            <td><a href="#recipe-8">8. Leader Signature Cards</a></td>
-            <td><code>Specific: "{Leader.Name}"</code>, <code>"[Blank]"</code></td>
-            <td>Drafting signature cards while shielding generic draws</td>
+            <td><a href="#recipe-8">8. Leader Signature &amp; Open Utility Cards</a></td>
+            <td><code>Specific</code>, <code>Skill: "[Blank]"</code></td>
+            <td>Drafting signature cards while shielding generic draws from class locks</td>
         </tr>
         <tr>
             <td><a href="#recipe-9">9. Connected Under-deeps Expeditions</a></td>
@@ -248,13 +248,16 @@
   }
 }</code></pre>
 
-    <!-- RECIPE 8: CHARACTER SIGNATURE CARDS -->
-    <h2 id="recipe-8">8. Dynamic Leader Signature Cards (Using <code>Specific</code>)</h2>
+    <!-- RECIPE 8: CHARACTER SIGNATURE & OPEN UTILITY CARDS -->
+    <h2 id="recipe-8">8. Leader Signature Cards &amp; Skill Shielding</h2>
     <p>
-        Certain powerful resource cards can only be played if a specific unique character is in your company (such as <em>Return of the King</em> for <em>Aragorn II</em>). You can dynamically draft signature cards tailored to whatever leader is randomly chosen—without hardcoding card titles:
+        Certain resource cards can only be played if a specific unique character is in your company (such as <em>Return of the King</em> for <em>Aragorn II</em>), or if your company includes a specific character class (such as <em>Ranger only</em> on <em>Anduin River</em>, <em>Sage only</em> on <em>Align Palant&iacute;r</em>, or <em>Scout only</em> on <em>Concealment</em>).
     </p>
 
     <h3>A. Dynamic Signature Event Recruitment</h3>
+    <p>
+        Draft signature events tailored dynamically to whatever leader is randomly chosen—without hardcoding card titles:
+    </p>
     <pre><code>{
   "Name": "Leader's Unique Signature Card",
   "Section": "Resources",
@@ -292,6 +295,27 @@
   },
   "Categories": {
     "Role": "Influence"
+  }
+}</code></pre>
+
+    <h3>C. Shielding Generic Draws from Class &amp; Skill Locks</h3>
+    <p>
+        In Cardnum, class restrictions on resource and hazard events are indexed directly under the official <code>Skill</code> attribute (e.g. <code>Skill: Ranger</code> on <em>Anduin River</em>, or <code>Skill: Sage</code> on <em>Reforging</em>).
+    </p>
+    <p>
+        When drafting open utility cards for an arbitrary company, combine <code>"Skill": "[Blank]"</code> with <code>"Specific": "[Blank]"</code> to ensure that every drafted card can be played by any company, with zero risk of dead cards:
+    </p>
+    <pre><code>{
+  "Name": "Universal Movement &amp; Protection Events",
+  "Section": "Resources",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Resource",
+    "Skill": "[Blank]",
+    "Specific": "[Blank]"
+  },
+  "Categories": {
+    "Role": "Movement; Protection"
   }
 }</code></pre>
 

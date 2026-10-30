@@ -9,6 +9,9 @@ namespace MECCG_Deck_Builder
     {
         public List<string> SelectedSets { get; set; } = [];
 
+        // Persisted folder path for Tag Set Save / Load / Merge
+        public string LastTagSetDirectory { get; set; } = string.Empty;
+
         // Active mode
         public int LastExtractionMode { get; set; } = 1; // 1 = Harvest, 2 = Relational, 3 = Quick Regex, 4 = File
 

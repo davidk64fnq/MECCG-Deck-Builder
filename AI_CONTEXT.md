@@ -98,6 +98,7 @@
   - [x] Issue #36: Support Dynamic Attribute Predicate Selectors (Attribute=Value) in Custom Taxonomy Tags and Deck Generation
   - [x] Issue #37: Broaden Cross-Card Lookup to Support Custom Categories and Region Type Taxonomy
   - [x] Issue #38: Consolidate Site/Region Requirement Taxonomy and Model Dynamic Character Homes as Native Predicates
+  - [x] Issue #39: Baseline Taxonomy Synchronization, Role Vocabulary Alignment, and Dialog Directory Persistence
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

@@ -3513,6 +3513,7 @@
       "id": "249",
       "name": "Bill the Pony",
       "Region Requirement": "Arthedain; The Shire",
+      "Role": "Movement",
       "set": "METW",
       "Site Requirement": "Bag End; Bree"
     },
@@ -3521,6 +3522,7 @@
       "id": "295",
       "name": "Goldberry",
       "Region Requirement": "Cardolan",
+      "Role": "Movement; Protection",
       "set": "METW",
       "Site Requirement": "Old Forest"
     },
@@ -3529,14 +3531,17 @@
       "id": "296",
       "name": "Gollum",
       "Region Requirement": "High Pass; Redhorn Gate",
+      "Role": "Item; Protection; Quest",
       "set": "METW",
-      "Site Requirement": "Goblin-gate; Moria"
+      "Site Requirement": "Goblin-gate; Moria",
+      "Target Item": "The One Ring"
     },
     {
       "fullCode": "Gwaihir (TW)",
       "id": "301",
       "name": "Gwaihir",
       "Region Requirement": "Anduin Vales",
+      "Role": "Movement",
       "set": "METW",
       "Site Requirement": "Eagles' Eyrie"
     },
@@ -3545,6 +3550,7 @@
       "id": "315",
       "name": "Leaflock",
       "Region Requirement": "Fangorn",
+      "Role": "Protection",
       "set": "METW",
       "Site Requirement": "Wellinghall"
     },
@@ -3553,6 +3559,7 @@
       "id": "357",
       "name": "Quickbeam",
       "Region Requirement": "Fangorn",
+      "Role": "Protection",
       "set": "METW",
       "Site Requirement": "Wellinghall"
     },
@@ -3560,15 +3567,17 @@
       "fullCode": "Roäc the Raven (TW)",
       "id": "369",
       "name": "Roäc the Raven",
-      "Region Requirement": "Northern Rhovanian",
+      "Region Requirement": "Northern Rhovanion",
+      "Role": "Recruitment",
       "set": "METW",
-      "Site Requirement": "Region=Northern Rhovanian"
+      "Site Requirement": "Region=Northern Rhovanion"
     },
     {
       "fullCode": "Shadowfax (TW)",
       "id": "375",
       "name": "Shadowfax",
       "Region Requirement": "Rohan",
+      "Role": "Movement",
       "set": "METW",
       "Site Requirement": "Dunharrow; Edoras"
     },
@@ -3577,6 +3586,7 @@
       "id": "377",
       "name": "Skinbark",
       "Region Requirement": "Fangorn",
+      "Role": "Protection",
       "set": "METW",
       "Site Requirement": "Wellinghall"
     },
@@ -3584,7 +3594,8 @@
       "fullCode": "Tom Bombadil (TW)",
       "id": "399",
       "name": "Tom Bombadil",
-      "Region Requirement": "Cardolan",
+      "Region Requirement": "Arthedain; Cardolan; Rhudaur; The Shire",
+      "Role": "Protection",
       "set": "METW",
       "Site Requirement": "Old Forest"
     },
@@ -3593,6 +3604,7 @@
       "id": "402",
       "name": "Treebeard",
       "Region Requirement": "Fangorn",
+      "Role": "Protection",
       "set": "METW",
       "Site Requirement": "Wellinghall"
     },
@@ -3713,6 +3725,7 @@
       "Site Requirement": "Dark-hold; Shadow-hold"
     },
     {
+      "Environment Stance": "Doors of Night",
       "fullCode": "Eye of Sauron (TW)",
       "id": "102",
       "name": "Eye of Sauron",
@@ -3736,6 +3749,7 @@
       "Target Species": "Nazgûl"
     },
     {
+      "Environment Stance": "Doors of Night",
       "fullCode": "Minions Stir (TW)",
       "id": "132",
       "name": "Minions Stir",
@@ -3744,6 +3758,7 @@
       "Target Species": "Orc; Troll"
     },
     {
+      "Environment Stance": "Doors of Night",
       "fullCode": "Plague of Wights (TW)",
       "id": "152",
       "name": "Plague of Wights",
@@ -3759,6 +3774,7 @@
       "set": "METW"
     },
     {
+      "Environment Stance": "Doors of Night",
       "fullCode": "Wake of War (TW)",
       "id": "179",
       "name": "Wake of War",
@@ -3772,7 +3788,8 @@
       "name": "Adûnaphel",
       "Region Requirement": "Brown Lands; Dagorlad; Gorgoroth; Western Mirkwood",
       "Role": "Readiness",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Region=Brown Lands; Region=Dagorlad; Region=Gorgoroth; Region=Western Mirkwood"
     },
     {
       "fullCode": "Akhôrahil (TW)",
@@ -3780,7 +3797,8 @@
       "name": "Akhôrahil",
       "Region Requirement": "Gorgoroth; Harondor; Horse Plains; Khand",
       "Role": "Combat",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Region=Gorgoroth; Region=Harondor; Region=Horse Plains; Region=Khand"
     },
     {
       "fullCode": "Align Palantír (TW)",
@@ -3796,7 +3814,7 @@
       "name": "Andúril, the Flame of the West",
       "Role": "Combat; Influence; Quest; Readiness",
       "set": "METW",
-      "Site Requirement": "Information!=[Blank]",
+      "Site Requirement": "Haven; Information!=[Blank]",
       "Target Item": "Narsil",
       "Target Species": "Dúnadan"
     },
@@ -3807,7 +3825,7 @@
       "Region Requirement": "Hollin; Redhorn Gate; Wold & Foothills",
       "Role": "Automatic Attack; Site",
       "set": "METW",
-      "Site Requirement": "Moria"
+      "Site Requirement": "Lorien; Moria; Region=Hollin; Region=Redhorn Gate; Region=Wold & Foothills"
     },
     {
       "fullCode": "Bane of the Ithil-stone (TW)",
@@ -3838,7 +3856,7 @@
       "name": "Dreams of Lore",
       "Role": "Quest",
       "set": "METW",
-      "Site Requirement": "Information!=[Blank]"
+      "Site Requirement": "Haven; Information!=[Blank]"
     },
     {
       "fullCode": "Dwar of Waw (TW)",
@@ -3847,6 +3865,7 @@
       "Region Requirement": "Gorgoroth; Harondor; Imlad Morgul; Ithilien",
       "Role": "Combat",
       "set": "METW",
+      "Site Requirement": "Region=Gorgoroth; Region=Harondor; Region=Imlad Morgul; Region=Ithilien",
       "Target Species": "Animal; Spider; Wolf"
     },
     {
@@ -3870,7 +3889,8 @@
       "name": "Hoarmûrath of Dír",
       "Region Requirement": "Dagorlad; Gorgoroth; Ithilien; Khand",
       "Role": "Combat",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Region=Dagorlad; Region=Gorgoroth; Region=Ithilien; Region=Khand"
     },
     {
       "fullCode": "Indûr Dawndeath (TW)",
@@ -3878,7 +3898,8 @@
       "name": "Indûr Dawndeath",
       "Region Requirement": "Gorgoroth; Harondor; Imlad Morgul; Khand",
       "Role": "Item",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Region=Gorgoroth; Region=Harondor; Region=Imlad Morgul; Region=Khand"
     },
     {
       "fullCode": "Khamûl the Easterling (TW)",
@@ -3886,7 +3907,8 @@
       "name": "Khamûl the Easterling",
       "Region Requirement": "Brown Lands; Gorgoroth; Heart of Mirkwood; Southern Mirkwood",
       "Role": "Hand",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Region=Brown Lands; Region=Gorgoroth; Region=Heart of Mirkwood; Region=Southern Mirkwood"
     },
     {
       "fullCode": "Lure of Creation (TW)",
@@ -3894,7 +3916,6 @@
       "name": "Lure of Creation",
       "Role": "Corruption",
       "set": "METW",
-      "Site Requirement": "Haven",
       "Target Species": "Wizard"
     },
     {
@@ -3935,7 +3956,7 @@
       "Region Requirement": "Dagorlad; Udûn",
       "Role": "Movement; Site",
       "set": "METW",
-      "Site Requirement": "Dark-hold"
+      "Site Requirement": "Region=Dagorlad"
     },
     {
       "fullCode": "Morgul-knife (TW)",
@@ -3949,9 +3970,10 @@
       "fullCode": "Reforging (TW)",
       "id": "363",
       "name": "Reforging",
-      "Role": "Item; Quest",
+      "Role": "Deck; Item",
       "set": "METW",
-      "Site Requirement": "Haven; Information!=[Blank]"
+      "Site Requirement": "Haven; Information!=[Blank]",
+      "Target Item": "Armor; Weapon"
     },
     {
       "fullCode": "Ren the Unclean (TW)",
@@ -3959,7 +3981,8 @@
       "name": "Ren the Unclean",
       "Region Requirement": "Dagorlad; Gorgoroth; Horse Plains; Ithilien",
       "Role": "Corruption",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Region=Dagorlad; Region=Gorgoroth; Region=Horse Plains; Region=Ithilien"
     },
     {
       "fullCode": "Rescue Prisoners (TW)",
@@ -3976,6 +3999,141 @@
       "Role": "Influence",
       "set": "METW",
       "Site Requirement": "Minas Tirith"
+    },
+    {
+      "fullCode": "Sacrifice of Form (TW)",
+      "id": "370",
+      "name": "Sacrifice of Form",
+      "Role": "Combat; Protection",
+      "set": "METW",
+      "Target Species": "Wizard"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "Shelob (TW)",
+      "id": "157",
+      "name": "Shelob",
+      "Region Requirement": "Gorgoroth; Imlad Morgul",
+      "Role": "Combat",
+      "set": "METW",
+      "Site Requirement": "Region=Gorgoroth; Region=Imlad Morgul",
+      "Target Species": "Animal; Spider"
+    },
+    {
+      "fullCode": "Siege (TW)",
+      "id": "158",
+      "name": "Siege",
+      "Role": "Automatic Attack; Movement",
+      "set": "METW",
+      "Site Requirement": "Border-hold; Free-hold",
+      "Target Species": "Orc"
+    },
+    {
+      "fullCode": "Stone of Erech (TW)",
+      "id": "383",
+      "name": "Stone of Erech",
+      "Role": "Quest",
+      "set": "METW",
+      "Site Requirement": "Vale of Erech"
+    },
+    {
+      "fullCode": "The Burden of Time (TW)",
+      "id": "165",
+      "name": "The Burden of Time",
+      "Role": "Corruption",
+      "set": "METW",
+      "Target Species": "Elf"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "The Nazgûl are Abroad (TW)",
+      "id": "167",
+      "name": "The Nazgûl are Abroad",
+      "Role": "Combat; Deck",
+      "set": "METW",
+      "Target Item": "Ring; The One Ring",
+      "Target Species": "Nazgûl"
+    },
+    {
+      "fullCode": "The Pale Sword (TW)",
+      "id": "168",
+      "name": "The Pale Sword",
+      "Role": "Combat; Corruption",
+      "set": "METW",
+      "Target Species": "Nazgûl"
+    },
+    {
+      "fullCode": "The White Tree (TW)",
+      "id": "397",
+      "name": "The White Tree",
+      "Role": "Site",
+      "set": "METW",
+      "Site Requirement": "Minas Tirith",
+      "Target Item": "Sapling of the White Tree"
+    },
+    {
+      "Environment Stance": "Doors of Night",
+      "fullCode": "The Will of Sauron (TW)",
+      "id": "171",
+      "name": "The Will of Sauron",
+      "Role": "Duration",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Traitor (TW)",
+      "id": "176",
+      "name": "Traitor",
+      "Role": "Combat; Corruption",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Ûvatha the Horseman (TW)",
+      "id": "178",
+      "name": "Ûvatha the Horseman",
+      "Region Requirement": "Gorgoroth; Harondor; Horse Plains; Khand",
+      "Role": "Deck; Hand",
+      "set": "METW",
+      "Site Requirement": "Region=Gorgoroth; Region=Harondor; Region=Horse Plains; Region=Khand"
+    },
+    {
+      "fullCode": "Witch-king of Angmar (TW)",
+      "id": "184",
+      "name": "Witch-king of Angmar",
+      "Region Requirement": "Angmar; Gorgoroth; Gundabad; Imlad Morgul",
+      "Role": "Site",
+      "set": "METW",
+      "Site Requirement": "Region=Angmar; Region=Gorgoroth; Region=Gundabad; Region=Imlad Morgul"
+    },
+    {
+      "fullCode": "A Chance Meeting (TW)",
+      "id": "239",
+      "name": "A Chance Meeting",
+      "Role": "Recruitment",
+      "set": "METW",
+      "Site Requirement": "Border-hold; Free-hold; Ruins & Lairs"
+    },
+    {
+      "fullCode": "A Friend or Three (TW)",
+      "id": "240",
+      "name": "A Friend or Three",
+      "Role": "Corruption; Influence",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Anduin River (TW)",
+      "id": "242",
+      "name": "Anduin River",
+      "Region Requirement": "Anórien; Dagorlad; Harondor; Ithilien; Lebennin; Rohan",
+      "Role": "Movement; Protection",
+      "set": "METW",
+      "Site Requirement": "Region=Anórien; Region=Dagorlad; Region=Harondor; Region=Ithilien; Region=Lebennin; Region=Rohan"
+    },
+    {
+      "fullCode": "Arouse Denizens (TW)",
+      "id": "77",
+      "name": "Arouse Denizens",
+      "set": "METW",
+      "Site Requirement": "Ruins & Lairs"
     }
   ],
   "Filters": [
@@ -4167,12 +4325,15 @@
     [
       "Region Requirement",
       "Anduin Vales",
+      "Angmar",
+      "Anórien",
       "Arthedain",
       "Brown Lands",
       "Cardolan",
       "Dagorlad",
       "Fangorn",
       "Gorgoroth",
+      "Gundabad",
       "Harondor",
       "Heart of Mirkwood",
       "High Pass",
@@ -4181,8 +4342,10 @@
       "Imlad Morgul",
       "Ithilien",
       "Khand",
-      "Northern Rhovanian",
+      "Lebennin",
+      "Northern Rhovanion",
       "Redhorn Gate",
+      "Rhudaur",
       "Rohan",
       "Southern Mirkwood",
       "The Shire",
@@ -4205,6 +4368,7 @@
       "Combat",
       "Corruption",
       "Deck",
+      "Duration",
       "Hand",
       "Influence",
       "Item",
@@ -4212,6 +4376,7 @@
       "Protection",
       "Quest",
       "Readiness",
+      "Recruitment",
       "Site",
       "Terrain"
     ],
@@ -4228,24 +4393,52 @@
       "Goblin-gate",
       "Haven",
       "Information!=[Blank]",
+      "Lorien",
       "Minas Tirith",
       "Moria",
       "Old Forest",
-      "Region=Northern Rhovanian",
+      "Region=Angmar",
+      "Region=Anórien",
+      "Region=Brown Lands",
+      "Region=Dagorlad",
+      "Region=Gorgoroth",
+      "Region=Gundabad",
+      "Region=Harondor",
+      "Region=Heart of Mirkwood",
+      "Region=Hollin",
+      "Region=Horse Plains",
+      "Region=Imlad Morgul",
+      "Region=Ithilien",
+      "Region=Khand",
+      "Region=Lebennin",
+      "Region=Northern Rhovanion",
+      "Region=Redhorn Gate",
+      "Region=Rohan",
+      "Region=Southern Mirkwood",
+      "Region=Western Mirkwood",
+      "Region=Wold & Foothills",
       "Ruins & Lairs",
       "Shadow-hold",
+      "Vale of Erech",
       "Wellinghall"
     ],
     [
       "Target Item",
+      "Armor",
       "Narsil",
-      "Palantír"
+      "Palantír",
+      "Ring",
+      "Sapling of the White Tree",
+      "The One Ring",
+      "Weapon"
     ],
     [
       "Target Species",
       "Animal",
       "Dúnadan",
+      "Elf",
       "Man",
+      "Men of Lamedon",
       "Nazgûl",
       "Orc",
       "Race!=Hobbit",
@@ -4254,6 +4447,7 @@
       "Spider",
       "Troll",
       "Undead",
+      "Witch-king of Angmar",
       "Wizard",
       "Wolf"
     ]

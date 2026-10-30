@@ -42,6 +42,7 @@ namespace MECCG_Deck_Builder
         private CancellationTokenSource _imageLoadCts;
         private Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
         private string _lastDeckRulesFilePath;
+        private string _lastTagSetDirectory;
 
         internal Form1()
         {
@@ -90,7 +91,24 @@ namespace MECCG_Deck_Builder
         {
             try
             {
-                string path = StoragePathService.ResolveDataFilePath("Rules_Support_Tags.json");
+                string path = null;
+
+#if DEBUG
+                // If running in development and we know where the source file is, load directly from source!
+                var settings = UserSettingsService.Current;
+                if (!string.IsNullOrWhiteSpace(settings.LastTagSetDirectory))
+                {
+                    string sourcePath = Path.Combine(settings.LastTagSetDirectory, "Rules_Support_Tags.json");
+                    if (File.Exists(sourcePath))
+                    {
+                        path = sourcePath;
+                    }
+                }
+#endif
+
+                // Standard runtime fallback (AppData -> bin\Debug)
+                path ??= StoragePathService.ResolveDataFilePath("Rules_Support_Tags.json");
+
                 if (File.Exists(path))
                 {
                     string json = File.ReadAllText(path);
@@ -103,7 +121,7 @@ namespace MECCG_Deck_Builder
             }
             catch
             {
-                // Baseline load fails gracefully without blocking catalog startup
+                // Graceful failure
             }
         }
 
@@ -1752,10 +1770,23 @@ namespace MECCG_Deck_Builder
 
         private void OpenFilterMenuItem_Click(object sender, EventArgs e)
         {
+            var settings = UserSettingsService.Current;
+
+            // 1. Check user settings first, fallback to AppData (or portable dir) if unset
+            string targetDir = !string.IsNullOrWhiteSpace(settings.LastTagSetDirectory) && Directory.Exists(settings.LastTagSetDirectory)
+                ? settings.LastTagSetDirectory
+                : StoragePathService.GetDataDirectory();
+
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+
             using var openFileDialog = new OpenFileDialog
             {
                 Title = $"{Constants.AppTitle} - Load Custom Tag Set",
                 DefaultExt = "json",
+                InitialDirectory = targetDir,
                 Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
 
@@ -1775,27 +1806,64 @@ namespace MECCG_Deck_Builder
 
         private void SaveFilterMenuItem_Click(object sender, EventArgs e)
         {
+            var settings = UserSettingsService.Current;
+
+            // 1. Check user settings first, fallback to AppData (or portable dir) if unset
+            string targetDir = !string.IsNullOrWhiteSpace(settings.LastTagSetDirectory) && Directory.Exists(settings.LastTagSetDirectory)
+                ? settings.LastTagSetDirectory
+                : StoragePathService.GetDataDirectory();
+
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+
             using var saveFileDialog = new SaveFileDialog
             {
                 Title = $"{Constants.AppTitle} - Save Custom Tag Set",
                 DefaultExt = "json",
-                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
+                Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*",
+                InitialDirectory = targetDir,
+                FileName = "Rules_Support_Tags.json"
             };
 
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
             {
+                // 2. Persist the folder across application restarts!
+                settings.LastTagSetDirectory = Path.GetDirectoryName(saveFileDialog.FileName);
+                UserSettingsService.SaveSettings();
+
                 var dto = OpenCloseFilter.FromFilterService(_filterService, _catalogService);
                 string json = JsonConvert.SerializeObject(dto, Formatting.Indented);
                 File.WriteAllText(saveFileDialog.FileName, json);
+
+                MessageBox.Show(this,
+                    "Tag set saved successfully.\n\nTags saved as 'Rules_Support_Tags.json' will be loaded automatically on startup.",
+                    Constants.AppTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
             }
         }
 
         private void ToolStripMenuFilterMerge_Click(object sender, EventArgs e)
         {
+            var settings = UserSettingsService.Current;
+
+            // 1. Check user settings first, fallback to AppData (or portable dir) if unset
+            string targetDir = !string.IsNullOrWhiteSpace(settings.LastTagSetDirectory) && Directory.Exists(settings.LastTagSetDirectory)
+                ? settings.LastTagSetDirectory
+                : StoragePathService.GetDataDirectory();
+
+            if (!Directory.Exists(targetDir))
+            {
+                Directory.CreateDirectory(targetDir);
+            }
+
             using var openFileDialog = new OpenFileDialog
             {
                 Title = $"{Constants.AppTitle} - Select Source Tag Set to Merge into Session",
                 DefaultExt = "json",
+                InitialDirectory = targetDir,
                 Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*"
             };
 

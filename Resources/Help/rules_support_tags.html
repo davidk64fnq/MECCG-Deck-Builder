@@ -100,7 +100,7 @@
         <tr>
             <td><a href="#role"><code>Role</code></a></td>
             <td><span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span></td>
-            <td>Primary tactical gameplay mechanism executed by the card</td>
+            <td>Tactical gameplay mechanism (Combat, Recruitment, Quest, Deck, etc.)</td>
         </tr>
         <tr>
             <td><a href="#site-requirement"><code>Site Requirement</code></a></td>
@@ -197,15 +197,15 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Character</span>
     </div>
     <p>
-        Character recruiting bonuses that grant bonus Direct Influence (DI) when influencing specific named faction cards or species factions. Powers dynamic faction recruitment in procedural generation templates.
+        Tracks character Direct Influence (DI) bonuses for recruiting specific named factions or entire species of factions. In procedural deck generation, querying <code>"Name": "{Leader.Category:Faction Bonus}"</code> automatically drafts the exact faction your company leader specializes in recruiting.
     </p>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Wood-elves</code> &rarr; Recruited with bonus by <em>Thranduil</em></li>
-        <li><code>Iron Hill Dwarves; Man</code> &rarr; Recruited with bonus by <em>D&aacute;in II</em></li>
-        <li><code>Riders of Rohan</code> &rarr; Recruited with bonus by <em>Th&eacute;oden</em></li>
-        <li><code>All; D&uacute;nadan</code> &rarr; Universal diplomat wildcard with species affinity (<em>Adrazar</em>)</li>
-        <li><code>All</code> &rarr; Open diplomat wildcard (<em>Peath</em>)</li>
+        <li><code>Wood-elves</code> &rarr; Specific named faction recruited with bonus by <em>Thranduil</em></li>
+        <li><code>Iron Hill Dwarves; Man</code> &rarr; Named faction and species recruitment bonuses on <em>D&aacute;in II</em></li>
+        <li><code>Riders of Rohan</code> &rarr; Specific named faction recruited with bonus by <em>Th&eacute;oden</em></li>
+        <li><code>Dunlendings</code> &rarr; Specific named faction recruited with bonus by <em>Peath</em></li>
+        <li><code>All</code> &rarr; Universal diplomat wildcard matching any faction in active expansions (<em>Adrazar</em>)</li>
     </ul>
 
     <h3 id="home-region" class="entry-heading">Home Region</h3>
@@ -213,12 +213,13 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Character</span>
     </div>
     <p>
-        A relational join mapping a character's home site directly to the site's geographic territory. Enables deck generators to recruit regionally cohesive starting companies without manual tagging.
+        Connects each character's printed home site directly to its geographic territory. In procedural deck generation, querying <code>"Home Region": "{Leader.Category:Home Region}"</code> lets you recruit starting companions from your leader's home territory for natural regional cohesion.
     </p>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Rhudaur</code> &rarr; Derived from <em>Rivendell</em> (<em>Aragorn II</em>)</li>
-        <li><code>An&oacute;rien</code> &rarr; Derived from <em>Minas Tirith</em> (<em>Boromir</em>)</li>
+        <li><code>Arthedain</code> &rarr; Derived from <em>Bree</em> (<em>Aragorn II</em>)</li>
+        <li><code>Rhudaur</code> &rarr; Derived from <em>Rivendell</em> (<em>Elrond</em>)</li>
+        <li><code>An&oacute;rien</code> &rarr; Derived from <em>Minas Tirith</em> (<em>Boromir II</em>)</li>
         <li><code>Rohan</code> &rarr; Derived from <em>Edoras</em> (<em>Th&eacute;oden</em>)</li>
     </ul>
 
@@ -234,14 +235,14 @@
         <li>Territories an ongoing event explicitly buffs, alters, or affects (e.g. regional combat modifiers or movement path adjustments).</li>
     </ol>
     <div class="note">
-        <strong>Dual-Mode Best Practice:</strong> For cards that function as both regional Creatures and global Events (such as the Nazg&ucirc;l), only tag the specific regions where they can be played as a creature. This prevents the generator from falsely drafting them as creatures in illegal regions.
+        <strong>Dual-Mode Cards (Creature / Event):</strong> For cards with dual card types (such as the Nazg&ucirc;l), only tag the specific regions required to play them as a <strong>creature</strong>. Do not tag <code>All</code> to represent their event mode being globally playable—doing so would allow the deck generator to falsely draft the card as a creature in illegal regions (such as the Shire).
     </div>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Harondor; Horse Plains; Gorgoroth; Khand</code> &rarr; Playable creature territories for <em>Akh&ocirc;rahil</em></li>
         <li><code>Imlad Morgul; Gorgoroth</code> &rarr; Playable creature territories for <em>Shelob</em></li>
-        <li><code>Dagorlad; Ud&ucirc;n</code> &rarr; Movement path territories modified by <em>Morannon</em></li>
-        <li><code>Wold &amp; Foothills; Hollin; Redhorn Gate</code> &rarr; Playable creature territories for <em>Balrog of Moria</em></li>
+        <li><code>Dagorlad; Ud&ucirc;n</code> &rarr; Movement path territories modified by <em>Morannon</em> (Event)</li>
+        <li><code>Hollin; Redhorn Gate; Wold &amp; Foothills</code> &rarr; Regional attacks buffed by <em>Balrog of Moria</em> (Permanent-event)</li>
     </ul>
 
     <h3 id="region-type" class="entry-heading">Region Type</h3>
@@ -249,14 +250,16 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Region</span> &bull; <span class="scope-pill">Site</span>
     </div>
     <p>
-        Classifies the terrain symbol printed on region movement cards. Can be propagated down to site cards using the Cross-Card Lookup tool to enable regional terrain filtering (e.g. <code>Region Type=Wilderness</code>).
+        Classifies the terrain classification printed on region movement cards. In the pre-packaged baseline taxonomy, these terrain types have already been propagated down to all site cards, enabling dynamic terrain queries on sites and movement paths (e.g. <code>Region Type=Wilderness</code> or <code>Region Type=Shadow-land</code>).
     </p>
-    <strong>Printed Terrain Symbols:</strong>
+    <strong>Canonical Terrain Classifications:</strong>
     <ul>
-        <li><code>Wilderness</code> &rarr; <em>Anduin Vales</em>, <em>Arthedain</em>, <em>Cardolan</em>, <em>Rhudaur</em></li>
-        <li><code>Shadow-land</code> &rarr; <em>Ithilien</em>, <em>Dagorlad</em>, <em>Gorgoroth</em></li>
-        <li><code>Dark-domain</code> &rarr; <em>Ud&ucirc;n</em>, <em>Nurn</em></li>
-        <li><code>Free-domain</code> &rarr; <em>Shire</em>, <em>Lindon</em></li>
+        <li><code>Free-domain</code> &rarr; <em>The Shire</em>, <em>Lindon</em>, <em>An&oacute;rien</em>, <em>Belfalas</em></li>
+        <li><code>Border-land</code> &rarr; <em>Anduin Vales</em>, <em>Rohan</em>, <em>Dorwinion</em>, <em>Woodland Realm</em></li>
+        <li><code>Wilderness</code> &rarr; <em>Arthedain</em>, <em>Cardolan</em>, <em>Rhudaur</em>, <em>Ithilien</em>, <em>Hollin</em></li>
+        <li><code>Shadow-land</code> &rarr; <em>Dagorlad</em>, <em>Brown Lands</em>, <em>Imlad Morgul</em>, <em>Angmar</em></li>
+        <li><code>Dark-domain</code> &rarr; <em>Gorgoroth</em>, <em>Ud&ucirc;n</em>, <em>Nurn</em>, <em>Southern Mirkwood</em></li>
+        <li><code>Coastal Sea</code> &rarr; <em>Bay of Belfalas</em>, <em>Mouths of the Anduin</em>, <em>Andrast Coast</em></li>
     </ul>
 
     <h3 id="role" class="entry-heading">Role</h3>
@@ -271,21 +274,21 @@
     </div>
     <strong>Baseline Roles (Pre-packaged Dataset):</strong>
     <ul>
-        <li><code>Automatic-attack</code> &mdash; Modifies, cancels, or creates site guardians (<em>Balrog of Moria</em>, <em>Siege</em>)</li>
-        <li><code>Combat</code> &mdash; General combat strength modifiers—prowess, body, strike rolls, or strike counts (<em>The Pale Sword</em>, <em>Awaken Denizens</em>, <em>Cruel Caradhras</em>)</li>
+        <li><code>Automatic Attack</code> &mdash; Modifies, buffs, cancels, or creates site guardian attacks faced by the whole company (<em>Balrog of Moria</em>, <em>Siege</em>). Note: Cards or allies with personal immunity to automatic-attack strikes (such as <em>Treebeard</em> or <em>Goldberry</em>) are classified under <code>Role: Protection</code>.</li>
+        <li><code>Combat</code> &mdash; Initiates, directs, or modifies attacks—prowess and body adjustments, strike counts, combat rolls, or triggering special event attacks (<em>The Pale Sword</em>, <em>Minions Stir</em>, <em>Traitor</em>)</li>
         <li><code>Corruption</code> &mdash; Strategic corruption offense or defense—forces corruption checks or burdens (<em>Lure of Power</em>, <em>Despair of the Heart</em>) or mitigates and heals corruption (<em>Praise to Elbereth</em>)</li>
-        <li><code>Deck</code> &mdash; Interacts with deck flow—searching the play deck (<em>Lucky Search</em>), graveyard recursion (<em>Reforging</em>), card cycling (<em>Vilya</em>), or search denial (<em>Bane of the Ithil-stone</em>)</li>
+        <li><code>Deck</code> &mdash; Interacts with deck and discard flow—searching/tutoring the play deck (<em>Lucky Search</em>), graveyard recursion from the discard pile (<em>Reforging</em>, <em>The Nazg&ucirc;l are Abroad</em>, <em>&Ucirc;vatha the Horseman</em>), card cycling (<em>Vilya</em>), or search denial (<em>Bane of the Ithil-stone</em>)</li>
         <li><code>Duration</code> &mdash; Extends the life or duration of active events in play (<em>The Will of Sauron</em>)</li>
-        <li><code>Faction</code> &mdash; Directly aids or modifies faction recruitment (<em>Stone of Erech</em>)</li>
-        <li><code>Hand</code> &mdash; Hand size manipulation and card draw (<em>Fellowship</em>, <em>Favor of the Valar</em>), hand scouting (<em>Mirror of Galadriel</em>), or forced discarding (<em>Kham&ucirc;l the Easterling</em>)</li>
-        <li><code>Influence</code> &mdash; Modifies general influence or Direct Influence pools (<em>Return of the King</em>)</li>
+        <li><code>Hand</code> &mdash; In-hand card economy and hand disruption—hand size modifiers (<em>Smoke Rings</em>), card draw acceleration (<em>Favor of the Valar</em>), hand scouting (<em>Mirror of Galadriel</em>), or forced discarding (<em>Kham&ucirc;l the Easterling</em>)</li>
+        <li><code>Influence</code> &mdash; Modifies general influence, Direct Influence (DI) ratings, or influence check rolls made against characters and factions (<em>Return of the King</em>, <em>A Friend or Three</em>)</li>
         <li><code>Item</code> &mdash; Retrieves, transfers, protects, or forces the discard/theft of items (<em>Align Palant&iacute;r</em>, <em>Ind&ucirc;r Dawndeath</em>)</li>
         <li><code>Movement</code> &mdash; Modifies travel, region pathing, or forces company return (<em>Morannon</em>)</li>
-        <li><code>Protection</code> &mdash; Cancels attacks, prevents strikes, or grants immunity to hazards (<em>Sacrifice of Form</em>)</li>
-        <li><code>Quest</code> &mdash; Triggers or advances victory conditions or scenario quests (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>)</li>
+        <li><code>Protection</code> &mdash; Cancels attacks, prevents strikes, or grants company/character immunity to hazards and site attacks (<em>Sacrifice of Form</em>, <em>Leaflock</em>, <em>Quickbeam</em>, <em>Goldberry</em>)</li>
+        <li><code>Quest</code> &mdash; Directly advances victory conditions or scenario goals by awarding Marshalling Points (MPs) for completing specific site journeys or tasks (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>). Non-scoring utility cards that transform the board (such as <em>The White Tree</em>) are classified under their functional mechanism (e.g. <code>Role: Site</code>).</li>
         <li><code>Readiness</code> &mdash; In-play status manipulation—tapping, untapping, healing, or removing/returning cards from the table (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>)</li>
+        <li><code>Recruitment</code> &mdash; Directly aids, modifies, or enables recruiting characters or factions into play (<em>A Chance Meeting</em>, <em>Ro&auml;c the Raven</em>)</li>
         <li><code>Site</code> &mdash; Alters site status, hold types, or site playability (<em>Witch-king of Angmar</em>, <em>The White Tree</em>)</li>
-        <li><code>Terrain</code> &mdash; Converts region path symbols between hostile and safe</li>
+        <li><code>Terrain</code> &mdash; Converts region path symbols and territory terrain classifications between hostile and safe (<em>Fog</em>, <em>Morgul Night</em>, <em>Moon</em>)</li>
     </ul>
 
     <h3 id="site-requirement" class="entry-heading">Site Requirement</h3>
@@ -300,15 +303,15 @@
         <li>The specific site(s) or hold type(s) an event attaches to, targets, or modifies.</li>
     </ol>
     <p>
-        Supports specific named sites (e.g. <code>Minas Tirith</code>, <code>Moria</code>), dynamic hold-type predicates (e.g. <code>Site=Dark-hold</code>, <code>Site=Shadow-hold</code>, <code>Site=Free-hold</code>), and regional site filters (e.g. <code>Region=Dagorlad</code>).
+        Supports specific named sites (e.g. <code>Minas Tirith</code>, <code>Moria</code>), structural site hold classifications (e.g. <code>Dark-hold</code>, <code>Shadow-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Free-hold</code>, <code>Border-hold</code>, <code>Haven</code>), and regional site filters (e.g. <code>Region=Dagorlad</code>).
     </p>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Site=Dark-hold; Site=Shadow-hold</code> &rarr; Required play sites for <em>Rescue Prisoners</em></li>
-        <li><code>Bree; Rivendell; Bag End</code> &rarr; Required play sites for <em>Bill the Pony</em></li>
+        <li><code>Dark-hold; Shadow-hold</code> &rarr; Permitted play sites for <em>Rescue Prisoners</em></li>
+        <li><code>Bag End; Bree</code> &rarr; Required play sites for <em>Bill the Pony</em></li>
         <li><code>Minas Tirith</code> &rarr; Target attachment site for <em>The White Tree</em></li>
-        <li><code>Site=Free-hold; Site=Border-hold</code> &rarr; Permitted sites for <em>Old Friendship</em></li>
-        <li><code>Site=Border-hold; Site=Free-hold; Site=Ruins &amp; Lairs</code> &rarr; Target sites for <em>Siege</em></li>
+        <li><code>Border-hold; Free-hold</code> &rarr; Target sites for <em>Siege</em></li>
+        <li><code>Ruins &amp; Lairs</code> &rarr; Target sites for <em>Awaken Denizens</em></li>
         <li><code>Moria; L&oacute;rien</code> &rarr; Target sites for <em>Balrog of Moria</em></li>
         <li><code>Region=Dagorlad</code> &rarr; Geographic site restriction for <em>Morannon</em></li>
     </ul>
