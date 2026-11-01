@@ -334,7 +334,7 @@ namespace MECCG_Deck_Builder
         public void RenameCustomKeyName(string oldKeyName, string newKeyName)
         {
             if (string.IsNullOrWhiteSpace(oldKeyName) || string.IsNullOrWhiteSpace(newKeyName) ||
-                string.Equals(oldKeyName, newKeyName, StringComparison.OrdinalIgnoreCase))
+                string.Equals(oldKeyName, newKeyName, StringComparison.Ordinal))
             {
                 return;
             }
@@ -359,7 +359,7 @@ namespace MECCG_Deck_Builder
         public void RenameCustomKeyValue(string keyName, string oldValue, string newValue)
         {
             if (string.IsNullOrWhiteSpace(keyName) || string.IsNullOrWhiteSpace(oldValue) ||
-                string.IsNullOrWhiteSpace(newValue) || string.Equals(oldValue, newValue, StringComparison.OrdinalIgnoreCase))
+                string.IsNullOrWhiteSpace(newValue) || string.Equals(oldValue, newValue, StringComparison.Ordinal))
             {
                 return;
             }

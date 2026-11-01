@@ -88,6 +88,16 @@
             <td>Geographic territory of a character's starting/home site</td>
         </tr>
         <tr>
+            <td><a href="#prerequisite"><code>Prerequisite</code></a></td>
+            <td><span class="scope-pill">Resource</span> (Quests)</td>
+            <td>Partner enabler cards or relics required to complete a quest</td>
+        </tr>
+        <tr>
+            <td><a href="#prerequisite-for"><code>Prerequisite For</code></a></td>
+            <td><span class="scope-pill">Resource</span> (Enablers)</td>
+            <td>Locks enablers out of generic draws until their quest is drafted</td>
+        </tr>
+        <tr>
             <td><a href="#region-requirement"><code>Region Requirement</code></a></td>
             <td><span class="scope-pill">Hazard</span> &bull; <span class="scope-pill">Resource</span></td>
             <td>Territories required to play creatures or affected by events</td>
@@ -100,7 +110,7 @@
         <tr>
             <td><a href="#role"><code>Role</code></a></td>
             <td><span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span></td>
-            <td>Tactical gameplay mechanism (Combat, Recruitment, Quest, Deck, etc.)</td>
+            <td>Tactical gameplay mechanism (Combat, Recruitment, Quest, Card Flow, etc.)</td>
         </tr>
         <tr>
             <td><a href="#site-requirement"><code>Site Requirement</code></a></td>
@@ -223,6 +233,36 @@
         <li><code>Rohan</code> &rarr; Derived from <em>Edoras</em> (<em>Th&eacute;oden</em>)</li>
     </ul>
 
+    <h3 id="prerequisite" class="entry-heading">Prerequisite</h3>
+    <div class="scope-badge">
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> (Quests &amp; Multi-Card Storylines)
+    </div>
+    <p>
+        Identifies the exact, named partner card(s) that an objective or quest card requires in company or discard to be played or scored. Used by procedural deck templates to automatically summon enabler events and relics without hardcoded titles.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Paths of the Dead</code> &rarr; Enabler required on <em>Army of the Dead</em></li>
+        <li><code>Narsil; Reforging</code> &rarr; Relic and event required on <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>Men of Lamedon</code> &rarr; Faction required on <em>Stone of Erech</em></li>
+    </ul>
+
+    <h3 id="prerequisite-for" class="entry-heading">Prerequisite For</h3>
+    <div class="scope-badge">
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> (Enabler Events &amp; Quest Relics)
+    </div>
+    <p>
+        The inverse companion to <code>Prerequisite</code>. Identifies which quest or storyline card this card enables.
+    </p>
+    <div class="note">
+        <strong>The Enabler Shield Pattern:</strong> When drafting generic utility cards, querying <code>"Prerequisite For": "[Blank]"</code> guarantees that niche enablers (like <em>Paths of the Dead</em>) are never drafted as dead cards into decks that lack their parent quest.
+    </div>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Army of the Dead</code> &rarr; Assigned to <em>Paths of the Dead</em></li>
+        <li><code>And&uacute;ril, the Flame of the West</code> &rarr; Assigned to <em>Narsil</em> and <em>Reforging</em></li>
+    </ul>
+
     <h3 id="region-requirement" class="entry-heading">Region Requirement</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Hazard</span> &bull; <span class="scope-pill">Resource</span>
@@ -270,23 +310,69 @@
         Classifies the primary tactical game mechanism executed by non-character cards (events, items, hazards, allies). Symmetrical across alignments—the card's <code>Primary</code> type dictates whether the effect aids your company or disrupts the opponent.
     </p>
     <div class="tip">
-        <strong>Custom Roles:</strong> The 15 roles listed below represent the pre-packaged baseline taxonomy shipped in <code>Rules_Support_Tags.json</code>. You can define additional custom roles (such as <code>Scout Support</code> or <code>Nazg&ucirc;l Hunter</code>) via <strong>Taxonomy &gt; Manage Custom Tags...</strong> at any time.
+        <strong>Custom Roles:</strong> The 14 roles listed below represent the pre-packaged baseline taxonomy shipped in <code>Rules_Support_Tags.json</code>. You can define additional custom roles (such as <code>Scout Support</code> or <code>Nazg&ucirc;l Hunter</code>) via <strong>Taxonomy &gt; Manage Custom Tags...</strong> at any time.
     </div>
     <strong>Baseline Roles (Pre-packaged Dataset):</strong>
     <ul>
         <li><code>Automatic Attack</code> &mdash; Modifies, buffs, cancels, or creates site guardian attacks faced by the whole company (<em>Balrog of Moria</em>, <em>Siege</em>). Note: Cards or allies with personal immunity to automatic-attack strikes (such as <em>Treebeard</em> or <em>Goldberry</em>) are classified under <code>Role: Protection</code>.</li>
-        <li><code>Combat</code> &mdash; Initiates, directs, or modifies attacks—prowess and body adjustments, strike counts, combat rolls, or triggering special event attacks (<em>The Pale Sword</em>, <em>Minions Stir</em>, <em>Traitor</em>)</li>
+        <li>
+            <code>Card Flow</code> &mdash; Managing cards between your hand, deck, and discard pile&mdash;drawing extra cards (<em>Favor of the Valar</em>), searching your play deck (<em>Lucky Search</em>), retrieving cards from your discard pile (<em>Reforging</em>, <em>Mouth of Sauron</em>), increasing hand size (<em>Smoke Rings</em>), or forcing an opponent to discard cards (<em>Kham&ucirc;l the Easterling</em>)
+        </li>
+        <li>
+            <code>Combat</code> &mdash; Engaging in physical combat&mdash;boosting prowess or body during an attack, adjusting combat dice rolls, adding strikes, or triggering bonus attacks:
+            <ul>
+                <li>
+                    <strong>Company Martial Strength (Resources):</strong> Prowess buffs and combat tricks used by characters when fighting strikes (<em>Block</em>, <em>Dodge</em>, <em>Risky Blow</em>, <em>Lucky Strike</em>, <em>Glamdring</em>).
+                </li>
+                <li>
+                    <strong>Attack Escalation &amp; Lethality (Hazards):</strong> Buffing creature prowess, increasing strike counts, or triggering extra attacks against companies (<em>Wake of War</em>, <em>Minions Stir</em>, <em>Orc-guard</em>, <em>Traitor</em>, <em>The Pale Sword</em>).
+                </li>
+            </ul>
+        </li>
         <li><code>Corruption</code> &mdash; Strategic corruption offense or defense—forces corruption checks or burdens (<em>Lure of Power</em>, <em>Despair of the Heart</em>) or mitigates and heals corruption (<em>Praise to Elbereth</em>)</li>
-        <li><code>Deck</code> &mdash; Interacts with deck and discard flow—searching/tutoring the play deck (<em>Lucky Search</em>), graveyard recursion from the discard pile (<em>Reforging</em>, <em>The Nazg&ucirc;l are Abroad</em>, <em>&Ucirc;vatha the Horseman</em>), card cycling (<em>Vilya</em>), or search denial (<em>Bane of the Ithil-stone</em>)</li>
         <li><code>Duration</code> &mdash; Extends the life or duration of active events in play (<em>The Will of Sauron</em>)</li>
-        <li><code>Hand</code> &mdash; In-hand card economy and hand disruption—hand size modifiers (<em>Smoke Rings</em>), card draw acceleration (<em>Favor of the Valar</em>), hand scouting (<em>Mirror of Galadriel</em>), or forced discarding (<em>Kham&ucirc;l the Easterling</em>)</li>
-        <li><code>Influence</code> &mdash; Modifies general influence, Direct Influence (DI) ratings, or influence check rolls made against characters and factions (<em>Return of the King</em>, <em>A Friend or Three</em>)</li>
+        <li>
+            <code>Influence</code> &mdash; Modifies mathematical influence totals, control ratings, or influence check rolls:
+            <ul>
+                <li><strong>Stat &amp; Capacity Adjustments:</strong> Direct Influence (DI) ratings, general influence pools, or character control limits (<em>Return of the King</em>).</li>
+                <li><strong>Influence Check Modifiers:</strong> Numerical bonuses or penalties to influence dice rolls made against characters, followers, or factions (<em>Lordly Presence</em>, <em>Old Friendship</em>, <em>A Friend or Three</em>, <em>Persuasive Words</em>).</li>
+                <li><strong>Influence Attack / Opponent Stealing:</strong> Aiding or protecting against influence attempts made by opponent companies or agents.</li>
+            </ul>
+        </li>
         <li><code>Item</code> &mdash; Retrieves, transfers, protects, or forces the discard/theft of items (<em>Align Palant&iacute;r</em>, <em>Ind&ucirc;r Dawndeath</em>)</li>
         <li><code>Movement</code> &mdash; Modifies travel, region pathing, or forces company return (<em>Morannon</em>)</li>
-        <li><code>Protection</code> &mdash; Cancels attacks, prevents strikes, or grants company/character immunity to hazards and site attacks (<em>Sacrifice of Form</em>, <em>Leaflock</em>, <em>Quickbeam</em>, <em>Goldberry</em>)</li>
+        <li>
+            <code>Protection</code> &mdash; Avoiding, mitigating, or surviving combat&mdash;cancelling attacks, dodging strikes, granting personal strike immunity, preventing wounds, or healing damage:
+            <ul>
+                <li>
+                    <strong>Attack &amp; Strike Evasion:</strong> Cancelling attacks before strikes are rolled, or slipping away unseen (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Escape</em>, <em>Halfling Stealth</em>, <em>Vanishment</em>).
+                </li>
+                <li>
+                    <strong>Immunity &amp; Target Denial:</strong> Allies or characters that cannot be attacked or chosen as strike targets (<em>Treebeard</em>, <em>Goldberry</em>, <em>Leaflock</em>, <em>Tom Bombadil</em>).
+                </li>
+                <li>
+                    <strong>Survival &amp; Healing:</strong> Preventing wounds, shielding characters from discard when defeated, or healing damage after combat (<em>Halfling Strength</em>, <em>Sacrifice of Form</em>, <em>Healing Herbs</em>).
+                </li>
+            </ul>
+        </li>
         <li><code>Quest</code> &mdash; Directly advances victory conditions or scenario goals by awarding Marshalling Points (MPs) for completing specific site journeys or tasks (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>). Non-scoring utility cards that transform the board (such as <em>The White Tree</em>) are classified under their functional mechanism (e.g. <code>Role: Site</code>).</li>
         <li><code>Readiness</code> &mdash; In-play status manipulation—tapping, untapping, healing, or removing/returning cards from the table (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>)</li>
-        <li><code>Recruitment</code> &mdash; Directly aids, modifies, or enables recruiting characters or factions into play (<em>A Chance Meeting</em>, <em>Ro&auml;c the Raven</em>)</li>
+        <li>
+            <code>Recruitment</code> &mdash; Enables, accelerates, or alters the physical entry of characters and factions into play (beyond numerical check modifiers):
+            <ul>
+                <li><strong>Location &amp; Site Bypasses:</strong> Playing characters or factions at non-standard sites or alternative havens (<em>A Chance Meeting</em>).</li>
+                <li><strong>Alternative Recruitment Engines:</strong> Enlisting factions through special substitute rules rather than standard diplomat influence checks (<em>Muster</em>, <em>Ro&auml;c the Raven</em>, <em>The Great Eagles</em>).</li>
+                <li><strong>Recruitment Pacing:</strong> Playing extra characters in a turn or tutoring characters/factions directly from deck or discard.</li>
+            </ul>
+            <div class="note">
+                <strong>Influence vs. Recruitment (The "Muster" Edge Case):</strong><br />
+                <ul>
+                    <li><strong>Pure Influence:</strong> Cards that merely grant a numerical bonus to standard diplomat rolls (e.g. <code>+5</code> on <em>Lordly Presence</em> or <em>A Friend or Three</em>) belong strictly under <code>Role: Influence</code>.</li>
+                    <li><strong>Pure Recruitment:</strong> Cards that alter sites, timing, or summon entities into play without a standard influence check (e.g. <em>A Chance Meeting</em>, <em>Ro&auml;c the Raven</em>) belong under <code>Role: Recruitment</code>.</li>
+                    <li><strong>Hybrid Cards (<em>Muster</em>):</strong> Under errata, <em>Muster</em> uses a warrior's prowess to modify an influence check. Because it both enables a martial class to recruit factions and modifies the check total, it carries dual tags: <code>Role: Influence; Recruitment</code>.</li>
+                </ul>
+            </div>
+        </li>
         <li><code>Site</code> &mdash; Alters site status, hold types, or site playability (<em>Witch-king of Angmar</em>, <em>The White Tree</em>)</li>
         <li><code>Terrain</code> &mdash; Converts region path symbols and territory terrain classifications between hostile and safe (<em>Fog</em>, <em>Morgul Night</em>, <em>Moon</em>)</li>
     </ul>
@@ -305,6 +391,11 @@
     <p>
         Supports specific named sites (e.g. <code>Minas Tirith</code>, <code>Moria</code>), structural site hold classifications (e.g. <code>Dark-hold</code>, <code>Shadow-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Free-hold</code>, <code>Border-hold</code>, <code>Haven</code>), and regional site filters (e.g. <code>Region=Dagorlad</code>).
     </p>
+    <div class="tip">
+        <strong>Modal "OR" Events vs. Hard Prerequisites:</strong><br />
+        Only tag <code>Site Requirement</code> if the site or hold type is a <strong>mandatory prerequisite</strong> required to play the card (e.g. <em>Rescue Prisoners</em> requiring a Dark-hold or Shadow-hold, or <em>Siege</em> requiring a Border-hold or Free-hold).<br /><br />
+        If an event features an <strong>unconstrained primary mode</strong> alongside an optional keying branch (such as <em>Dragon's Desolation</em>, which offers <em>"+2 prowess to any Dragon attack OR play a Dragon at Ruins &amp; Lairs"</em>), leave <code>Site Requirement</code> <strong><code>[Blank]</code></strong>. Tagging the conditional enabler would falsely brand the card as a site-locked hazard in procedural rules, preventing general decks from drafting it as open combat support.
+    </div>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Dark-hold; Shadow-hold</code> &rarr; Permitted play sites for <em>Rescue Prisoners</em></li>

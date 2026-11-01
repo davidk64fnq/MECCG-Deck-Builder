@@ -42,23 +42,42 @@
 
 1. **Official Card Attributes (Filter Slots 1 & 2):**
    - Housed inside `GroupBoxCardAttributes` ("Card Attributes (Official Database)").
-   - Canonical rules properties: `Attribute` (e.g. *Race*, *Skill*) and `Value` (e.g. *Dúnadan*, *Warrior*).
+   - Canonical rules properties: `Attribute` (e.g. *Race*, *Skill*, *Specific*) and `Value` (e.g. *Dúnadan*, *Warrior*).
    - Inspected via context menu item: `Card Attributes`.
    - Expansion sets filtered globally via top **Catalog** menu checkboxes.
+
 2. **Custom User Taxonomy (Filter Slots 3 & 4):**
    - Housed inside `GroupBoxCustomTags` ("Custom Tags (User Taxonomy)").
-   - User-defined taxonomy: `Category` (e.g. *Strategy*, *Role*) and `Tag` (e.g. *Ring Destruction*, *Scout Support*).
-   - Inspected via context menu item: `Assigned Tags`.
+   - User-defined taxonomy: `Category` (e.g. *Role*, *Region Requirement*, *Prerequisite*) and `Tag` (e.g. *Card Flow*, *Gorgoroth*, *Paths of the Dead*).
+   - Inspected via context menu item: `Assigned Tags` and the live **Card Taxonomy Inspector** pane.
    - Card tagging actions: `Assign Tag` (with `+ Author New Tag...` and `+ Add Tag...`), `Remove Tag`.
    - Dedicated manager: `Taxonomy > Manage Custom Tags...` (`Categories`, `Tags`, `Add...`, `Rename...`, `Delete`).
-   - Tag file persistence: `Taxonomy > Load Tag Set...`, `Taxonomy > Merge Tag Set...`, and `Taxonomy > Save Tag Set...`.
+   - Tag file persistence: `Taxonomy > Load Tag Set...`, `Taxonomy > Merge Tag Set...`, and `Taxonomy > Save Tag Set...` (defaults to auto-loaded baseline `Rules_Support_Tags.json`).
    - Global filter reset: `Taxonomy > Clear All Active Filters` (<kbd>Ctrl+R</kbd>).
-3. **Procedural Rule Schema Symmetry:**
+
+3. **Procedural Rule Schema Symmetry & Storyline Engine:**
    - `"Attributes"`: Dictionary of official criteria (`Attribute: Value`, e.g. `{"Race": "Dwarf"}`).
    - `"Categories"`: Dictionary of custom criteria (`Category: Tag`, e.g. `{"Faction Bonus": "Wood-elves"}`).
-   - Placeholders: `{Variable.AttributeName}` for official attributes (including `{Variable.Home}` resolving both named sites and dynamic predicates), `{Variable.Category:CategoryName}` (or `{Variable.Tag:...}`) for custom tags.
-   - Dynamic Predicates: Evaluates `Attribute=Value`, `Attribute!=Value`, and compound `&&` logic (e.g. `Region=Under-deeps && Site!=Dark-hold`, `Site=Haven`, `Site=Dark-hold`, `Adjacent Sites!=[Blank]`) against candidate cards dynamically, with diacritic resilience and canonical hold-type normalization.
-   - Consolidated Geography Categories: Location rules unified into `Site Requirement` and `Region Requirement` for cards in scope, with `Home Region` preserved for character origin joins.
+   - **Placeholders:** `{Variable.AttributeName}` for official attributes (including `{Variable.Home}` resolving both named sites and dynamic predicates) and `{Variable.Category:CategoryName}` (or `{Variable.Tag:...}`) for custom tags.
+   - **Dynamic Predicates:** Evaluates `Attribute=Value`, `Attribute!=Value`, and compound `&&` logic (e.g. `Region=Under-deeps && Site!=Dark-hold`, `Site=Haven`, `Site=Dark-hold`, `Adjacent Sites!=[Blank]`) dynamically, with diacritic resilience and canonical hold-type normalization.
+   - **Strict Geography Separation:**
+     - `Site Requirement`: Reserved exclusively for **Site Names** (*Vale of Erech*, *Minas Tirith*) and **Site Hold Types** (*Dark-hold*, *Ruins & Lairs*). Strictly purged of `Region=...` predicates (Nazgûl use `Region Requirement`) and redundant `Haven` tags (havens are foundational to all decks; omitting them prevents false expedition draws).
+     - `Region Requirement`: Reserved exclusively for **Geographic Region Names** (*Gorgoroth*, *Rohan*) and **Terrain Types** (*Wilderness*, *Shadow-land*).
+     - `Home Region`: Preserved specifically on characters to link starting sites to territories for regional company cohesion.
+   - **Role Taxonomy (14 Baseline Roles):**
+     - Symmetrical across resources and hazards: `Automatic Attack`, `Card Flow`, `Combat`, `Corruption`, `Duration`, `Influence`, `Item`, `Movement`, `Protection`, `Quest`, `Readiness`, `Recruitment`, `Site`, `Terrain`.
+     - `Card Flow`: Unified tag covering the hand-deck-discard pipeline (drawing extra cards, searching play decks, discard retrieval, hand size modifiers, cycling, and discard attacks).
+     - `Combat` vs. `Protection`: `Combat` is strictly engaging in the fight (prowess, strikes, combat dice, extra attacks). `Protection` is strictly avoiding or surviving the fight (attack cancellation, stealth/evasion, personal strike immunity, wound prevention, healing).
+     - *Creature Policy:* Standard hazard creatures omit `Role: Combat` (their combat nature is fully captured by official attributes `Secondary: Creature` and `Prowess`/`Strikes`; tagging them pollutes the combat trick filter). Dual-mode cards only receive a `Role` if their event mode has a distinct tactical function (e.g., `Readiness` on *Adûnaphel*, `Combat` on *Akhôrahil* for his -1 Body debuff).
+     - *Avatars Policy:* Avatars (Wizards, Ringwraiths) omit `Role` tags; they are deck keystones drafted by Name or `Race: Wizard`, not commodity utility draws.
+   - **Universal Quest & Storyline Chaining:**
+     - `Prerequisite`: Assigned to quest cards to declare required enabler cards or relics (e.g. `Paths of the Dead` on *Army of the Dead*; `Narsil; Reforging` on *Andúril*).
+     - `Prerequisite For`: Assigned to enabler cards (e.g. `Army of the Dead` on *Paths of the Dead*).
+     - *Enabler Shield Pattern:* Generic open resource rules specify `"Prerequisite For": "[Blank]"` so specialized enablers are never drafted into decks lacking their parent quest.
+   - **Primary Usability Rule (Soft Synergy vs. Hard Dependency):**
+     - Hard dependencies (cards non-functional without each other, like *Army of the Dead* and *Paths of the Dead*) use `Specific` and `Prerequisite`.
+     - Standalone cards with optional partner perks (e.g., *Arwen* +7 DI on Aragorn, or *Athelas* healing with any Dúnadan vs. corruption removal with Aragorn) must **never** be tagged with hard prerequisites (`Specific`) or restrictive secondary roles that would lock them out of generic company draws.
+
 4. **Core Workflow Menu Hierarchy:**
    - **Deck:** `New Deck` (<kbd>Ctrl+N</kbd>), `Open Deck...` (<kbd>Ctrl+O</kbd>), `Save Deck` (<kbd>Ctrl+S</kbd>), `Save Deck As...`, `Generate from Rules...` (<kbd>Ctrl+G</kbd>), `Re-run Deck Rules` (<kbd>F5</kbd>), `Export Deck...` (<kbd>Ctrl+E</kbd>), `Exit`.
    - **Catalog:** `Select All Expansions`, `Clear All Expansions`, expansion checkboxes, `Download Card Artwork...`.
@@ -99,6 +118,11 @@
   - [x] Issue #37: Broaden Cross-Card Lookup to Support Custom Categories and Region Type Taxonomy
   - [x] Issue #38: Consolidate Site/Region Requirement Taxonomy and Model Dynamic Character Homes as Native Predicates
   - [x] Issue #39: Baseline Taxonomy Synchronization, Role Vocabulary Alignment, and Dialog Directory Persistence
+  - [x] Issue #40: Unified 'Card Flow' Role, Case-Sensitive Tag Renaming Fix, and Universal Quest Engine Architecture
+    - Consolidated 'Deck' and 'Hand' roles into plain-language 'Card Flow' tag.
+    - Fixed tag/category rename bug by changing guard comparison to StringComparison.Ordinal.
+    - Implemented 'Prerequisite' and 'Prerequisite For' categories with Recipe 10 documentation.
+    - Purged 'Region=...' predicates and redundant 'Haven' tags from Site Requirement.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

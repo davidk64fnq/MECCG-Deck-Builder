@@ -42,7 +42,6 @@ namespace MECCG_Deck_Builder
         private CancellationTokenSource _imageLoadCts;
         private Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
         private string _lastDeckRulesFilePath;
-        private string _lastTagSetDirectory;
 
         internal Form1()
         {
@@ -1808,14 +1807,24 @@ namespace MECCG_Deck_Builder
         {
             var settings = UserSettingsService.Current;
 
-            // 1. Check user settings first, fallback to AppData (or portable dir) if unset
-            string targetDir = !string.IsNullOrWhiteSpace(settings.LastTagSetDirectory) && Directory.Exists(settings.LastTagSetDirectory)
-                ? settings.LastTagSetDirectory
-                : StoragePathService.GetDataDirectory();
+            string targetDir = settings.LastTagSetDirectory;
 
-            if (!Directory.Exists(targetDir))
+#if DEBUG
+            // Safety guard: If in development, prevent saving to bin\Debug!
+            if (string.IsNullOrWhiteSpace(targetDir) || targetDir.Contains(@"\bin\", StringComparison.OrdinalIgnoreCase))
             {
-                Directory.CreateDirectory(targetDir);
+                // Automatically finds the repo root above bin\Debug\net8.0-windows
+                string projectSourceDir = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\.."));
+                if (Directory.Exists(projectSourceDir))
+                {
+                    targetDir = projectSourceDir;
+                }
+            }
+#endif
+
+            if (string.IsNullOrWhiteSpace(targetDir) || !Directory.Exists(targetDir))
+            {
+                targetDir = StoragePathService.GetDataDirectory();
             }
 
             using var saveFileDialog = new SaveFileDialog
@@ -1824,6 +1833,7 @@ namespace MECCG_Deck_Builder
                 DefaultExt = "json",
                 Filter = "MECCG Custom Tag Set (*.json)|*.json|All Files (*.*)|*.*",
                 InitialDirectory = targetDir,
+                RestoreDirectory = true, // Prevents Windows from mutating the path
                 FileName = "Rules_Support_Tags.json"
             };
 

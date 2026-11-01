@@ -66,6 +66,11 @@
             <td><code>Adjacent Sites: "{...}"</code>, <code>"[Blank]"</code></td>
             <td>Guaranteed subterranean entrance pathing with zero orphan sites</td>
         </tr>
+        <tr>
+            <td><a href="#recipe-10">10. Universal Quest Engine</a></td>
+            <td><code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code></td>
+            <td>Drafting complete multi-card storyline packages with zero hardcoding</td>
+        </tr>
     </table>
 
     <!-- RECIPE 1: ITEM DRAFTING -->
@@ -213,16 +218,28 @@
   }
 }</code></pre>
 
-    <!-- RECIPE 7: DUAL-MODE CARDS -->
-    <h2 id="recipe-7">7. Handling Dual-Mode Cards (Creature / Events)</h2>
+    <!-- RECIPE 7: DUAL-MODE & MODAL CARDS -->
+    <h2 id="recipe-7">7. Handling Dual-Mode &amp; Modal "OR" Cards</h2>
     <p>
-        Several hazards (like the Nazg&ucirc;l) possess dual secondary types (e.g., <code>Creature/Permanent-event</code>). Often, their Creature mode is restricted to specific geographic regions (e.g., <em>Gorgoroth</em>, <em>Khand</em>), while their Event mode is playable anywhere.
+        Certain cards offer split functionality—either via dual card types (such as Nazg&ucirc;l with <code>Creature/Permanent-event</code>) or through modal "OR" rules text (such as <em>Dragon's Desolation</em>).
+    </p>
+
+    <div class="note">
+        <strong>The Guiding Principle &mdash; Restrictions vs. Permissions:</strong><br />
+        Why do we tag the restriction on a Nazg&ucirc;l, but leave <em>Dragon's Desolation</em> blank?
+        <ul>
+            <li><strong>Restrictions (Tag them):</strong> A Nazg&ucirc;l's creature mode is <em>legally barred</em> outside its printed regions. We tag those regions so the generator never drafts it as an illegal creature in Eriador.</li>
+            <li><strong>Permissions (Leave blank):</strong> <em>Dragon's Desolation</em> is <em>always legal</em> anywhere on Middle-earth under its primary mode. Its Ruins &amp; Lairs clause is an optional alternative permission, not a play barrier. Leaving it <code>[Blank]</code> ensures the generator recognizes it as a universally playable card.</li>
+        </ul>
+    </div>
+
+    <h3>A. Drafting Dual Cards as Creatures (Strictly Regional)</h3>
+    <p>
+        Several hazards (like the Nazg&ucirc;l) possess dual secondary types. Often, their Creature mode is restricted to specific geographic regions (e.g., <em>Gorgoroth</em>, <em>Khand</em>), while their Event mode is playable anywhere.
     </p>
     <p>
         <strong>Tagging Best Practice:</strong> Only tag the strict creature regions in your custom taxonomy (e.g., <code>Region Requirement: Gorgoroth; Khand</code>). Do not add "All" or "Anywhere" for the event side, as that would cause the generator to falsely draft them as creatures in illegal regions like the Shire.
     </p>
-
-    <h3>A. Drafting the Card as a Creature (Strictly Regional)</h3>
     <pre><code>{
   "Name": "Gorgoroth Guardians",
   "Section": "Hazards",
@@ -235,7 +252,7 @@
   }
 }</code></pre>
 
-    <h3>B. Drafting the Card as an Event (Globally Available)</h3>
+    <h3>B. Drafting Dual Cards as Events (Globally Available)</h3>
     <pre><code>{
   "Name": "Exhaustion Hazard Events",
   "Section": "Hazards",
@@ -245,6 +262,28 @@
   },
   "Categories": {
     "Role": "Exhaustion"
+  }
+}</code></pre>
+
+    <h3>C. Modal "OR" Events (Global Effect vs. Keying Enabler)</h3>
+    <p>
+        Cards like <em>Dragon's Desolation</em> offer a universally playable mode (buffing any Dragon attack anywhere) <em>OR</em> an alternative enabling clause (keying a Dragon hazard creature to Ruins &amp; Lairs with wilderness).
+    </p>
+    <ul>
+        <li><strong>Tagging Best Practice:</strong> Leave <code>Site Requirement</code> and <code>Region Requirement</code> <strong><code>[Blank]</code></strong>.</li>
+        <li><strong>Why:</strong> The card does not <em>mandate</em> a Ruins &amp; Lairs site to be legally played. Tagging the site condition would prevent open hazard rules (such as <code>"Site Requirement": "[Blank]"</code>) from drafting the card to support wandering Dragon creatures or lair automatic-attacks.</li>
+    </ul>
+    <pre><code>{
+  "Name": "Open Dragon Enhancements",
+  "Section": "Hazards",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Role": "Combat",
+    "Target Species": "Dragon",
+    "Site Requirement": "[Blank]"
   }
 }</code></pre>
 
@@ -391,5 +430,91 @@
     <p>
         Rule 2 queries all Under-deeps sites whose semicolon-separated <code>Adjacent Sites</code> tag contains <em>Blue Mountain Dwarf-hold</em>, successfully matching and adding <em>The Drowning-deeps</em> without hardcoded site pairings.
     </p>
+
+    <!-- RECIPE 10: UNIVERSAL QUEST & STORYLINE ENGINE -->
+    <h2 id="recipe-10">10. The Universal Quest &amp; Storyline Engine</h2>
+    <p>
+        Certain scenario objectives require a full package of connected cards—a champion hero, a destination site, a starting site, and a prerequisite enabler card. (For example, <em>Army of the Dead</em> requires <em>Aragorn II</em>, movement from <em>Dunharrow</em> to <em>Vale of Erech</em>, and the event <em>Paths of the Dead</em>).
+    </p>
+    <p>
+        By chaining <code>SaveAs</code> variables with fallback routing, a single generic 5-rule block can draft <strong>any random quest from your catalog</strong> and automatically pull in every required card without hardcoding titles:
+    </p>
+
+    <pre><code>[
+  {
+    "Name": "Random Scenario Quest",
+    "SaveAs": "Quest",
+    "Section": "Resources",
+    "Count": 1,
+    "Categories": {
+      "Role": "Quest"
+    }
+  },
+  {
+    "Name": "Quest Champion Hero",
+    "Section": "Pool",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Character",
+      "Name": "{Quest.Specific}"
+    },
+    "Fallback": {
+      "Name": "Generic Companion",
+      "Attributes": {
+        "Primary": "Character"
+      }
+    }
+  },
+  {
+    "Name": "Quest Enabler Card",
+    "SaveAs": "Enabler",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Resource",
+      "Name": "{Quest.Category:Prerequisite}"
+    },
+    "Fallback": {
+      "Name": "Open Resource Support",
+      "Categories": {
+        "Role": "Card Flow; Protection",
+        "Prerequisite For": "[Blank]"
+      }
+    }
+  },
+  {
+    "Name": "Quest Destination Site",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{Quest.Category:Site Requirement}"
+    }
+  },
+  {
+    "Name": "Quest Origin / Enabler Site",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{Enabler.Category:Site Requirement}"
+    },
+    "Fallback": {
+      "Name": "Open Adventure Site",
+      "Attributes": {
+        "Primary": "Site"
+      }
+    }
+  }
+]</code></pre>
+
+    <div class="tip">
+        <strong>Shielding Generic Resource Draws:</strong><br />
+        To ensure that quest enablers (like <em>Paths of the Dead</em>) are never drawn by generic utility rules into non-quest decks, add <code>"Prerequisite For": "[Blank]"</code> to all open resource rules:
+        <pre><code>"Categories": {
+  "Role": "Card Flow; Protection",
+  "Prerequisite For": "[Blank]"
+}</code></pre>
+    </div>
 </body>
 </html>

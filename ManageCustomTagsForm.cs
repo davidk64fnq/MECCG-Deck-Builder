@@ -245,7 +245,7 @@ namespace MECCG_Deck_Builder
             if (_listBoxKeys.SelectedItem is not string currentKey) return;
 
             string renamedKey = PromptDialog.Show(this, "Rename Category", $"Enter new name for category '{currentKey}':", currentKey);
-            if (string.IsNullOrWhiteSpace(renamedKey) || string.Equals(renamedKey, currentKey, StringComparison.OrdinalIgnoreCase)) return;
+            if (string.IsNullOrWhiteSpace(renamedKey) || string.Equals(renamedKey, currentKey, StringComparison.Ordinal)) return;
 
             renamedKey = renamedKey.Trim();
             _filterService.RenameCustomKeyName(currentKey, renamedKey);
@@ -287,7 +287,7 @@ namespace MECCG_Deck_Builder
                 _listBoxValues.SelectedItem is not string currentVal) return;
 
             string renamedVal = PromptDialog.Show(this, "Rename Tag", $"Enter new name for tag '{currentVal}':", currentVal);
-            if (string.IsNullOrWhiteSpace(renamedVal) || string.Equals(renamedVal, currentVal, StringComparison.OrdinalIgnoreCase)) return;
+            if (string.IsNullOrWhiteSpace(renamedVal) || string.Equals(renamedVal, currentVal, StringComparison.Ordinal)) return;
 
             renamedVal = renamedVal.Trim();
             _filterService.RenameCustomKeyValue(currentKey, currentVal, renamedVal);
