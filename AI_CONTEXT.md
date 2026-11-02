@@ -123,6 +123,11 @@
     - Fixed tag/category rename bug by changing guard comparison to StringComparison.Ordinal.
     - Implemented 'Prerequisite' and 'Prerequisite For' categories with Recipe 10 documentation.
     - Purged 'Region=...' predicates and redundant 'Haven' tags from Site Requirement.
+  - [x] Issue #41: Geographic Theater Deck Rules: Contiguous Region Clusters, Haven Starter Hubs, and Overland Pathfinding
+    - Graph layer built from 'Adjacent Regions' taxonomy on Region cards.
+    - Added 'GeographicTheater' rule schema with 'Starter Only' and 'Starter + Region' execution modes.
+    - Automated Hero starting haven (Rivendell), stepping-stone havens (Lórien/Grey Havens for Edhellond), and BFS overland transit routes.
+    - Unified downstream contract exporting {Theater.Haven} and {Theater.Region}.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
@@ -141,3 +146,45 @@ To eliminate the inconsistencies, historical quirks, and unstructured text burde
    - Convert the enriched JSON into CSV.
    - Import into MECCG Deck Builder via `Taxonomy > Import Taxonomy (CSV)...` to inspect and review the taxonomy live in the UI and filter slots.
 6. **Unified Master Schema Consolidation:** Once all partitions are finalized, consolidate the schemas into a unified local master catalog (`cards-dc.json` / `Card.cs`).
+
+## Modular Slot Matrix Architecture & Parametric Deck Assembly
+
+### 1. Vision & Core Objectives
+To evolve procedural generation beyond monolithic `.json` templates into a modular, workbench-style deck constructor:
+- **Decoupled Components:** Split full deck rule sets into reusable, modular `.json` components by theme and section (e.g., Company packages, Hazard suites, Regional site routes, and Strategy/Quest engines).
+- **Interactive Assembly Matrix (Alternative B):** A unified configuration dialog where players select modules via dropdown slots (e.g., *Company*, *Theater/Region*, *Strategy*, *Hazard Suite*) rather than stepping through a rigid multi-page wizard or editing raw JSON files.
+- **In-App Visual Designer (Long-Term):** Future capability to visually author, parameterize, and export component files directly inside the application using existing faceted filter controls.
+
+---
+
+### 2. Parametric Budgeting & Variable Deck Sizing
+To prevent components from hardcoding static integer counts (`"Count": 7`) that break when deck sizes change (e.g., 25/25 starter, 30/30 tournament, 36/36, 40/40 drafts):
+- **Runtime Budget Injection:** The Matrix UI lets the user select target deck sizes (e.g., 30 Resources / 30 Hazards / 20 Sideboard) and passes these targets into the orchestrator.
+- **Proportional Allocation (`Percent`):** Component rules can declare fractional budgets (e.g., `"Percent": 20` for combat gear, `"Percent": 10` for factions, `"Percent": 70` for open utility events).
+- **Integer Resolution & Surplus Absorption:** The orchestrator converts percentages to integer counts (`Budget * Percent`) and allocates any rounding remainders to the largest open utility rule.
+
+---
+
+### 3. Multi-Directional / Order-Independent Assembly (Inverted Drivers)
+Because deck construction does not always originate from the leader character outward, the execution pipeline supports flexible dependency chaining:
+- **Leader-First Construction (Outward):**
+  1. `Company Module` selects a leader (e.g., *Dáin II*) $\rightarrow$ `SaveAs: "Leader"`.
+  2. `Site Module` queries `{Leader.Category:Home Region}` and `{Leader.Home}` to draft matching strongholds and contiguous regions.
+  3. `Resource Module` queries `{Leader.Category:Faction Bonus}` to draft matching faction cards.
+- **Region-First Construction (Inward / Geographic Anchor):**
+  1. `Theater/Region Module` establishes a geographic territory (e.g., *Gondor / Anórien*) $\rightarrow$ `SaveAs: "AnchorRegion"`.
+  2. `Company Module` queries `"Home Region": "{AnchorRegion.Region}"`, constraining candidate leaders strictly to characters native to that theater (*Boromir*, *Faramir*, *Beregond*).
+  3. `Site Module` drafts contiguous site paths and strongholds within that regional cluster.
+  4. `Hazard Module` keys regional hazards and creatures directly to the theater's terrain and region requirements.
+- **Strategy/Quest-First Construction:**
+  1. `Quest Module` selects an objective (e.g., *Army of the Dead*) $\rightarrow$ `SaveAs: "Quest"`.
+  2. Chained modules resolve required champions (`{Quest.Specific}` $\rightarrow$ *Aragorn II*), prerequisites (`{Quest.Category:Prerequisite}` $\rightarrow$ *Paths of the Dead*), and staging sites (`{Quest.Category:Site Requirement}`).
+
+---
+
+### 4. Component Contracts & Context Continuity
+- **Shared In-Memory Context:** Leverages the existing `contextVariables` dictionary (`SaveAs` / `{...}`) across sequential component executions without modifying core generation evaluation logic.
+- **Contract Declarations:** Component headers declare their context dependencies:
+  - `"RequiresContext": [ "Leader" ]` (Prerequisites that must be present in memory).
+  - `"ProvidesContext": [ "Leader", "ExpeditionSites" ]` (Variables populated for downstream modules).
+- **Global Constraints Maintained:** Deck uniqueness limits, 3-copy rules, and alignment compatibility remain globally enforced across all evaluated components.

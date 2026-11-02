@@ -71,6 +71,11 @@
             <td><code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code></td>
             <td>Drafting complete multi-card storyline packages with zero hardcoding</td>
         </tr>
+        <tr>
+            <td><a href="#recipe-11">11. Geographic Theaters &amp; Movement</a></td>
+            <td><code>GeographicTheater</code>, <code>Adjacent Regions</code>, <code>Mode</code></td>
+            <td>Drafting cohesive regional clusters, haven hubs, and overland routes</td>
+        </tr>
     </table>
 
     <!-- RECIPE 1: ITEM DRAFTING -->
@@ -516,5 +521,66 @@
   "Prerequisite For": "[Blank]"
 }</code></pre>
     </div>
+
+    <!-- RECIPE 11: GEOGRAPHIC THEATERS & REGIONAL CLUSTERS -->
+    <h2 id="recipe-11">11. Geographic Theaters &amp; Contiguous Movement Paths</h2>
+    <p>
+        Procedural deck generation templates can establish cohesive Middle-earth operational theaters using Middle-earth's <code>Adjacent Regions</code> adjacency graph:
+    </p>
+
+    <h3>A. Haven-Tethered Starter Hub (0 Region Cards)</h3>
+    <p>
+        Anchor your expedition to <em>Rivendell</em> (or a randomly chosen haven) using pure Starter Movement without diluting your site deck with region cards:
+    </p>
+    <pre><code>[
+  {
+    "RuleType": "GeographicTheater",
+    "Name": "Rivendell Expedition Hub",
+    "Mode": "Starter Only",
+    "Haven": "Rivendell",
+    "RegionCount": 4
+  },
+  {
+    "Name": "Regional Adventure Sites",
+    "Section": "Sites",
+    "Count": 6,
+    "Attributes": {
+      "Primary": "Site",
+      "Region": "{Theater.Region}"
+    }
+  }
+]</code></pre>
+
+    <h3>B. Contiguous Roaming Cluster with Overland Pathfinding</h3>
+    <p>
+        Roam freely through a cluster of up to 4 contiguous regions around <em>Lórien</em>, automatically drafting the region cards, starting haven (*Rivendell*), and the shortest overland BFS hiking route:
+    </p>
+    <pre><code>[
+  {
+    "RuleType": "GeographicTheater",
+    "Name": "Southern Mirkwood Theater",
+    "Mode": "Starter + Region",
+    "Haven": "Lórien",
+    "RegionCount": 4,
+    "IncludeOverlandPath": true
+  },
+  {
+    "Name": "Roaming Adventure Destinations",
+    "Section": "Sites",
+    "Count": 5,
+    "Attributes": {
+      "Primary": "Site",
+      "Region": "{Theater.Region}"
+    }
+  },
+  {
+    "Name": "Regional Creature Hazards",
+    "Section": "Hazards",
+    "Count": 8,
+    "Categories": {
+      "Region Requirement": "{Theater.Region}"
+    }
+  }
+]</code></pre>
 </body>
 </html>

@@ -2391,6 +2391,27 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
+            // Generate and save detailed execution trace log
+            string traceFilePath = null;
+            try
+            {
+                string traceLog = result.GenerateExecutionTrace(ruleSet.DeckTitle);
+                string dir = Path.GetDirectoryName(filePath);
+                string baseName = Path.GetFileNameWithoutExtension(filePath);
+                traceFilePath = Path.Combine(dir, $"{baseName}.trace.log");
+                File.WriteAllText(traceFilePath, traceLog);
+            }
+            catch
+            {
+                try
+                {
+                    string fallbackLog = result.GenerateExecutionTrace(ruleSet.DeckTitle);
+                    traceFilePath = Path.Combine(StoragePathService.GetDataDirectory(), "Last_Deck_Generation.trace.log");
+                    File.WriteAllText(traceFilePath, fallbackLog);
+                }
+                catch { }
+            }
+
             _lastDeckRulesFilePath = filePath;
             ToolStripMenuToolsRerunDeckGen.Enabled = true;
             ToolStripMenuToolsRerunDeckGen.Text = $"Re-run Rules ({Path.GetFileName(filePath)})";
@@ -2447,6 +2468,11 @@ namespace MECCG_Deck_Builder
             sb.AppendLine($"Sideboard: {_currentDeck.Sideboard.Count}");
             sb.AppendLine($"Sites: {_currentDeck.Sites.Count}");
 
+            if (!string.IsNullOrEmpty(traceFilePath) && File.Exists(traceFilePath))
+            {
+                sb.AppendLine($"\nExecution Trace Log saved to:\n{Path.GetFileName(traceFilePath)}");
+            }
+
             var branches = result.Logs.Where(l => l.RuleName.StartsWith("[Branch Selected]")).ToList();
             if (branches.Count > 0)
             {
@@ -2457,13 +2483,31 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            var shortfalls = result.Logs.Where(l => l.IsShortfall).ToList();
-            if (shortfalls.Count > 0)
+            var primaryShortfalls = result.Logs.Where(l => l.IsShortfall && !l.IsFallback).ToList();
+            if (primaryShortfalls.Count > 0)
             {
-                sb.AppendLine("\nNotice - Insufficient matching cards:");
-                foreach (var sf in shortfalls)
+                sb.AppendLine("\nNotices & Fallback Routing:");
+                foreach (var sf in primaryShortfalls)
                 {
-                    sb.AppendLine($" • {sf.RuleName} ({sf.Section}): added {sf.AddedCount} of {sf.RequestedCount}");
+                    int logIndex = result.Logs.IndexOf(sf);
+                    // Check if the immediately following log was a fallback for this rule
+                    var nextLog = (logIndex >= 0 && logIndex + 1 < result.Logs.Count) ? result.Logs[logIndex + 1] : null;
+
+                    if (nextLog != null && nextLog.IsFallback)
+                    {
+                        if (nextLog.AddedCount >= nextLog.RequestedCount)
+                        {
+                            sb.AppendLine($" • {sf.RuleName} ({sf.Section}): added {sf.AddedCount} of {sf.RequestedCount} -> Resolved by fallback '{nextLog.RuleName}' (+{nextLog.AddedCount})");
+                        }
+                        else
+                        {
+                            sb.AppendLine($" • {sf.RuleName} ({sf.Section}): added {sf.AddedCount} of {sf.RequestedCount} -> Partial fallback '{nextLog.RuleName}' (+{nextLog.AddedCount} of {nextLog.RequestedCount})");
+                        }
+                    }
+                    else
+                    {
+                        sb.AppendLine($" • {sf.RuleName} ({sf.Section}): added {sf.AddedCount} of {sf.RequestedCount} (Unresolved shortfall)");
+                    }
                 }
             }
 

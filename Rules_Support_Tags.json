@@ -2801,6 +2801,7 @@
       "set": "MELE"
     },
     {
+      "Adjacent Regions": "Andrast; Anfalas; Bay of Belfalas; Eriadoran Coast; Old Pûkel-land",
       "fullCode": "Andrast (TW)",
       "id": "187",
       "name": "Andrast",
@@ -2808,6 +2809,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Andrast; Bay of Belfalas; Eriadoran Coast",
       "fullCode": "Andrast Coast (TW)",
       "id": "188",
       "name": "Andrast Coast",
@@ -2815,6 +2817,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Brown Lands; Grey Mountain Narrows; Gundabad; High Pass; Southern Mirkwood; Western Mirkwood; Wold & Foothills; Woodland Realm",
       "fullCode": "Anduin Vales (TW)",
       "id": "189",
       "name": "Anduin Vales",
@@ -2822,6 +2825,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Andrast; Bay of Belfalas; Belfalas; Lamedon; Old Pûkel-land",
       "fullCode": "Anfalas (TW)",
       "id": "190",
       "name": "Anfalas",
@@ -2829,6 +2833,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Arthedain; Forochel; Gundabad; Rhudaur",
       "fullCode": "Angmar (TW)",
       "id": "191",
       "name": "Angmar",
@@ -2836,6 +2841,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Ithilien; Lebennin; Rohan",
       "fullCode": "Anórien (TW)",
       "id": "192",
       "name": "Anórien",
@@ -2843,6 +2849,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Angmar; Cardolan; Forochel; Lindon; Númeriador; Rhudaur; The Shire",
       "fullCode": "Arthedain (TW)",
       "id": "193",
       "name": "Arthedain",
@@ -2850,6 +2857,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Andrast; Anfalas; Belfalas; Mouths of the Anduin",
       "fullCode": "Bay of Belfalas (TW)",
       "id": "194",
       "name": "Bay of Belfalas",
@@ -2857,6 +2865,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anfalas; Bay of Belfalas; Lamedon; Lebennin; Mouths of the Anduin",
       "fullCode": "Belfalas (TW)",
       "id": "195",
       "name": "Belfalas",
@@ -2864,6 +2873,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Dagorlad; Southern Mirkwood; Wold & Foothills",
       "fullCode": "Brown Lands (TW)",
       "id": "196",
       "name": "Brown Lands",
@@ -2871,6 +2881,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Arthedain; Dunland; Enedhwaith; Eriadoran Coast; Hollin; Rhudaur; The Shire",
       "fullCode": "Cardolan (TW)",
       "id": "197",
       "name": "Cardolan",
@@ -2878,6 +2889,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Brown Lands; Horse Plains; Ithilien; Southern Mirkwood; Southern Rhovanion",
       "fullCode": "Dagorlad (TW)",
       "id": "198",
       "name": "Dagorlad",
@@ -2885,6 +2897,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Northern Rhovanion; Southern Rhovanion",
       "fullCode": "Dorwinion (TW)",
       "id": "199",
       "name": "Dorwinion",
@@ -2892,6 +2905,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Cardolan; Enedhwaith; Hollin",
       "fullCode": "Dunland (TW)",
       "id": "200",
       "name": "Dunland",
@@ -2899,6 +2913,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Eriadoran Coast; Lindon",
       "fullCode": "Elven Shores (TW)",
       "id": "201",
       "name": "Elven Shores",
@@ -2906,6 +2921,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Cardolan; Dunland; Eriadoran Coast; Gap of Isen; Old Pûkel-land",
       "fullCode": "Enedhwaith (TW)",
       "id": "202",
       "name": "Enedhwaith",
@@ -2913,6 +2929,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Andrast; Cardolan; Elven Shores; Enedhwaith; Old Pûkel-land",
       "fullCode": "Eriadoran Coast (TW)",
       "id": "203",
       "name": "Eriadoran Coast",
@@ -2920,6 +2937,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Gap of Isen; Rohan; Wold & Foothills",
       "fullCode": "Fangorn (TW)",
       "id": "204",
       "name": "Fangorn",
@@ -2927,6 +2945,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Angmar; Arthedain; Númeriador",
       "fullCode": "Forochel (TW)",
       "id": "205",
       "name": "Forochel",
@@ -2934,6 +2953,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Enedhwaith; Fangorn; Old Pûkel-land; Rohan",
       "fullCode": "Gap of Isen (TW)",
       "id": "206",
       "name": "Gap of Isen",
@@ -2941,6 +2961,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Imlad Morgul; Nurn; Udûn",
       "fullCode": "Gorgoroth (TW)",
       "id": "207",
       "name": "Gorgoroth",
@@ -2948,6 +2969,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Northern Rhovanion; Withered Heath; Woodland Realm",
       "fullCode": "Grey Mountain Narrows (TW)",
       "id": "208",
       "name": "Grey Mountain Narrows",
@@ -2955,6 +2977,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Angmar",
       "fullCode": "Gundabad (TW)",
       "id": "209",
       "name": "Gundabad",
@@ -2962,6 +2985,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Ithilien; Khand; Mouths of the Anduin",
       "fullCode": "Harondor (TW)",
       "id": "210",
       "name": "Harondor",
@@ -2969,6 +2993,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Northern Rhovanion; Southern Mirkwood; Southern Rhovanion; Western Mirkwood; Woodland Realm",
       "fullCode": "Heart of Mirkwood (TW)",
       "id": "211",
       "name": "Heart of Mirkwood",
@@ -2976,6 +3001,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Rhudaur",
       "fullCode": "High Pass (TW)",
       "id": "212",
       "name": "High Pass",
@@ -2983,6 +3009,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Cardolan; Dunland; Redhorn Gate; Rhudaur",
       "fullCode": "Hollin (TW)",
       "id": "213",
       "name": "Hollin",
@@ -2990,6 +3017,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Dagorlad; Nurn; Southern Rhovanion",
       "fullCode": "Horse Plains (TW)",
       "id": "214",
       "name": "Horse Plains",
@@ -2997,6 +3025,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Gorgoroth; Ithilien",
       "fullCode": "Imlad Morgul (TW)",
       "id": "215",
       "name": "Imlad Morgul",
@@ -3004,6 +3033,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Northern Rhovanion; Withered Heath",
       "fullCode": "Iron Hills (TW)",
       "id": "216",
       "name": "Iron Hills",
@@ -3011,6 +3041,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anórien; Dagorlad; Harondor; Imlad Morgul",
       "fullCode": "Ithilien (TW)",
       "id": "217",
       "name": "Ithilien",
@@ -3018,6 +3049,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Harondor; Nurn",
       "fullCode": "Khand (TW)",
       "id": "218",
       "name": "Khand",
@@ -3025,6 +3057,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anfalas; Belfalas; Lebennin",
       "fullCode": "Lamedon (TW)",
       "id": "219",
       "name": "Lamedon",
@@ -3032,6 +3065,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anórien; Belfalas; Lamedon; Mouths of the Anduin",
       "fullCode": "Lebennin (TW)",
       "id": "220",
       "name": "Lebennin",
@@ -3039,6 +3073,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Arthedain; Elven Shores; Númeriador",
       "fullCode": "Lindon (TW)",
       "id": "221",
       "name": "Lindon",
@@ -3046,6 +3081,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Bay of Belfalas; Belfalas; Harondor; Lebennin",
       "fullCode": "Mouths of the Anduin (TW)",
       "id": "222",
       "name": "Mouths of the Anduin",
@@ -3053,6 +3089,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Dorwinion; Grey Mountain Narrows; Heart of Mirkwood; Iron Hills; Southern Mirkwood; Withered Heath; Woodland Realm",
       "fullCode": "Northern Rhovanion (TW)",
       "id": "223",
       "name": "Northern Rhovanion",
@@ -3060,6 +3097,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Arthedain; Forochel; Lindon",
       "fullCode": "Númeriador (TW)",
       "id": "224",
       "name": "Númeriador",
@@ -3067,6 +3105,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Gorgoroth; Horse Plains; Khand",
       "fullCode": "Nurn (TW)",
       "id": "225",
       "name": "Nurn",
@@ -3074,6 +3113,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anfalas; Old Pûkel-land",
       "fullCode": "Old Pûkel Gap (TW)",
       "id": "226",
       "name": "Old Pûkel Gap",
@@ -3081,6 +3121,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Andrast; Enedhwaith; Gap of Isen; Old Pûkel Gap",
       "fullCode": "Old Pûkel-land (TW)",
       "id": "227",
       "name": "Old Pûkel-land",
@@ -3088,6 +3129,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Hollin; Wold & Foothills",
       "fullCode": "Redhorn Gate (TW)",
       "id": "228",
       "name": "Redhorn Gate",
@@ -3095,6 +3137,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Angmar; Arthedain; Cardolan; High Pass; Hollin",
       "fullCode": "Rhudaur (TW)",
       "id": "229",
       "name": "Rhudaur",
@@ -3102,6 +3145,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anórien; Fangorn; Gap of Isen; Wold & Foothills",
       "fullCode": "Rohan (TW)",
       "id": "230",
       "name": "Rohan",
@@ -3109,6 +3153,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Brown Lands; Dagorlad; Heart of Mirkwood; Southern Rhovanion; Western Mirkwood",
       "fullCode": "Southern Mirkwood (TW)",
       "id": "231",
       "name": "Southern Mirkwood",
@@ -3116,6 +3161,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Dagorlad; Dorwinion; Heart of Mirkwood; Horse Plains; Northern Rhovanion; Southern Mirkwood",
       "fullCode": "Southern Rhovanion (TW)",
       "id": "232",
       "name": "Southern Rhovanion",
@@ -3123,6 +3169,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Arthedain; Cardolan",
       "fullCode": "The Shire (TW)",
       "id": "233",
       "name": "The Shire",
@@ -3130,6 +3177,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Gorgoroth",
       "fullCode": "Udûn (TW)",
       "id": "234",
       "name": "Udûn",
@@ -3137,6 +3185,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Heart of Mirkwood; Southern Mirkwood; Woodland Realm",
       "fullCode": "Western Mirkwood (TW)",
       "id": "235",
       "name": "Western Mirkwood",
@@ -3144,6 +3193,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Grey Mountain Narrows; Iron Hills; Northern Rhovanion",
       "fullCode": "Withered Heath (TW)",
       "id": "236",
       "name": "Withered Heath",
@@ -3151,6 +3201,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Brown Lands; Fangorn; Redhorn Gate; Rohan",
       "fullCode": "Wold & Foothills (TW)",
       "id": "237",
       "name": "Wold & Foothills",
@@ -3158,6 +3209,7 @@
       "set": "METW"
     },
     {
+      "Adjacent Regions": "Anduin Vales; Grey Mountain Narrows; Heart of Mirkwood; Northern Rhovanion; Western Mirkwood",
       "fullCode": "Woodland Realm (TW)",
       "id": "238",
       "name": "Woodland Realm",
@@ -4156,7 +4208,7 @@
       "fullCode": "Block (TW)",
       "id": "251",
       "name": "Block",
-      "Role": "Readiness",
+      "Role": "Combat",
       "set": "METW"
     },
     {
@@ -4482,7 +4534,7 @@
       "fullCode": "Lucky Search (TW)",
       "id": "319",
       "name": "Lucky Search",
-      "Role": "Card Flow",
+      "Role": "Item",
       "set": "METW",
       "Site Requirement": "Dark-hold; Shadow-hold"
     },
@@ -4558,6 +4610,60 @@
     }
   ],
   "Filters": [
+    [
+      "Adjacent Regions",
+      "Andrast",
+      "Anduin Vales",
+      "Anfalas",
+      "Angmar",
+      "Anórien",
+      "Arthedain",
+      "Bay of Belfalas",
+      "Belfalas",
+      "Brown Lands",
+      "Cardolan",
+      "Dagorlad",
+      "Dorwinion",
+      "Dunland",
+      "Elven Shores",
+      "Enedhwaith",
+      "Eriadoran Coast",
+      "Fangorn",
+      "Forochel",
+      "Gap of Isen",
+      "Gorgoroth",
+      "Grey Mountain Narrows",
+      "Gundabad",
+      "Harondor",
+      "Heart of Mirkwood",
+      "High Pass",
+      "Hollin",
+      "Horse Plains",
+      "Imlad Morgul",
+      "Iron Hills",
+      "Ithilien",
+      "Khand",
+      "Lamedon",
+      "Lebennin",
+      "Lindon",
+      "Mouths of the Anduin",
+      "Northern Rhovanion",
+      "Nurn",
+      "Númeriador",
+      "Old Pûkel Gap",
+      "Old Pûkel-land",
+      "Redhorn Gate",
+      "Rhudaur",
+      "Rohan",
+      "Southern Mirkwood",
+      "Southern Rhovanion",
+      "The Shire",
+      "Udûn",
+      "Western Mirkwood",
+      "Withered Heath",
+      "Wold & Foothills",
+      "Woodland Realm"
+    ],
     [
       "Adjacent Sites",
       "Adjacent Sites!=[Blank]&&Site=Ruins & Lairs",

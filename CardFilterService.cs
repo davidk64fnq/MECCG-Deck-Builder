@@ -649,6 +649,74 @@ namespace MECCG_Deck_Builder
             return [];
         }
 
+        public List<string> GetAdjacentRegions(string cardId)
+        {
+            return GetCardTagsForCategory(cardId, "Adjacent Regions");
+        }
+
+        public List<string> GetAdjacentRegions(Card regionCard)
+        {
+            if (regionCard == null) return [];
+            return GetAdjacentRegions(regionCard.Id);
+        }
+
+        /// <summary>
+        /// Builds an in-memory graph of Middle-earth region adjacencies from region cards and custom taxonomy tags.
+        /// Guaranteed to include bidirectional edges for contiguous traversal and pathfinding.
+        /// </summary>
+        public Dictionary<string, HashSet<string>> BuildRegionAdjacencyGraph(IEnumerable<Card> cards)
+        {
+            var graph = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            if (cards == null) return graph;
+
+            foreach (var card in cards)
+            {
+                if (!string.Equals(card.Primary, "Region", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string regionName = card.Name?.Trim();
+                if (string.IsNullOrEmpty(regionName)) continue;
+
+                if (!graph.TryGetValue(regionName, out var neighbors))
+                {
+                    neighbors = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    graph[regionName] = neighbors;
+                }
+
+                var adjacent = GetAdjacentRegions(card.Id);
+                string attrVal = card.GetAttribute("Adjacent Regions");
+                if (!string.IsNullOrWhiteSpace(attrVal))
+                {
+                    foreach (var part in attrVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    {
+                        if (!adjacent.Contains(part, StringComparer.OrdinalIgnoreCase))
+                        {
+                            adjacent.Add(part);
+                        }
+                    }
+                }
+
+                foreach (var adj in adjacent)
+                {
+                    if (string.IsNullOrWhiteSpace(adj)) continue;
+                    string trimmedAdj = adj.Trim();
+                    neighbors.Add(trimmedAdj);
+
+                    // Ensure bidirectional connectivity
+                    if (!graph.TryGetValue(trimmedAdj, out var reverseNeighbors))
+                    {
+                        reverseNeighbors = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        graph[trimmedAdj] = reverseNeighbors;
+                    }
+                    reverseNeighbors.Add(regionName);
+                }
+            }
+
+            return graph;
+        }
+
         public void RemoveCardCustomTag(string cardId, string keyName, string tagValue)
         {
             if (string.IsNullOrEmpty(cardId) || string.IsNullOrEmpty(keyName) || string.IsNullOrWhiteSpace(tagValue))
@@ -850,7 +918,14 @@ namespace MECCG_Deck_Builder
             if (val.Contains(';'))
             {
                 var split = val.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                return split.Any(s => EqualsWithDiacriticFallback(s, value.Trim()));
+                var targetSplit = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return split.Any(s => targetSplit.Any(t => EqualsWithDiacriticFallback(s, t)));
+            }
+
+            if (value.Contains(';'))
+            {
+                var targetSplit = value.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return targetSplit.Any(t => EqualsWithDiacriticFallback(val.Trim(), t));
             }
 
             return false;

@@ -152,6 +152,82 @@
         </tr>
     </table>
 
+    <!-- SECTION 2.A: GEOGRAPHIC THEATER OBJECT -->
+    <h2 id="theater-object">2.A Geographic Theater Rule Object (<code>GeographicTheater</code>)</h2>
+    <p>
+        Used when <code>RuleType</code> is <code>"GeographicTheater"</code> (or <code>"Theater"</code>). Constructs cohesive regional play areas using Middle-earth's <code>Adjacent Regions</code> graph layer, supporting pure Starter Movement hubs and contiguous roaming clusters with automatic starting haven and transit pathing:
+    </p>
+
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>Mode</code></td>
+            <td>string</td>
+            <td><code>"Starter Only"</code></td>
+            <td>
+                Movement strategy:
+                <ul>
+                    <li><code>"Starter Only"</code>: Pure Haven hub. Identifies candidate regions containing sites where <code>Nearest Haven == Haven</code>. Adds <strong>0</strong> region cards to the site deck.</li>
+                    <li><code>"Starter + Region"</code>: Contiguous roaming cluster. Expands an adjacent cluster of contiguous regions from the haven's home territory and adds the <code>&lt;Region&gt;</code> cards to the <code>Sites</code> partition.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Haven</code></td>
+            <td>string</td>
+            <td><code>"Random"</code></td>
+            <td>
+                Anchor Haven: <code>"Rivendell"</code>, <code>"Lórien"</code>, <code>"Grey Havens"</code>, <code>"Edhellond"</code>, valid non-Hero havens (e.g. <code>"Dol Guldur"</code>), or <code>"Random"</code>.<br />
+                <em>Smart Haven Snapping:</em> If a non-haven site (such as <em>Bree</em> or <em>Minas Tirith</em>) is specified, the engine snaps to its printed nearest haven (<em>Rivendell</em>, <em>Edhellond</em>) for both modes. Unrecognized site names or typos fall back safely to <em>Rivendell</em> with a trace note.
+            </td>
+        </tr>
+        <tr>
+            <td><code>RegionCount</code></td>
+            <td>integer</td>
+            <td><code>4</code></td>
+            <td>
+                Total number of contiguous regions in the theater. Defaults to <code>4</code> (guaranteeing that any local site-to-site move is reachable in a single turn). Higher values (e.g. <code>5</code> to <code>8</code>) can be specified to create wider multi-turn campaign corridors.
+            </td>
+        </tr>
+        <tr>
+            <td><code>SiteCount</code></td>
+            <td>integer</td>
+            <td><code>0</code></td>
+            <td>
+                Optional number of adventure sites to sample directly within the active theater. If omitted or <code>0</code>, adventure sites can be drafted by downstream rules using <code>"Region": "{Theater.Region}"</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>IncludeOverlandPath</code></td>
+            <td>boolean</td>
+            <td><code>false</code></td>
+            <td>
+                If <code>true</code> in <code>Starter + Region</code> mode, uses Breadth-First Search (BFS) on the <code>Adjacent Regions</code> graph to add the shortest contiguous region path from <em>Rhudaur</em> (Rivendell) to the theater.
+            </td>
+        </tr>
+        <tr>
+            <td><code>IncludeIntermediateHavens</code></td>
+            <td>boolean</td>
+            <td><code>true</code></td>
+            <td>
+                If <code>true</code>, automatically adds intermediate stepping-stone havens for Haven-to-Haven starter movement (e.g. <em>Lórien</em> or <em>Grey Havens</em> when traveling to <em>Edhellond</em>).
+            </td>
+        </tr>
+        <tr>
+            <td><code>SaveAs</code></td>
+            <td>string</td>
+            <td><code>"Theater"</code></td>
+            <td>
+                Captures the active theater into context variables, enabling downstream rules to query <code>{Theater.Haven}</code> and <code>{Theater.Region}</code>.
+            </td>
+        </tr>
+    </table>
+
     <!-- CHOICE OBJECT -->
     <h2 id="choice-object">3. Branch Choice Object (<code>DeckGenerationChoice</code>)</h2>
     <table>

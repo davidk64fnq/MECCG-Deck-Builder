@@ -26,6 +26,17 @@
     </div>
 
     <div class="note">
+        <strong>Taxonomy Design Philosophy &mdash; Structural Hooks vs. In-Game Modifiers:</strong><br />
+        The companion taxonomy dataset does not attempt to transcribe every situational penalty, dice modifier, or flavor handicap printed on card faces. (Cards already display those rules when in hand or on the table).<br /><br />
+        Instead, tags serve strictly as <strong>structural deck-building bridges</strong> between disparate card types:
+        <ul>
+            <li><strong>Positive Strategic Enablers:</strong> Tags capture abilities that procedural rules actively search for&mdash;such as recruiting a faction (<code>Faction Bonus</code>), fighting a specific monster (<code>Combat Bonus</code>), or pairing a quest with its required enabler card (<code>Prerequisite</code>).</li>
+            <li><strong>Why Negative Drawbacks are Omitted (e.g., <em>Barliman Butterbur</em>):</strong> Characters with situational handicaps (such as Barliman's <em>"-1 to influence checks against factions"</em>) are never drafted <em>for</em> their penalties. They are drafted for their baseline stats (e.g. <code>Mind: 1</code>, <code>Skill: Warrior</code>, <code>Home: Bree</code>). Tagging negative modifiers would clutter the taxonomy with dead values that no procedural deck rule would ever query.</li>
+            <li><strong>Avoiding Stat Duplication:</strong> Ratings already tracked in the official database (such as base <code>Direct</code>, <code>Prowess</code>, <code>Mind</code>, or official <code>Corruption</code> burden) are not duplicated as custom tags. Deck rules query those printed properties directly.</li>
+        </ul>
+    </div>
+
+    <div class="note">
         <strong>Card Examples &amp; Set Conventions:</strong>
         Wherever possible, card examples throughout this guide are drawn from the base premiere set, <em>The Wizards</em> (<code>METW</code>). For gameplay mechanics introduced in subsequent expansions (such as Under-deeps sites introduced in <em>The Dragons</em> or minion/fallen mechanics from <em>The Lidless Eye</em> and <em>The Balrog</em>), the expansion set code is explicitly noted in parentheses (e.g. <code>MEBA</code>).
     </div>
@@ -209,6 +220,14 @@
     <p>
         Tracks character Direct Influence (DI) bonuses for recruiting specific named factions or entire species of factions. In procedural deck generation, querying <code>"Name": "{Leader.Category:Faction Bonus}"</code> automatically drafts the exact faction your company leader specializes in recruiting.
     </p>
+    <div class="note">
+        <strong>Faction Recruitment vs. Follower Influence (e.g., Balin, D&aacute;in II):</strong><br />
+        Several diplomats feature printed text granting direct influence bonuses against both a faction and individual characters of that species (for example, <em>Balin</em> reads <em>"+1 direct influence against Dwarves and Dwarf factions"</em>).
+        <ul>
+            <li><strong>Why Factions are Tagged:</strong> Factions are external resource cards that must be deliberately included in your play deck. <code>Faction Bonus</code> provides the machine-actionable hook needed by procedural rules (e.g. <code>"Name": "{Leader.Category:Faction Bonus}"</code>) to pull that faction into the deck.</li>
+            <li><strong>Why Follower Influence is Omitted:</strong> Controlling followers in a company is governed by a character's printed <code>Direct</code> attribute and biological <code>Race</code>. Procedural company recruitment rules already draft companions by race (e.g. <code>"Race": "{Leader.Race}"</code>) or DI capacity (e.g. <code>"Direct": "&gt;= 2"</code>). Tagging Balin with follower influence would duplicate existing official attributes without adding functional deck-construction value.</li>
+        </ul>
+    </div>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Wood-elves</code> &rarr; Specific named faction recruited with bonus by <em>Thranduil</em></li>
@@ -316,7 +335,7 @@
     <ul>
         <li><code>Automatic Attack</code> &mdash; Modifies, buffs, cancels, or creates site guardian attacks faced by the whole company (<em>Balrog of Moria</em>, <em>Siege</em>). Note: Cards or allies with personal immunity to automatic-attack strikes (such as <em>Treebeard</em> or <em>Goldberry</em>) are classified under <code>Role: Protection</code>.</li>
         <li>
-            <code>Card Flow</code> &mdash; Managing cards between your hand, deck, and discard pile&mdash;drawing extra cards (<em>Favor of the Valar</em>), searching your play deck (<em>Lucky Search</em>), retrieving cards from your discard pile (<em>Reforging</em>, <em>Mouth of Sauron</em>), increasing hand size (<em>Smoke Rings</em>), or forcing an opponent to discard cards (<em>Kham&ucirc;l the Easterling</em>)
+            <code>Card Flow</code> &mdash; Managing cards between your hand, deck, and discard pile&mdash;drawing extra cards (<em>Favor of the Valar</em>), scouting or filtering your play deck (<em>Far-sight</em>, <em>Mirror of Galadriel</em>), retrieving cards from your discard pile (<em>Mouth of Sauron</em>), increasing hand size (<em>Smoke Rings</em>), or forcing an opponent to discard cards (<em>Kham&ucirc;l the Easterling</em>).
         </li>
         <li>
             <code>Combat</code> &mdash; Engaging in physical combat&mdash;boosting prowess or body during an attack, adjusting combat dice rolls, adding strikes, or triggering bonus attacks:
@@ -339,7 +358,7 @@
                 <li><strong>Influence Attack / Opponent Stealing:</strong> Aiding or protecting against influence attempts made by opponent companies or agents.</li>
             </ul>
         </li>
-        <li><code>Item</code> &mdash; Retrieves, transfers, protects, or forces the discard/theft of items (<em>Align Palant&iacute;r</em>, <em>Ind&ucirc;r Dawndeath</em>)</li>
+        <li><code>Item</code> &mdash; Retrieves, searches, transfers, protects, or forces the discard/theft of items (<em>Lucky Search</em>, <em>Reforging</em>, <em>Align Palant&iacute;r</em>, <em>Ind&ucirc;r Dawndeath</em>).</li>
         <li><code>Movement</code> &mdash; Modifies travel, region pathing, or forces company return (<em>Morannon</em>)</li>
         <li>
             <code>Protection</code> &mdash; Avoiding, mitigating, or surviving combat&mdash;cancelling attacks, dodging strikes, granting personal strike immunity, preventing wounds, or healing damage:
@@ -356,7 +375,7 @@
             </ul>
         </li>
         <li><code>Quest</code> &mdash; Directly advances victory conditions or scenario goals by awarding Marshalling Points (MPs) for completing specific site journeys or tasks (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>). Non-scoring utility cards that transform the board (such as <em>The White Tree</em>) are classified under their functional mechanism (e.g. <code>Role: Site</code>).</li>
-        <li><code>Readiness</code> &mdash; In-play status manipulation—tapping, untapping, healing, or removing/returning cards from the table (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>)</li>
+        <li><code>Readiness</code> &mdash; Character and ally stamina and status&mdash;tapping, untapping, wounding, healing, or returning characters to hand (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>). Note: Discarding or stealing items belongs under <code>Role: Item</code>, while altering or closing sites belongs under <code>Role: Site</code>.</li>
         <li>
             <code>Recruitment</code> &mdash; Enables, accelerates, or alters the physical entry of characters and factions into play (beyond numerical check modifiers):
             <ul>
