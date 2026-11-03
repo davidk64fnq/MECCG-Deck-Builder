@@ -96,7 +96,7 @@ namespace MECCG_Deck_Builder
                 "secondary" => Secondary,
                 "race" => Race,
                 "subrace" => Subrace,
-                "site" => Site,
+                "site" or "sitetype" => Site,
                 "region" => Region,
                 "playable" => Playable,
                 "goldring" => GoldRing,

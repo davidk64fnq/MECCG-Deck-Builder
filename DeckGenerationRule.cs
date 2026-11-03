@@ -50,6 +50,16 @@ namespace MECCG_Deck_Builder
         public string Haven { get; set; } = string.Empty;
 
         /// <summary>
+        /// Optional Middle-earth terrain filter constraining the geographic cluster and adventure sites (e.g. "Wilderness; Border-land", "!=Dark-domain").
+        /// </summary>
+        public string RegionType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Optional site hold classification filter constraining adventure sites (e.g. "Free-hold; Border-hold", "!=Dark-hold; !=Shadow-hold").
+        /// </summary>
+        public string SiteType { get; set; } = string.Empty;
+
+        /// <summary>
         /// Maximum number of regions in the contiguous cluster (defaults to 4 for single-turn transit, but can be higher for larger multi-turn theaters).
         /// </summary>
         public int? RegionCount { get; set; }

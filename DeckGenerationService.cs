@@ -190,6 +190,13 @@ namespace MECCG_Deck_Builder
                     return false;
                 }
 
+                // In MECCG site decks, duplicate sites or regions are never permitted
+                if (sectionType == DeckSectionType.Sites &&
+                    deck.Sites.Any(s => string.Equals(s.Name, c.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return false;
+                }
+
                 foreach (var (attrKey, (rawTemplate, resolvedVal)) in resolvedAttributes)
                 {
                     if (!string.IsNullOrWhiteSpace(rawTemplate) && string.IsNullOrWhiteSpace(resolvedVal))
@@ -214,12 +221,17 @@ namespace MECCG_Deck_Builder
 
                         if (!string.IsNullOrWhiteSpace(resolvedVal))
                         {
-                            var allowedTags = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                            if (!allowedTags.Any(t =>
-                                t == "*" ||
-                                string.Equals(t, "All", StringComparison.OrdinalIgnoreCase) ||
-                                filterService.MatchesCustomCriterion(c.Id, catKey, t) ||
-                                (CardFilterService.TryParsePredicate(t, out _, out _, out _) && CardFilterService.MatchesPredicate(c, t, filterService))))
+                            bool matchesCategory = EvaluateTokensWithExclusion(resolvedVal, token =>
+                            {
+                                if (CardFilterService.TryParsePredicate(token, out _, out _, out _))
+                                {
+                                    return CardFilterService.MatchesPredicate(c, token, filterService);
+                                }
+
+                                return filterService.MatchesCustomCriterion(c.Id, catKey, token);
+                            });
+
+                            if (!matchesCategory)
                             {
                                 return false;
                             }
@@ -388,7 +400,23 @@ namespace MECCG_Deck_Builder
 
             string modeDisplayName = isStarterPlusRegion ? "Starter + Region" : "Starter Only";
 
-            // 2. Determine Selected Anchor Haven with Validation & Snapping
+            // 2. Determine RegionType and SiteType Constraints
+            string regionTypeFilter = !string.IsNullOrWhiteSpace(rule.RegionType)
+                ? rule.RegionType
+                : (rule.Attributes.TryGetValue("RegionType", out string rtA) ? rtA
+                : (rule.Attributes.TryGetValue("Region Type", out string rtA2) ? rtA2
+                : (rule.Categories.TryGetValue("Region Type", out string rtC) ? rtC
+                : (rule.Categories.TryGetValue("RegionType", out string rtC2) ? rtC2 : string.Empty))));
+
+            string siteTypeFilter = !string.IsNullOrWhiteSpace(rule.SiteType)
+                ? rule.SiteType
+                : (rule.Attributes.TryGetValue("SiteType", out string stA) ? stA
+                : (rule.Attributes.TryGetValue("Site Type", out string stA2) ? stA2
+                : (rule.Attributes.TryGetValue("Site", out string stA3) ? stA3
+                : (rule.Categories.TryGetValue("SiteType", out string stC) ? stC
+                : (rule.Categories.TryGetValue("Site Type", out string stC2) ? stC2 : string.Empty)))));
+
+            // 3. Determine Selected Anchor Haven with Validation & Snapping
             string rawHaven = !string.IsNullOrWhiteSpace(rule.Haven)
                 ? rule.Haven
                 : (rule.Attributes.TryGetValue("Haven", out string h) ? h : string.Empty);
@@ -402,7 +430,6 @@ namespace MECCG_Deck_Builder
             }
             else
             {
-                // Check 4 canonical Hero havens first
                 var canonicalHero = HeroHavens.FirstOrDefault(hv => CardFilterService.EqualsWithDiacriticFallback(hv, rawHaven));
                 if (canonicalHero != null)
                 {
@@ -410,19 +437,15 @@ namespace MECCG_Deck_Builder
                 }
                 else
                 {
-                    // Check if the site exists in the catalog
                     var siteCard = FindCard(allCards, ruleSets, "Site", rawHaven);
                     if (siteCard != null)
                     {
                         if (string.Equals(CardFilterService.NormalizeSiteType(siteCard.Site), "Haven", StringComparison.OrdinalIgnoreCase))
                         {
-                            // 1. Valid non-Hero Haven (e.g. Dol Guldur, Carn Dûm)
                             selectedHaven = siteCard.Name;
                         }
                         else
                         {
-                            // 2. Non-haven site (e.g. Bree -> Rivendell, Minas Tirith -> Edhellond)
-                            // Snap to nearest printed haven for both modes
                             string nearest = !string.IsNullOrWhiteSpace(siteCard.Haven) ? siteCard.Haven.Trim() : "Rivendell";
                             selectedHaven = HeroHavens.FirstOrDefault(hv => CardFilterService.EqualsWithDiacriticFallback(hv, nearest)) ?? nearest;
                             havenValidationNote = $"Specified site '{siteCard.Name}' is not a Haven; snapped to nearest Haven '{selectedHaven}'.";
@@ -430,14 +453,13 @@ namespace MECCG_Deck_Builder
                     }
                     else
                     {
-                        // 3. Unrecognized site name / typo -> fall back safely to Rivendell
                         selectedHaven = "Rivendell";
                         havenValidationNote = $"Unrecognized Haven '{rawHaven}'; falling back to 'Rivendell'.";
                     }
                 }
             }
 
-            // 3. Determine Region Limit (default is 4 for single-turn reach, but permits larger theaters if specified)
+            // 4. Determine Region Limit
             int maxRegions = 4;
             if (rule.RegionCount.HasValue && rule.RegionCount.Value > 0)
             {
@@ -454,7 +476,7 @@ namespace MECCG_Deck_Builder
 
             maxRegions = Math.Max(1, maxRegions);
 
-            // 4. Determine Transit / Stepping Stone Options
+            // 5. Determine Transit / Stepping Stone Options
             bool includeOverland = rule.IncludeOverlandPath ?? false;
             if (!includeOverland && rule.Attributes.TryGetValue("IncludeOverlandPath", out string ovStr) && bool.TryParse(ovStr, out bool parsedOverland))
             {
@@ -467,7 +489,7 @@ namespace MECCG_Deck_Builder
                 includeIntermediateHavens = parsedHavens;
             }
 
-            // 5. Determine Adventure Site Draft Count (only drafts if explicitly requested)
+            // 6. Determine Adventure Site Draft Count
             int siteCount = 0;
             if (rule.SiteCount.HasValue && rule.SiteCount.Value > 0)
             {
@@ -478,10 +500,10 @@ namespace MECCG_Deck_Builder
                 siteCount = parsedSc;
             }
 
-            // 6. Build Middle-earth Region Adjacency Graph from custom tags & attributes
+            // 7. Build Middle-earth Region Adjacency Graph from custom tags & attributes
             var graph = filterService.BuildRegionAdjacencyGraph(allCards);
 
-            // 7. Resolve Haven Home Region
+            // 8. Resolve Haven Home Region
             string homeRegion = "Rhudaur";
             if (HavenHomeRegions.TryGetValue(selectedHaven, out string foundHome))
             {
@@ -494,13 +516,48 @@ namespace MECCG_Deck_Builder
                 homeRegion = havenCard.Region.Trim();
             }
 
+            // 9. Build Allowed Region Set if RegionType is Constrained
+            HashSet<string> allowedRegions = null;
+            if (!string.IsNullOrWhiteSpace(regionTypeFilter))
+            {
+                var matchingRegions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var regCard in allCards.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var rTypes = GetRegionTypesForCard(regCard, allCards, filterService);
+                    if (MatchesRegionTypeFilter(rTypes, regionTypeFilter))
+                    {
+                        matchingRegions.Add(regCard.Name.Trim());
+                    }
+                }
+
+                if (matchingRegions.Count > 0)
+                {
+                    allowedRegions = matchingRegions;
+                }
+                else
+                {
+                    string warn = $"No regions matched RegionType '{regionTypeFilter}'; filter ignored.";
+                    havenValidationNote = (havenValidationNote != null ? havenValidationNote + " | " : "") + warn;
+                }
+            }
+
             List<string> activeRegions;
             var theaterAddedCardNames = new List<string>();
 
             if (isStarterPlusRegion)
             {
-                // Starter + Region: Seed from haven home territory and expand contiguous cluster of <= 4 regions
-                activeRegions = ExpandContiguousRegionCluster(graph, homeRegion, maxRegions);
+                // Starter + Region: Seed from haven home territory (or closest allowed territory) and expand contiguous cluster
+                string seedRegion = homeRegion;
+                if (allowedRegions != null && !allowedRegions.Contains(homeRegion))
+                {
+                    var pathToAllowed = FindShortestRegionPath(graph, homeRegion, allowedRegions);
+                    if (pathToAllowed.Count > 0)
+                    {
+                        seedRegion = pathToAllowed[^1];
+                    }
+                }
+
+                activeRegions = ExpandContiguousRegionCluster(graph, seedRegion, maxRegions, allowedRegions);
 
                 // Add the X <Region> cards to the Sites deck partition
                 foreach (var reg in activeRegions)
@@ -537,30 +594,29 @@ namespace MECCG_Deck_Builder
                     !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase) &&
                     (ruleSets == null || ruleSets.Count == 0 || ruleSets.Contains(c.Set)) &&
                     CardFilterService.EqualsWithDiacriticFallback(c.Haven, selectedHaven) &&
-                    !string.IsNullOrWhiteSpace(c.Region)).ToList();
+                    !string.IsNullOrWhiteSpace(c.Region) &&
+                    (string.IsNullOrWhiteSpace(siteTypeFilter) || MatchesSiteTypeFilter(c, siteTypeFilter)) &&
+                    (string.IsNullOrWhiteSpace(regionTypeFilter) || MatchesRegionTypeFilter(GetRegionTypesForCard(c, allCards, filterService), regionTypeFilter))).ToList();
 
                 var candidateRegions = candidateSites
                     .Select(c => c.Region.Trim())
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-                // Always ensure the Haven's own home territory is part of the theater candidate pool
-                if (!string.IsNullOrWhiteSpace(homeRegion))
+                if (!string.IsNullOrWhiteSpace(homeRegion) && (allowedRegions == null || allowedRegions.Contains(homeRegion)))
                 {
                     candidateRegions.Add(homeRegion);
                 }
 
                 activeRegions = [];
 
-                // Anchor 1: Start with Haven's home territory
-                if (!string.IsNullOrWhiteSpace(homeRegion))
+                if (!string.IsNullOrWhiteSpace(homeRegion) && (allowedRegions == null || allowedRegions.Contains(homeRegion)))
                 {
                     activeRegions.Add(homeRegion);
                 }
 
                 if (candidateRegions.Count > maxRegions)
                 {
-                    // Expand contiguously from home territory across candidate regions
                     var cluster = ExpandContiguousRegionCluster(graph, homeRegion, maxRegions, candidateRegions);
                     foreach (var cr in cluster)
                     {
@@ -570,7 +626,6 @@ namespace MECCG_Deck_Builder
                         }
                     }
 
-                    // Fill any remaining allowance from candidate regions
                     if (activeRegions.Count < maxRegions)
                     {
                         foreach (var cr in candidateRegions)
@@ -595,8 +650,7 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 8. Starting Haven Resolution & Stepping-Stone Transit
-            // Hero starting company always requires Rivendell in the site deck
+            // 10. Starting Haven Resolution & Stepping-Stone Transit
             var rivendellCard = FindCard(allCards, ruleSets, "Site", "Rivendell");
             if (rivendellCard != null && AddSiteOrRegionCard(deck, rivendellCard, cardCountsByName))
             {
@@ -605,7 +659,6 @@ namespace MECCG_Deck_Builder
 
             if (!CardFilterService.EqualsWithDiacriticFallback(selectedHaven, "Rivendell"))
             {
-                // Add stepping-stone haven for Haven-to-Haven starter movement to Edhellond
                 if (includeIntermediateHavens && CardFilterService.EqualsWithDiacriticFallback(selectedHaven, "Edhellond"))
                 {
                     var intermediateCard = FindCard(allCards, ruleSets, "Site", "Lórien") ??
@@ -616,14 +669,13 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                // Add the anchor haven site card
                 if (havenCard != null && AddSiteOrRegionCard(deck, havenCard, cardCountsByName))
                 {
                     theaterAddedCardNames.Add($"{havenCard.Name} (Haven - Anchor Destination)");
                 }
             }
 
-            // 9. Draft Adventure Sites (if explicitly requested on the theater rule itself)
+            // 11. Draft Adventure Sites (Filtering by active regions, SiteType, and RegionType)
             var draftedSiteNames = new List<string>();
             int sitesAddedCount = 0;
             if (siteCount > 0)
@@ -636,6 +688,16 @@ namespace MECCG_Deck_Builder
                     if (!activeRegions.Contains(c.Region, StringComparer.OrdinalIgnoreCase)) return false;
 
                     if (!isStarterPlusRegion && !CardFilterService.EqualsWithDiacriticFallback(c.Haven, selectedHaven))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(siteTypeFilter) && !MatchesSiteTypeFilter(c, siteTypeFilter))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(regionTypeFilter) && !MatchesRegionTypeFilter(GetRegionTypesForCard(c, allCards, filterService), regionTypeFilter))
                     {
                         return false;
                     }
@@ -655,7 +717,7 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 10. Unified Downstream Context Contract: {Theater.Haven} & {Theater.Region}
+            // 12. Unified Downstream Context Contract: {Theater.Haven} & {Theater.Region}
             var contextCards = new List<Card>();
             string allRegionsJoined = string.Join("; ", activeRegions);
 
@@ -681,7 +743,11 @@ namespace MECCG_Deck_Builder
                 contextVariables["Theater"] = contextCards;
             }
 
-            string logNote = $"Haven='{selectedHaven}' | Home='{homeRegion}' | {{Theater.Region}}=[{allRegionsJoined}]";
+            string logNote = $"Haven='{selectedHaven}' | Home='{homeRegion}'";
+            if (!string.IsNullOrWhiteSpace(regionTypeFilter)) logNote += $" | RegionType='{regionTypeFilter}'";
+            if (!string.IsNullOrWhiteSpace(siteTypeFilter)) logNote += $" | SiteType='{siteTypeFilter}'";
+            logNote += $" | {{Theater.Region}}=[{allRegionsJoined}]";
+
             if (!string.IsNullOrEmpty(havenValidationNote))
             {
                 logNote = $"{havenValidationNote} | {logNote}";
@@ -710,11 +776,89 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        internal static bool MatchesSiteTypeFilter(Card card, string siteTypeQuery)
+        {
+            if (card == null || string.IsNullOrWhiteSpace(siteTypeQuery)) return true;
+            return EvaluateTokensWithExclusion(siteTypeQuery, target => CardFilterService.MatchesSiteType(card.Site, target));
+        }
+
+        internal static bool MatchesRegionTypeFilter(
+            IEnumerable<string> cardRegionTypes,
+            string regionTypeQuery)
+        {
+            if (string.IsNullOrWhiteSpace(regionTypeQuery)) return true;
+            var types = (cardRegionTypes ?? []).ToList();
+            return EvaluateTokensWithExclusion(regionTypeQuery, target => types.Any(t => CardFilterService.EqualsWithDiacriticFallback(t, target)));
+        }
+
+        internal static List<string> GetRegionTypesForCard(
+            Card card,
+            IReadOnlyList<Card> allCards,
+            CardFilterService filterService)
+        {
+            var types = new List<string>();
+            if (card == null) return types;
+
+            if (filterService != null)
+            {
+                var directTags = filterService.GetCardTagsForCategory(card.Id, "Region Type");
+                if (directTags != null && directTags.Count > 0)
+                {
+                    types.AddRange(directTags);
+                }
+            }
+
+            string attrVal = card.GetAttribute("Region Type");
+            if (!string.IsNullOrWhiteSpace(attrVal))
+            {
+                foreach (var part in attrVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    if (!types.Contains(part, StringComparer.OrdinalIgnoreCase))
+                    {
+                        types.Add(part);
+                    }
+                }
+            }
+
+            if (types.Count == 0 && string.Equals(card.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(card.Region))
+            {
+                var regionCard = allCards.FirstOrDefault(c =>
+                    string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
+                    CardFilterService.EqualsWithDiacriticFallback(c.Name, card.Region));
+
+                if (regionCard != null)
+                {
+                    if (filterService != null)
+                    {
+                        var regTags = filterService.GetCardTagsForCategory(regionCard.Id, "Region Type");
+                        if (regTags != null && regTags.Count > 0)
+                        {
+                            types.AddRange(regTags);
+                        }
+                    }
+
+                    string regAttr = regionCard.GetAttribute("Region Type");
+                    if (!string.IsNullOrWhiteSpace(regAttr))
+                    {
+                        foreach (var part in regAttr.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        {
+                            if (!types.Contains(part, StringComparer.OrdinalIgnoreCase))
+                            {
+                                types.Add(part);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return types;
+        }
+
         internal static List<string> ExpandContiguousRegionCluster(
-            Dictionary<string, HashSet<string>> graph,
-            string seedRegion,
-            int targetCount,
-            ISet<string> allowedRegions = null)
+    Dictionary<string, HashSet<string>> graph,
+    string seedRegion,
+    int targetCount,
+    HashSet<string> allowedRegions = null)
         {
             var cluster = new List<string>();
             if (string.IsNullOrWhiteSpace(seedRegion)) return cluster;
@@ -872,6 +1016,58 @@ namespace MECCG_Deck_Builder
 
         #region ATTRIBUTE_EVALUATION_AND_NUMERIC_OPERATORS
 
+        /// <summary>
+        /// Evaluates a semicolon-delimited query string supporting positive inclusions (OR), 
+        /// negative exclusions prefixed with '!=' (AND), wildcards ('*', 'All'), and blank sentinels ('[Blank]').
+        /// </summary>
+        internal static bool EvaluateTokensWithExclusion(
+            string query,
+            Func<string, bool> matchesSingleTarget)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return true;
+
+            var tokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (tokens.Length == 0) return true;
+
+            var positiveTargets = new List<string>();
+            var negativeTargets = new List<string>();
+
+            foreach (var token in tokens)
+            {
+                if (token == "*" || string.Equals(token, "All", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                if (token.StartsWith("!=") && token.Length > 2)
+                {
+                    negativeTargets.Add(token[2..].Trim());
+                }
+                else
+                {
+                    positiveTargets.Add(token);
+                }
+            }
+
+            // 1. Negative Exclusions (AND logic): any match immediately rejects the card
+            foreach (var neg in negativeTargets)
+            {
+                if (matchesSingleTarget(neg))
+                {
+                    return false;
+                }
+            }
+
+            // 2. Positive Inclusions (OR logic): if specified, at least one must match
+            if (positiveTargets.Count > 0)
+            {
+                return positiveTargets.Any(pos => matchesSingleTarget(pos));
+            }
+
+            // 3. If only negative exclusions were specified and none matched, the card passes
+            return true;
+        }
+
         private static bool EvaluateAttributeCriterion(Card card, string attrKey, string resolvedVal, CardFilterService filterService)
         {
             if (string.IsNullOrWhiteSpace(resolvedVal))
@@ -893,27 +1089,14 @@ namespace MECCG_Deck_Builder
                 return EvaluateNumericAttributeComparison(card, attrKey, resolvedVal);
             }
 
-            var allowedValues = resolvedVal.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            return allowedValues.Any(v =>
+            return EvaluateTokensWithExclusion(resolvedVal, token =>
             {
-                if (v == "*" || string.Equals(v, "All", StringComparison.OrdinalIgnoreCase))
+                if (CardFilterService.TryParsePredicate(token, out _, out _, out _))
                 {
-                    return true;
+                    return CardFilterService.MatchesPredicate(card, token, filterService);
                 }
 
-                // Support inequality operator values on text attributes (e.g. "Site": "!=Haven")
-                if (v.StartsWith("!=") && v.Length > 2)
-                {
-                    string target = v[2..].Trim();
-                    return !CardFilterService.MatchesCardnumCriterion(card, attrKey, target);
-                }
-
-                if (CardFilterService.TryParsePredicate(v, out _, out _, out _))
-                {
-                    return CardFilterService.MatchesPredicate(card, v, filterService);
-                }
-
-                return CardFilterService.MatchesCardnumCriterion(card, attrKey, v);
+                return CardFilterService.MatchesCardnumCriterion(card, attrKey, token);
             });
         }
 
@@ -1151,6 +1334,15 @@ namespace MECCG_Deck_Builder
 
         private static bool IsUniqueCard(Card card)
         {
+            if (card == null) return false;
+
+            // In MECCG, all Site cards and Region cards are strictly unique in deck construction (max 1 copy per site deck)
+            if (string.Equals(card.Primary, "Site", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(card.Primary, "Region", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
             return string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase);
         }
 

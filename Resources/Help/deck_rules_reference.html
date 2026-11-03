@@ -195,11 +195,35 @@
             </td>
         </tr>
         <tr>
+            <td><code>RegionType</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>
+                Optional Middle-earth terrain filter constraining the contiguous cluster and drafted adventure sites:
+                <ul>
+                    <li><strong>Terrain Inclusions:</strong> Semicolon-separated terrain types (e.g. <code>"Wilderness; Border-land"</code>, <code>"Coastal Sea; Free-domain"</code>).</li>
+                    <li><strong>Terrain Exclusions (<code>!=</code>):</strong> Excludes hostile terrain from the theater (e.g. <code>"!=Dark-domain; !=Shadow-land"</code>).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
             <td><code>SiteCount</code></td>
             <td>integer</td>
             <td><code>0</code></td>
             <td>
                 Optional number of adventure sites to sample directly within the active theater. If omitted or <code>0</code>, adventure sites can be drafted by downstream rules using <code>"Region": "{Theater.Region}"</code>.
+            </td>
+        </tr>
+        <tr>
+            <td><code>SiteType</code></td>
+            <td>string</td>
+            <td><code>""</code></td>
+            <td>
+                Optional site hold classification filter constraining adventure sites drafted via <code>SiteCount</code> (or downstream rules):
+                <ul>
+                    <li><strong>Hold Inclusions:</strong> Semicolon-separated hold types (e.g. <code>"Free-hold; Border-hold; Ruins &amp; Lairs"</code>).</li>
+                    <li><strong>Hold Exclusions (<code>!=</code>):</strong> Excludes lethal holds from automatic drafting (e.g. <code>"!=Dark-hold; !=Shadow-hold"</code>).</li>
+                </ul>
             </td>
         </tr>
         <tr>
@@ -281,7 +305,18 @@
         <li><code>"Prowess": "&gt;= 7; 1"</code> &mdash; Tiered query matching warriors of prowess 7+ OR a 1-prowess scout.</li>
     </ul>
 
-    <h3>B. Blank &amp; Missing Value Matching (<code>"[Blank]"</code>)</h3>
+    <h3>B. Negative Exclusion &amp; Inequality Matching (<code>!=</code>)</h3>
+    <p>
+        Prefix any attribute value or taxonomy tag with <code>!=</code> to reject cards possessing that trait. Exclusions can be chained with semicolons:
+    </p>
+    <ul>
+        <li><code>"Site": "!=Dark-hold; !=Shadow-hold"</code> &mdash; Rejects any site classified as a Dark-hold or Shadow-hold (evaluated as <strong>AND</strong> logic across all exclusions).</li>
+        <li><code>"Role": "!=Combat; !=Automatic Attack"</code> &mdash; Excludes combat tricks from generic event or item draws.</li>
+        <li><code>"Race": "D&uacute;nadan; Dwarf; !=Hobbit"</code> &mdash; Combines positive inclusions (OR) with strict negative exclusions (AND).</li>
+        <li><code>"Adjacent Sites": "!=[Blank]"</code> &mdash; Matches cards that have at least one tag assigned under <em>Adjacent Sites</em>.</li>
+    </ul>
+
+    <h3>C. Blank &amp; Missing Value Matching (<code>"[Blank]"</code>)</h3>
     <p>
         To query cards that have no value assigned for an attribute or category, use <code>"[Blank]"</code>:
     </p>
@@ -292,7 +327,7 @@
         <li><code>"Skill": "[Blank]"</code> &mdash; Open events playable by any company without requiring specific classes (such as Sage, Ranger, or Scout).</li>
     </ul>
 
-    <h3>C. Semicolon Multi-Value OR Logic</h3>
+    <h3>D. Semicolon Multi-Value OR Logic</h3>
     <p>
         Any string inside <code>Attributes</code> or <code>Categories</code> can contain multiple semicolon-delimited values. A card matches if it satisfies <strong>any</strong> of the values:
     </p>
@@ -304,7 +339,7 @@
   "Automatic Attack": "Dragon; Drake"
 }</code></pre>
 
-    <h3>D. Wildcard &amp; Universal Sentinel Matching (<code>*</code> and <code>All</code>)</h3>
+    <h3>E. Wildcard &amp; Universal Sentinel Matching (<code>*</code> and <code>All</code>)</h3>
     <p>
         Any query criterion in <code>Attributes</code> or <code>Categories</code> that contains <code>*</code> or <code>All</code> acts as a wildcard, satisfying that check for any card that meets the other constraints in the rule. This is particularly valuable when querying properties dynamically captured from character cards:
     </p>
@@ -317,13 +352,13 @@
         If the captured leader is a universal diplomat like <em>Adrazar</em> (tagged <code>Faction Bonus: All</code>), the placeholder resolves to <code>"Name": "All"</code>. Rather than failing to find a card literally named "All", the engine recognizes the sentinel, treats the <code>Name</code> criterion as an open wildcard, and randomly samples from <strong>all faction cards available in your active expansions</strong>.
     </p>
 
-    <h3>E. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
+    <h3>F. Runtime Variable Interpolation (<code>SaveAs</code> &rarr; <code>{...}</code>)</h3>
     <p>
         When a rule captures one or more cards via <code>"SaveAs": "MyVar"</code>, downstream rules can dynamically query those cards' properties using bracketed tokens:
     </p>
 
-    <!-- SECTION 4.F: DYNAMIC ATTRIBUTE PREDICATE SELECTORS -->
-    <h3 id="predicate-selectors">F. Dynamic Attribute Predicate Selectors (Attribute=Value)</h3>
+    <!-- SECTION 4.G: DYNAMIC ATTRIBUTE PREDICATE SELECTORS -->
+    <h3 id="predicate-selectors">G. Dynamic Attribute Predicate Selectors (Attribute=Value)</h3>
     <p>
         Custom taxonomy tags and procedural generation rules support dynamic rules predicates using the <code>Attribute=Value</code> syntax:
     </p>

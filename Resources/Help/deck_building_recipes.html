@@ -582,5 +582,29 @@
     }
   }
 ]</code></pre>
+    <h3>C. Terrain &amp; Hold Constrained Expeditions (Safe Hobbit Roaming)</h3>
+    <p>
+        Constrain a theater to safe Eriador terrain while excluding dangerous Shadow-lands and lethal Dark-hold / Shadow-hold automatic attacks:
+    </p>
+    <pre><code>[
+  {
+    "RuleType": "GeographicTheater",
+    "Name": "Safe Eriador Roaming Hub",
+    "Mode": "Starter + Region",
+    "Haven": "Rivendell",
+    "RegionCount": 4,
+    "RegionType": "!=Shadow-land; !=Dark-domain",
+    "SiteType": "Free-hold; Border-hold; Ruins &amp; Lairs",
+    "SiteCount": 4
+  },
+  {
+    "Name": "Low-Hazard Wilderness Creatures",
+    "Section": "Hazards",
+    "Count": 6,
+    "Categories": {
+      "Region Requirement": "{Theater.Region}"
+    }
+  }
+]</code></pre>
 </body>
 </html>
