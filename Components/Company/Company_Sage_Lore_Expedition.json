@@ -1,0 +1,48 @@
+﻿{
+    "DeckTitle": "Scholarly Lore Expedition",
+    "ComponentType": "Company",
+    "Version": "1.0",
+    "ProvidesContext": [ "Leader" ],
+    "RequiresContext": [],
+    "Rules": [
+        {
+            "Name": "Expedition Scholar Leader",
+            "SaveAs": "Leader",
+            "Section": "Pool",
+            "Count": 1,
+            "Attributes": {
+                "Primary": "Character",
+                "Skill": "Sage; Diplomat"
+            },
+            "Categories": {
+                "Home Region": "{Theater.Region}"
+            },
+            "Fallback": {
+                "Name": "Open Scholar Leader",
+                "Attributes": {
+                    "Primary": "Character",
+                    "Skill": "Sage; Diplomat"
+                }
+            }
+        },
+        {
+            "Name": "Scholars & Wilderness Guides",
+            "Section": "Pool",
+            "Count": 4,
+            "Attributes": {
+                "Primary": "Character",
+                "Skill": "Sage; Scout; Ranger"
+            },
+            "Categories": {
+                "Home Region": "{Leader.Category:Home Region}"
+            },
+            "Fallback": {
+                "Name": "Open Scholars & Guides",
+                "Attributes": {
+                    "Primary": "Character",
+                    "Skill": "Sage; Scout; Ranger"
+                }
+            }
+        }
+    ]
+}

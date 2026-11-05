@@ -27,6 +27,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
   - Plain Text (.txt): Formatted deck listing.
 - Procedural Deck Generator: Generate complete decks from declarative JSON rule templates with attribute and category queries, deck copy limits, and randomized thematic branches (RandomChoice). Features configurable distribution strategies (`Distribution: Variety | Focused | Uniform`), relational operators (`<`, `<=`, `>`, `>=`, `!=`) and range bounding on numeric stats, dynamic attribute predicate selectors (`Attribute=Value`, `&&`, e.g. `Site=Haven`, `Site=Dark-hold`, `Site=Ruins & Lairs`, `Region=Udûn`, `Region=Under-deeps && Site!=Dark-hold`, `Adjacent Sites!=[Blank]`), runtime variable capture (SaveAs), unified starting site resolution (`{Leader.Home}` supporting both named sites and native dynamic predicates), consolidated location taxonomy (`Site Requirement`, `Region Requirement`), dynamic cross-card property placeholders (e.g. {Leader.Category:Faction Bonus}, {Leader.Category:Home Region}), universal wildcard sentinels (`*` and `All`), blank matching ([Blank]), and automated shortfall fallbacks (Fallback). Re-run instant variations with F5 or load rules via Deck > Generate from Rules... (Ctrl+G). Active expansion sets in the Catalog menu are preserved across generation runs.
 - Session Persistence: Remembers active expansion set selection across application restarts and preserves extraction regex parameters across sessions.
+- Modular Deck Assembly Workbench: Assemble legal decks by combining modular Company packages and Geographic Theater routes (Deck > Assemble from Components... [Ctrl+M]). Features multi-directional assembly (Leader-First retinue recruitment vs. Region-First territorial defense), parametric overrides for species, leader class, pool size, terrain, hold types, haven anchors, and movement modes, in-session state recall, and instant re-run (F5).
 
 ---
 
@@ -51,6 +52,7 @@ An offline-capable Windows desktop application for building, organizing, filteri
 | Ctrl + R | Global | Clear all active filter slots (Taxonomy > Clear All Active Filters) |
 | F1 | Global | Open Help documentation (Help > Help Contents) |
 | Enter | Quick Assign Tag Box | Assign tag(s) to the active card (+ Assign) |
+| Ctrl + M | Global | Open Modular Deck Assembly Workbench (Deck > Assemble from Components...) |
 
 ---
 

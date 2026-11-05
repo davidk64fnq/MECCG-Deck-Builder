@@ -1,0 +1,26 @@
+﻿{
+    "DeckTitle": "Contiguous Roaming Theater",
+    "ComponentType": "Theater",
+    "Version": "1.0",
+    "ProvidesContext": [ "Theater" ],
+    "RequiresContext": [],
+    "Rules": [
+        {
+            "RuleType": "GeographicTheater",
+            "Name": "Contiguous Roaming Cluster",
+            "Mode": "Starter + Region",
+            "Haven": "Auto",
+            "RegionCount": 4,
+            "IncludeIntermediateHavens": true
+        },
+        {
+            "Name": "Regional Strongholds & Adventure Sites",
+            "Section": "Sites",
+            "Count": 8,
+            "Attributes": {
+                "Primary": "Site",
+                "Region": "{Theater.Region}"
+            }
+        }
+    ]
+}

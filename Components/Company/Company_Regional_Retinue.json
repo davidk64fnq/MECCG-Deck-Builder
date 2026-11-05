@@ -1,0 +1,48 @@
+﻿{
+    "DeckTitle": "Regional Retinue Company",
+    "ComponentType": "Company",
+    "Version": "1.0",
+    "ProvidesContext": [ "Leader" ],
+    "RequiresContext": [],
+    "Rules": [
+        {
+            "Name": "Company Leader",
+            "SaveAs": "Leader",
+            "Section": "Pool",
+            "Count": 1,
+            "Attributes": {
+                "Primary": "Character",
+                "Direct": ">= 1",
+                "Mind": ">= 4"
+            },
+            "Categories": {
+                "Home Region": "{Theater.Region}"
+            },
+            "Fallback": {
+                "Name": "Open Retinue Leader",
+                "Attributes": {
+                    "Primary": "Character",
+                    "Direct": ">= 1",
+                    "Mind": ">= 4"
+                }
+            }
+        },
+        {
+            "Name": "Regional Companions",
+            "Section": "Pool",
+            "Count": 4,
+            "Attributes": {
+                "Primary": "Character"
+            },
+            "Categories": {
+                "Home Region": "{Leader.Category:Home Region}"
+            },
+            "Fallback": {
+                "Name": "Open Retinue Companions",
+                "Attributes": {
+                    "Primary": "Character"
+                }
+            }
+        }
+    ]
+}

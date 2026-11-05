@@ -42,6 +42,11 @@ namespace MECCG_Deck_Builder
         private CancellationTokenSource _imageLoadCts;
         private Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
         private string _lastDeckRulesFilePath;
+        private enum LastGenerationMode { None, RulesFile, ModularAssembly }
+        private LastGenerationMode _lastGenMode = LastGenerationMode.None;
+        private List<string> _lastModularComponentFiles;
+        private Dictionary<string, string> _lastModularOverrides;
+        private string _lastModularSummary;
 
         internal Form1()
         {
@@ -2239,6 +2244,94 @@ namespace MECCG_Deck_Builder
 
         #region TOOLS_AND_HELP
 
+        private void ToolStripMenuToolsAssembleDeck_Click(object sender, EventArgs e)
+        {
+            using var dlg = new DeckAssemblyMatrixDialog();
+            if (dlg.ShowDialog(this) == DialogResult.OK && dlg.SelectedComponentFiles != null)
+            {
+                _lastModularComponentFiles = [.. dlg.SelectedComponentFiles];
+                _lastModularOverrides = new Dictionary<string, string>(dlg.ParameterOverrides, StringComparer.OrdinalIgnoreCase);
+                _lastModularSummary = dlg.AssemblySummary;
+                _lastGenMode = LastGenerationMode.ModularAssembly;
+
+                RunModularAssembly(_lastModularComponentFiles, _lastModularOverrides, _lastModularSummary);
+            }
+        }
+
+        private void RunModularAssembly(
+            List<string> componentFiles,
+            Dictionary<string, string> parameterOverrides,
+            string summaryTitle)
+        {
+            if (componentFiles == null || componentFiles.Count == 0) return;
+
+            // Load components fresh from disk so any JSON edits are picked up immediately
+            var components = new List<DeckGenerationRuleSet>();
+            foreach (var file in componentFiles)
+            {
+                if (!File.Exists(file))
+                {
+                    MessageBox.Show(this, $"Component file not found:\n{file}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                string json = File.ReadAllText(file);
+                var ruleSet = DeckGenerationService.LoadRuleSetFromJson(json);
+                if (ruleSet != null) components.Add(ruleSet);
+            }
+
+            var activeSetsBeforeGen = new HashSet<string>(_currentDeck.IncludedSets, StringComparer.OrdinalIgnoreCase);
+
+            var result = DeckGenerationService.GenerateModularDeck(
+                _catalogService.Cards,
+                activeSetsBeforeGen,
+                _filterService,
+                components,
+                parameterOverrides);
+
+            if (!result.Success)
+            {
+                MessageBox.Show(this, $"Assembly failed: {result.ErrorMessage}", Constants.AppTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            _currentDeck.Clear();
+            _currentDeck.Title = result.Deck.Title;
+
+            foreach (var s in activeSetsBeforeGen) _currentDeck.IncludedSets.Add(s);
+            foreach (var s in result.Deck.IncludedSets) _currentDeck.IncludedSets.Add(s);
+
+            _currentDeck.Pool.AddRange(result.Deck.Pool);
+            _currentDeck.Resources.AddRange(result.Deck.Resources);
+            _currentDeck.Hazards.AddRange(result.Deck.Hazards);
+            _currentDeck.Sideboard.AddRange(result.Deck.Sideboard);
+            _currentDeck.Sites.AddRange(result.Deck.Sites);
+
+            ResetAllFilters();
+            foreach (DeckSectionType st in Enum.GetValues<DeckSectionType>())
+            {
+                RefreshSectionListBox(st);
+            }
+            UpdateFormTitle();
+
+            // Save trace log
+            string traceLog = result.GenerateExecutionTrace(summaryTitle ?? "Modular Assembled Deck");
+            string tracePath = Path.Combine(StoragePathService.GetDataDirectory(), "Last_Modular_Assembly.trace.log");
+            File.WriteAllText(tracePath, traceLog);
+
+            // Update F5 menu text
+            ToolStripMenuToolsRerunDeckGen.Enabled = true;
+            ToolStripMenuToolsRerunDeckGen.Text = $"Re-run Assembly ({summaryTitle ?? "Modular"})";
+
+            MessageBox.Show(this,
+                $"Modular Deck Assembled Successfully!\n\n" +
+                $"Pool: {_currentDeck.Pool.Count}\n" +
+                $"Sites: {_currentDeck.Sites.Count}\n\n" +
+                $"Execution log saved to: {Path.GetFileName(tracePath)}",
+                Constants.AppTitle,
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
         private async void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
         {
             if (_masterCards.Count == 0)
@@ -2340,13 +2433,17 @@ namespace MECCG_Deck_Builder
 
         private void ToolStripMenuToolsRerunDeckGen_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(_lastDeckRulesFilePath) && File.Exists(_lastDeckRulesFilePath))
+            if (_lastGenMode == LastGenerationMode.ModularAssembly && _lastModularComponentFiles != null && _lastModularComponentFiles.Count > 0)
+            {
+                RunModularAssembly(_lastModularComponentFiles, _lastModularOverrides, _lastModularSummary);
+            }
+            else if (!string.IsNullOrEmpty(_lastDeckRulesFilePath) && File.Exists(_lastDeckRulesFilePath))
             {
                 RunDeckGeneration(_lastDeckRulesFilePath);
             }
             else
             {
-                ToolStripMenuToolsGenerateDeck_Click(sender, e);
+                ToolStripMenuToolsAssembleDeck_Click(sender, e);
             }
         }
 
@@ -2413,6 +2510,7 @@ namespace MECCG_Deck_Builder
             }
 
             _lastDeckRulesFilePath = filePath;
+            _lastGenMode = LastGenerationMode.RulesFile;
             ToolStripMenuToolsRerunDeckGen.Enabled = true;
             ToolStripMenuToolsRerunDeckGen.Text = $"Re-run Rules ({Path.GetFileName(filePath)})";
 

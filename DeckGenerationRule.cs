@@ -8,6 +8,9 @@ namespace MECCG_Deck_Builder
         public string DeckTitle { get; set; } = "Generated Deck";
         public string RuleSetType { get; set; } = "SequentialRules";
         public string Version { get; set; } = "1.0";
+        public string ComponentType { get; set; } = string.Empty; // "Company", "Theater", "Strategy", "Hazards"
+        public List<string> ProvidesContext { get; set; } = [];
+        public List<string> RequiresContext { get; set; } = [];
         public List<DeckGenerationRule> Rules { get; set; } = [];
     }
 

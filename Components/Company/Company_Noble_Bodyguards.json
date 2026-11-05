@@ -1,0 +1,52 @@
+﻿{
+    "DeckTitle": "Noble & Loyal Bodyguards",
+    "ComponentType": "Company",
+    "Version": "1.0",
+    "ProvidesContext": [ "Leader" ],
+    "RequiresContext": [],
+    "Rules": [
+        {
+            "Name": "Noble Champion",
+            "SaveAs": "Leader",
+            "Section": "Pool",
+            "Count": 1,
+            "Attributes": {
+                "Primary": "Character",
+                "Mind": ">= 6",
+                "Direct": ">= 2"
+            },
+            "Categories": {
+                "Home Region": "{Theater.Region}"
+            },
+            "Fallback": {
+                "Name": "Open Noble Champion",
+                "Attributes": {
+                    "Primary": "Character",
+                    "Mind": ">= 6",
+                    "Direct": ">= 2"
+                }
+            }
+        },
+        {
+            "Name": "Loyal Bodyguards & Retainers",
+            "Section": "Pool",
+            "Count": 4,
+            "Attributes": {
+                "Primary": "Character",
+                "Mind": "<= 4",
+                "Skill": "Warrior; Scout"
+            },
+            "Categories": {
+                "Home Region": "{Leader.Category:Home Region}"
+            },
+            "Fallback": {
+                "Name": "Open Martial Bodyguards",
+                "Attributes": {
+                    "Primary": "Character",
+                    "Mind": "<= 4",
+                    "Skill": "Warrior; Scout"
+                }
+            }
+        }
+    ]
+}

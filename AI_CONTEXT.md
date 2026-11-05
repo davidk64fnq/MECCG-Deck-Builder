@@ -128,6 +128,16 @@
     - Added 'GeographicTheater' rule schema with 'Starter Only' and 'Starter + Region' execution modes.
     - Automated Hero starting haven (Rivendell), stepping-stone havens (Lórien/Grey Havens for Edhellond), and BFS overland transit routes.
     - Unified downstream contract exporting {Theater.Haven} and {Theater.Region}.
+  - [x] Issue #42: Modular Deck Assembly Workbench: Two-Slot Component Matrix (Starting Pool & Geographic Theater)
+    - Created `DeckAssemblyMatrixDialog` (Ctrl+M) providing a side-by-side modular assembly workbench.
+    - Added Company slot controls: component discovery, multi-select species checklist, leader skill filter, and pool size spinner.
+    - Added Theater slot controls: component discovery, haven anchor, movement mode, dynamic region/site numeric spinners, canonical terrain and hold checklists, and transit toggles.
+    - Supported bi-directional assembly pipelines: Leader-First (Company -> Theater) and Region-First (Theater -> Company) via `"Haven": "Auto"`.
+    - Fixed fallback property inheritance: fallbacks now inherit parent target `Section` and `SaveAs` variable captures.
+    - Added `GenerateModularDeck` to `DeckGenerationService` with dynamic parameter injection and blackboard context sharing.
+    - Context-aware `F5` re-run routing: re-reads component JSONs from disk and regenerates using exact workbench parameter choices.
+    - In-session dialog memory (`DeckAssemblyDialogState`): restores all controls upon reopening the workbench.
+    - Authored initial component library: `Company_Regional_Retinue.json`, `Company_Noble_Bodyguards.json`, `Company_Sage_Lore_Expedition.json`, and `Theater_Contiguous_Cluster.json`.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

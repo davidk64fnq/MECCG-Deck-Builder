@@ -88,6 +88,7 @@
             SaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsGenerateDeck = new System.Windows.Forms.ToolStripMenuItem();
+            ToolStripMenuToolsAssembleDeck = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuToolsRerunDeckGen = new System.Windows.Forms.ToolStripMenuItem();
             ExportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -660,6 +661,7 @@
                 saveAsToolStripMenuItem,
                 new System.Windows.Forms.ToolStripSeparator(),
                 ToolStripMenuToolsGenerateDeck,
+                ToolStripMenuToolsAssembleDeck,
                 ToolStripMenuToolsRerunDeckGen,
                 new System.Windows.Forms.ToolStripSeparator(),
                 ExportToolStripMenuItem,
@@ -714,6 +716,14 @@
             ToolStripMenuToolsGenerateDeck.Size = new System.Drawing.Size(224, 22);
             ToolStripMenuToolsGenerateDeck.Text = "&Generate from Rules...";
             ToolStripMenuToolsGenerateDeck.Click += ToolStripMenuToolsGenerateDeck_Click;
+            // 
+            // ToolStripMenuToolsAssembleDeck
+            // 
+            ToolStripMenuToolsAssembleDeck.Name = "ToolStripMenuToolsAssembleDeck";
+            ToolStripMenuToolsAssembleDeck.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M;
+            ToolStripMenuToolsAssembleDeck.Size = new System.Drawing.Size(245, 22);
+            ToolStripMenuToolsAssembleDeck.Text = "Assemble from &Components...";
+            ToolStripMenuToolsAssembleDeck.Click += ToolStripMenuToolsAssembleDeck_Click;
             // 
             // ToolStripMenuToolsRerunDeckGen
             // 
@@ -1150,6 +1160,7 @@
         private System.Windows.Forms.ToolStripMenuItem SaveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsGenerateDeck;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsAssembleDeck;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuToolsRerunDeckGen;
         private System.Windows.Forms.ToolStripMenuItem ExportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;

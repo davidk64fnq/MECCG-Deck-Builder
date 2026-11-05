@@ -33,6 +33,32 @@
         <li><strong>Dynamic Attribute Predicate Selectors (<code>Attribute=Value</code>):</strong> Query dynamic criteria (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, <code>Site=Ruins &amp; Lairs</code>, <code>Region=Ud&ucirc;n</code>, <code>Alignment=Neutral</code>) directly in custom tags or rule queries, with automatic diacritic resilience and hold-type normalization.</li>
     </ul>
 
+    <!-- MODULAR DECK ASSEMBLY WORKBENCH -->
+    <h2 id="modular-assembly">Modular Deck Assembly Workbench (<kbd>Ctrl+M</kbd>)</h2>
+    <p>
+        In addition to running monolithic generation templates, the application features an interactive <strong>Modular Deck Assembly Workbench</strong> (via <strong>Deck &gt; Assemble from Components...</strong> [<kbd>Ctrl+M</kbd>]). This allows you to combine decoupled, reusable components (e.g., Company packages and Geographic Theater routes) without editing raw JSON files:
+    </p>
+
+    <ul>
+        <li>
+            <strong>Multi-Directional Assembly Drivers:</strong>
+            <ul>
+                <li><strong>Leader-First (Company &rarr; Theater):</strong> The starting company drafts a leader and retinue; the theater automatically expands around the leader's home territory using <code>Haven: "Auto"</code>.</li>
+                <li><strong>Region-First (Theater &rarr; Company):</strong> The theater establishes a geographic cluster and exports <code>{Theater.Region}</code>; the company drafts leaders and companions native to that theater.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Parametric Overrides:</strong> Refine rules at runtime without modifying files:
+            <ul>
+                <li><strong>Company Slot:</strong> Multi-select species checklist (Dwarf, Elf, D&uacute;nadan, Hobbit, Man), leader skill focus (Diplomat, Sage, Ranger, Scout, Warrior), and pool size spinner.</li>
+                <li><strong>Theater Slot:</strong> Haven anchor snapping, movement mode (<em>Starter + Region</em> vs. <em>Starter Only</em>), region count, site density, terrain checklists, site hold checklists, and overland pathing toggles.</li>
+            </ul>
+        </li>
+        <li><strong>Dynamic Mode Synchronization:</strong> Selecting <em>Starter Only</em> locks region count to 0 and disables overland routes, ensuring site decks stay free of region cards.</li>
+        <li><strong>Context-Aware Instant Re-Run (<kbd>F5</kbd>):</strong> Pressing <kbd>F5</kbd> re-reads component JSON files from disk and generates fresh randomized rolls using your exact parameter choices.</li>
+        <li><strong>In-Session State Recall:</strong> The workbench automatically remembers all your selections, numeric counts, and checked boxes upon reopening.</li>
+    </ul>
+
     <div class="tip">
         <strong>Related Guides:</strong> Review the <a href="deck_rules_reference.html">JSON Schema Reference</a> for syntax specifications, or follow the step-by-step <a href="worked_example_factions.html">Dynamic Factions Worked Example</a>.
     </div>

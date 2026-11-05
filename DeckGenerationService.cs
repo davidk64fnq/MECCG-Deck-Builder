@@ -353,14 +353,174 @@ namespace MECCG_Deck_Builder
                 int remainingNeeded = rule.Count - addedForThisRule;
                 rule.Fallback.Count = remainingNeeded;
 
-                if (string.IsNullOrWhiteSpace(rule.Fallback.Section))
+                // 1. Fallback MUST inherit parent's Section unless explicitly specified in Fallback JSON
+                rule.Fallback.Section = rule.Section;
+
+                // 2. If parent was supposed to save a variable (e.g. "Leader"), delegate SaveAs to the Fallback
+                if (!string.IsNullOrWhiteSpace(rule.SaveAs) && string.IsNullOrWhiteSpace(rule.Fallback.SaveAs))
                 {
-                    rule.Fallback.Section = sectionType.ToString();
+                    rule.Fallback.SaveAs = rule.SaveAs;
                 }
 
                 // Recurse into fallback with isFallback = true
                 ExecuteRule(rule.Fallback, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables, true);
             }
+        }
+
+        /// <summary>
+        /// Assembles a legal deck by sequentially executing a list of modular components sharing
+        /// an in-memory blackboard context (contextVariables) and global card copy limits.
+        /// </summary>
+        public static DeckGenerationResult GenerateModularDeck(
+            IEnumerable<Card> catalogCards,
+            ISet<string> defaultSets,
+            CardFilterService filterService,
+            IReadOnlyList<DeckGenerationRuleSet> components,
+            Dictionary<string, string> parameterOverrides = null)
+        {
+            if (components == null || components.Count == 0)
+            {
+                return new DeckGenerationResult
+                {
+                    Success = false,
+                    ErrorMessage = "No components selected for assembly."
+                };
+            }
+
+            var deck = new Deck
+            {
+                Title = components.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.DeckTitle))?.DeckTitle ?? "Modular Assembled Deck"
+            };
+
+            var cardCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var contextVariables = new Dictionary<string, List<Card>>(StringComparer.OrdinalIgnoreCase);
+            var logs = new List<DeckRuleExecutionLog>();
+            var allCards = catalogCards?.ToList() ?? [];
+
+            foreach (var component in components)
+            {
+                if (component?.Rules == null) continue;
+
+                logs.Add(new DeckRuleExecutionLog
+                {
+                    RuleName = $"[Component: {component.ComponentType}] {component.DeckTitle}",
+                    Section = "-",
+                    RequestedCount = 0,
+                    AddedCount = 0
+                });
+
+                bool isCompany = string.Equals(component.ComponentType, "Company", StringComparison.OrdinalIgnoreCase) ||
+                                 component.DeckTitle.Contains("Company", StringComparison.OrdinalIgnoreCase);
+
+                bool isTheater = string.Equals(component.ComponentType, "Theater", StringComparison.OrdinalIgnoreCase) ||
+                                 component.DeckTitle.Contains("Theater", StringComparison.OrdinalIgnoreCase);
+
+                // --- 1. APPLY COMPANY COMPONENT OVERRIDES ---
+                if (isCompany && parameterOverrides != null)
+                {
+                    // A. Pool Size Adjustment
+                    if (parameterOverrides.TryGetValue("Company.PoolSize", out string psStr) && int.TryParse(psStr, out int poolSize) && poolSize > 0)
+                    {
+                        var poolRules = component.Rules.Where(r => string.Equals(r.Section, "Pool", StringComparison.OrdinalIgnoreCase)).ToList();
+                        if (poolRules.Count >= 2)
+                        {
+                            poolRules[0].Count = Math.Min(1, poolSize);
+                            poolRules[1].Count = Math.Max(0, poolSize - poolRules[0].Count);
+                        }
+                        else if (poolRules.Count == 1)
+                        {
+                            poolRules[0].Count = poolSize;
+                        }
+                    }
+
+                    // B. Species / Race Multi-Filter
+                    if (parameterOverrides.TryGetValue("Company.Race", out string raceOverride) && !string.IsNullOrWhiteSpace(raceOverride))
+                    {
+                        foreach (var rule in component.Rules)
+                        {
+                            if (string.Equals(rule.Section, "Pool", StringComparison.OrdinalIgnoreCase))
+                            {
+                                rule.Attributes["Race"] = raceOverride;
+                                if (rule.Fallback != null)
+                                {
+                                    rule.Fallback.Attributes["Race"] = raceOverride;
+                                }
+                            }
+                        }
+                    }
+
+                    // C. Leader Skill Focus
+                    if (parameterOverrides.TryGetValue("Company.Skill", out string skillOverride) && !string.IsNullOrWhiteSpace(skillOverride) && !string.Equals(skillOverride, "Any", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var leaderRule = component.Rules.FirstOrDefault(r => !string.IsNullOrWhiteSpace(r.SaveAs) && string.Equals(r.SaveAs, "Leader", StringComparison.OrdinalIgnoreCase))
+                            ?? component.Rules.FirstOrDefault(r => string.Equals(r.Section, "Pool", StringComparison.OrdinalIgnoreCase));
+
+                        if (leaderRule != null)
+                        {
+                            leaderRule.Attributes["Skill"] = skillOverride;
+                            if (leaderRule.Fallback != null)
+                            {
+                                leaderRule.Fallback.Attributes["Skill"] = skillOverride;
+                            }
+                        }
+                    }
+                }
+
+                // --- 2. EXECUTE RULES IN COMPONENT ---
+                foreach (var rule in component.Rules)
+                {
+                    // Apply Theater overrides
+                    if (isTheater && parameterOverrides != null)
+                    {
+                        if (IsGeographicTheaterRule(rule))
+                        {
+                            if (parameterOverrides.TryGetValue("Theater.Haven", out string havenOverride) && !string.IsNullOrWhiteSpace(havenOverride))
+                                rule.Haven = havenOverride;
+
+                            if (parameterOverrides.TryGetValue("Theater.Mode", out string modeOverride) && !string.IsNullOrWhiteSpace(modeOverride))
+                                rule.Mode = modeOverride;
+
+                            if (parameterOverrides.TryGetValue("Theater.RegionCount", out string rcStr) && int.TryParse(rcStr, out int rc))
+                                rule.RegionCount = rc;
+
+                            if (parameterOverrides.TryGetValue("Theater.SiteCount", out string scStr) && int.TryParse(scStr, out int sc))
+                                rule.SiteCount = sc;
+
+                            if (parameterOverrides.TryGetValue("Theater.RegionType", out string rtOverride))
+                                rule.RegionType = rtOverride;
+
+                            if (parameterOverrides.TryGetValue("Theater.SiteType", out string stOverride))
+                                rule.SiteType = stOverride;
+
+                            if (parameterOverrides.TryGetValue("Theater.IncludeOverlandPath", out string ovStr) && bool.TryParse(ovStr, out bool ov))
+                                rule.IncludeOverlandPath = ov;
+
+                            if (parameterOverrides.TryGetValue("Theater.IncludeIntermediateHavens", out string ihStr) && bool.TryParse(ihStr, out bool ih))
+                                rule.IncludeIntermediateHavens = ih;
+                        }
+                        else if (string.Equals(rule.Section, "Sites", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Sync destination adventure site rule count and hold type
+                            if (parameterOverrides.TryGetValue("Theater.SiteCount", out string scStr2) && int.TryParse(scStr2, out int sc2))
+                                rule.Count = sc2;
+
+                            if (parameterOverrides.TryGetValue("Theater.SiteType", out string stOverride2) && !string.IsNullOrWhiteSpace(stOverride2))
+                                rule.Attributes["Site"] = stOverride2;
+                        }
+                    }
+
+                    ExecuteRule(rule, deck, cardCountsByName, logs, allCards, defaultSets, filterService, contextVariables);
+                }
+            }
+
+            deck.SortSections();
+
+            return new DeckGenerationResult
+            {
+                Deck = deck,
+                Logs = logs,
+                Success = true
+            };
         }
 
         #region GEOGRAPHIC_THEATER_ENGINE
@@ -421,8 +581,27 @@ namespace MECCG_Deck_Builder
                 ? rule.Haven
                 : (rule.Attributes.TryGetValue("Haven", out string h) ? h : string.Empty);
 
+            // Parameter / Placeholder resolution
+            rawHaven = ResolvePlaceholders(rawHaven, contextVariables, filterService);
+
             string selectedHaven;
             string havenValidationNote = null;
+
+            // Handle "Auto": if Leader is in context, snap to leader's home/haven; otherwise Random
+            if (string.Equals(rawHaven, "Auto", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(rawHaven, "From Leader", StringComparison.OrdinalIgnoreCase))
+            {
+                if (contextVariables != null && contextVariables.TryGetValue("Leader", out var leaders) && leaders.Count > 0)
+                {
+                    var leader = leaders[0];
+                    string leaderHome = !string.IsNullOrWhiteSpace(leader.Home) ? leader.Home.Trim() : "";
+                    rawHaven = !string.IsNullOrEmpty(leaderHome) ? leaderHome : "Random";
+                }
+                else
+                {
+                    rawHaven = "Random";
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(rawHaven) || string.Equals(rawHaven, "Random", StringComparison.OrdinalIgnoreCase))
             {
@@ -448,7 +627,7 @@ namespace MECCG_Deck_Builder
                         {
                             string nearest = !string.IsNullOrWhiteSpace(siteCard.Haven) ? siteCard.Haven.Trim() : "Rivendell";
                             selectedHaven = HeroHavens.FirstOrDefault(hv => CardFilterService.EqualsWithDiacriticFallback(hv, nearest)) ?? nearest;
-                            havenValidationNote = $"Specified site '{siteCard.Name}' is not a Haven; snapped to nearest Haven '{selectedHaven}'.";
+                            havenValidationNote = $"Leader site '{siteCard.Name}' is not a Haven; snapped to nearest Haven '{selectedHaven}'.";
                         }
                     }
                     else
