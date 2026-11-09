@@ -138,6 +138,14 @@
     - Context-aware `F5` re-run routing: re-reads component JSONs from disk and regenerates using exact workbench parameter choices.
     - In-session dialog memory (`DeckAssemblyDialogState`): restores all controls upon reopening the workbench.
     - Authored initial component library: `Company_Regional_Retinue.json`, `Company_Noble_Bodyguards.json`, `Company_Sage_Lore_Expedition.json`, and `Theater_Contiguous_Cluster.json`.
+  - [x] Issue #43: Avatar Tournament Copy Limits, Universal Ally Engine, and Directory Taxonomy Refactoring
+    - Implemented official tournament Avatar allowance in `DeckGenerationService.cs` (up to 3 of one, or 2+1 mix; max 3 total in Resources; max 2 distinct titles; 3 different prohibited).
+    - Fixed Avatar playset distribution in `Focused` sampling mode.
+    - Tagged *Roäc the Raven* with dynamic predicate `Site Requirement: Region=Northern Rhovanion` and `Region Requirement: Northern Rhovanion`.
+    - Authored Chapter 2 (Allies) and Chapter 3 (Avatars) in `tagging_and_drafting_playbook.html`.
+    - Documented the Keystone Principle and Gandalf's `Home: Site=Haven` predicate.
+    - Refactored Catalog Partition Directory table into an alphabetical index mapping desktop filter criteria (Slots 1 & 2) to custom categories and specialized attributes.
+    - Updated `deck_generation_engine.html` and `deck_rules_reference.html` with Avatar copy limit rules.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

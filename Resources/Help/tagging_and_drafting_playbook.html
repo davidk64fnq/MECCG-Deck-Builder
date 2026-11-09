@@ -1,0 +1,513 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Catalog Tagging &amp; Procedural Drafting Playbook</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="index.html">Home</a> &gt;
+        <a href="custom_taxonomy.html">Custom Taxonomy &amp; Automation</a> &gt;
+        Tagging &amp; Drafting Playbook
+    </div>
+
+    <h1>Catalog Tagging &amp; Procedural Drafting Playbook</h1>
+    <p>
+        This playbook provides the authoritative taxonomy rationale and corresponding procedural JSON generation recipes for each functional card partition across Middle-earth. Use these chapters to understand why specific tags are assigned (and why situational modifiers are omitted), and how to author resilient procedural deck templates that draft them.
+    </p>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK DIRECTORY MATRIX                                          -->
+    <!-- ================================================================== -->
+    <h2>Catalog Partition Directory</h2>
+    <p>
+        Use this directory to jump directly to the tagging standards and procedural drafting patterns for any specific catalog slice:
+    </p>
+
+    <table>
+        <tr>
+            <th style="width: 18%;">Partition</th>
+            <th style="width: 32%;">Catalog Filter Criteria (App Slots 1 &amp; 2)</th>
+            <th style="width: 50%;">Custom Categories &amp; Specialized Attributes</th>
+        </tr>
+        <tr>
+            <td><a href="#allies-playbook">Allies</a></td>
+            <td>
+                <code>Secondary = Ally</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Role</code>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#avatars-playbook">Avatars</a></td>
+            <td>
+                <code>Secondary = Avatar</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Home Region</code> (blank on Gandalf)<br />
+                <strong>Specialized Attributes:</strong> <code>Home</code> (dynamic predicate <code>Site=Haven</code> on Gandalf)
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#characters-playbook">Characters</a></td>
+            <td>
+                <code>Primary = Character</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Includes Avatars in catalog filter; separated in deck generator)</em></span>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Home Region</code>, <code>Faction Bonus</code>, <code>Combat Bonus</code><br />
+                <strong>Specialized Attributes:</strong> <code>Home</code> (structured predicates e.g. <code>Site=Dark-hold</code>), <code>Corruption</code> (inverted resistance e.g. <code>-2</code> on Hobbits)
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#factions-playbook">Factions</a></td>
+            <td>
+                <code>Secondary = Faction</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Site Requirement</code>, <code>Target Species</code>, <code>Target Item</code>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#hazard-creatures-playbook">Hazard Creatures</a></td>
+            <td>
+                <code>Primary = Hazard</code><br />
+                <code>Secondary = Creature</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Region Type</code><br />
+                <strong>Specialized Attributes:</strong> <code>Skill</code> (hazard traits e.g. <code>Flying</code>, <code>Ringwraith</code>), <code>Race</code> (singular normalization)
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#hazard-events-playbook">Hazard Events</a></td>
+            <td>
+                <code>Primary = Hazard</code><br />
+                <code>Secondary = Short-event; Long-event; Permanent-event</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Species</code>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#items-playbook">Items &amp; Gear</a></td>
+            <td>
+                <code>Secondary = Minor / Major / Greater / Gold Ring / Special Item</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Role</code>, <code>Target Species</code>, <code>Prerequisite</code>, <code>Prerequisite For</code><br />
+                <strong>Specialized Attributes:</strong> <code>Race</code> (overloaded gear types: <code>Weapon</code>, <code>Armor</code>, <code>Lost Knowledge</code>, <code>Palantír</code>, <code>Treasure</code>)
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#resource-events-playbook">Resource Events</a></td>
+            <td>
+                <code>Primary = Resource</code><br />
+                <code>Secondary = Short-event; Long-event; Permanent-event</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code>, <code>Region Requirement</code>
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#sites-playbook">Sites &amp; Havens</a></td>
+            <td>
+                <code>Primary = Site; Region</code>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Adjacent Sites</code>, <code>Automatic Attack</code>, <code>Region Type</code><br />
+                <strong>Specialized Attributes:</strong> Discrete Item Flags (<code>MinorItem</code>, <code>Hoard</code>, etc. vs. unparsed <code>Playable</code> string), <code>Haven</code> (Under-deeps surface entrance)
+            </td>
+        </tr>
+    </table>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: ALLIES                                           -->
+    <!-- ================================================================== -->
+    <h2 id="allies-playbook">Allies (Resources &amp; Company Retinue)</h2>
+    <p>
+        Allies are unique Resource entities that accompany a company like characters, but do not count toward company size limits, cannot bear items, and are controlled without Direct Influence. They provide valuable Marshalling Points (MPs), tactical movement acceleration, strike evasion, or alternative faction recruitment. Because allies enter play at specific geographic locations during the site phase, taxonomy tagging focuses on their <strong>staging destinations</strong> and <strong>tactical mechanisms</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR ALLIES -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Omission Rules</th>
+        </tr>
+        <tr>
+            <td><code>Site Requirement</code></td>
+            <td>
+                Exact catalog site titles (e.g. <code>Old Forest</code>, <code>Wellinghall</code>, <code>Bag End; Bree</code>, <code>Dunharrow; Edoras</code>) or dynamic site predicates (<code>Region=Northern Rhovanion</code>).
+            </td>
+            <td>
+                <ul>
+                    <li>Mandatory staging locations required to bring the ally into play.</li>
+                    <li>Semicolon multi-values list alternative legal staging sites.</li>
+                    <li><strong>Dynamic Predicates for Regional Allies:</strong> Allies playable at any site in a region (such as <em>Ro&auml;c the Raven</em>) carry <code>Region=Northern Rhovanion</code>. This enables universal site rules (e.g. <code>"Name": "{Ally.Category:Site Requirement}"</code>) to query the site deck for a legal destination with zero fallbacks.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Region Requirement</code></td>
+            <td>Geographic territory required to play the ally (e.g. <code>Northern Rhovanion</code>).</td>
+            <td>
+                <ul>
+                    <li>Used when an ally's recruitment is geographically tied to a specific territory (<em>Ro&auml;c the Raven</em>), enabling Geographic Theater rules to discover regional allies.</li>
+                    <li><strong>Post-Entry Roaming Limits:</strong> Geographic discard boundaries (such as Ents or <em>Tom Bombadil</em> discarding when moving outside their home lands) are <strong>omitted</strong> here to prevent false drafting into decks that lack their actual staging sites.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Role</code></td>
+            <td>
+                <code>Movement</code>, <code>Protection</code>, <code>Recruitment</code>.
+            </td>
+            <td>
+                <ul>
+                    <li><code>Movement</code>: Extra movement phases, emergency Haven relocation, or unrestricted flight (<em>Bill the Pony</em>, <em>Gwaihir</em>, <em>Shadowfax</em>).</li>
+                    <li><code>Protection</code>: Strike immunity against automatic attacks, attack evasion, or hazard cancellation (<em>Treebeard</em>, <em>Goldberry</em>, <em>Tom Bombadil</em>).</li>
+                    <li><code>Recruitment</code>: Alternative faction recruitment mechanisms (<em>Ro&auml;c the Raven</em>).</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>What is Intentionally OMITTED on Allies:</strong>
+        <ul>
+            <li><strong>No <code>Home</code> Attribute:</strong> Allies are resource cards, not characters. They possess no printed starting site or healing haven. Staging sites belong strictly under <code>Site Requirement</code>.</li>
+            <li><strong>No <code>Role: Combat</code> on Defensive Allies:</strong> Ents and nature spirits possess high defensive prowess and strike immunity, but do not grant combat prowess bonuses or extra strikes to other characters. Classifying them as <code>Role: Combat</code> would pollute combat trick filters.</li>
+            <li><strong>No Hard Dependencies for Soft Triggers (*Gollum*):</strong> Although <em>Gollum</em> can discard <em>The One Ring</em>, he is an autonomous defensive ally. Under the Primary Usability Rule, he is never tagged with <code>Specific: The One Ring</code>, ensuring open utility rules can draft him safely.</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: AVATARS (WIZARDS & RINGWRAITHS)                  -->
+    <!-- ================================================================== -->
+    <h2 id="avatars-playbook">Avatars (Wizards &amp; Ringwraiths)</h2>
+    <p>
+        Avatars represent the player's physical manifestation on Middle-earth (the five Istari Wizards in Hero decks, or the Ringwraiths in Minion decks). Although indexed with <code>Primary: Character</code> and <code>Secondary: Avatar</code>, they follow unique deck-construction rules: they <strong>cannot start in the starting pool</strong> and are placed in the Resource play deck. The procedural generator strictly enforces official tournament allowances across all Avatar drafts: <strong>up to 3 copies of a single Avatar</strong>, or <strong>2 copies of one Avatar and 1 copy of another</strong> (including 1 each of three different Avatars, or attempting to draft a 4th Avatar card, is automatically blocked). Because Avatars are foundational keystones around which an entire deck is designed, their taxonomy tagging is intentionally minimal.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR AVATARS -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Omission Rules</th>
+        </tr>
+        <tr>
+            <td><code>Home Region</code></td>
+            <td>
+                Canonical territory where the Avatar's fixed home site is located (e.g. <code>Gap of Isen</code> for Isengard, <code>Southern Mirkwood</code> for Rhosgobel, <code>Lindon</code> for Grey Havens, <code>Belfalas</code> for Edhellond).
+            </td>
+            <td>
+                <ul>
+                    <li>Assigned strictly to Avatars with a fixed geographic home site.</li>
+                    <li><strong>The Gandalf Exception (<code>[Blank]</code>):</strong> <em>Gandalf</em> prints <code>Home Site: Any Haven</code>, indexed in the official database as the native predicate <code>Home: Site=Haven</code>. Because Gandalf has open starting and arrival options across Middle-earth, his <code>Home Region</code> is left <strong><code>[Blank]</code></strong> to prevent tying him to a single territory.</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>Why Avatar Rules Text is Intentionally OMITTED from Tags:</strong>
+        <ul>
+            <li><strong>No <code>Role</code> Tags (The Keystone Principle):</strong> Wizards feature powerful abilities (such as <em>Saruman</em> taking spells from discard or <em>Radagast</em> drawing cards in Wilderness). Tagging them with <code>Role: Card Flow</code> or <code>Role: Movement</code> is strictly prohibited because generic utility queries in procedural templates (e.g. <em>"Draft 4 Card Flow events"</em>) would mistakenly draft 14-Mind Wizard cards into event slots.</li>
+            <li><strong>No Item Affinity Tags:</strong> Gandalf's ability to test Gold Rings and Saruman's ability to use Palant&iacute;ri are not tagged under <code>Target Item</code>. Avatars are drafted intentionally by name or race, never as accessory tools for item queries.</li>
+            <li><strong>No Starting Pool Eligibility:</strong> Official game rules prohibit Avatars from starting in the starting pool. The procedural generation engine automatically enforces this constraint regardless of query parameters.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: Keystone Wizard Draft &amp; Automated Origin Resolution (3x Playset)</h4>
+    <p>
+        Drafts a specific Wizard (or a random Wizard from your active sets) into the Resource deck as a full 3-card playset, automatically ensuring their legal home or haven site is added to the site deck using dynamic predicate expansion:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Deck Keystone Avatar",
+    "SaveAs": "Avatar",
+    "Section": "Resources",
+    "Count": 3,
+    "Distribution": "Focused",
+    "Attributes": {
+      "Primary": "Character",
+      "Secondary": "Avatar",
+      "Race": "Wizard"
+    }
+  },
+  {
+    "Name": "Avatar Home or Arrival Haven",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{Avatar.Home}"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern B: The Legal 2+1 Dual Wizard Package</h4>
+    <p>
+        Drafts a competitive split retinue consisting of 2 copies of a primary Wizard and 1 copy of a backup secondary Wizard, automatically resolving the primary Wizard's starting site:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Primary Wizard",
+    "SaveAs": "PrimaryWizard",
+    "Section": "Resources",
+    "Count": 2,
+    "Distribution": "Focused",
+    "Attributes": {
+      "Secondary": "Avatar",
+      "Race": "Wizard"
+    }
+  },
+  {
+    "Name": "Secondary Backup Wizard",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Secondary": "Avatar",
+      "Race": "Wizard"
+    }
+  },
+  {
+    "Name": "Primary Wizard Origin Site",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{PrimaryWizard.Home}"
+    }
+  }
+]</code></pre>
+    <div class="note">
+        <strong>Engine Enforcement of Avatar Copy Limits:</strong><br />
+        The procedural generation engine actively validates Avatar allowances when evaluating candidate additions in the Resource deck:
+        <ul>
+            <li><strong>Hard Cap of 3:</strong> Once 3 Avatar cards are added across rules, all subsequent Avatar queries yield 0 additions and report a shortfall.</li>
+            <li><strong>Maximum 2 Distinct Titles:</strong> If 2 distinct Avatars are already in the deck (such as 1 <em>Gandalf</em> and 1 <em>Saruman</em>), queries for a third distinct Wizard (e.g. <em>Radagast</em>) are automatically blocked.</li>
+            <li><strong>The 2+1 Balance:</strong> When 2 distinct Avatars are drafted, neither is permitted to exceed 2 copies, guaranteeing the resulting Resource deck satisfies the official 2 of one + 1 of another structure.</li>
+        </ul>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: CHARACTERS (STARTING POOL & IN-GAME RECRUITS)     -->
+    <!-- ================================================================== -->
+    <h2 id="characters-playbook">Characters (Pool &amp; Company Recruitment)</h2>
+    <p>
+        Characters form the core engine of MECCG decks. They are drafted into the <code>Pool</code> (starting company) or <code>Resources</code> (deck characters recruited during play). Because character cards already possess rich official numerical attributes (<code>Mind</code>, <code>Direct</code>, <code>Prowess</code>, <code>Body</code>, <code>Corruption</code>, <code>Skills</code>, and <code>Race</code>), taxonomy tagging on characters is strictly restricted to three <strong>structural bridge categories</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING PHILOSOPHY FOR CHARACTERS -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Omission Rules</th>
+        </tr>
+        <tr>
+            <td><code>Home Region</code></td>
+            <td>Canonical region name where the character's printed home site is located (e.g. <code>Arthedain</code> for Bree, <code>Rhudaur</code> for Rivendell).</td>
+            <td>
+                <ul>
+                    <li>Enables regional company drafting matching the leader's home territory.</li>
+                    <li><strong>Avatars &amp; Dynamic Homes:</strong> Wizards and Ringwraiths with open starting locations (e.g. <em>Any Haven</em>) leave <code>Home Region</code> <strong><code>[Blank]</code></strong>. Their open arrival is handled by the native predicate <code>Home: Site=Haven</code>.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Faction Bonus</code></td>
+            <td>
+                Exact catalog faction titles (e.g. <code>Riders of Rohan</code>, <code>Wood-elves</code>) or species predicates (<code>Race=Dwarf</code>, <code>Race=Man</code>, <code>All</code>).
+            </td>
+            <td>
+                <ul>
+                    <li>Captures direct influence bonuses printed on characters.</li>
+                    <li>Semicolon multi-values combine specific factions and racial bonuses (e.g. <code>Iron Hill Dwarves; Race=Man</code> on <em>D&aacute;in II</em>).</li>
+                    <li>Universal diplomats use the <code>All</code> wildcard (<em>Adrazar</em>).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Combat Bonus</code></td>
+            <td>Target creature species against which the character has combat superiority (e.g. <code>Orc</code>, <code>Nazg&ucirc;l</code>).</td>
+            <td>
+                <ul>
+                    <li>Captures character prowess boosts or enemy body reduction (e.g. <em>&Eacute;owyn</em> vs. Nazg&ucirc;l).</li>
+                    <li>Leave blank for general combatants without species-specific text.</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>What is Intentionally OMITTED on Characters:</strong>
+        <ul>
+            <li><strong>No <code>Role</code> Tags:</strong> Characters are never tagged with <code>Role: Combat</code>, <code>Role: Influence</code>, or <code>Role: Card Flow</code>. Doing so would cause generic event queries to draft characters into resource event slots.</li>
+            <li><strong>No Negative Modifiers:</strong> Situational handicaps (such as <em>Barliman Butterbur's</em> <code>-1</code> influence or <em>Bifur's</em> <code>-1</code> corruption check) are never tagged. Procedural rules draft characters for their strengths; no rule ever queries a penalty.</li>
+            <li><strong>No Follower Modifiers:</strong> Influence over followers is already governed by official <code>Direct</code> capacity and biological <code>Race</code>. Tagging follower perks is redundant.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Leader-First Regional Retinue</h4>
+    <p>
+        Drafts a high-influence diplomat leader, captures their identity via <code>SaveAs: "Leader"</code>, and then drafts a company of companions native to the leader's home territory:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Starting Diplomat Leader",
+    "SaveAs": "Leader",
+    "Section": "Pool",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Character",
+      "Skill": "Diplomat",
+      "Direct": "&gt;= 2"
+    }
+  },
+  {
+    "Name": "Regional Retinue Companions",
+    "Section": "Pool",
+    "Count": 4,
+    "Attributes": {
+      "Primary": "Character",
+      "Mind": "&lt;= 3"
+    },
+    "Categories": {
+      "Home Region": "{Leader.Category:Home Region}"
+    },
+    "Fallback": {
+      "Name": "Open Culture Companions",
+      "Attributes": {
+        "Primary": "Character",
+        "Race": "{Leader.Race}"
+      }
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern B: Dynamic Faction Recruitment</h4>
+    <p>
+        Pulls the exact faction that the leader specializes in recruiting, with automatic wildcard expansion for universal diplomats (<em>Adrazar</em>) and species fallback for general diplomats (<em>Balin</em>):
+    </p>
+    <pre><code>{
+  "Name": "Leader's Recruitable Faction",
+  "Section": "Resources",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Faction",
+    "Name": "{Leader.Category:Faction Bonus}"
+  },
+  "Fallback": {
+    "Name": "Fallback Culture Faction",
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Faction",
+      "Race": "{Leader.Race}"
+    }
+  }
+}</code></pre>
+
+    <h4>Pattern C: Automated Starting Site Resolution</h4>
+    <p>
+        Works universally for both fixed-home characters (<em>Aragorn</em> &rarr; Bree) and dynamic home Avatars (<em>Gandalf</em> &rarr; <code>Site=Haven</code>) without branching logic:
+    </p>
+    <pre><code>{
+  "Name": "Company Starting Origin",
+  "Section": "Sites",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Site",
+    "Name": "{Leader.Home}"
+  }
+}</code></pre>
+
+
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Universal Ally &amp; Auto-Staging Engine</h4>
+    <p>
+        Drafts any random ally from your active expansions (including fixed-stronghold allies and regional enablers like <em>Ro&auml;c the Raven</em>), automatically guaranteeing that a legal destination site is added to the site deck without branching logic or fallbacks:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Universal Company Ally",
+    "SaveAs": "RetinueAlly",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Ally"
+    }
+  },
+  {
+    "Name": "Ally Staging Destination",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{RetinueAlly.Category:Site Requirement}"
+    }
+  }
+]</code></pre>
+    <p>
+        <strong>How it executes seamlessly:</strong>
+    </p>
+    <ul>
+        <li><strong>Fixed-Site Allies (<em>Treebeard</em>, <em>Goldberry</em>, <em>Shadowfax</em>):</strong> <code>{RetinueAlly.Category:Site Requirement}</code> resolves to an exact site name (e.g. <code>"Wellinghall"</code>, <code>"Old Forest"</code>, or <code>"Dunharrow; Edoras"</code>). Rule 2 matches the title directly and adds it to the site deck.</li>
+        <li><strong>Regional Allies (<em>Ro&auml;c the Raven</em>):</strong> <code>{RetinueAlly.Category:Site Requirement}</code> resolves to the dynamic predicate <code>"Region=Northern Rhovanion"</code>. Rule 2 evaluates the predicate on the fly and randomly samples a legal site located in Northern Rhovanion (e.g. <em>Dale</em>, <em>The Lonely Mountain</em>, or <em>Buhr Widu</em>).</li>
+    </ul>
+
+    <h4>Pattern B: Small-Company Scout Mobility &amp; Bodyguards</h4>
+    <p>
+        Targets mobility mounts or attack-cancelling allies tailored for fast, low-footprint scouting companies (such as hobbit stealth packs or solo scouts):
+    </p>
+    <pre><code>{
+  "Name": "Scout Mobility Mounts",
+  "Section": "Resources",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Ally"
+  },
+  "Categories": {
+    "Role": "Movement; Protection"
+  }
+}</code></pre>
+
+    <h4>Pattern C: Regional Theater Ally Enlistment</h4>
+    <p>
+        When operating within a regional theater (such as a Northern Rhovanion expedition), drafts regional allies dynamically by matching their <code>Region Requirement</code> to the active theater:
+    </p>
+    <pre><code>{
+  "Name": "Theater Regional Ally",
+  "Section": "Resources",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Ally"
+  },
+  "Categories": {
+    "Region Requirement": "{Theater.Region}"
+  }
+}</code></pre>
+</body>
+</html>

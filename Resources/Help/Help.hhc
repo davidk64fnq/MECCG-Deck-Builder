@@ -91,6 +91,10 @@
 			<param name="Name" value="Companion Rules Tag Set Reference">
 			<param name="Local" value="rules_support_tags.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Catalog Tagging &amp; Procedural Drafting Playbook">
+			<param name="Local" value="tagging_and_drafting_playbook.html">
+			</OBJECT>
 	</UL>
 </UL>
 </BODY></HTML>

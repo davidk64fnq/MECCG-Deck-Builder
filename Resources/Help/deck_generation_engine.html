@@ -21,11 +21,11 @@
             <strong>Configurable Distribution Strategies (<code>Distribution</code>):</strong> Choose how card copies are sampled:
             <ul>
                 <li><code>"Variety"</code> (default): Prioritizes 1 copy of every eligible card title before drawing duplicate copies.</li>
-                <li><code>"Focused"</code> (or <code>"Playset"</code>): Concentrates additions into full legal playsets (3x non-unique, 1x unique) of each chosen title for competitive engine consistency.</li>
+                <li><code>"Focused"</code> (or <code>"Playset"</code>): Concentrates additions into full legal playsets up to 3 copies for non-unique cards and Avatars, 1 for other unique cards) of each chosen title for competitive engine consistency.</li>
                 <li><code>"Uniform"</code> (or <code>"Random"</code>): Unweighted random draw with replacement up to legal deck limits.</li>
             </ul>
         </li>
-        <li><strong>Deck Copy Limits:</strong> Automatically enforces standard card copy limits: maximum 1 copy for unique cards and up to 3 copies for non-unique cards across the entire deck.</li>
+        <li><strong>Deck Copy Limits:</strong> Automatically enforces standard card copy limits: maximum 1 copy for unique cards and up to 3 copies for non-unique cards across the entire deck (with the official Avatar exception allowing up to 3 copies of one Wizard/Ringwraith, or 2 of one and 1 of another in Resources).</li>
         <li><strong>Randomized Thematic Branches (<code>RandomChoice</code>):</strong> Author multiple company themes or hazard packages in a single template, using weighted probability to randomly choose a theme and assign a tailored deck title.</li>
         <li><strong>Leader &amp; Variable Capture (<code>SaveAs</code> &amp; <code>{...}</code>):</strong> Capture chosen characters into named variables (e.g. <code>"SaveAs": "Leader"</code>) and query their attributes (e.g. <code>{Leader.Home}</code>) or categories (e.g. <code>{Leader.Category:Faction Bonus}</code>) in subsequent rules.</li>
         <li><strong>Automated Shortfall Backups (<code>Fallback</code>):</strong> Attach secondary backup rules that execute automatically if a primary query yields fewer cards than requested due to uniqueness limits or missing tags.</li>

@@ -335,7 +335,7 @@
     <ul>
         <li><code>Automatic Attack</code> &mdash; Modifies, buffs, cancels, or creates site guardian attacks faced by the whole company (<em>Balrog of Moria</em>, <em>Siege</em>). Note: Cards or allies with personal immunity to automatic-attack strikes (such as <em>Treebeard</em> or <em>Goldberry</em>) are classified under <code>Role: Protection</code>.</li>
         <li>
-            <code>Card Flow</code> &mdash; Managing cards between your hand, deck, and discard pile&mdash;drawing extra cards (<em>Favor of the Valar</em>), scouting or filtering your play deck (<em>Far-sight</em>, <em>Mirror of Galadriel</em>), retrieving cards from your discard pile (<em>Mouth of Sauron</em>), increasing hand size (<em>Smoke Rings</em>), or forcing an opponent to discard cards (<em>Kham&ucirc;l the Easterling</em>).
+            <code>Card Flow</code> &mdash; Managing cards and intelligence across the hand, deck, and discard pipeline&mdash;drawing extra cards (<em>Favor of the Valar</em>), scouting or inspecting hands and draw decks (<em>Far-sight</em>, <em>Palant&iacute;r of Amon S&ucirc;l</em>), filtering and reordering play decks (<em>Mirror of Galadriel</em>, <em>Palant&iacute;r of Ann&uacute;minas</em>), retrieving cards from the discard pile (<em>Mouth of Sauron</em>), expanding maximum hand size (<em>Smoke Rings</em>), or attacking and forcing opponent discards (<em>Kham&ucirc;l the Easterling</em>).
         </li>
         <li>
             <code>Combat</code> &mdash; Engaging in physical combat&mdash;boosting prowess or body during an attack, adjusting combat dice rolls, adding strikes, or triggering bonus attacks:
@@ -431,15 +431,12 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span>
     </div>
     <p>
-        Identifies specific item classifications, gear keywords, or magical objects that a resource or hazard event requires in company, enhances, transfers, tests, or targets for corruption/theft.
+        Identifies general item classifications, gear types, or rules keywords (e.g. <code>Weapon</code>, <code>Armor</code>, <code>Gold Ring</code>, <code>Palantír</code>, <code>Lost Knowledge</code>) that an event or hazard requires, enhances, transfers, tests, or targets for theft/corruption.
     </p>
-    <strong>Representative Examples:</strong>
-    <ul>
-        <li><code>Palant&iacute;r</code> &rarr; Required in company for <em>Align Palant&iacute;r</em> and <em>Bane of the Ithil-stone</em></li>
-        <li><code>Weapon; Armor</code> &rarr; Target item types for <em>Reforging</em></li>
-        <li><code>Gold Ring</code> &rarr; Required item type for <em>Test of Form</em> and <em>The Precious</em></li>
-        <li><code>Lost Knowledge</code> &rarr; Required tome/scroll type for <em>Into the Smoking Cone</em></li>
-    </ul>
+    <div class="note">
+        <strong>Generic Item Classes vs. Specific Quest Relics:</strong><br />
+        <code>Target Item</code> is strictly reserved for broad item categories and keywords. Do not use this category for specific named unique items required by a quest or storyline card (such as <em>The One Ring</em> on <em>Cracks of Doom</em>, or <em>Narsil</em> on <em>Andúril</em>). Specific named cards must always be tagged under <code>Prerequisite</code> so the Universal Quest Engine can draft them by title.
+    </div>
 
     <h3 id="target-species" class="entry-heading">Target Species</h3>
     <div class="scope-badge">

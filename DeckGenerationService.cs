@@ -253,7 +253,7 @@ namespace MECCG_Deck_Builder
             {
                 while (addedForThisRule < rule.Count)
                 {
-                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName, deck, sectionType)).ToList();
                     if (available.Count == 0) break;
 
                     var titleGroups = available.GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase).ToList();
@@ -263,7 +263,7 @@ namespace MECCG_Deck_Builder
                     var sampleCard = chosenGroup[0];
 
                     int currentCount = cardCountsByName.GetValueOrDefault(sampleCard.Name, 0);
-                    int maxAllowed = IsUniqueCard(sampleCard) ? 1 : 3;
+                    int maxAllowed = GetMaxAllowedForCard(sampleCard, deck, sectionType);
                     int canAdd = maxAllowed - currentCount;
                     int toAdd = Math.Min(canAdd, rule.Count - addedForThisRule);
 
@@ -285,7 +285,7 @@ namespace MECCG_Deck_Builder
             {
                 while (addedForThisRule < rule.Count)
                 {
-                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName, deck, sectionType)).ToList();
                     if (available.Count == 0) break;
 
                     var titleGroups = available.GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase).ToList();
@@ -307,7 +307,7 @@ namespace MECCG_Deck_Builder
             {
                 while (addedForThisRule < rule.Count)
                 {
-                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName)).ToList();
+                    var available = candidates.Where(c => CanAddCard(c, cardCountsByName, deck, sectionType)).ToList();
                     if (available.Count == 0) break;
 
                     int minCount = available.Min(c => cardCountsByName.GetValueOrDefault(c.Name, 0));
@@ -881,7 +881,7 @@ namespace MECCG_Deck_Builder
                         return false;
                     }
 
-                    return CanAddCard(c, cardCountsByName);
+                    return CanAddCard(c, cardCountsByName, deck, DeckSectionType.Sites);
                 }).ToList();
 
                 while (sitesAddedCount < siteCount && candidateSites.Count > 0)
@@ -1504,10 +1504,62 @@ namespace MECCG_Deck_Builder
                    (rule.Choices != null && rule.Choices.Count > 0);
         }
 
-        private static bool CanAddCard(Card card, Dictionary<string, int> cardCountsByName)
+        private static bool IsAvatar(Card card)
         {
+            if (card == null) return false;
+            return string.Equals(card.Secondary, "Avatar", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(card.Race, "Wizard", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(card.Race, "Ringwraith", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static int GetMaxAllowedForCard(Card card, Deck deck, DeckSectionType sectionType)
+        {
+            if (card == null) return 0;
+
+            // Special MECCG Avatar Allowance (3 of one, or 2 of one + 1 of another; max 3 total in Resources)
+            if (IsAvatar(card) && sectionType == DeckSectionType.Resources && deck != null)
+            {
+                var existingAvatars = deck.Resources.Where(IsAvatar).ToList();
+                int totalAvatars = existingAvatars.Count;
+
+                if (totalAvatars >= 3) return 0;
+
+                var distinctAvatars = existingAvatars.Select(a => a.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                bool alreadyInDeck = distinctAvatars.Contains(card.Name, StringComparer.OrdinalIgnoreCase);
+
+                // 1. If this is a new Avatar not yet in the deck:
+                if (!alreadyInDeck)
+                {
+                    // Cannot have 3 different Avatars in play deck
+                    if (distinctAvatars.Count >= 2) return 0;
+
+                    // First Avatar chosen for the deck: can take all 3 copies!
+                    if (distinctAvatars.Count == 0) return 3;
+
+                    // Second distinct Avatar: can take whatever slots remain (e.g. 3 - 1 = 2; or 3 - 2 = 1)
+                    return 3 - totalAvatars;
+                }
+
+                // 2. If this Avatar is already in the deck:
+                // If there is another distinct Avatar already present, neither can exceed 2 (completing 2+1)
+                if (distinctAvatars.Count == 2)
+                {
+                    return 2;
+                }
+
+                // Only Avatar in deck so far: can reach up to 3 copies
+                return 3;
+            }
+
+            return IsUniqueCard(card) ? 1 : 3;
+        }
+
+        private static bool CanAddCard(Card card, Dictionary<string, int> cardCountsByName, Deck deck = null, DeckSectionType sectionType = DeckSectionType.Resources)
+        {
+            if (card == null) return false;
+
             int currentCount = cardCountsByName.GetValueOrDefault(card.Name, 0);
-            int maxAllowed = IsUniqueCard(card) ? 1 : 3;
+            int maxAllowed = GetMaxAllowedForCard(card, deck, sectionType);
             return currentCount < maxAllowed;
         }
 
