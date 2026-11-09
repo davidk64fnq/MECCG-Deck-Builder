@@ -4216,7 +4216,8 @@
       "id": "88",
       "name": "Call of Home",
       "Role": "Readiness",
-      "set": "METW"
+      "set": "METW",
+      "Target Species": "Race!=Wizard"
     },
     {
       "fullCode": "Call of the Sea (TW)",
@@ -5080,7 +5081,7 @@
       "id": "153",
       "name": "Pûkel-men",
       "set": "METW",
-      "Site Requirement": "Amon Hen; Dark-hold; Glittering Caves; Ruined Signal Tower; Shadow-hold; Stone-circle; The Stones"
+      "Site Requirement": "Dark-hold; Shadow-hold"
     },
     {
       "fullCode": "Rogrog (TW)",
@@ -5227,7 +5228,7 @@
       "fullCode": "Muster Disperses (TW)",
       "id": "138",
       "name": "Muster Disperses",
-      "Role": "Card Flow",
+      "Role": "Influence",
       "set": "METW"
     },
     {
@@ -5251,7 +5252,7 @@
       "fullCode": "New Moon (TW)",
       "id": "140",
       "name": "New Moon",
-      "Role": "Readiness; Site",
+      "Role": "Readiness; Site; Terrain",
       "set": "METW",
       "Target Species": "Elf"
     },
@@ -5481,7 +5482,8 @@
       "id": "169",
       "name": "The Precious",
       "Role": "Corruption",
-      "set": "METW"
+      "set": "METW",
+      "Target Item": "Ring"
     },
     {
       "fullCode": "The Ring's Betrayal (TW)",
@@ -5674,6 +5676,13 @@
       "name": "Woses of the Drúadan Forest",
       "set": "METW",
       "Site Requirement": "Drúadan Forest"
+    },
+    {
+      "fullCode": "Easterlings (TW)",
+      "id": "273",
+      "name": "Easterlings",
+      "set": "METW",
+      "Site Requirement": "Easterling Camp"
     }
   ],
   "Filters": [
@@ -6025,7 +6034,6 @@
     ],
     [
       "Site Requirement",
-      "Amon Hen",
       "Bag End",
       "Beorn's House",
       "Blue Mountain Dwarf-hold",
@@ -6040,9 +6048,9 @@
       "Dunharrow",
       "Dunnish Clan-hold",
       "Eagles' Eyrie",
+      "Easterling Camp",
       "Edoras",
       "Free-hold",
-      "Glittering Caves",
       "Goblin-gate",
       "Grey Havens",
       "Henneth Annûn",
@@ -6062,14 +6070,11 @@
       "Pelargir",
       "Region=Northern Rhovanion",
       "Rivendell",
-      "Ruined Signal Tower",
       "Ruins & Lairs",
       "Shadow-hold",
       "Shrel-Kain",
       "Southron Oasis",
-      "Stone-circle",
       "The Lonely Mountain",
-      "The Stones",
       "The White Towers",
       "Thranduil's Halls",
       "Vale of Erech",
@@ -6101,6 +6106,7 @@
       "Race!=Hobbit",
       "Race!=Hobbit && Race!=Dwarf && Race!=Orc && Race!=Nazgûl",
       "Race!=Hobbit && Race!=Wizard",
+      "Race!=Wizard",
       "Sage",
       "Spider",
       "Troll",

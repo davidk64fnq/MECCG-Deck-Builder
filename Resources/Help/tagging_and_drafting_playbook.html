@@ -67,28 +67,39 @@
                 <code>Secondary = Faction</code>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Site Requirement</code>, <code>Target Species</code>, <code>Target Item</code>
+                <strong>Categories:</strong> <code>Site Requirement</code>, <code>Prerequisite</code><br />
+                <strong>Specialized Attributes:</strong> <code>Specific</code> (named character requirement e.g. <code>Aragorn II</code> on <em>Army of the Dead</em>)
             </td>
         </tr>
         <tr>
-            <td><a href="#hazard-creatures-playbook">Hazard Creatures</a></td>
+            <td><a href="#hazard-creatures-playbook">Hazard Creatures (Standard)</a></td>
             <td>
-                <code>Primary = Hazard</code><br />
-                <code>Secondary = Creature</code>
+                <code>Secondary = Creature</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Pure combat creatures; excludes dual-mode events)</em></span>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Region Type</code><br />
-                <strong>Specialized Attributes:</strong> <code>Skill</code> (hazard traits e.g. <code>Flying</code>, <code>Ringwraith</code>), <code>Race</code> (singular normalization)
+                <strong>Categories:</strong> <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Environment Stance</code>, <code>Role</code> (item theft utility only)
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#dual-creatures-playbook">Hazard Creatures (Dual-Mode)</a></td>
+            <td>
+                <code>Secondary = Creature/Permanent-event; Creature/Short-event</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Nazg&ucirc;l &amp; split-timing hazard events)</em></span>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Region Requirement</code> (creature mode), <code>Role</code> (event mode), <code>Site Requirement</code>, <code>Target Species</code>
             </td>
         </tr>
         <tr>
             <td><a href="#hazard-events-playbook">Hazard Events</a></td>
             <td>
                 <code>Primary = Hazard</code><br />
-                <code>Secondary = Short-event; Long-event; Permanent-event</code>
+                <code>Secondary = Short-event; Long-event; Permanent-event</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Excludes dual-mode creatures)</em></span>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Species</code>
+                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Species</code>, <code>Target Item</code>
             </td>
         </tr>
         <tr>
@@ -98,7 +109,7 @@
             </td>
             <td>
                 <strong>Categories:</strong> <code>Role</code>, <code>Target Species</code>, <code>Prerequisite</code>, <code>Prerequisite For</code><br />
-                <strong>Specialized Attributes:</strong> <code>Race</code> (overloaded gear types: <code>Weapon</code>, <code>Armor</code>, <code>Lost Knowledge</code>, <code>Palantír</code>, <code>Treasure</code>)
+                <strong>Specialized Attributes:</strong> <code>Race</code> (overloaded gear types: <code>Weapon</code>, <code>Armor</code>, <code>Lost Knowledge</code>, <code>Palant&iacute;r</code>, <code>Treasure</code>)
             </td>
         </tr>
         <tr>
@@ -509,5 +520,755 @@
     "Region Requirement": "{Theater.Region}"
   }
 }</code></pre>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: FACTIONS                                         -->
+    <!-- ================================================================== -->
+    <h2 id="factions-playbook">Factions (Alliances &amp; Marshalling Points)</h2>
+    <p>
+        Factions represent the free peoples, realms, and creature alliances of Middle-earth recruited to aid the struggle against the shadow. They are unique Resource cards worth substantial Marshalling Points (typically 2 to 3 MPs, and up to 6 MPs for legendary storylines). Because factions are recruited during the site phase by diplomats making an influence check, taxonomy tagging focuses on their <strong>staging strongholds</strong>, <strong>storyline prerequisites</strong>, and official <strong>character locks</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR FACTIONS -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category / Attribute</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Scope Rules</th>
+        </tr>
+        <tr>
+            <td><code>Site Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Exact catalog site title where the faction must be recruited (e.g. <code>Edoras</code>, <code>Thranduil's Halls</code>, <code>Iron Hill Dwarf-hold</code>, <code>Minas Tirith</code>, <code>Vale of Erech</code>).
+            </td>
+            <td>
+                <ul>
+                    <li>Mandatory physical stronghold required to make the recruitment influence check.</li>
+                    <li>In <em>The Wizards</em> (<code>METW</code>), all 29 factions recruit at an exact, named site.</li>
+                    <li>Guarantees that destination site rules (<code>"Name": "{Faction.Category:Site Requirement}"</code>) draft legal strongholds automatically.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Prerequisite</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Named enabler card required to play or muster the faction (e.g. <code>Paths of the Dead</code> for <em>Army of the Dead</em>).
+            </td>
+            <td>
+                <ul>
+                    <li>Assigned strictly to storyline factions that require a prerequisite card in play or discard to be mustered.</li>
+                    <li>Omitted (<code>[Blank]</code>) for standard factions recruited via normal dice checks.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Specific</code><br /><span class="scope-pill">Official Attribute</span></td>
+            <td>
+                Exact title of a named unique character required to recruit this faction (e.g. <code>Aragorn II</code> on <em>Army of the Dead</em>).
+            </td>
+            <td>
+                <ul>
+                    <li>Indexed directly in the core catalog (<code>cards-dc.json</code>).</li>
+                    <li>Enables procedural generation rules to query <code>"Name": "{Faction.Specific}"</code> to recruit the required hero into the starting pool without hardcoding.</li>
+                    <li>Left unpopulated on standard open factions.</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <div class="note">
+        <strong>What is Intentionally OMITTED on Factions:</strong>
+        <ul>
+            <li><strong>No <code>Role</code> Tags:</strong> Factions are scored Marshalling Point assets, not utility events. Tagging them with <code>Role: Influence</code> or <code>Role: Recruitment</code> would cause generic event queries to draft high-MP factions into event slots.</li>
+            <li><strong>No <code>Target Species</code> for Standard Modifications:</strong> Standard printed dice adjustments (such as <em>Wood-elves</em> granting <code>Elves (+1), Dwarves (-2)</code>) are situational in-game roll modifiers. In deck construction, diplomat recruitment bonuses are handled proactively by <code>Faction Bonus</code> on Character cards.</li>
+            <li><strong>No Redundant Racial Tags:</strong> Factions already carry their official species classification in the database (e.g. <em>Wood-elves</em> has <code>Race: Elf</code>, <em>Iron Hill Dwarves</em> has <code>Race: Dwarf</code>, <em>Riders of Rohan</em> has <code>Race: Man</code>). Procedural rules query official <code>Race</code> directly without custom tag duplication.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Leader-Aligned Faction &amp; Stronghold Engine</h4>
+    <p>
+        Drafts the exact faction that your company's diplomat leader specializes in recruiting (via <code>Faction Bonus</code>), falling back to their native species, and automatically drafts the corresponding stronghold into the site deck:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Leader's Recruitable Faction",
+    "SaveAs": "ExpeditionFaction",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Faction",
+      "Name": "{Leader.Category:Faction Bonus}"
+    },
+    "Fallback": {
+      "Name": "Species Culture Faction",
+      "Attributes": {
+        "Primary": "Resource",
+        "Secondary": "Faction",
+        "Race": "{Leader.Race}"
+      }
+    }
+  },
+  {
+    "Name": "Faction Recruitment Stronghold",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{ExpeditionFaction.Category:Site Requirement}"
+    }
+  }
+]</code></pre>
+    <p>
+        <strong>How it executes:</strong>
+    </p>
+    <ul>
+        <li>If <em>Thranduil</em> is the leader, Rule 1 evaluates <code>{Leader.Category:Faction Bonus}</code> &rarr; drafts <em>Wood-elves</em>. Rule 2 evaluates <code>{ExpeditionFaction.Category:Site Requirement}</code> &rarr; drafts <em>Thranduil's Halls</em>.</li>
+        <li>If <em>D&aacute;in II</em> is the leader, Rule 1 drafts <em>Iron Hill Dwarves</em>, and Rule 2 drafts <em>Iron Hill Dwarf-hold</em>.</li>
+        <li>If <em>Adrazar</em> (universal diplomat tagged <code>Faction Bonus: All</code>) is the leader, <code>All</code> acts as a wildcard, randomly sampling any available faction in your active sets and pulling its matching stronghold into the site deck.</li>
+    </ul>
+
+    <h4>Pattern B: Regional Homeland Faction Recruitment</h4>
+    <p>
+        When operating in an established adventure theater (such as a Rohan or Gondor regional cluster), drafts factions whose recruitment site is located within the active theater:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Regional Stronghold Destination",
+    "SaveAs": "TargetHold",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Region": "{Theater.Region}"
+    }
+  },
+  {
+    "Name": "Matching Regional Faction",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Resource",
+      "Secondary": "Faction"
+    },
+    "Categories": {
+      "Site Requirement": "{TargetHold.Name}"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern C: Automated Storyline Quests (<em>Army of the Dead</em>)</h4>
+    <p>
+        Drafts the high-scoring quest faction <em>Army of the Dead</em> and automatically summons its champion hero (*Aragorn II* via <code>Specific</code>), required enabler event (*Paths of the Dead* via <code>Prerequisite</code>), and staging destination (*Vale of Erech* via <code>Site Requirement</code>) with zero hardcoding:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Storyline Faction Objective",
+    "SaveAs": "QuestFaction",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Name": "Army of the Dead"
+    }
+  },
+  {
+    "Name": "Quest Champion Hero",
+    "Section": "Pool",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Character",
+      "Name": "{QuestFaction.Specific}"
+    }
+  },
+  {
+    "Name": "Quest Prerequisite Enabler",
+    "Section": "Resources",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Resource",
+      "Name": "{QuestFaction.Category:Prerequisite}"
+    }
+  },
+  {
+    "Name": "Quest Staging Destination",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{QuestFaction.Category:Site Requirement}"
+    }
+  }
+]</code></pre>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: HAZARD CREATURES (STANDARD)                      -->
+    <!-- ================================================================== -->
+    <h2 id="hazard-creatures-playbook">Hazard Creatures: Standard (Combat &amp; Ambushes)</h2>
+    <p>
+        Standard hazard creatures represent the wandering beasts, Orc warbands, Trolls, Dragons, and guardians that attack companies during the movement/hazard phase. They are identified by <code>Secondary = Creature</code> (excluding dual-mode Nazg&ucirc;l and split events). Because standard creatures engage companies primarily through physical combat, taxonomy tagging focuses on their <strong>keying conditions</strong> (terrain, regions, and site holds) and <strong>environmental prerequisites</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR STANDARD CREATURES -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category / Attribute</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Scope Rules</th>
+        </tr>
+        <tr>
+            <td><code>Region Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Canonical terrain types (<code>Wilderness</code>, <code>Border-land</code>, <code>Shadow-land</code>, <code>Dark-domain</code>, <code>Free-domain</code>, <code>Coastal Sea</code>) and named regions where the creature can be keyed to the region itself (e.g. <code>Heart of Mirkwood</code>, <code>Grey Mountain Narrows</code>, <code>Andrast Coast</code>).
+            </td>
+            <td>
+                <ul>
+                    <li>Assigned when a creature can be keyed directly to a terrain symbol or named region in the company's site path, regardless of the destination site's hold type.</li>
+                    <li><strong>Pragmatic Omission (*P&ucirc;kel-men*):</strong> While *Corsairs* and *Giant Spiders* can be keyed directly to their listed regions (attacking even if the destination is a Free-hold or Border-hold), *P&ucirc;kel-men* can only be keyed to <em>Ruins &amp; Lairs destination sites</em> within its 10 southern regions. To prevent *P&ucirc;kel-men* from being drafted as a dead card into Gondor or Rohan decks that only visit Free-holds and Border-holds (*Minas Tirith*, *Edoras*), its <code>Region Requirement</code> is left <strong><code>[Blank]</code></strong>.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Site Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Universal printed site hold types (<code>Dark-hold</code>, <code>Shadow-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Border-hold</code>, <code>Free-hold</code>) or explicitly printed named sites (e.g. <code>Caves of &Ucirc;lund</code>, <code>Dancing Spire</code>, <code>Irerock</code>, <code>The Lonely Mountain</code>, <code>Moria</code>, <code>Dr&uacute;adan Forest; Old Forest; Wellinghall</code>).
+            </td>
+            <td>
+                <ul>
+                    <li><strong>Universal Holds:</strong> Tag hold types only if the creature can attack at that hold type unconditionally anywhere on Middle-earth.</li>
+                    <li><strong>Literal Named Sites:</strong> Tag specific site names only if the site title is <em>explicitly printed on the face of the card</em>. (Never manually expand regional hold permissions into hardcoded site lists).</li>
+                    <li><strong>Pragmatic Omission of Region-Bounded Holds:</strong> Secondary clauses such as <em>"also playable at Ruins &amp; Lairs in these regions"</em> (on *Corsairs*, *Giant Spiders*, *Huorn*, *Old Man Willow*, and *P&ucirc;kel-men*) are omitted from <code>Site Requirement</code> so generic hold queries do not draft them into illegal regions.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Environment Stance</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Doors of Night</code></td>
+            <td>
+                <ul>
+                    <li>Assigned strictly to the four Unique Dragons (*Agburanar*, *Daelomin*, *Leucaruth*, *Smaug*) that require <em>Doors of Night</em> to roam outside their fixed lairs.</li>
+                    <li>Left <code>[Blank]</code> on all standard non-environmental creatures.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Role</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Item</code></td>
+            <td>
+                <ul>
+                    <li><strong>Omitted on Combatants:</strong> Standard creatures do <em>not</em> carry <code>Role: Combat</code>. Their combat nature is already fully represented by official stats (<code>Prowess</code>, <code>Strikes</code>, <code>Body</code>). Tagging them with Combat would pollute event filters when drafting combat tricks.</li>
+                    <li><strong>Pure Utility Exceptions:</strong> Assigned strictly to non-damaging utility creatures that specialize purely in item theft: *Pick-pocket* and *Thief*.</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <!-- PRAGMATIC DECK BUILDING NOTE BOX -->
+    <div class="note">
+        <strong>Pragmatic Deck-Building Trade-off &mdash; Region-Bounded Hold Clauses:</strong><br />
+        Several creatures print secondary clauses allowing them to be keyed to specific hold types within listed regions (for example, *Corsairs of Umbar* at Ruins &amp; Lairs and Shadow-holds in coastal regions; *Giant Spiders* at Ruins, Shadow, and Dark-holds in Mirkwood; and *P&ucirc;kel-men* at Ruins &amp; Lairs in 10 southern regions).<br /><br />
+        <strong>Why we omit these conditional holds from <code>Site Requirement</code>:</strong>
+        <ul>
+            <li><strong>Preventing Geographic Leakage:</strong> If *Corsairs*, *Giant Spiders*, or *P&ucirc;kel-men* were tagged with generic <code>Site Requirement: Ruins &amp; Lairs</code>, a procedural rule drafting Ruins guardians for an <strong>Eriador</strong> or <strong>Northern Rhovanion</strong> deck would draft them to guard *Weathertop* or *Dale*, where they are illegal.</li>
+            <li><strong>Avoiding Expansion Maintenance Debt:</strong> Manually resolving those clauses into specific site titles (e.g. *Amon Hen*, *Glittering Caves*) only works for a single set and requires manual updates every time a later expansion introduces a new Ruins &amp; Lairs in those regions.</li>
+            <li><strong>How They Draft Cleanly:</strong> Roaming regional creatures (*Corsairs*, *Giant Spiders*, *Huorn*, *Old Man Willow*) are drafted into local theater decks via <strong><code>Region Requirement</code></strong>, while *P&ucirc;kel-men* is drafted cleanly via its unconditional base holds (<code>Dark-hold; Shadow-hold</code>).</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Geographic Theater Regional Hazard Suite</h4>
+    <p>
+        When operating in an established adventure theater (such as a Mirkwood, Gondor, or Coastal expedition), drafts hazard creatures native to the active theater's contiguous territories using <code>Region Requirement</code>:
+    </p>
+    <pre><code>{
+  "Name": "Local Theater Roaming Creatures",
+  "Section": "Hazards",
+  "Count": 8,
+  "Attributes": {
+    "Primary": "Hazard",
+    "Secondary": "Creature"
+  },
+  "Categories": {
+    "Region Requirement": "{Theater.Region}"
+  }
+}</code></pre>
+    <p>
+        <strong>How it executes:</strong>
+    </p>
+    <ul>
+        <li>In a <strong>Mirkwood Theater</strong>, <code>{Theater.Region}</code> automatically matches and drafts *Giant Spiders*, *Huorn*, and *Old Man Willow*.</li>
+        <li>In a <strong>Coastal Theater</strong>, <code>{Theater.Region}</code> automatically drafts *Corsairs of Umbar*.</li>
+        <li>In an <strong>Iron Hills / Northern Rhovanion Theater</strong>, <code>{Theater.Region}</code> automatically drafts roaming Dragons (*Agburanar*, *Daelomin*, *Smaug*).</li>
+    </ul>
+
+    <h4>Pattern B: Stronghold &amp; Dark-hold Ambushers</h4>
+    <p>
+        Drafts lethal universal stronghold defenders keyed specifically to fortified shadow holds without geographic constraints:
+    </p>
+    <pre><code>{
+  "Name": "Fortress Guardians",
+  "Section": "Hazards",
+  "Count": 6,
+  "Attributes": {
+    "Primary": "Hazard",
+    "Secondary": "Creature"
+  },
+  "Categories": {
+    "Site Requirement": "Dark-hold; Shadow-hold"
+  }
+}</code></pre>
+    <p>
+        Matches cards with unconditional stronghold keys: *Olog-hai (Trolls)*, *Barrow-wight*, *Ghosts*, *Ghouls*, *Orc-guard*, *Orc-watch*, *Silent Watcher*, and *P&ucirc;kel-men*.
+    </p>
+
+    <h4>Pattern C: Terrain-Keyed Wilderness Prowlers</h4>
+    <p>
+        Drafts creatures that prey on companies traversing long overland wilderness routes, independent of specific regional names:
+    </p>
+    <pre><code>{
+  "Name": "Overland Wilderness Predators",
+  "Section": "Hazards",
+  "Count": 6,
+  "Attributes": {
+    "Primary": "Hazard",
+    "Secondary": "Creature"
+  },
+  "Categories": {
+    "Region Requirement": "Wilderness"
+  }
+}</code></pre>
+    <p>
+        Drafts natural wilderness predators: *Cave-drake*, *Giant*, *Wargs*, *Wolves*, *Brigands*, *Orc-patrol*, *Orc-warriors*, and *Orc-warband*.
+    </p>
+
+    <h4>Pattern D: The Awakened Unique Dragon Package</h4>
+    <p>
+        Drafts a legendary Unique Dragon paired automatically with its mandatory environmental enabler (<em>Doors of Night</em>) and its dedicated lair:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Legendary Roaming Dragon",
+    "SaveAs": "DragonBoss",
+    "Section": "Hazards",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Hazard",
+      "Secondary": "Creature",
+      "Race": "Dragon",
+      "Unique": "Unique"
+    },
+    "Categories": {
+      "Environment Stance": "Doors of Night"
+    }
+  },
+  {
+    "Name": "Required Shadow Environment Enabler",
+    "Section": "Hazards",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Hazard",
+      "Name": "Doors of Night"
+    }
+  },
+  {
+    "Name": "Dragon Home Lair",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{DragonBoss.Category:Site Requirement}"
+    }
+  }
+]</code></pre>
+    <p>
+        If *Smaug* is sampled, Rule 3 evaluates <code>{DragonBoss.Category:Site Requirement}</code> &rarr; drafts *The Lonely Mountain*. If *Daelomin* is sampled &rarr; drafts *Dancing Spire*.
+    </p>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: HAZARD CREATURES (DUAL-MODE)                     -->
+    <!-- ================================================================== -->
+    <h2 id="dual-creatures-playbook">Hazard Creatures: Dual-Mode (Nazg&ucirc;l &amp; Split Events)</h2>
+    <p>
+        Dual-mode hazard cards possess split timing: they can enter play either as a regional <strong>hazard creature</strong> or as an ongoing <strong>permanent-event</strong> (or reactive <strong>short-event</strong>). In <em>The Wizards</em>, this partition consists of the nine Ringwraith Nazg&ucirc;l, *Shelob*, and the *Mouth of Sauron*. Because these cards perform double duty, taxonomy tagging balances their <strong>strict regional creature boundaries</strong> with their <strong>global utility event mechanisms</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR DUAL-MODE CREATURES -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category / Attribute</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Scope Rules</th>
+        </tr>
+        <tr>
+            <td><code>Region Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Exact geographic territories and terrain symbols printed on the card face for creature entry (e.g. <code>Gorgoroth</code>, <code>Dark-domain</code>, <code>Harondor</code>, <code>Imlad Morgul</code>).
+            </td>
+            <td>
+                <ul>
+                    <li><strong>Creature-Side Only:</strong> Tag strictly the printed regions where the card is legally allowed to attack as a creature.</li>
+                    <li><strong>Never Tag <code>All</code> for Events:</strong> Although their event mode can be played globally, tagging "All" would cause the deck generator to falsely draft them as creatures in illegal regions (such as the Shire or Rhudaur).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Site Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Dark-hold</code></td>
+            <td>
+                <ul>
+                    <li>All nine Nazg&ucirc;l and *Mouth of Sauron* print <code>[d]</code> as their universal base hold key.</li>
+                    <li>Left <code>[Blank]</code> on *Shelob*, whose site attacks are bounded strictly by her listed regions (<em>Imlad Morgul</em> and <em>Gorgoroth</em>).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Environment Stance</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Doors of Night</code></td>
+            <td>
+                <ul>
+                    <li>Assigned strictly to *Shelob*, whose event mode requires <em>Doors of Night</em> to be in play.</li>
+                    <li>Left <code>[Blank]</code> on the Nazg&ucirc;l and *Mouth of Sauron*.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Role</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Combat</code>, <code>Card Flow</code>, <code>Corruption</code>, <code>Item</code>, <code>Readiness</code>, <code>Site</code></td>
+            <td>
+                <ul>
+                    <li><strong>Classifies the Event Mode:</strong> Unlike pure creatures, dual cards carry a tactical role tag defining what their event side accomplishes when tapped or resolved.</li>
+                    <li><code>Readiness</code> &rarr; Tapping characters (*Ad&ucirc;naphel*).</li>
+                    <li><code>Combat</code> &rarr; Direct body debuffs (*Akh&ocirc;rahil*), extra strikes (*Hoarm&ucirc;rath of D&iacute;r*), or creature attack buffs (*Dwar of Waw*, *Shelob*).</li>
+                    <li><code>Item</code> &rarr; Forcing item discards on wounded characters (*Ind&ucirc;r Dawndeath*).</li>
+                    <li><code>Card Flow</code> &rarr; Hand disruption (*Kham&ucirc;l the Easterling*) or hazard retrieval from discard (*Mouth of Sauron*, *&Ucirc;vatha the Horseman*).</li>
+                    <li><code>Corruption</code> &rarr; Universal corruption checks (*Ren the Unclean*).</li>
+                    <li><code>Site</code> &rarr; Hold transformation (*Witch-king of Angmar*).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Target Species</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Animal; Spider; Wolf</code></td>
+            <td>
+                <ul>
+                    <li>Assigned strictly when the card's event mode specifically buffs or aids targeted minion species (*Dwar of Waw* and *Shelob*).</li>
+                    <li>Left <code>[Blank]</code> on all other dual cards.</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: Drafting Dual Cards as Regional Creatures</h4>
+    <p>
+        When operating in an eastern or southern theater (such as Gorgoroth, Khand, or Harondor), drafts dual cards strictly as formidable combat creatures matching the active theater:
+    </p>
+    <pre><code>{
+  "Name": "Southern Realm Guardians",
+  "Section": "Hazards",
+  "Count": 3,
+  "Attributes": {
+    "Secondary": "Creature/Permanent-event"
+  },
+  "Categories": {
+    "Region Requirement": "{Theater.Region}"
+  }
+}</code></pre>
+    <p>
+        If the theater is <strong>Gorgoroth</strong> or <strong>Khand</strong>, Rule 1 matches *Akh&ocirc;rahil*, *Hoarm&ucirc;rath of D&iacute;r*, *Ind&ucirc;r Dawndeath*, and *&Ucirc;vatha the Horseman*.
+    </p>
+
+    <h4>Pattern B: Drafting Dual Cards as Open Utility Events</h4>
+    <p>
+        Drafts the cards globally as tactical disruption events for any hazard suite, completely independent of Middle-earth geography:
+    </p>
+    <pre><code>{
+  "Name": "Disruption &amp; Corruption Hazard Events",
+  "Section": "Hazards",
+  "Count": 2,
+  "Categories": {
+    "Role": "Corruption; Readiness"
+  }
+}</code></pre>
+    <p>
+        Matches *Ad&ucirc;naphel* (tapping key characters) or *Ren the Unclean* (triggering table-wide corruption checks).
+    </p>
+
+    <h4>Pattern C: The Nazg&ucirc;l Hand-Disruption Engine (*Kham&ucirc;l*)</h4>
+    <p>
+        Pairs multiple Nazg&ucirc;l permanent-events with *Kham&ucirc;l the Easterling* to strip the opponent's hand down to zero cards:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Passive Nazg&ucirc;l Anchors",
+    "Section": "Hazards",
+    "Count": 3,
+    "Attributes": {
+      "Secondary": "Creature/Permanent-event"
+    }
+  },
+  {
+    "Name": "Hand Disruption Finisher",
+    "Section": "Hazards",
+    "Count": 1,
+    "Attributes": {
+      "Name": "Kham&ucirc;l the Easterling"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern D: Animal &amp; Spider Swarm Multipliers</h4>
+    <p>
+        Drafts species-buffing dual cards alongside natural swarms to escalate strike lethality:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Spider Swarm Attackers",
+    "Section": "Hazards",
+    "Count": 6,
+    "Attributes": {
+      "Primary": "Hazard",
+      "Race": "Spider; Animal"
+    }
+  },
+  {
+    "Name": "Swarm Combat Multiplier",
+    "Section": "Hazards",
+    "Count": 1,
+    "Categories": {
+      "Role": "Combat",
+      "Target Species": "Spider; Animal"
+    }
+  }
+]</code></pre>
+    <p>
+        Rule 2 evaluates `Target Species: Spider; Animal` &rarr; matches and drafts *Dwar of Waw* or *Shelob*.
+    </p>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: HAZARD EVENTS                                    -->
+    <!-- ================================================================== -->
+    <h2 id="hazard-events-playbook">Hazard Events (Disruption, Environment &amp; Traps)</h2>
+    <p>
+        Hazard events represent the pervasive influence of the Shadow across Middle-earth: severe weather, corrupting whispers, ambushes at ancient strongholds, and traps laid for specific peoples or treasures. Identified by <code>Primary = Hazard</code> and <code>Secondary = Short-event; Long-event; Permanent-event</code> (excluding dual-mode Nazg&ucirc;l and split creatures), this partition contains 60 distinct cards in <em>The Wizards</em> (16 Permanent-events, 15 Long-events, and 29 Short-events). Because hazard events do not have physical combat stats, taxonomy tagging defines their <strong>tactical role</strong>, <strong>environmental conditions</strong>, <strong>pathway constraints</strong>, and <strong>targeted items or species</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR HAZARD EVENTS -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+    <table>
+        <tr>
+            <th style="width: 25%;">Category / Attribute</th>
+            <th style="width: 35%;">Permitted Values</th>
+            <th style="width: 40%;">Tagging Logic &amp; Scope Rules</th>
+        </tr>
+        <tr>
+            <td><code>Role</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                <code>Automatic Attack</code>, <code>Card Flow</code>, <code>Combat</code>, <code>Corruption</code>, <code>Duration</code>, <code>Influence</code>, <code>Item</code>, <code>Movement</code>, <code>Readiness</code>, <code>Site</code>, <code>Terrain</code>
+            </td>
+            <td>
+                <ul>
+                    <li>The primary classifier governing what tactical disruption the hazard event executes. Semicolon multi-values are assigned when an event provides modal choices or dual effects.</li>
+                    <li><code>Automatic Attack</code>: Modifies, doubles prowess/strikes, or adds automatic attacks at sites (*Awaken Denizens*, *Awaken Minions*, *Eye of Sauron*, *Arouse Denizens*, *Arouse Minions*, *Siege*, *Balrog of Moria*).</li>
+                    <li><code>Combat</code>: Buffs creature prowess/strikes, adds strikes, or inflates the hazard limit (*Clouds*, *Minions Stir*, *Plague of Wights*, *Wake of War*, *Fell Beast*, *Fury of the Iron Crown*, *Gloom*, *Lost in...*).</li>
+                    <li><code>Corruption</code>: Inflicts corruption points (CP) or forces corruption checks (*Despair of the Heart*, *Lure of...*, *Greed*, *The Precious*, *The Ring's Betrayal*, *The Will of the Ring*, *The Balance of Things*, *Weariness of the Heart*).</li>
+                    <li><code>Duration</code>: Extends the life of ongoing long-events (*The Will of Sauron*).</li>
+                    <li><code>Influence</code>: Discards recruited factions by testing the opponent's unused general influence (*Muster Disperses*).</li>
+                    <li><code>Item</code>: Forces item discards on moving or visited companies (*Drowning Seas*).</li>
+                    <li><code>Movement</code>: Forces companies to return to their site of origin or halts movement (*Foul Fumes*, *Long Winter*, *Snowstorm*, *Drowning Seas*, *Siege*).</li>
+                    <li><code>Readiness</code>: Taps characters or bounces them back to hand (*Call of Home*, *Call of the Sea*, *Tookish Blood*, *New Moon*, *Morgul-horse*).</li>
+                    <li><code>Site</code>: Taps sites, closes sites, or cancels the site phase (*River*, *Lost at Sea*, *Lost in Free-domains*, *Storms of Oss&euml;*, *Balrog of Moria*).</li>
+                    <li><code>Terrain</code>: Converts region path symbols and territory terrain classifications between safe and hostile (*Fell Winter*, *Morgul Night*, *Awaken the Earth's Fire*, *Choking Shadows*, *Gloom*, *New Moon*).</li>
+                    <li><code>Card Flow</code>: Cancels deck/discard searching (*Bane of the Ithil-stone*), returns events from discard (*The Nazg&ucirc;l are Abroad*), forces hand discards (*Drowning Seas*), or cancels environment events in play (*Twilight*).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Environment Stance</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Doors of Night</code></td>
+            <td>
+                <ul>
+                    <li>Assigned to cards that require <em>Doors of Night</em> to be in play, or gain enhanced lethality when <em>Doors of Night</em> is active (17 cards across METW).</li>
+                    <li>Also assigned to <em>Doors of Night</em> itself as the foundational Shadow anchor.</li>
+                    <li>Enables procedural deck rules to automatically recruit <em>Doors of Night</em> whenever weather or environmental hazards are drafted.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Region Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Canonical terrain types (<code>Wilderness</code>, <code>Border-land</code>, <code>Shadow-land</code>, <code>Dark-domain</code>, <code>Coastal Sea</code>, <code>Free-domain</code>) or specific regional territories (e.g. <code>Hollin; Redhorn Gate; Wold &amp; Foothills</code>).
+            </td>
+            <td>
+                <ul>
+                    <li>Assigned when an event triggers on, requires, or targets specific terrain in the company's site path (e.g. *Snowstorm*, *Long Winter*, *Foul Fumes*, *Lost at Sea*, and the *Lost in...* series).</li>
+                    <li>Assigned on regional permanent-events like *Balrog of Moria* that buff all automatic attacks across specific named territories.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Site Requirement</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Structural hold types (<code>Ruins &amp; Lairs</code>, <code>Dark-hold; Shadow-hold</code>, <code>Border-hold; Free-hold</code>) or specific named sites (<code>L&oacute;rien; Moria</code>).
+            </td>
+            <td>
+                <ul>
+                    <li>Assigned when an event attaches to, modifies, or requires a company to be at a specific hold type or site.</li>
+                    <li>*Awaken Denizens* / *Arouse Denizens* &rarr; <code>Ruins &amp; Lairs</code>.</li>
+                    <li>*Awaken Minions* / *Arouse Minions* &rarr; <code>Dark-hold; Shadow-hold</code>.</li>
+                    <li>*Siege* &rarr; <code>Border-hold; Free-hold</code>.</li>
+                    <li>*Balrog of Moria* &rarr; <code>L&oacute;rien; Moria</code>.</li>
+                    <li><strong>Permissive "OR" Clauses Omitted:</strong> Events featuring an open global mode alongside an optional hold permission (such as *Dragon's Desolation*) leave <code>Site Requirement</code> <strong><code>[Blank]</code></strong> to preserve open drafting.</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Target Species</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td>
+                Biological minion races (<code>Orc</code>, <code>Troll</code>, <code>Undead</code>, <code>Wolf</code>, <code>Animal</code>, <code>Spider</code>, <code>Dragon</code>, <code>Nazg&ucirc;l</code>, <code>Man</code>), targeted character races (<code>Elf</code>, <code>Hobbit</code>, <code>Wizard</code>, <code>D&uacute;nadan</code>), or species immunity predicates (e.g. <code>Race!=Hobbit &amp;&amp; Race!=Wizard</code>).
+            </td>
+            <td>
+                <ul>
+                    <li><strong>Minion Buffs:</strong> Assigned when an event escalates combat for specific minion creature attacks (*Minions Stir*, *Plague of Wights*, *Wake of War*, *Fell Winter*, *Fury of the Iron Crown*, *Words of Power and Terror*).</li>
+                    <li><strong>Character Targets:</strong> Assigned when an event targets specific character species (*The Burden of Time*, *Call of the Sea*, *Tookish Blood*, *Lure of Creation*, *Night*).</li>
+                    <li><strong>Immunity Predicates:</strong> Accurately indexes printed character exclusions on corruption hazards (*Despair of the Heart*, *Lure of Expedience*, *Lure of Nature*, *Lure of Power*, *Greed*).</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td><code>Target Item</code><br /><span class="scope-pill">Custom Category</span></td>
+            <td><code>Palant&iacute;r</code>, <code>Ring</code></td>
+            <td>
+                <ul>
+                    <li>Assigned strictly when an event specifically targets, punishes, or triggers off an item classification.</li>
+                    <li><code>Palant&iacute;r</code> &rarr; *Bane of the Ithil-stone*.</li>
+                    <li><code>Ring</code> &rarr; *The Nazg&ucirc;l are Abroad*, *The Precious*, *The Ring's Betrayal*, and *The Will of the Ring*.</li>
+                    <li>Enables procedural scenario and solo rules to draft targeted anti-Ring or anti-Palant&iacute;r hazard packages.</li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Pure Corruption Suite</h4>
+    <p>
+        Drafts a coordinated corruption package targeting the opponent company's moral fortitude, independent of physical combat prowess:
+    </p>
+    <pre><code>{
+  "Name": "Corruption Disruption Package",
+  "Section": "Hazards",
+  "Count": 6,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Role": "Corruption"
+  }
+}</code></pre>
+    <p>
+        Samples from universal corruption hazards (*Lure of Nature*, *Lure of Power*, *Despair of the Heart*, *The Balance of Things*, *Weariness of the Heart*).
+    </p>
+
+    <h4>Pattern B: The Shadow Weather &amp; Environment Engine</h4>
+    <p>
+        Drafts a cohesive environment suite centered on <em>Doors of Night</em> and dark weather events that convert terrain and force company retreat:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Foundational Shadow Environment",
+    "Section": "Hazards",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Hazard",
+      "Name": "Doors of Night"
+    }
+  },
+  {
+    "Name": "Dark Weather &amp; Terrain Hazards",
+    "Section": "Hazards",
+    "Count": 4,
+    "Attributes": {
+      "Primary": "Hazard",
+      "Secondary": "Long-event; Short-event"
+    },
+    "Categories": {
+      "Environment Stance": "Doors of Night",
+      "Role": "Terrain; Movement"
+    }
+  }
+]</code></pre>
+    <p>
+        Rule 2 matches and drafts *Morgul Night*, *Foul Fumes*, *Long Winter*, *Snowstorm*, *Fell Winter*, or *Gloom*.
+    </p>
+
+    <h4>Pattern C: Stronghold Traps &amp; Automatic Attack Doublers</h4>
+    <p>
+        Drafts events that turn destination site guardian attacks into lethal, multi-strike barriers:
+    </p>
+    <pre><code>{
+  "Name": "Stronghold Ambush Enhancers",
+  "Section": "Hazards",
+  "Count": 4,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Role": "Automatic Attack",
+    "Site Requirement": "Dark-hold; Shadow-hold; Ruins &amp; Lairs"
+  }
+}</code></pre>
+    <p>
+        Drafts *Awaken Denizens*, *Awaken Minions*, *Arouse Denizens*, *Arouse Minions*, and *Eye of Sauron*.
+    </p>
+
+    <h4>Pattern D: The Ring-Hunter Hazard Package</h4>
+    <p>
+        In scenario play or solo challenges targeting a hero company pursuing a Ring strategy, drafts hazards specifically designed to punish ring possession:
+    </p>
+    <pre><code>{
+  "Name": "Anti-Ring Harassment Events",
+  "Section": "Hazards",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Hazard"
+  },
+  "Categories": {
+    "Target Item": "Ring"
+  }
+}</code></pre>
+    <p>
+        Drafts *The Nazg&ucirc;l are Abroad*, *The Precious*, *The Ring's Betrayal*, and *The Will of the Ring*.
+    </p>
+
+    <h4>Pattern E: Anti-Diplomat &amp; Faction Sabotage</h4>
+    <p>
+        Targets companies attempting diplomatic recruitment by breaking their alliances in play:
+    </p>
+    <pre><code>{
+  "Name": "Faction Sabotage Event",
+  "Section": "Hazards",
+  "Count": 1,
+  "Attributes": {
+    "Primary": "Hazard",
+    "Secondary": "Short-event"
+  },
+  "Categories": {
+    "Role": "Influence"
+  }
+}</code></pre>
+    <p>
+        Directly drafts *Muster Disperses* to contest the opponent's recruited factions.
+    </p>
 </body>
 </html>

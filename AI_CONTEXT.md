@@ -146,6 +146,14 @@
     - Documented the Keystone Principle and Gandalf's `Home: Site=Haven` predicate.
     - Refactored Catalog Partition Directory table into an alphabetical index mapping desktop filter criteria (Slots 1 & 2) to custom categories and specialized attributes.
     - Updated `deck_generation_engine.html` and `deck_rules_reference.html` with Avatar copy limit rules.
+  - [x] Issue #44: Composite Secondary Filter Fix, Hazard Partition Tri-Split, and Chapters 4–7 Playbook Implementation
+    - Fixed CS0161 and composite slash-filtering bug in `CardFilterService.MatchesCardnumCriterion` by checking exact matches before delimiter splitting.
+    - Enhanced `sets_and_faceting.html` explaining faceted peer-slot dropdown pruning vs. Master List intersection scope.
+    - Refactored Catalog Partition Directory into distinct Standard Creature, Dual-Mode Creature, and Hazard Event rows with clean category scopes.
+    - Authored Chapter 4: Factions (29 METW factions, 1-to-1 strongholds, and *Army of the Dead* quest engine).
+    - Authored Chapter 5: Hazard Creatures (Standard - 44 METW cards), establishing the Regional Hold Boundary Rule and Option 1 universal hold keys for *Pûkel-men*.
+    - Authored Chapter 6: Hazard Creatures (Dual-Mode - 11 METW cards), balancing creature territorial boundaries with event roles.
+    - Authored Chapter 7: Hazard Events (60 METW cards across Permanent, Long, and Short events), standardizing `Role: Influence` on *Muster Disperses*, `Target Item: Ring` on *The Precious*, and removing *The One Ring* prerequisite on *The Nazgûl are Abroad*.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

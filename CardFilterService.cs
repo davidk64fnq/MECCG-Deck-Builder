@@ -873,6 +873,13 @@ namespace MECCG_Deck_Builder
                 return MatchesSiteType(cardValue, value);
             }
 
+            // 1. If the card value matches the selected dropdown value exactly, match immediately!
+            if (EqualsWithDiacriticFallback(cardValue.Trim(), value.Trim()))
+            {
+                return true;
+            }
+
+            // 2. Otherwise, check if the card has composite multi-values (e.g. matching "Creature" inside "Creature/Permanent-event")
             if (cardValue.Contains(';') ||
                 (string.Equals(key, "Secondary", StringComparison.OrdinalIgnoreCase) && cardValue.Contains('/')) ||
                 (string.Equals(key, "Region", StringComparison.OrdinalIgnoreCase) && cardValue.Contains('/')))
@@ -881,7 +888,7 @@ namespace MECCG_Deck_Builder
                 return parts.Any(p => EqualsWithDiacriticFallback(p, value.Trim()));
             }
 
-            return EqualsWithDiacriticFallback(cardValue.Trim(), value.Trim());
+            return false;
         }
 
         public bool MatchesCustomCriterion(string cardId, string key, string value)
