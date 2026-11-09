@@ -2656,54 +2656,17 @@ namespace MECCG_Deck_Builder
 
         private void ToolStripMenuToolsExportCsv_Click(object sender, EventArgs e)
         {
-            if (_masterCards.Count == 0)
-            {
-                MessageBox.Show(this,
-                    "No cards are currently displayed in the Master List to export.\n\nPlease select at least one expansion set or adjust your active filters.",
-                    Constants.AppTitle,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
+            using var dlg = new ExportTaxonomyDialog(
+                _catalogService,
+                _filterService,
+                _currentDeck.IncludedSets,
+                _masterCards,
+                _filterSlots[0].CurrentKey,
+                _filterSlots[1].CurrentKey,
+                _filterSlots[2].CurrentKey,
+                _filterSlots[3].CurrentKey);
 
-            using var sfd = new SaveFileDialog
-            {
-                Title = $"{Constants.AppTitle} - Export Taxonomy Draft (CSV)",
-                DefaultExt = "csv",
-                Filter = "CSV Spreadsheet (*.csv)|*.csv",
-                FileName = "Taxonomy_Draft.csv"
-            };
-
-            if (sfd.ShowDialog(this) == DialogResult.OK)
-            {
-                var activeAttributes = new List<string>();
-                if (!string.IsNullOrWhiteSpace(_filterSlots[0].CurrentKey)) activeAttributes.Add(_filterSlots[0].CurrentKey);
-                if (!string.IsNullOrWhiteSpace(_filterSlots[1].CurrentKey)) activeAttributes.Add(_filterSlots[1].CurrentKey);
-
-                var activeCategories = new List<string>();
-                if (!string.IsNullOrWhiteSpace(_filterSlots[2].CurrentKey)) activeCategories.Add(_filterSlots[2].CurrentKey);
-                if (!string.IsNullOrWhiteSpace(_filterSlots[3].CurrentKey)) activeCategories.Add(_filterSlots[3].CurrentKey);
-
-                TaxonomyExtractionService.ExportTemplateDraftToCsv(
-                    _masterCards,
-                    _filterService,
-                    sfd.FileName,
-                    activeAttributes,
-                    activeCategories);
-
-                MessageBox.Show(this,
-                    $"Taxonomy draft exported successfully to:\n{sfd.FileName}\n\n" +
-                    $"Cards exported: {_masterCards.Count}\n" +
-                    $"Official attribute columns: {(activeAttributes.Count > 0 ? string.Join(", ", activeAttributes) : "Primary (default)")}\n" +
-                    $"Custom category columns: {(activeCategories.Count > 0 ? string.Join(", ", activeCategories) : "[Insert Category Name] (blank draft)")}\n\n" +
-                    "Workflow in Google Sheets or Excel:\n" +
-                    "1. Review and edit tags (separate multiple tags with ';').\n" +
-                    "2. Add new category columns as needed.\n" +
-                    "3. Import changes back via Taxonomy > Import Taxonomy from CSV...",
-                    Constants.AppTitle,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-            }
+            dlg.ShowDialog(this);
         }
 
         private void ToolStripMenuToolsImportCsv_Click(object sender, EventArgs e)

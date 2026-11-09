@@ -176,3 +176,61 @@ pre {
         font-family: inherit;
         font-size: inherit;
     }
+
+/* Sub-chapter Reference Heading */
+h4.entry-heading-sub {
+    font-size: 10.5pt;
+    font-weight: bold;
+    color: #1A365D;
+    background-color: #EDF2F7;
+    border-left: 4px solid #2B6CB0;
+    padding: 4px 8px;
+    margin-top: 16px;
+    margin-bottom: 6px;
+}
+
+/* Quick Chapter Jump Bar */
+.chapter-nav {
+    background-color: #EDF2F7;
+    border: 1px solid #CBD5E0;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin: 10px 0 16px 0;
+    font-size: 8.5pt;
+    line-height: 1.8;
+}
+
+    .chapter-nav strong {
+        color: #1A365D;
+        margin-right: 4px;
+    }
+
+    .chapter-nav a {
+        color: #2B6CB0;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .chapter-nav a:hover {
+            text-decoration: underline;
+        }
+
+/* Back to Directory / Top Jump Bar */
+.back-to-top {
+    margin: 18px 0 24px 0;
+    padding-top: 6px;
+    border-top: 1px dashed #CBD5E0;
+    font-size: 8.5pt;
+    color: #718096;
+    text-align: right;
+}
+
+    .back-to-top a {
+        color: #2B6CB0;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+        .back-to-top a:hover {
+            text-decoration: underline;
+        }

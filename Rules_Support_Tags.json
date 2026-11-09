@@ -4599,7 +4599,8 @@
       "id": "246",
       "name": "Athelas",
       "Role": "Readiness",
-      "set": "METW"
+      "set": "METW",
+      "Target Species": "Dúnadan"
     },
     {
       "Environment Stance": "Doors of Night",
@@ -4622,7 +4623,8 @@
       "id": "250",
       "name": "Black Arrow",
       "Role": "Combat",
-      "set": "METW"
+      "set": "METW",
+      "Target Species": "Man"
     },
     {
       "fullCode": "Blue Mountain Dwarves (TW)",
@@ -4635,7 +4637,7 @@
       "fullCode": "Book of Mazarbul (TW)",
       "id": "253",
       "name": "Book of Mazarbul",
-      "Role": "Quest",
+      "Role": "Card Flow; Quest",
       "set": "METW",
       "Site Requirement": "Moria"
     },
@@ -4750,8 +4752,8 @@
       "fullCode": "The One Ring [H] (TW)",
       "id": "396",
       "name": "The One Ring",
-      "Prerequisite For": "Cracks of Doom; Gollum",
-      "Role": "Protection",
+      "Prerequisite For": "Cracks of Doom",
+      "Role": "Combat; Influence; Protection",
       "set": "METW"
     },
     {
@@ -4759,14 +4761,15 @@
       "id": "371",
       "name": "Sapling of the White Tree",
       "Prerequisite For": "The White Tree",
-      "set": "METW",
-      "Site Requirement": "Ruins & Lairs"
+      "Role": "Quest",
+      "set": "METW"
     },
     {
       "fullCode": "Narsil (TW)",
       "id": "339",
       "name": "Narsil",
       "Prerequisite For": "Andúril, the Flame of the West",
+      "Role": "Combat; Influence",
       "set": "METW"
     },
     {
@@ -4796,9 +4799,9 @@
       "fullCode": "Elven Cloak (TW)",
       "id": "276",
       "name": "Elven Cloak",
+      "Region Requirement": "Wilderness",
       "Role": "Protection",
-      "set": "METW",
-      "Site Requirement": "Wilderness"
+      "set": "METW"
     },
     {
       "fullCode": "Dagger of Westernesse (TW)",
@@ -4857,7 +4860,8 @@
       "id": "382",
       "name": "Sting",
       "Role": "Combat",
-      "set": "METW"
+      "set": "METW",
+      "Target Species": "Hobbit"
     },
     {
       "fullCode": "Elves of Lindon (TW)",
@@ -4917,13 +4921,14 @@
       "id": "294",
       "name": "Glamdring",
       "Role": "Combat",
-      "set": "METW"
+      "set": "METW",
+      "Target Species": "Orc"
     },
     {
       "fullCode": "Great-shield of Rohan (TW)",
       "id": "300",
       "name": "Great-shield of Rohan",
-      "Role": "Combat",
+      "Role": "Combat; Protection",
       "set": "METW"
     },
     {
@@ -5306,7 +5311,7 @@
       "fullCode": "Palantír of Osgiliath [H] (TW)",
       "id": "351",
       "name": "Palantír of Osgiliath",
-      "Role": "Card Flow",
+      "Role": "Card Flow; Protection",
       "set": "METW"
     },
     {
@@ -5343,15 +5348,14 @@
       "fullCode": "Red Arrow (TW)",
       "id": "361",
       "name": "Red Arrow",
-      "Prerequisite": "Riders of Rohan",
-      "Role": "Recruitment",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Influence; Recruitment"
     },
     {
       "fullCode": "Red Book of Westmarch [H] (TW)",
       "id": "362",
       "name": "Red Book of Westmarch",
-      "Role": "Recruitment",
+      "Role": "Influence; Quest",
       "set": "METW",
       "Site Requirement": "Bag End",
       "Target Species": "Hobbit"
@@ -5382,6 +5386,7 @@
       "fullCode": "Scroll of Isildur [H] (TW)",
       "id": "372",
       "name": "Scroll of Isildur",
+      "Role": "Item",
       "set": "METW",
       "Target Item": "Ring"
     },
@@ -5440,7 +5445,7 @@
       "fullCode": "The Arkenstone [H] (TW)",
       "id": "389",
       "name": "The Arkenstone",
-      "Role": "Influence; Readiness; Recruitment",
+      "Role": "Influence; Readiness",
       "set": "METW",
       "Target Species": "Dwarf"
     },
@@ -5473,7 +5478,7 @@
       "fullCode": "The Iron Crown [H] (TW)",
       "id": "393",
       "name": "The Iron Crown",
-      "Role": "Protection",
+      "Role": "Combat; Influence; Protection",
       "set": "METW",
       "Target Species": "Man; Orc; Troll"
     },
@@ -5683,6 +5688,148 @@
       "name": "Easterlings",
       "set": "METW",
       "Site Requirement": "Easterling Camp"
+    },
+    {
+      "fullCode": "Durin's Axe (TW)",
+      "id": "263",
+      "name": "Durin's Axe",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Barin's Tribe [H] (TW)",
+      "id": "264",
+      "name": "Dwarven Ring of Barin's Tribe",
+      "Role": "Item",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Bávor's Tribe [H] (TW)",
+      "id": "265",
+      "name": "Dwarven Ring of Bávor's Tribe",
+      "Role": "Item",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Drúin's Tribe [H] (TW)",
+      "id": "266",
+      "name": "Dwarven Ring of Drúin's Tribe",
+      "Role": "Item",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Durin's Tribe [H] (TW)",
+      "id": "267",
+      "name": "Dwarven Ring of Durin's Tribe",
+      "Role": "Site",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Dwálin's Tribe [H] (TW)",
+      "id": "268",
+      "name": "Dwarven Ring of Dwálin's Tribe",
+      "Role": "Item",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Thélor's Tribe [H] (TW)",
+      "id": "269",
+      "name": "Dwarven Ring of Thélor's Tribe",
+      "Role": "Item",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Dwarven Ring of Thrár's Tribe [H] (TW)",
+      "id": "270",
+      "name": "Dwarven Ring of Thrár's Tribe",
+      "Role": "Item",
+      "set": "METW",
+      "Target Species": "Dwarf"
+    },
+    {
+      "fullCode": "Lesser Ring (TW)",
+      "id": "316",
+      "name": "Lesser Ring",
+      "Role": "Influence",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Magic Ring of Courage (TW)",
+      "id": "321",
+      "name": "Magic Ring of Courage",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Magic Ring of Lore (TW)",
+      "id": "322",
+      "name": "Magic Ring of Lore",
+      "Role": "Card Flow; Item",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Magic Ring of Nature (TW)",
+      "id": "323",
+      "name": "Magic Ring of Nature",
+      "Role": "Protection",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Magic Ring of Stealth (TW)",
+      "id": "324",
+      "name": "Magic Ring of Stealth",
+      "Role": "Protection",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Magic Ring of Words (TW)",
+      "id": "325",
+      "name": "Magic Ring of Words",
+      "Role": "Influence",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Orcrist (TW)",
+      "id": "345",
+      "name": "Orcrist",
+      "Role": "Combat",
+      "set": "METW",
+      "Target Species": "Orc"
+    },
+    {
+      "fullCode": "Potion of Prowess (TW)",
+      "id": "354",
+      "name": "Potion of Prowess",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Shield of Iron-bound Ash (TW)",
+      "id": "376",
+      "name": "Shield of Iron-bound Ash",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "fullCode": "Sword of Gondolin (TW)",
+      "id": "385",
+      "name": "Sword of Gondolin",
+      "Role": "Combat",
+      "set": "METW"
+    },
+    {
+      "fullCode": "The Mithril-coat [H] (TW)",
+      "id": "394",
+      "name": "The Mithril-coat",
+      "Role": "Combat",
+      "set": "METW"
     }
   ],
   "Filters": [
@@ -6054,6 +6201,7 @@
       "Goblin-gate",
       "Grey Havens",
       "Henneth Annûn",
+      "Influence",
       "Information!=[Blank]",
       "Irerock",
       "Iron Hill Dwarf-hold",
@@ -6068,6 +6216,7 @@
       "Old Forest",
       "Ovir Hollow",
       "Pelargir",
+      "Recruitment",
       "Region=Northern Rhovanion",
       "Rivendell",
       "Ruins & Lairs",

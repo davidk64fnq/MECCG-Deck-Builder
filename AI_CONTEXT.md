@@ -154,6 +154,13 @@
     - Authored Chapter 5: Hazard Creatures (Standard - 44 METW cards), establishing the Regional Hold Boundary Rule and Option 1 universal hold keys for *Pûkel-men*.
     - Authored Chapter 6: Hazard Creatures (Dual-Mode - 11 METW cards), balancing creature territorial boundaries with event roles.
     - Authored Chapter 7: Hazard Events (60 METW cards across Permanent, Long, and Short events), standardizing `Role: Influence` on *Muster Disperses*, `Target Item: Ring` on *The Precious*, and removing *The One Ring* prerequisite on *The Nazgûl are Abroad*.
+  - [x] Issue #45: Generalized Taxonomy CSV Exporter, Playbook Reference Cards & Navigation, and Chapter 8 (Items & Gear)
+    - Replaced chapter 3-column tables with full-width Reference Cards and scope badges.
+    - Added in-topic chapter navigation bar (`.chapter-nav`) and per-chapter return links (`.back-to-top`) to eliminate long-scroll fatigue.
+    - Created `ExportTaxonomyDialog.cs` providing a generalized partition exporter with 12 presets and smart column checklists.
+    - Refined `Readiness` (wound healing & untapping) vs. `Protection` (combat evasion & survival) and expanded `Role: Item` to include ring testing.
+    - Audited all 54 METW items and authored Chapter 8 (Items & Gear) with five procedural drafting patterns.
+    - Synchronized Column 3 of the Catalog Partition Directory table for Items & Gear.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

@@ -358,24 +358,39 @@
                 <li><strong>Influence Attack / Opponent Stealing:</strong> Aiding or protecting against influence attempts made by opponent companies or agents.</li>
             </ul>
         </li>
-        <li><code>Item</code> &mdash; Retrieves, searches, transfers, protects, or forces the discard/theft of items (<em>Lucky Search</em>, <em>Reforging</em>, <em>Align Palant&iacute;r</em>, <em>Ind&ucirc;r Dawndeath</em>).</li>
+        <li>
+            <code>Item</code> &mdash; Interacts with physical gear&mdash;retrieving items from discard, searching play decks, transferring gear, protecting items from theft, <strong>modifying Gold Ring test rolls</strong>, or forcing the theft/discard of items (<em>Lucky Search</em>, <em>Reforging</em>, <em>Align Palant&iacute;r</em>, <em>Scroll of Isildur</em>, <em>Ind&ucirc;r Dawndeath</em>, <em>Dwarven Rings</em>).
+        </li>
         <li><code>Movement</code> &mdash; Modifies travel, region pathing, or forces company return (<em>Morannon</em>)</li>
         <li>
-            <code>Protection</code> &mdash; Avoiding, mitigating, or surviving combat&mdash;cancelling attacks, dodging strikes, granting personal strike immunity, preventing wounds, or healing damage:
+            <code>Protection</code> &mdash; Mitigating or avoiding danger during combat&mdash;cancelling attacks before strikes are rolled, dodging strikes, granting strike immunity, or preventing wounds:
             <ul>
                 <li>
-                    <strong>Attack &amp; Strike Evasion:</strong> Cancelling attacks before strikes are rolled, or slipping away unseen (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Escape</em>, <em>Halfling Stealth</em>, <em>Vanishment</em>).
+                    <strong>Attack &amp; Strike Evasion:</strong> Cancelling attacks before strikes are rolled, slipping away unseen, or dodging specific terrain strikes (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Escape</em>, <em>Halfling Stealth</em>, <em>Vanishment</em>, <em>Elven Cloak</em>, <em>Torque of Hues</em>, <em>Magic Ring of Nature</em>, <em>Magic Ring of Stealth</em>).
                 </li>
                 <li>
                     <strong>Immunity &amp; Target Denial:</strong> Allies or characters that cannot be attacked or chosen as strike targets (<em>Treebeard</em>, <em>Goldberry</em>, <em>Leaflock</em>, <em>Tom Bombadil</em>).
                 </li>
                 <li>
-                    <strong>Survival &amp; Healing:</strong> Preventing wounds, shielding characters from discard when defeated, or healing damage after combat (<em>Halfling Strength</em>, <em>Sacrifice of Form</em>, <em>Healing Herbs</em>).
+                    <strong>Combat Survival:</strong> Shielding characters from being wounded or preventing discard when defeated (<em>Halfling Strength</em>, <em>Sacrifice of Form</em>).
                 </li>
             </ul>
         </li>
         <li><code>Quest</code> &mdash; Directly advances victory conditions or scenario goals by awarding Marshalling Points (MPs) for completing specific site journeys or tasks (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>). Non-scoring utility cards that transform the board (such as <em>The White Tree</em>) are classified under their functional mechanism (e.g. <code>Role: Site</code>).</li>
-        <li><code>Readiness</code> &mdash; Character and ally stamina and status&mdash;tapping, untapping, wounding, healing, or returning characters to hand (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>). Note: Discarding or stealing items belongs under <code>Role: Item</code>, while altering or closing sites belongs under <code>Role: Site</code>.</li>
+        <li>
+            <code>Readiness</code> &mdash; Character and ally stamina, action capability, and physical condition&mdash;tapping, untapping, recovering from wounds, or returning characters to hand:
+            <ul>
+                <li>
+                    <strong>Wound Recovery &amp; Healing:</strong> Transitioning characters from <em>wounded</em> to <em>well</em> (<em>Athelas</em>, <em>Healing Herbs</em>).
+                </li>
+                <li>
+                    <strong>Stamina &amp; Untapping:</strong> Untapping characters outside the untap phase or refreshing exhausted companions (<em>Healing Herbs</em>, <em>The Arkenstone</em>).
+                </li>
+                <li>
+                    <strong>Adversary Disruption:</strong> Forcing characters to tap or bouncing them back to hand (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>).
+                </li>
+            </ul>
+        </li>
         <li>
             <code>Recruitment</code> &mdash; Enables, accelerates, or alters the physical entry of characters and factions into play (beyond numerical check modifiers):
             <ul>
