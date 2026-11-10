@@ -6,7 +6,12 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <div class="nav-bar"><a href="index.html">Home</a> &gt; <a href="custom_taxonomy.html">Custom Taxonomy &amp; Automation</a> &gt; Companion Rules Tags</div>
+    <a id="top"></a>
+    <div class="nav-bar">
+        <a href="index.html">Home</a> &gt;
+        <a href="custom_taxonomy.html">Custom Taxonomy &amp; Automation</a> &gt;
+        Companion Rules Tags
+    </div>
 
     <h1>Companion Rules Tag Set Reference</h1>
     <p>
@@ -20,6 +25,26 @@
             <strong><code>Rules_Support_Tags.json</code> (Rules Intelligence Layer):</strong> A companion taxonomy dataset authored to bridge unstructured card text into queryable taxonomy tags—mapping site automatic attacks, character recruiting bonuses, and event requirements so that generic procedural deck rules can generate legal, themed decks automatically.
         </li>
     </ul>
+
+    <!-- IN-TOPIC QUICK NAVIGATION JUMP BAR -->
+    <div class="chapter-nav">
+        <strong>Jump to Category:</strong>
+        <a href="#adjacent-regions">Adjacent Regions</a> &bull;
+        <a href="#adjacent-sites">Adjacent Sites</a> &bull;
+        <a href="#automatic-attack">Automatic Attack</a> &bull;
+        <a href="#combat-bonus">Combat Bonus</a> &bull;
+        <a href="#environment-stance">Environment Stance</a> &bull;
+        <a href="#faction-bonus">Faction Bonus</a> &bull;
+        <a href="#home-region">Home Region</a> &bull;
+        <a href="#prerequisite">Prerequisite</a> &bull;
+        <a href="#prerequisite-for">Prerequisite For</a> &bull;
+        <a href="#region-requirement">Region Requirement</a> &bull;
+        <a href="#region-type">Region Type</a> &bull;
+        <a href="#role">Role</a> &bull;
+        <a href="#site-requirement">Site Requirement</a> &bull;
+        <a href="#target-item">Target Item</a> &bull;
+        <a href="#target-species">Target Species</a>
+    </div>
 
     <div class="tip">
         <strong>Pre-Packaged Developer Baseline:</strong> All categories and tags listed in this reference are <strong>already completed and pre-packaged</strong>. You do not need to run any extractions or tag any cards—the procedural deck generator and filter dropdowns can use these categories immediately upon opening the app.
@@ -67,6 +92,11 @@
             <th style="width: 25%;">Category Name</th>
             <th style="width: 35%;">Card Scope (Primary)</th>
             <th style="width: 40%;">Primary Purpose &amp; Role</th>
+        </tr>
+        <tr>
+            <td><a href="#adjacent-regions"><code>Adjacent Regions</code></a></td>
+            <td><span class="scope-pill">Region</span></td>
+            <td>Contiguous overland borders forming Middle-earth's transit graph</td>
         </tr>
         <tr>
             <td><a href="#adjacent-sites"><code>Adjacent Sites</code></a></td>
@@ -143,75 +173,122 @@
     <!-- SECTION 2: DETAILED CATEGORY REFERENCE CARDS -->
     <h2>2. Detailed Category Reference</h2>
 
-    <h3 id="adjacent-sites" class="entry-heading">Adjacent Sites</h3>
+    <h3 id="adjacent-regions" class="entry-heading">Adjacent Regions</h3>
     <div class="scope-badge">
-        <strong>Card Scope:</strong> <span class="scope-pill">Site</span> (Under-deeps sites only; surface sites remain <code>[Blank]</code>)
+        <strong>Card Scope:</strong> <span class="scope-pill">Region</span> (Region cards only; sites strictly remain <code>[Blank]</code>)
     </div>
     <p>
-        Records all sites directly accessible from an Under-deeps site—including both <strong>surface site entrances</strong> and <strong>contiguous Under-deeps sites</strong>—with passage movement difficulty ratings stripped so they can be matched cleanly as card titles. This enables dynamic Under-deeps movement and expedition rules without hardcoding site pairs.
+        Records all physical territories sharing a contiguous border with this region. In the application's engine, this category forms the in-memory <strong>adjacency graph of Middle-earth</strong>:
     </p>
-    <strong>Representative Example:</strong>
+    <ul>
+        <li><strong>Bidirectional Integrity:</strong> Border connections are bidirectional (if Region A borders Region B, Region B borders Region A). The BFS pathfinding graph builder validates and enforces this symmetry automatically.</li>
+        <li><strong>Overland Hiking Routes:</strong> When authoring Geographic Theater rules with <code>"IncludeOverlandPath": true</code>, the engine uses this graph layer to compute the shortest contiguous highway from <em>Rhudaur</em> (Rivendell) to any operational theater across the map.</li>
+        <li><strong>Contiguous Cluster Expansion:</strong> Allows roaming theater rules to expand an adjacent territorial cluster of 3 to 6 regions seeded directly from a haven's home territory.</li>
+    </ul>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Angmar; Cardolan; Forochel; Lindon; N&uacute;meriador; Rhudaur; The Shire</code> &rarr; Borders for <em>Arthedain</em></li>
+        <li><code>Anduin Vales; Dagorlad; Southern Mirkwood; Wold &amp; Foothills</code> &rarr; Borders for <em>Brown Lands</em></li>
+        <li><code>Anfalas; Bay of Belfalas; Lamedon; Lebennin; Mouths of the Anduin</code> &rarr; Borders for <em>Belfalas</em></li>
+        <li><code>Gorgoroth</code> &rarr; Single border connection for <em>Ud&ucirc;n</em></li>
+    </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
+
+    <h3 id="adjacent-sites" class="entry-heading">Adjacent Sites</h3>
+    <div class="scope-badge">
+        <strong>Card Scope:</strong> <span class="scope-pill">Site</span> (Under-deeps sites only; surface sites strictly remain <code>[Blank]</code>)
+    </div>
+    <p>
+        Records all physical locations directly accessible from an Under-deeps site (introduced in <em>The Dragons</em>, <em>The Lidless Eye</em>, and <em>The Balrog</em>)—including both <strong>surface site entrances</strong> and <strong>contiguous Under-deeps sites</strong>—with passage movement difficulty ratings stripped so they can be matched cleanly as card titles.
+    </p>
+    <div class="note">
+        <strong>The "No Orphans" Rule:</strong> An Under-deeps site drafted without its corresponding surface entrance is completely unplayable in game—your company can never travel there.<br /><br />
+        Because all 69 sites in <em>The Wizards</em> (METW) are surface sites or Havens, they strictly leave <code>Adjacent Sites</code> <strong><code>[Blank]</code></strong>. This allows procedural rules to draft any deep lair and then query <code>"Adjacent Sites": "[Blank]"</code> to auto-draft its surface entrance into the site deck with zero risk of broken travel paths.
+    </div>
+    <strong>Representative Examples:</strong>
     <ul>
         <li><code>Blue Mountain Dwarf-hold; Remains of Thangorodrim; The Under-vaults</code> &rarr; Connected surface and Under-deeps sites for <em>The Drowning-deeps</em> (MEBA)</li>
+        <li><code>Barad-d&ucirc;r; The Under-galleries; The Under-leas</code> &rarr; Connected surface and Under-deeps sites for <em>The Under-gates</em> (MELE)</li>
+        <li><code>[Blank]</code> &rarr; All 69 surface sites and Havens in <em>The Wizards</em> (METW)</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="automatic-attack" class="entry-heading">Automatic Attack</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Site</span>
     </div>
     <p>
-        Indexes guardian creature species printed on site cards using singular terms
-        (e.g. <code>Orc</code>, not <code>Orcs</code>) to align directly with hazard creature
-        race attributes. For sites that allow open attacks (e.g. <em>
-            "opponent may play any creature
-            keyed to Ruins &amp; Lairs"
-        </em>), site predicates (e.g. <code>Site=Ruins &amp; Lairs</code>)
-        define which hazard creatures can attack there.
+        Indexes guardian creature species printed on site cards using normalized singular terms (e.g. <code>Orc</code>, not <code>Orcs</code>) to align directly with hazard creature race attributes. Peaceful holds and Havens leave this field <strong><code>[Blank]</code></strong>. For sites that allow open attacks (e.g. <em>"opponent may play any creature keyed to Ruins &amp; Lairs"</em>), dynamic site predicates (e.g. <code>Site=Ruins &amp; Lairs</code>) define which hazard creatures can attack there.
     </p>
     <div class="note">
-        <strong>Sites vs. Events/Hazards:</strong> <code>Automatic Attack</code> is reserved strictly for <strong>site cards</strong> to record their native guardians. For resource or hazard events that create, modify, or cancel automatic attacks (such as <em>Siege</em> or <em>Balrog of Moria</em>), use <code>Role: Automatic-attack</code>.
+        <strong>Sites vs. Events/Hazards:</strong> <code>Automatic Attack</code> is reserved strictly for <strong>site cards</strong> to record their native guardians. For resource or hazard events that create, modify, or cancel automatic attacks (such as <em>Siege</em>, <em>Quiet Lands</em>, or <em>Sun</em>), use <code>Role: Automatic Attack</code>.
     </div>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Dragon</code> &rarr; <em>Dancing Spire</em>, <em>The Lonely Mountain</em></li>
-        <li><code>Orc; Troll</code> &rarr; <em>Barad-d&ucirc;r</em>, <em>Dol Guldur</em></li>
+        <li><code>Dragon</code> &rarr; <em>Dancing Spire</em>, <em>The Lonely Mountain</em>, <em>Caves of &Ucirc;lund</em>, <em>Irerock</em></li>
+        <li><code>Orc; Troll</code> &rarr; Dual-attack fortresses <em>Barad-d&ucirc;r</em> and <em>Dol Guldur</em></li>
+        <li><code>Orc</code> &rarr; <em>Carn D&ucirc;m</em>, <em>Cirith Ungol</em>, <em>Goblin-gate</em>, <em>Moria</em>, <em>Mount Gram</em>, <em>Shelob's Lair</em></li>
+        <li><code>P&ucirc;kel-creature</code> &rarr; <em>Glittering Caves</em>, <em>Stone-circle</em>, <em>The Stones</em></li>
         <li><code>Spider</code> &rarr; <em>Ruined Signal Tower</em></li>
+        <li><code>Troll</code> &rarr; <em>Ettenmoors</em></li>
+        <li><code>Undead</code> &rarr; <em>Amon Hen</em>, <em>Barrow-downs</em>, <em>Dead Marshes</em>, <em>Gladden Fields</em>, <em>Minas Morgul</em>, <em>Tolfalas</em></li>
+        <li><code>Wolf</code> &rarr; <em>Isengard</em>, <em>Ost-in-Edhil</em>, <em>The White Towers</em>, <em>Weathertop</em></li>
         <li><code>Site=Ruins &amp; Lairs; Site=Shadow-hold</code> &rarr; <em>Framsburg</em> (METD &mdash; dynamic hold predicate)</li>
+        <li><code>[Blank]</code> &rarr; All 4 Havens and 30 peaceful Free-holds and Border-holds (<em>Bag End</em>, <em>Bree</em>, <em>Edoras</em>, <em>Minas Tirith</em>, <em>Rivendell</em>, <em>Wellinghall</em>)</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="combat-bonus" class="entry-heading">Combat Bonus</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Character</span>
     </div>
     <p>
-        Flags characters providing combat advantages—such as direct prowess bonuses, body/survival bonuses, opponent body reduction, or strike roll modifiers—specifically against targeted creature species.
+        Flags characters providing martial advantages—such as direct prowess bonuses, body/survival bonuses, opponent body reduction, or strike roll modifiers—specifically against targeted creature species. Left blank for general combatants without species-specific rules text.
     </p>
     <div class="note">
         <strong>Characters vs. Non-Characters:</strong> <code>Combat Bonus</code> is reserved strictly for <strong>characters</strong>. For items, weapons, events, or hazards that modify combat or target specific creature types, use <code>Role: Combat</code> (the mechanism) and <code>Target Species</code> (the targeted species).
     </div>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Orc</code> &rarr; Character prowess/check bonuses on <em>D&aacute;in II</em> and <em>Gimli</em></li>
-        <li><code>Nazg&ucirc;l</code> &rarr; Character combat bonuses on <em>Galva</em> and <em>Peath</em></li>
+        <li><code>Orc</code> &rarr; Character prowess and strike check bonuses on <em>D&aacute;in II</em> and <em>Gimli</em></li>
+        <li><code>Nazg&ucirc;l</code> &rarr; Character combat prowess superiority on <em>&Eacute;owyn</em></li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="environment-stance" class="entry-heading">Environment Stance</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span> (Events &amp; Creatures)
     </div>
     <p>
-        Tracks whether a card requires or benefits from <em>Gates of Morning</em> (Light) or <em>Doors of Night</em> (Shadow) being in play. (Items and allies do not use this tag, as environmental conditions only affect events and certain nocturnal creatures.) This supports two primary workflows:
+        Tracks whether a card requires or benefits from <em>Gates of Morning</em> (Light) or <em>Doors of Night</em> (Shadow) being in play. (Items and allies do not use this tag, as environmental conditions only affect events and nocturnal creatures.) This supports two primary workflows:
     </p>
     <ul>
-        <li><strong>Dedicated Strategy (Top-Down):</strong> When building a dedicated <em>Gates of Morning</em> or <em>Doors of Night</em> deck, filtering by this category quickly gathers all matching resource events, hazard events, and creatures that support that strategy.</li>
-        <li><strong>Automated Prerequisite Support (Bottom-Up):</strong> When procedural deck rules draft cards that depend on day or night, the generator can automatically include <em>Gates of Morning</em> or <em>Doors of Night</em> in the deck so those cards can actually be played.</li>
+        <li><strong>Dedicated Strategy (Top-Down):</strong> When building a dedicated <em>Gates of Morning</em> daylight deck or <em>Doors of Night</em> dark weather hazard suite, filtering by this category quickly gathers all matching cards.</li>
+        <li><strong>Automated Prerequisite Support (Bottom-Up):</strong> When procedural deck rules draft cards that depend on day or night, the generator can automatically pull <em>Gates of Morning</em> or <em>Doors of Night</em> into the deck so those cards can legally enter play.</li>
     </ul>
     <strong>Stance Values:</strong>
     <ul>
-        <li><code>Gates of Morning</code> &rarr; Light-dependent cards (<em>Clear Skies</em>, <em>Sun</em>)</li>
-        <li><code>Doors of Night</code> &rarr; Shadow-dependent cards (<em>Foul Fumes</em>, <em>Shelob</em>, <em>The Will of Sauron</em>)</li>
-        <li><code>Gates of Morning; Doors of Night</code> &rarr; Dual-environment cards (<em>Moon</em>)</li>
+        <li><code>Gates of Morning</code> &rarr; Light-dependent cards (<em>Gates of Morning</em>, <em>Clear Skies</em>, <em>Fog</em>, <em>Dark Quarrels</em>, <em>Fair Travels in Dark-domains</em>, <em>Fair Travels in Shadow-lands</em>, <em>Quiet Lands</em>, <em>Stars</em>, <em>Sun</em>, <em>The Cock Crows</em>, <em>The Evenstar</em>)</li>
+        <li><code>Doors of Night</code> &rarr; Shadow-dependent cards (<em>Doors of Night</em>, <em>Foul Fumes</em>, <em>Long Winter</em>, <em>Morgul Night</em>, <em>Snowstorm</em>, <em>Gloom</em>, <em>Choking Shadows</em>, <em>Shelob</em>, <em>The Will of Sauron</em>, and all four Unique Dragons)</li>
+        <li><code>Gates of Morning; Doors of Night</code> &rarr; Dual-environment lunar cards (<em>Moon</em>)</li>
+        <li><code>[Blank]</code> &rarr; Standard open events and creatures playable in clear weather</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="faction-bonus" class="entry-heading">Faction Bonus</h3>
     <div class="scope-badge">
@@ -224,18 +301,22 @@
         <strong>Faction Recruitment vs. Follower Influence (e.g., Balin, D&aacute;in II):</strong><br />
         Several diplomats feature printed text granting direct influence bonuses against both a faction and individual characters of that species (for example, <em>Balin</em> reads <em>"+1 direct influence against Dwarves and Dwarf factions"</em>).
         <ul>
-            <li><strong>Why Factions are Tagged:</strong> Factions are external resource cards that must be deliberately included in your play deck. <code>Faction Bonus</code> provides the machine-actionable hook needed by procedural rules (e.g. <code>"Name": "{Leader.Category:Faction Bonus}"</code>) to pull that faction into the deck.</li>
+            <li><strong>Why Factions are Tagged:</strong> Factions are external resource cards that must be deliberately included in your play deck. <code>Faction Bonus</code> provides the machine-actionable hook needed by procedural rules to pull that faction into the deck.</li>
             <li><strong>Why Follower Influence is Omitted:</strong> Controlling followers in a company is governed by a character's printed <code>Direct</code> attribute and biological <code>Race</code>. Procedural company recruitment rules already draft companions by race (e.g. <code>"Race": "{Leader.Race}"</code>) or DI capacity (e.g. <code>"Direct": "&gt;= 2"</code>). Tagging Balin with follower influence would duplicate existing official attributes without adding functional deck-construction value.</li>
         </ul>
     </div>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Wood-elves</code> &rarr; Specific named faction recruited with bonus by <em>Thranduil</em></li>
-        <li><code>Iron Hill Dwarves; Man</code> &rarr; Named faction and species recruitment bonuses on <em>D&aacute;in II</em></li>
+        <li><code>Iron Hill Dwarves; Race=Man</code> &rarr; Named faction and species recruitment bonuses on <em>D&aacute;in II</em></li>
         <li><code>Riders of Rohan</code> &rarr; Specific named faction recruited with bonus by <em>Th&eacute;oden</em></li>
         <li><code>Dunlendings</code> &rarr; Specific named faction recruited with bonus by <em>Peath</em></li>
         <li><code>All</code> &rarr; Universal diplomat wildcard matching any faction in active expansions (<em>Adrazar</em>)</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="home-region" class="entry-heading">Home Region</h3>
     <div class="scope-badge">
@@ -250,21 +331,35 @@
         <li><code>Rhudaur</code> &rarr; Derived from <em>Rivendell</em> (<em>Elrond</em>)</li>
         <li><code>An&oacute;rien</code> &rarr; Derived from <em>Minas Tirith</em> (<em>Boromir II</em>)</li>
         <li><code>Rohan</code> &rarr; Derived from <em>Edoras</em> (<em>Th&eacute;oden</em>)</li>
+        <li><code>Gap of Isen</code> &rarr; Derived from <em>Isengard</em> (<em>Saruman</em>)</li>
+        <li><code>Southern Mirkwood</code> &rarr; Derived from <em>Rhosgobel</em> (<em>Radagast</em>)</li>
+        <li><code>[Blank]</code> &rarr; Dynamic Avatars whose arrival site is unconstrained (<em>Gandalf</em> &rarr; <code>Home: Site=Haven</code>)</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="prerequisite" class="entry-heading">Prerequisite</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> (Quests &amp; Multi-Card Storylines)
     </div>
     <p>
-        Identifies the exact, named partner card(s) that an objective or quest card requires in company or discard to be played or scored. Used by procedural deck templates to automatically summon enabler events and relics without hardcoded titles.
+        Identifies the exact, named partner card(s) that an objective or quest card requires in company, play, or discard to be played or scored. Used by procedural deck templates to automatically summon enabler events and relics without hardcoded titles.
     </p>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Paths of the Dead</code> &rarr; Enabler required on <em>Army of the Dead</em></li>
         <li><code>Narsil; Reforging</code> &rarr; Relic and event required on <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>The One Ring</code> &rarr; Artifact required to complete <em>Cracks of Doom</em> and <em>Gollum's Fate</em></li>
+        <li><code>Sapling of the White Tree</code> &rarr; Relic required to blossom <em>The White Tree</em></li>
         <li><code>Men of Lamedon</code> &rarr; Faction required on <em>Stone of Erech</em></li>
+        <li><code>Ents of Fangorn; Leaflock; Quickbeam; Skinbark; Treebeard</code> &rarr; Active ally/faction required on <em>Ent-draughts</em></li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="prerequisite-for" class="entry-heading">Prerequisite For</h3>
     <div class="scope-badge">
@@ -274,13 +369,19 @@
         The inverse companion to <code>Prerequisite</code>. Identifies which quest or storyline card this card enables.
     </p>
     <div class="note">
-        <strong>The Enabler Shield Pattern:</strong> When drafting generic utility cards, querying <code>"Prerequisite For": "[Blank]"</code> guarantees that niche enablers (like <em>Paths of the Dead</em>) are never drafted as dead cards into decks that lack their parent quest.
+        <strong>The Enabler Shield Pattern:</strong> When drafting generic utility cards, querying <code>"Prerequisite For": "[Blank]"</code> guarantees that niche enablers (like <em>Paths of the Dead</em> or <em>Reforging</em>) are never drafted as dead cards into decks that lack their parent quest.
     </div>
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Army of the Dead</code> &rarr; Assigned to <em>Paths of the Dead</em></li>
         <li><code>And&uacute;ril, the Flame of the West</code> &rarr; Assigned to <em>Narsil</em> and <em>Reforging</em></li>
+        <li><code>The White Tree</code> &rarr; Assigned to <em>Sapling of the White Tree</em></li>
+        <li><code>Cracks of Doom</code> &rarr; Assigned to <em>The One Ring</em></li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="region-requirement" class="entry-heading">Region Requirement</h3>
     <div class="scope-badge">
@@ -290,8 +391,8 @@
         Consolidates all card-to-region playability constraints and modifications into a single queryable category. Identifies:
     </p>
     <ol>
-        <li>Geographic territories required to bring a card into play (e.g. hazard creatures keyed to specific regions), and</li>
-        <li>Territories an ongoing event explicitly buffs, alters, or affects (e.g. regional combat modifiers or movement path adjustments).</li>
+        <li>Geographic territories required to bring a card into play (e.g. hazard creatures keyed to specific regions, or coastal mounts), and</li>
+        <li>Territories an ongoing event explicitly buffs, alters, or affects (e.g. regional combat modifiers or Ranger movement shortcuts).</li>
     </ol>
     <div class="note">
         <strong>Dual-Mode Cards (Creature / Event):</strong> For cards with dual card types (such as the Nazg&ucirc;l), only tag the specific regions required to play them as a <strong>creature</strong>. Do not tag <code>All</code> to represent their event mode being globally playable—doing so would allow the deck generator to falsely draft the card as a creature in illegal regions (such as the Shire).
@@ -300,9 +401,20 @@
     <ul>
         <li><code>Harondor; Horse Plains; Gorgoroth; Khand</code> &rarr; Playable creature territories for <em>Akh&ocirc;rahil</em></li>
         <li><code>Imlad Morgul; Gorgoroth</code> &rarr; Playable creature territories for <em>Shelob</em></li>
-        <li><code>Dagorlad; Ud&ucirc;n</code> &rarr; Movement path territories modified by <em>Morannon</em> (Event)</li>
+        <li><code>An&oacute;rien; Dagorlad; Harondor; Ithilien; Lebennin; Rohan</code> &rarr; Transit regions for <em>Anduin River</em></li>
+        <li><code>Dagorlad; Gorgoroth; Horse Plains</code> &rarr; Transit regions for <em>Ash Mountains</em></li>
+        <li><code>Anduin Vales; Dunland; Fangorn; Hollin; Rhudaur; Wold &amp; Foothills</code> &rarr; Transit regions for <em>Misty Mountains</em></li>
+        <li><code>Gorgoroth; Harondor; Ithilien; Nurn</code> &rarr; Transit regions for <em>Mountains of Shadow</em></li>
+        <li><code>Anfalas; An&oacute;rien; Lamedon; Old P&ucirc;kel-land; Rohan</code> &rarr; Transit regions for <em>White Mountains</em></li>
+        <li><code>Dagorlad; Ud&ucirc;n</code> &rarr; Infiltration path modified by <em>Morannon</em> (Permanent-event)</li>
         <li><code>Hollin; Redhorn Gate; Wold &amp; Foothills</code> &rarr; Regional attacks buffed by <em>Balrog of Moria</em> (Permanent-event)</li>
+        <li><code>Wilderness; Border-land</code> &rarr; Terrain required for travel hazards (<em>Snowstorm</em>, <em>Long Winter</em>)</li>
+        <li><code>Coastal Sea</code> &rarr; Maritime travel boundaries for <em>Fair Sailing</em> and <em>Great Ship</em></li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="region-type" class="entry-heading">Region Type</h3>
     <div class="scope-badge">
@@ -313,13 +425,17 @@
     </p>
     <strong>Canonical Terrain Classifications:</strong>
     <ul>
-        <li><code>Free-domain</code> &rarr; <em>The Shire</em>, <em>Lindon</em>, <em>An&oacute;rien</em>, <em>Belfalas</em></li>
-        <li><code>Border-land</code> &rarr; <em>Anduin Vales</em>, <em>Rohan</em>, <em>Dorwinion</em>, <em>Woodland Realm</em></li>
-        <li><code>Wilderness</code> &rarr; <em>Arthedain</em>, <em>Cardolan</em>, <em>Rhudaur</em>, <em>Ithilien</em>, <em>Hollin</em></li>
-        <li><code>Shadow-land</code> &rarr; <em>Dagorlad</em>, <em>Brown Lands</em>, <em>Imlad Morgul</em>, <em>Angmar</em></li>
-        <li><code>Dark-domain</code> &rarr; <em>Gorgoroth</em>, <em>Ud&ucirc;n</em>, <em>Nurn</em>, <em>Southern Mirkwood</em></li>
-        <li><code>Coastal Sea</code> &rarr; <em>Bay of Belfalas</em>, <em>Mouths of the Anduin</em>, <em>Andrast Coast</em></li>
+        <li><code>Free-domain</code> &rarr; <em>The Shire</em>, <em>Lindon</em>, <em>An&oacute;rien</em>, <em>Belfalas</em>, <em>Lebennin</em></li>
+        <li><code>Border-land</code> &rarr; <em>Anduin Vales</em>, <em>Rohan</em>, <em>Dorwinion</em>, <em>Gap of Isen</em>, <em>Lamedon</em>, <em>Woodland Realm</em></li>
+        <li><code>Wilderness</code> &rarr; <em>Arthedain</em>, <em>Cardolan</em>, <em>Rhudaur</em>, <em>Ithilien</em>, <em>Hollin</em>, <em>Dunland</em>, <em>Fangorn</em>, <em>Heart of Mirkwood</em>, <em>High Pass</em>, <em>Redhorn Gate</em>, <em>Wold &amp; Foothills</em></li>
+        <li><code>Shadow-land</code> &rarr; <em>Dagorlad</em>, <em>Brown Lands</em>, <em>Imlad Morgul</em>, <em>Angmar</em>, <em>Grey Mountain Narrows</em>, <em>Horse Plains</em>, <em>Khand</em></li>
+        <li><code>Dark-domain</code> &rarr; <em>Gorgoroth</em>, <em>Ud&ucirc;n</em>, <em>Nurn</em>, <em>Southern Mirkwood</em>, <em>Gundabad</em></li>
+        <li><code>Coastal Sea</code> &rarr; <em>Andrast Coast</em>, <em>Bay of Belfalas</em>, <em>Elven Shores</em>, <em>Eriadoran Coast</em>, <em>Mouths of the Anduin</em></li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="role" class="entry-heading">Role</h3>
     <div class="scope-badge">
@@ -333,40 +449,40 @@
     </div>
     <strong>Baseline Roles (Pre-packaged Dataset):</strong>
     <ul>
-        <li><code>Automatic Attack</code> &mdash; Modifies, buffs, cancels, or creates site guardian attacks faced by the whole company (<em>Balrog of Moria</em>, <em>Siege</em>). Note: Cards or allies with personal immunity to automatic-attack strikes (such as <em>Treebeard</em> or <em>Goldberry</em>) are classified under <code>Role: Protection</code>.</li>
+        <li><code>Automatic Attack</code> &mdash; Modifies, buffs, cancels, or creates site guardian attacks faced by the whole company (<em>Balrog of Moria</em>, <em>Siege</em>, <em>Quiet Lands</em>, <em>Sun</em>). Note: Cards or allies with personal immunity to automatic-attack strikes (such as <em>Treebeard</em> or <em>Goldberry</em>) are classified under <code>Role: Protection</code>.</li>
         <li>
-            <code>Card Flow</code> &mdash; Managing cards and intelligence across the hand, deck, and discard pipeline&mdash;drawing extra cards (<em>Favor of the Valar</em>), scouting or inspecting hands and draw decks (<em>Far-sight</em>, <em>Palant&iacute;r of Amon S&ucirc;l</em>), filtering and reordering play decks (<em>Mirror of Galadriel</em>, <em>Palant&iacute;r of Ann&uacute;minas</em>), retrieving cards from the discard pile (<em>Mouth of Sauron</em>), expanding maximum hand size (<em>Smoke Rings</em>), or attacking and forcing opponent discards (<em>Kham&ucirc;l the Easterling</em>).
+            <code>Card Flow</code> &mdash; Managing cards and intelligence across the hand, deck, and discard pipeline&mdash;drawing extra cards (<em>Favor of the Valar</em>), scouting or inspecting hands and draw decks (<em>Far-sight</em>, <em>Mirror of Galadriel</em>, <em>Palant&iacute;r of Amon S&ucirc;l</em>), filtering and reordering play decks (<em>Palant&iacute;r of Ann&uacute;minas</em>), retrieving cards from the discard pile (<em>Mouth of Sauron</em>, <em>Reforging</em>, <em>Vilya</em>), mass hazard permanent-event discard (<em>Gates of Morning</em>, <em>The Cock Crows</em>, <em>Wizard's River-horses</em>), expanding maximum hand size (<em>Smoke Rings</em>), or attacking and forcing opponent discards (<em>Kham&ucirc;l the Easterling</em>, <em>Drowning Seas</em>).
         </li>
         <li>
             <code>Combat</code> &mdash; Engaging in physical combat&mdash;boosting prowess or body during an attack, adjusting combat dice rolls, adding strikes, or triggering bonus attacks:
             <ul>
                 <li>
-                    <strong>Company Martial Strength (Resources):</strong> Prowess buffs and combat tricks used by characters when fighting strikes (<em>Block</em>, <em>Dodge</em>, <em>Risky Blow</em>, <em>Lucky Strike</em>, <em>Glamdring</em>).
+                    <strong>Company Martial Strength (Resources):</strong> Prowess buffs and combat tricks used by characters when fighting strikes (<em>Block</em>, <em>Dodge</em>, <em>Risky Blow</em>, <em>Lucky Strike</em>, <em>Glamdring</em>, <em>Clear Skies</em>, <em>Fellowship</em>, <em>Kindling of the Spirit</em>, <em>Sacrifice of Form</em>, <em>Stars</em>, <em>Sun</em>, <em>The Evenstar</em>, <em>The Old Thrush</em>, <em>True F&aacute;na</em>, <em>Wizard's Fire</em>, <em>Wizard's Flame</em>).
                 </li>
                 <li>
                     <strong>Attack Escalation &amp; Lethality (Hazards):</strong> Buffing creature prowess, increasing strike counts, or triggering extra attacks against companies (<em>Wake of War</em>, <em>Minions Stir</em>, <em>Orc-guard</em>, <em>Traitor</em>, <em>The Pale Sword</em>).
                 </li>
             </ul>
         </li>
-        <li><code>Corruption</code> &mdash; Strategic corruption offense or defense—forces corruption checks or burdens (<em>Lure of Power</em>, <em>Despair of the Heart</em>) or mitigates and heals corruption (<em>Praise to Elbereth</em>)</li>
-        <li><code>Duration</code> &mdash; Extends the life or duration of active events in play (<em>The Will of Sauron</em>)</li>
+        <li><code>Corruption</code> &mdash; Strategic corruption offense or defense—forces corruption checks or burdens (<em>Lure of Power</em>, <em>Despair of the Heart</em>), mitigates and heals corruption (<em>Praise to Elbereth</em>, <em>Elf-song</em>, <em>Palant&iacute;r of Elostirion</em>), or grants roll bonuses and auto-passes (<em>A Friend or Three</em>, <em>Fellowship</em>, <em>Halfling Strength</em>, <em>Nenya</em>, <em>New Friendship</em>, <em>Old Friendship</em>).</li>
+        <li><code>Duration</code> &mdash; Extends the life or duration of active events in play (<em>The Will of Sauron</em>).</li>
         <li>
             <code>Influence</code> &mdash; Modifies mathematical influence totals, control ratings, or influence check rolls:
             <ul>
-                <li><strong>Stat &amp; Capacity Adjustments:</strong> Direct Influence (DI) ratings, general influence pools, or character control limits (<em>Return of the King</em>).</li>
-                <li><strong>Influence Check Modifiers:</strong> Numerical bonuses or penalties to influence dice rolls made against characters, followers, or factions (<em>Lordly Presence</em>, <em>Old Friendship</em>, <em>A Friend or Three</em>, <em>Persuasive Words</em>).</li>
-                <li><strong>Influence Attack / Opponent Stealing:</strong> Aiding or protecting against influence attempts made by opponent companies or agents.</li>
+                <li><strong>Stat &amp; Capacity Adjustments:</strong> Direct Influence (DI) ratings, general influence pools, or character control limits (<em>Return of the King</em>, <em>Nenya</em>, <em>Wizard's Voice</em>).</li>
+                <li><strong>Influence Check Modifiers:</strong> Numerical bonuses, roll rerolls, or penalties to influence dice rolls made against characters, followers, or factions (<em>Lordly Presence</em>, <em>Old Friendship</em>, <em>New Friendship</em>, <em>A Friend or Three</em>, <em>Persuasive Words</em>, <em>Tempering Friendship</em>, <em>Muster</em>).</li>
+                <li><strong>Influence Defense:</strong> Cancelling influence attempts made by opponent companies or agents (<em>Wizard's Laughter</em>).</li>
             </ul>
         </li>
         <li>
-            <code>Item</code> &mdash; Interacts with physical gear&mdash;retrieving items from discard, searching play decks, transferring gear, protecting items from theft, <strong>modifying Gold Ring test rolls</strong>, or forcing the theft/discard of items (<em>Lucky Search</em>, <em>Reforging</em>, <em>Align Palant&iacute;r</em>, <em>Scroll of Isildur</em>, <em>Ind&ucirc;r Dawndeath</em>, <em>Dwarven Rings</em>).
+            <code>Item</code> &mdash; Interacts with physical gear&mdash;retrieving items from discard (<em>Reforging</em>), searching play decks (<em>Lucky Search</em>), playing items at tapped sites (<em>Thorough Search</em>), activating seeing stones (<em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>), <strong>testing Gold Rings</strong> (<em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>, <em>Scroll of Isildur</em>, <em>Dwarven Rings</em>), or forcing the theft/discard of items (<em>Ind&ucirc;r Dawndeath</em>, <em>Pick-pocket</em>, <em>Thief</em>).
         </li>
-        <li><code>Movement</code> &mdash; Modifies travel, region pathing, or forces company return (<em>Morannon</em>)</li>
+        <li><code>Movement</code> &mdash; Modifies travel, region pathing, multi-site journeys, haven return, or forces company retreat (<em>Anduin River</em>, <em>Ash Mountains</em>, <em>Bridge</em>, <em>Great-road</em>, <em>Misty Mountains</em>, <em>Morannon</em>, <em>Mountains of Shadow</em>, <em>White Mountains</em>, <em>Foul Fumes</em>, <em>Long Winter</em>).</li>
         <li>
             <code>Protection</code> &mdash; Mitigating or avoiding danger during combat&mdash;cancelling attacks before strikes are rolled, dodging strikes, granting strike immunity, or preventing wounds:
             <ul>
                 <li>
-                    <strong>Attack &amp; Strike Evasion:</strong> Cancelling attacks before strikes are rolled, slipping away unseen, or dodging specific terrain strikes (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Escape</em>, <em>Halfling Stealth</em>, <em>Vanishment</em>, <em>Elven Cloak</em>, <em>Torque of Hues</em>, <em>Magic Ring of Nature</em>, <em>Magic Ring of Stealth</em>).
+                    <strong>Attack &amp; Strike Evasion:</strong> Cancelling attacks before strikes are rolled, slipping away unseen, or dodging specific terrain strikes (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Escape</em>, <em>Ford</em>, <em>Halfling Stealth</em>, <em>Hiding</em>, <em>Praise to Elbereth</em>, <em>Sacrifice of Form</em>, <em>Secret Entrance</em>, <em>Secret Passage</em>, <em>Stealth</em>, <em>The Cock Crows</em>, <em>Vanishment</em>, <em>Wizard's River-horses</em>, <em>Elven Cloak</em>, <em>Torque of Hues</em>, <em>Magic Ring of Nature</em>, <em>Magic Ring of Stealth</em>).
                 </li>
                 <li>
                     <strong>Immunity &amp; Target Denial:</strong> Allies or characters that cannot be attacked or chosen as strike targets (<em>Treebeard</em>, <em>Goldberry</em>, <em>Leaflock</em>, <em>Tom Bombadil</em>).
@@ -374,17 +490,20 @@
                 <li>
                     <strong>Combat Survival:</strong> Shielding characters from being wounded or preventing discard when defeated (<em>Halfling Strength</em>, <em>Sacrifice of Form</em>).
                 </li>
+                <li>
+                    <strong>Hazard Limit Reduction:</strong> Decreasing hazard limit draws on company movement (<em>Eagle-mounts</em>, <em>Fair Sailing</em>, <em>Fair Travels...</em>, <em>Great Ship</em>, <em>Horses</em>).
+                </li>
             </ul>
         </li>
-        <li><code>Quest</code> &mdash; Directly advances victory conditions or scenario goals by awarding Marshalling Points (MPs) for completing specific site journeys or tasks (<em>And&uacute;ril</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>). Non-scoring utility cards that transform the board (such as <em>The White Tree</em>) are classified under their functional mechanism (e.g. <code>Role: Site</code>).</li>
+        <li><code>Quest</code> &mdash; Directly advances victory conditions or scenario goals by awarding Marshalling Points (MPs) for completing specific site journeys, storing relics, or destroying The One Ring (<em>And&uacute;ril</em>, <em>Cracks of Doom</em>, <em>Dreams of Lore</em>, <em>Gollum's Fate</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>, <em>Earth of Galadriel's Orchard</em>). Non-scoring utility cards that transform the board (such as <em>The White Tree</em>) are classified under their functional mechanism (e.g. <code>Role: Site</code>).</li>
         <li>
             <code>Readiness</code> &mdash; Character and ally stamina, action capability, and physical condition&mdash;tapping, untapping, recovering from wounds, or returning characters to hand:
             <ul>
                 <li>
-                    <strong>Wound Recovery &amp; Healing:</strong> Transitioning characters from <em>wounded</em> to <em>well</em> (<em>Athelas</em>, <em>Healing Herbs</em>).
+                    <strong>Wound Recovery &amp; Healing:</strong> Transitioning characters from <em>wounded</em> to <em>well</em> (<em>Athelas</em>, <em>Healing Herbs</em>, <em>Halfling Strength</em>).
                 </li>
                 <li>
-                    <strong>Stamina &amp; Untapping:</strong> Untapping characters outside the untap phase or refreshing exhausted companions (<em>Healing Herbs</em>, <em>The Arkenstone</em>).
+                    <strong>Stamina &amp; Untapping:</strong> Untapping characters outside the untap phase or refreshing exhausted companions (<em>And&uacute;ril</em>, <em>Halfling Strength</em>, <em>Narya</em>, <em>The Arkenstone</em>).
                 </li>
                 <li>
                     <strong>Adversary Disruption:</strong> Forcing characters to tap or bouncing them back to hand (<em>Ad&ucirc;naphel</em>, <em>Call of Home</em>).
@@ -394,22 +513,18 @@
         <li>
             <code>Recruitment</code> &mdash; Enables, accelerates, or alters the physical entry of characters and factions into play (beyond numerical check modifiers):
             <ul>
-                <li><strong>Location &amp; Site Bypasses:</strong> Playing characters or factions at non-standard sites or alternative havens (<em>A Chance Meeting</em>).</li>
+                <li><strong>Location &amp; Site Bypasses:</strong> Playing characters or factions at non-standard sites or alternative havens (<em>A Chance Meeting</em>, <em>Old Road</em>).</li>
                 <li><strong>Alternative Recruitment Engines:</strong> Enlisting factions through special substitute rules rather than standard diplomat influence checks (<em>Muster</em>, <em>Ro&auml;c the Raven</em>, <em>The Great Eagles</em>).</li>
                 <li><strong>Recruitment Pacing:</strong> Playing extra characters in a turn or tutoring characters/factions directly from deck or discard.</li>
             </ul>
-            <div class="note">
-                <strong>Influence vs. Recruitment (The "Muster" Edge Case):</strong><br />
-                <ul>
-                    <li><strong>Pure Influence:</strong> Cards that merely grant a numerical bonus to standard diplomat rolls (e.g. <code>+5</code> on <em>Lordly Presence</em> or <em>A Friend or Three</em>) belong strictly under <code>Role: Influence</code>.</li>
-                    <li><strong>Pure Recruitment:</strong> Cards that alter sites, timing, or summon entities into play without a standard influence check (e.g. <em>A Chance Meeting</em>, <em>Ro&auml;c the Raven</em>) belong under <code>Role: Recruitment</code>.</li>
-                    <li><strong>Hybrid Cards (<em>Muster</em>):</strong> Under errata, <em>Muster</em> uses a warrior's prowess to modify an influence check. Because it both enables a martial class to recruit factions and modifies the check total, it carries dual tags: <code>Role: Influence; Recruitment</code>.</li>
-                </ul>
-            </div>
         </li>
-        <li><code>Site</code> &mdash; Alters site status, hold types, or site playability (<em>Witch-king of Angmar</em>, <em>The White Tree</em>)</li>
-        <li><code>Terrain</code> &mdash; Converts region path symbols and territory terrain classifications between hostile and safe (<em>Fog</em>, <em>Morgul Night</em>, <em>Moon</em>)</li>
+        <li><code>Site</code> &mdash; Alters site status, hold types, or site playability (<em>Morannon</em>, <em>Quiet Lands</em>, <em>The White Tree</em>, <em>Witch-king of Angmar</em>).</li>
+        <li><code>Terrain</code> &mdash; Converts region path symbols and territory terrain classifications between hostile and safe (<em>Fog</em>, <em>Moon</em>, <em>Quiet Lands</em>, <em>Stars</em>, <em>The Evenstar</em>, <em>Morgul Night</em>).</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="site-requirement" class="entry-heading">Site Requirement</h3>
     <div class="scope-badge">
@@ -423,34 +538,61 @@
         <li>The specific site(s) or hold type(s) an event attaches to, targets, or modifies.</li>
     </ol>
     <p>
-        Supports specific named sites (e.g. <code>Minas Tirith</code>, <code>Moria</code>), structural site hold classifications (e.g. <code>Dark-hold</code>, <code>Shadow-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Free-hold</code>, <code>Border-hold</code>, <code>Haven</code>), and regional site filters (e.g. <code>Region=Dagorlad</code>).
+        Supports specific named sites (e.g. <em>Minas Tirith</em>, <em>Moria</em>), structural site hold classifications (e.g. <code>Dark-hold</code>, <code>Shadow-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Free-hold</code>, <code>Border-hold</code>, <code>Haven</code>), and dynamic site predicates (e.g. <code>Information!=[Blank]</code>).
     </p>
     <div class="tip">
         <strong>Modal "OR" Events vs. Hard Prerequisites:</strong><br />
-        Only tag <code>Site Requirement</code> if the site or hold type is a <strong>mandatory prerequisite</strong> required to play the card (e.g. <em>Rescue Prisoners</em> requiring a Dark-hold or Shadow-hold, or <em>Siege</em> requiring a Border-hold or Free-hold).<br /><br />
+        Only tag <code>Site Requirement</code> if the site or hold type is a <strong>mandatory prerequisite</strong> required to play the card (e.g. <em>Rescue Prisoners</em> requiring a Dark-hold or Shadow-hold, or <em>Bridge</em> requiring a Haven).<br /><br />
         If an event features an <strong>unconstrained primary mode</strong> alongside an optional keying branch (such as <em>Dragon's Desolation</em>, which offers <em>"+2 prowess to any Dragon attack OR play a Dragon at Ruins &amp; Lairs"</em>), leave <code>Site Requirement</code> <strong><code>[Blank]</code></strong>. Tagging the conditional enabler would falsely brand the card as a site-locked hazard in procedural rules, preventing general decks from drafting it as open combat support.
     </div>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Dark-hold; Shadow-hold</code> &rarr; Permitted play sites for <em>Rescue Prisoners</em></li>
-        <li><code>Bag End; Bree</code> &rarr; Required play sites for <em>Bill the Pony</em></li>
-        <li><code>Minas Tirith</code> &rarr; Target attachment site for <em>The White Tree</em></li>
-        <li><code>Border-hold; Free-hold</code> &rarr; Target sites for <em>Siege</em></li>
-        <li><code>Ruins &amp; Lairs</code> &rarr; Target sites for <em>Awaken Denizens</em></li>
+        <li><code>Haven</code> &rarr; Mandatory entry origin or arrival haven (<em>Bridge</em>, <em>Fellowship</em>, <em>Great-road</em>, <em>Old Road</em>)</li>
+        <li><code>Minas Tirith</code> &rarr; Target attachment and scoring stronghold (<em>Return of the King</em>, <em>The White Tree</em>)</li>
+        <li><code>Mount Doom</code> &rarr; Climax site for Ring destruction quests (<em>Cracks of Doom</em>, <em>Gollum's Fate</em>)</li>
+        <li><code>Vale of Erech</code> &rarr; Staging site for <em>Stone of Erech</em> and <em>Army of the Dead</em></li>
+        <li><code>Dunharrow</code> &rarr; Expedition starting site for <em>Paths of the Dead</em></li>
+        <li><code>L&oacute;rien</code> &rarr; Mandatory scrying site for <em>Mirror of Galadriel</em></li>
+        <li><code>Eagles' Eyrie</code> &rarr; Mandatory flight origin for <em>Eagle-mounts</em></li>
+        <li><code>Border-hold; Free-hold; Ruins &amp; Lairs</code> &rarr; Permitted recruitment holds for <em>A Chance Meeting</em></li>
+        <li><code>Border-hold; Dark-hold; Free-hold; Shadow-hold</code> &rarr; Holding holds for <em>Rescue Prisoners</em></li>
+        <li><code>Information!=[Blank]</code> &rarr; Dynamic predicate matching any site where <em>Information</em> is playable for Sage lore rituals (<em>And&uacute;ril</em>, <em>Dreams of Lore</em>, <em>Far-sight</em>, <em>Reforging</em>, <em>Ringlore</em>)</li>
+        <li><code>Border-hold; Free-hold</code> &rarr; Target holds for <em>Siege</em></li>
+        <li><code>Ruins &amp; Lairs</code> &rarr; Target holds for <em>Awaken Denizens</em></li>
         <li><code>Moria; L&oacute;rien</code> &rarr; Target sites for <em>Balrog of Moria</em></li>
-        <li><code>Region=Dagorlad</code> &rarr; Geographic site restriction for <em>Morannon</em></li>
+        <li><code>[Blank]</code> &rarr; Standard open combat, travel, and protection events playable anywhere</li>
     </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 
     <h3 id="target-item" class="entry-heading">Target Item</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span>
     </div>
     <p>
-        Identifies general item classifications, gear types, or rules keywords (e.g. <code>Weapon</code>, <code>Armor</code>, <code>Gold Ring</code>, <code>Palantír</code>, <code>Lost Knowledge</code>) that an event or hazard requires, enhances, transfers, tests, or targets for theft/corruption.
+        Identifies general item classifications, gear types, or rules keywords (e.g. <code>Weapon</code>, <code>Armor</code>, <code>Gold Ring</code>, <code>Palant&iacute;r</code>, <code>Lost Knowledge</code>) that an event or hazard requires, enhances, transfers, tests, or targets for theft/corruption.
     </p>
     <div class="note">
-        <strong>Generic Item Classes vs. Specific Quest Relics:</strong><br />
-        <code>Target Item</code> is strictly reserved for broad item categories and keywords. Do not use this category for specific named unique items required by a quest or storyline card (such as <em>The One Ring</em> on <em>Cracks of Doom</em>, or <em>Narsil</em> on <em>Andúril</em>). Specific named cards must always be tagged under <code>Prerequisite</code> so the Universal Quest Engine can draft them by title.
+        <strong>The Ring Hierarchy &mdash; <code>Gold Ring</code> vs. <code>Ring</code>:</strong><br />
+        Taxonomy tags maintain a strict functional boundary across ring mechanics:
+        <ul>
+            <li><strong><code>Target Item: Gold Ring</code> (The Testing Suite):</strong> Reserved exclusively for cards that interact with or test untested Gold Rings (<em>Ringlore</em>, <em>Scroll of Isildur</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>). This aligns directly with the official site attribute <code>GoldRing: yes</code>.</li>
+            <li><strong><code>Target Item: Ring</code> (Universal Ring Hazards):</strong> Assigned to hazards that target, punish, or corrupt a character bearing <em>any</em> ring (Gold Ring, Magic Ring, Lesser Ring, Dwarven Ring, or The One Ring), such as <em>The Precious</em>, <em>The Ring's Betrayal</em>, and <em>The Will of the Ring</em>.</li>
+            <li><strong>Specific One Ring Quests:</strong> Quests specifically mandating the destruction of <em>The One Ring</em> (such as <em>Cracks of Doom</em> or <em>Gollum's Fate</em>) declare <code>Prerequisite: The One Ring</code> rather than a broad category tag.</li>
+        </ul>
+    </div>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Gold Ring</code> &rarr; Untested rings and testing rituals (<em>Ringlore</em>, <em>Scroll of Isildur</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>)</li>
+        <li><code>Ring</code> &rarr; Universal ring corruption hazards (<em>The Precious</em>, <em>The Ring's Betrayal</em>, <em>The Will of the Ring</em>, <em>The Nazg&ucirc;l are Abroad</em>)</li>
+        <li><code>Palant&iacute;r</code> &rarr; Seeing stone activation and corruption (<em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>, <em>Bane of the Ithil-stone</em>)</li>
+        <li><code>Armor; Weapon</code> &rarr; Martial gear retrieved by <em>Reforging</em></li>
+    </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
     </div>
 
     <h3 id="target-species" class="entry-heading">Target Species</h3>
@@ -461,117 +603,48 @@
         Identifies specific biological species or creature races (e.g. <code>Elf</code>, <code>D&uacute;nadan</code>, <code>Wizard</code>, <code>Nazg&ucirc;l</code>, <code>Orc</code>) that an event, weapon, item, ally, or hazard explicitly targets, modifies, or aids. Supports exact species names as well as dynamic exclusion predicates.
     </p>
     <div class="note">
-        <strong>Named Characters vs. Species:</strong> Do <strong>not</strong> use this category for specific named individuals (such as <em>Aragorn II</em>). Named character requirements are official database properties tracked directly under the <code>Specific</code> attribute (e.g. <code>Specific: Aragorn II</code> on <em>Return of the King</em>).
+        <strong>Named Characters vs. Species:</strong> Do <strong>not</strong> use this category for specific named individuals (such as <em>Aragorn II</em> or <em>Gandalf</em>). Named character requirements are official database properties tracked directly under the <code>Specific</code> attribute (e.g. <code>Specific: Aragorn II</code> on <em>Return of the King</em>, or <code>Specific: Gandalf</code> on <em>Narya</em>).
     </div>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Orc</code> &rarr; Weapons targeting Orcs (<em>Glamdring</em>, <em>Orcrist</em>) or allies aiding against Orcs (<em>Beorn</em>)</li>
-        <li><code>Nazg&ucirc;l</code> &rarr; Weapons or attacks targeting Nazg&ucirc;l (<em>Dagger of Westernesse</em>, <em>The Pale Sword</em>)</li>
-        <li><code>Wizard</code> &rarr; Targets or requires a Wizard (<em>Sacrifice of Form</em>)</li>
-        <li><code>D&uacute;nadan</code> &rarr; Grants prowess bonuses to D&uacute;nedain (<em>And&uacute;ril, the Flame of the West</em>)</li>
-        <li><code>Hobbit</code> &rarr; Grants body protection to Hobbits (<em>Halfling Strength</em>)</li>
-        <li><code>Race!=Hobbit &amp;&amp; Race!=Wizard</code> &rarr; Excludes Hobbits and Wizards from corruption check (<em>Despair of the Heart</em>)</li>
+        <li><code>Wizard</code> &rarr; Mandatory caster race for Istari spells (<em>Kindling of the Spirit</em>, <em>Sacrifice of Form</em>, <em>True F&aacute;na</em>, <em>Vanishment</em>, <em>Wizard's Fire</em>, <em>Wizard's Flame</em>, <em>Wizard's Laughter</em>, <em>Wizard's River-horses</em>, <em>Wizard's Voice</em>, <em>Wizard's Test</em>)</li>
+        <li><code>Hobbit</code> &rarr; Exclusive evasion and endurance perks (<em>Halfling Stealth</em>, <em>Halfling Strength</em>)</li>
+        <li><code>Elf</code> &rarr; Species prowess buff on <em>The Evenstar</em></li>
+        <li><code>D&uacute;nadan; Man</code> &rarr; Daytime combat prowess buff on <em>Sun</em></li>
+        <li><code>D&uacute;nadan</code> &rarr; Bearer untapping stamina on <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>Man; Orc; Troll</code> &rarr; Attack cancellation on <em>Dark Quarrels</em></li>
+        <li><code>Troll</code> &rarr; Attack cancellation on <em>The Cock Crows</em></li>
+        <li><code>Nazg&ucirc;l</code> &rarr; Event/attack cancellation on <em>Praise to Elbereth</em> and <em>Wizard's River-horses</em></li>
+        <li><code>Race!=Nazg&ucirc;l</code> &rarr; Printed exclusion on <em>The Old Thrush</em> (cannot target Nazg&ucirc;l attacks)</li>
+        <li><code>Orc; Troll</code> &rarr; Minion swarm attack buffs (<em>Minions Stir</em>, <em>Wake of War</em>, <em>Fury of the Iron Crown</em>)</li>
+        <li><code>Undead</code> &rarr; Attack escalation for spirits and wights (<em>Plague of Wights</em>)</li>
+        <li><code>Race!=Hobbit &amp;&amp; Race!=Wizard</code> &rarr; Printed character exclusions on corruption hazards (<em>Despair of the Heart</em>, <em>Lure of Nature</em>, <em>Lure of Power</em>, <em>Greed</em>)</li>
     </ul>
-
-    <!-- SECTION 3: PROCEDURAL RULES SYNTAX -->
-    <h2 id="rules-syntax">3. Using Companion Categories in Procedural Deck Rules</h2>
-    <p>
-        These companion categories enable rich, declarative deck generation rules:
-    </p>
-
-    <h3>A. Universal Starting Site Rule (Handling Standard &amp; Dynamic Characters)</h3>
-    <p>
-        Because dynamic home rules are modeled directly as predicates in the official <code>Home</code> attribute (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>), a single rule recruits legal starting sites for 100% of characters with zero boilerplate:
-    </p>
-    <pre><code>{
-  "Name": "Leader's Starting Site",
-  "Section": "Sites",
-  "Count": 1,
-  "Attributes": {
-    "Primary": "Site",
-    "Name": "{Leader.Home}"
-  }
-}</code></pre>
-
-    <div class="note">
-        <strong>Execution Walkthrough:</strong>
-        <ul>
-            <li><strong>Standard Characters (Aragorn, Boromir, Frodo):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code>). The rule finds the site and succeeds.</li>
-            <li><strong>Dynamic Characters (Gandalf, Doeth, Crook-legged Orc):</strong> <code>{Leader.Home}</code> resolves to the predicate (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>). The engine evaluates the predicate on the fly and draws randomly from all matching sites in your active expansions!</li>
-        </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
     </div>
 
-    <h3>B. Automated Destination Sites for Quest Events (Site Requirement)</h3>
+    <!-- SECTION 3: PROCEDURAL DRAFTING PLAYBOOK BRIDGE -->
+    <h2 id="drafting-bridge">3. Procedural Drafting &amp; Deck Rules</h2>
     <p>
-        When your deck includes site-specific quest events (such as <em>Rescue Prisoners</em> or <em>The White Tree</em>), capture the event into a variable and draft destination sites dynamically using <code>Site Requirement</code>:
+        For partition-by-partition procedural JSON templates, variable chaining (<code>SaveAs</code>), dynamic token resolution (<code>{Leader.Home}</code>, <code>{Quest.Category:Site Requirement}</code>), and complete drafting recipes, see the companion guides:
     </p>
-    <pre><code>[
-  {
-    "Name": "Rescue Prisoners Quest",
-    "SaveAs": "RescueQuest",
-    "Section": "Resources",
-    "Count": 1,
-    "Attributes": {
-      "Name": "Rescue Prisoners"
-    }
-  },
-  {
-    "Name": "Rescue Destination Sites",
-    "Section": "Sites",
-    "Count": 2,
-    "Attributes": {
-      "Primary": "Site",
-      "Name": "{RescueQuest.Category:Site Requirement}"
-    }
-  }
-]</code></pre>
+    <ul>
+        <li>
+            <a href="tagging_and_drafting_playbook.html"><strong>Catalog Tagging &amp; Procedural Drafting Playbook:</strong></a> Authoritative tagging rationale, scope discipline, and JSON drafting recipes for Allies, Avatars, Characters, Factions, Hazards, Items, Resource Events, Sites, and Regions.
+        </li>
+        <li>
+            <a href="deck_building_recipes.html"><strong>Deck Construction Recipes &amp; Patterns:</strong></a> Practical cookbook of high-level strategic snippets (e.g. Under-deeps expeditions, Dragon lairs, and Gold Ring testing).
+        </li>
+        <li>
+            <a href="deck_rules_reference.html"><strong>Rules JSON Schema Reference:</strong></a> Complete technical reference for rule properties, distribution strategies, relational operators, and variable interpolation syntax.
+        </li>
+    </ul>
 
-    <h3>C. Targeted Dragon Lair Expedition</h3>
-    <p>
-        Recruit destination sites specifically guarded by true Dragons without hardcoding site names:
-    </p>
-    <pre><code>{
-  "Name": "Dragon Lair Destinations",
-  "Section": "Sites",
-  "Count": 2,
-  "Attributes": {
-    "Primary": "Site"
-  },
-  "Categories": {
-    "Automatic Attack": "Dragon"
-  }
-}</code></pre>
-
-    <h3>D. Regional Themed Recruitment</h3>
-    <p>
-        Recruit backup characters whose home site is located in the same geographic region as the company leader:
-    </p>
-    <pre><code>{
-  "Name": "Regional Reinforcements",
-  "Section": "Pool",
-  "Count": 2,
-  "Attributes": {
-    "Primary": "Character"
-  },
-  "Categories": {
-    "Home Region": "{Leader.Category:Home Region}"
-  }
-}</code></pre>
-
-    <h3>E. Drafting Regional Hazards (Region Requirement)</h3>
-    <p>
-        Draft hazard creatures keyed strictly to a specific geographic region using <code>Region Requirement</code>:
-    </p>
-    <pre><code>{
-  "Name": "Gorgoroth Guardians",
-  "Section": "Hazards",
-  "Count": 3,
-  "Attributes": {
-    "Secondary": "Creature"
-  },
-  "Categories": {
-    "Region Requirement": "Gorgoroth"
-  }
-}</code></pre>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
 </body>
 </html>

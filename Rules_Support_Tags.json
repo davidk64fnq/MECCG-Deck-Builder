@@ -2796,7 +2796,7 @@
       "set": "MELE"
     },
     {
-      "Adjacent Regions": "Andrast; Anfalas; Bay of Belfalas; Eriadoran Coast; Old Pûkel-land",
+      "Adjacent Regions": "Andrast Coast; Anfalas; Bay of Belfalas; Eriadoran Coast; Old Pûkel-land",
       "fullCode": "Andrast (TW)",
       "id": "187",
       "name": "Andrast",
@@ -2852,7 +2852,7 @@
       "set": "METW"
     },
     {
-      "Adjacent Regions": "Andrast; Anfalas; Belfalas; Mouths of the Anduin",
+      "Adjacent Regions": "Andrast; Andrast Coast; Anfalas; Belfalas; Mouths of the Anduin",
       "fullCode": "Bay of Belfalas (TW)",
       "id": "194",
       "name": "Bay of Belfalas",
@@ -2924,7 +2924,7 @@
       "set": "METW"
     },
     {
-      "Adjacent Regions": "Andrast; Cardolan; Elven Shores; Enedhwaith; Old Pûkel-land",
+      "Adjacent Regions": "Andrast; Andrast Coast; Cardolan; Elven Shores; Enedhwaith; Old Pûkel-land",
       "fullCode": "Eriadoran Coast (TW)",
       "id": "203",
       "name": "Eriadoran Coast",
@@ -3116,7 +3116,7 @@
       "set": "METW"
     },
     {
-      "Adjacent Regions": "Andrast; Enedhwaith; Gap of Isen; Old Pûkel Gap",
+      "Adjacent Regions": "Andrast; Enedhwaith; Eriadoran Coast; Gap of Isen; Old Pûkel Gap",
       "fullCode": "Old Pûkel-land (TW)",
       "id": "227",
       "name": "Old Pûkel-land",
@@ -3911,13 +3911,15 @@
       "id": "290",
       "name": "Fellowship",
       "Role": "Combat; Corruption",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Haven"
     },
     {
       "Environment Stance": "Gates of Morning",
       "fullCode": "Gates of Morning (TW)",
       "id": "293",
       "name": "Gates of Morning",
+      "Role": "Card Flow",
       "set": "METW"
     },
     {
@@ -4209,7 +4211,8 @@
       "id": "254",
       "name": "Bridge",
       "Role": "Movement",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Haven"
     },
     {
       "fullCode": "Call of Home (TW)",
@@ -5836,6 +5839,7 @@
     [
       "Adjacent Regions",
       "Andrast",
+      "Andrast Coast",
       "Anduin Vales",
       "Anfalas",
       "Angmar",
@@ -6200,6 +6204,7 @@
       "Free-hold",
       "Goblin-gate",
       "Grey Havens",
+      "Haven",
       "Henneth Annûn",
       "Influence",
       "Information!=[Blank]",

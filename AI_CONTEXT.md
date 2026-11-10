@@ -161,6 +161,13 @@
     - Refined `Readiness` (wound healing & untapping) vs. `Protection` (combat evasion & survival) and expanded `Role: Item` to include ring testing.
     - Audited all 54 METW items and authored Chapter 8 (Items & Gear) with five procedural drafting patterns.
     - Synchronized Column 3 of the Catalog Partition Directory table for Items & Gear.
+  - [x] Issue #46: Resource Events, Sites, and Regions Playbook Completion, Adjacency Graph Repair, and Companion Tags Alignment
+    - Audited and aligned 85 METW Resource Events; refined `Role: Influence` on *Tempering Friendship*, established `Target Item: Gold Ring` for the testing suite (*Ringlore*, *Test of Form*, *Test of Lore*, *Wizard's Test*, *Scroll of Isildur*), and populated `Site Requirement: Haven` on Haven-entry events.
+    - Verified 69 METW Sites; confirmed discrete flags for `Information` (5 sites), `Palantiri` (6 sites), and `Scroll` (*Tolfalas*).
+    - Repaired 4 Middle-earth region adjacency graph defects (*Andrast*, *Bay of Belfalas*, *Eriadoran Coast*, *Old Pûkel-land*) restoring bidirectional BFS pathfinding.
+    - Authored Chapters 9 (Resource Events), 10 (Sites & Havens), and 11 (Regions) in `tagging_and_drafting_playbook.html`.
+    - Overhauled `rules_support_tags.html` with full 15-category `.chapter-nav` navigation, `.back-to-top` links, `Adjacent Regions` documentation, and a clean cross-reference bridge in Section 3.
+    - Transferred the `{Leader.Home}` machine predicate execution walkthrough into Chapter 3 of the Playbook.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

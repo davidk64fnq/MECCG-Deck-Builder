@@ -30,7 +30,8 @@
         <a href="#hazard-events-playbook">Hazard Events</a> &bull;
         <a href="#items-playbook">Items &amp; Gear</a> &bull;
         <a href="#resource-events-playbook">Resource Events</a> &bull;
-        <a href="#sites-playbook">Sites &amp; Havens</a>
+        <a href="#sites-playbook">Sites &amp; Havens</a> &bull;
+        <a href="#regions-playbook">Regions</a>
     </div>
 
     <!-- ================================================================== -->
@@ -132,20 +133,35 @@
             <td><a href="#resource-events-playbook">Resource Events</a></td>
             <td>
                 <code>Primary = Resource</code><br />
-                <code>Secondary = Short-event; Long-event; Permanent-event</code>
+                <code>Secondary = Short-event; Long-event; Permanent-event</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Spells, quests, combat buffs, travel, &amp; utility)</em></span>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code>, <code>Region Requirement</code>
+                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Target Item</code><br />
+                <strong>Specialized Attributes:</strong> <code>Skill</code> (class locks e.g. <code>Sage</code>, <code>Ranger</code>, <code>Warrior</code>, <code>Scout</code>, <code>Diplomat</code>; shield generic draws via <code>"[Blank]"</code>), <code>Specific</code> (character locks e.g. <code>Aragorn II</code> on <em>Return of the King</em>)
             </td>
         </tr>
         <tr>
             <td><a href="#sites-playbook">Sites &amp; Havens</a></td>
             <td>
-                <code>Primary = Site; Region</code>
+                <code>Primary = Site</code><br />
+                <code>Site = Free-hold; Border-hold; Ruins &amp; Lairs; Shadow-hold; Dark-hold; Haven</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Surface holds, starter havens, &amp; subterranean deeps)</em></span>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Adjacent Sites</code>, <code>Automatic Attack</code>, <code>Region Type</code><br />
-                <strong>Specialized Attributes:</strong> Discrete Item Flags (<code>MinorItem</code>, <code>Hoard</code>, etc. vs. unparsed <code>Playable</code> string), <code>Haven</code> (Under-deeps surface entrance)
+                <strong>Categories:</strong> <code>Automatic Attack</code>, <code>Region Type</code>, <code>Adjacent Sites</code> (Under-deeps only; <code>[Blank]</code> on surface sites)<br />
+                <strong>Specialized Attributes:</strong> Discrete Item Flags (<code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Hoard</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code> vs. composite <code>Playable</code> string), <code>Haven</code> (nearest haven for surface sites; adjacent entrance for Under-deeps)
+            </td>
+        </tr>
+        <tr>
+            <td><a href="#regions-playbook">Regions</a></td>
+            <td>
+                <code>Primary = Region</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Geographic terrain &amp; overland movement paths)</em></span>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Adjacent Regions</code>, <code>Region Type</code><br />
+                <strong>Specialized Attributes:</strong> <code>Region</code> (self-identity title)
             </td>
         </tr>
     </table>
@@ -553,10 +569,13 @@
     "Name": "{Leader.Home}"
   }
 }</code></pre>
-
-    <div class="back-to-top">
-        <a href="#catalog-directory">&#9650; Back to Partition Directory</a> &bull;
-        <a href="#top">&#9650; Top of Page</a>
+    <div class="note">
+        <strong>Execution Walkthrough &mdash; Fixed Sites vs. Machine Predicates:</strong><br />
+        A single rule handles 100% of Middle-earth starting characters with zero boilerplate:
+        <ul>
+            <li><strong>Standard Characters (<em>Aragorn</em>, <em>Boromir</em>, <em>Frodo</em>):</strong> <code>{Leader.Home}</code> resolves to a specific site title (e.g. <code>"Rivendell"</code> or <code>"Minas Tirith"</code>). The rule finds the site and succeeds.</li>
+            <li><strong>Dynamic Characters (<em>Gandalf</em>, <em>Doeth</em>, <em>Crook-legged Orc</em>):</strong> <code>{Leader.Home}</code> resolves directly to a machine-actionable rules predicate (e.g. <code>Site=Haven</code>, <code>Site=Dark-hold</code>, or <code>Region=Under-deeps &amp;&amp; Site!=Dark-hold</code>). The generator evaluates the predicate dynamically, sampling randomly from all legal catalog sites matching that criteria in your active expansion sets.</li>
+        </ul>
     </div>
 
     <!-- ================================================================== -->
@@ -1589,24 +1608,630 @@
     </div>
 
     <!-- ================================================================== -->
-    <!-- PLAYBOOK CHAPTER: RESOURCE EVENTS (PLACEHOLDER)                    -->
+    <!-- PLAYBOOK CHAPTER: RESOURCE EVENTS                                  -->
     <!-- ================================================================== -->
     <h2 id="resource-events-playbook">Resource Events (Spells, Quests &amp; Flow)</h2>
     <p>
-        <em>[Chapter under authoring &mdash; covers Permanent, Long, and Short resource events; Gates of Morning light stance; combat tricks vs. protection; and card flow engines.]</em>
+        Resource events represent the spells, ancient lore, sudden luck, environmental blessings, and diplomatic maneuvers called upon by the free peoples of Middle-earth. Partitioned across three timings (<code>Short-event</code>, <code>Long-event</code>, and <code>Permanent-event</code>), this category encompasses 85 distinct cards in <em>The Wizards</em> (METW). Unlike items or allies, resource events rarely enter play as physical scoring assets on their own; instead, they act as the tactical glue that accelerates movement, cancels creature ambushes, passes corruption checks, tests gold rings, and fulfills legendary storylines. Because resource events lack printed combat ratings or standard racial attributes, taxonomy tagging focuses on their <strong>tactical role</strong>, <strong>daylight environmental stance</strong>, <strong>geographic pathing</strong>, <strong>storyline prerequisites</strong>, and <strong>class or species restrictions</strong>.
     </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR RESOURCE EVENTS -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+
+    <h4 class="entry-heading-sub">Role</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        The primary operational classifier defining what mechanism the card executes when played. Resource events span 11 of the 14 baseline taxonomy roles:
+    </p>
+    <ul>
+        <li><code>Automatic Attack</code> &rarr; Reduces or mitigates guardian automatic attacks at visited sites (<em>Quiet Lands</em>, <em>Sun</em>)</li>
+        <li><code>Card Flow</code> &rarr; Searching play decks, retrieving cards from discard, hand cycling, or mass hazard permanent-event discard (<em>Gates of Morning</em>, <em>Favor of the Valar</em>, <em>Far-sight</em>, <em>Mirror of Galadriel</em>, <em>Reforging</em>, <em>The Cock Crows</em>, <em>Vilya</em>, <em>Wizard's River-horses</em>)</li>
+        <li><code>Combat</code> &rarr; Active martial prowess buffs, combat dice enhancements, or strike debuffs (<em>Block</em>, <em>Dodge</em>, <em>Lucky Strike</em>, <em>Risky Blow</em>, <em>Clear Skies</em>, <em>Fellowship</em>, <em>Kindling of the Spirit</em>, <em>Lapse of Will</em>, <em>Sacrifice of Form</em>, <em>Stars</em>, <em>Sun</em>, <em>The Evenstar</em>, <em>The Old Thrush</em>, <em>True F&aacute;na</em>, <em>Wizard's Fire</em>, <em>Wizard's Flame</em>)</li>
+        <li><code>Corruption</code> &rarr; Mitigating corruption burdens, providing roll bonuses, or auto-passing corruption checks (<em>A Friend or Three</em>, <em>Elf-song</em>, <em>Fellowship</em>, <em>Halfling Strength</em>, <em>Nenya</em>, <em>New Friendship</em>, <em>Old Friendship</em>)</li>
+        <li><code>Influence</code> &rarr; Numerical bonuses to influence dice rolls or direct influence capacity buffs (<em>A Friend or Three</em>, <em>Lordly Presence</em>, <em>Muster</em>, <em>Nenya</em>, <em>New Friendship</em>, <em>Old Friendship</em>, <em>Persuasive Words</em>, <em>Return of the King</em>, <em>Tempering Friendship</em>, <em>Wizard's Laughter</em>, <em>Wizard's Voice</em>)</li>
+        <li><code>Item</code> &rarr; Testing Gold Rings, retrieving stored gear, activating Palant&iacute;ri, or searching for items (<em>Align Palant&iacute;r</em>, <em>Lucky Search</em>, <em>Reforging</em>, <em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Thorough Search</em>, <em>Use Palant&iacute;r</em>, <em>Wizard's Test</em>)</li>
+        <li><code>Movement</code> &rarr; Granting additional movement phases, haven return, or regional route adjustments (<em>Anduin River</em>, <em>Ash Mountains</em>, <em>Bridge</em>, <em>Great-road</em>, <em>Misty Mountains</em>, <em>Morannon</em>, <em>Mountains of Shadow</em>, <em>White Mountains</em>)</li>
+        <li><code>Protection</code> &rarr; Cancelling attacks before strikes are rolled, dodging strikes, or reducing hazard limits (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Eagle-mounts</em>, <em>Elf-song</em>, <em>Escape</em>, <em>Fair Sailing</em>, <em>Fair Travels...</em>, <em>Ford</em>, <em>Great Ship</em>, <em>Halfling Stealth</em>, <em>Hiding</em>, <em>Horses</em>, <em>Praise to Elbereth</em>, <em>Sacrifice of Form</em>, <em>Secret Entrance</em>, <em>Secret Passage</em>, <em>Stealth</em>, <em>The Cock Crows</em>, <em>Vanishment</em>, <em>Wizard's River-horses</em>)</li>
+        <li><code>Quest</code> &rarr; Scoring Marshalling Points (MPs) for completing specific journeys, or destroying The One Ring (<em>And&uacute;ril, the Flame of the West</em>, <em>Cracks of Doom</em>, <em>Dreams of Lore</em>, <em>Gollum's Fate</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>)</li>
+        <li><code>Readiness</code> &rarr; Untapping characters, stamina recovery, or healing wounds from wounded to well status (<em>And&uacute;ril, the Flame of the West</em>, <em>Halfling Strength</em>, <em>Narya</em>)</li>
+        <li><code>Recruitment</code> &rarr; Enabling or accelerating character/faction entry into play at non-standard sites or alternative havens (<em>A Chance Meeting</em>, <em>Muster</em>, <em>Old Road</em>)</li>
+        <li><code>Site</code> &rarr; Transforming site status into a Haven or functioning as a dark site (<em>Morannon</em>, <em>Quiet Lands</em>, <em>The White Tree</em>)</li>
+        <li><code>Terrain</code> &rarr; Converting region path symbols and territory terrain between hostile and safe (<em>Fog</em>, <em>Moon</em>, <em>Quiet Lands</em>, <em>Stars</em>, <em>The Evenstar</em>)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Environment Stance</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Tracks cards that legally mandate <em>Gates of Morning</em> to enter play, or gain enhanced daylight bonuses while it is active (11 cards in METW), alongside <em>Gates of Morning</em> itself and the dual-environment card <em>Moon</em>.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Gates of Morning</code> &rarr; Foundational daylight anchor (<em>Gates of Morning</em>), daylight-mandated events (<em>Clear Skies</em>, <em>Fog</em>), and daylight-escalated bonuses (<em>Dark Quarrels</em>, <em>Fair Travels in Dark-domains</em>, <em>Fair Travels in Shadow-lands</em>, <em>Quiet Lands</em>, <em>Stars</em>, <em>Sun</em>, <em>The Cock Crows</em>, <em>The Evenstar</em>)</li>
+        <li><code>Doors of Night</code> &rarr; Shadow-countering card active during darkness (<em>Praise to Elbereth</em>)</li>
+        <li><code>Gates of Morning; Doors of Night</code> &rarr; Dual-environment lunar card (<em>Moon</em>)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Site Requirement</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Indexes mandatory physical sites, structural hold types, or site predicate conditions where a company must be located to play or maintain the event.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Haven</code> &rarr; Required play or starting origin site (<em>Bridge</em>, <em>Fellowship</em>, <em>Great-road</em>, <em>Old Road</em>)</li>
+        <li><code>Minas Tirith</code> &rarr; Mandatory stronghold for Gondor storyline events (<em>Return of the King</em>, <em>The White Tree</em>)</li>
+        <li><code>Mount Doom</code> &rarr; Mandatory quest climax site for Ring destruction (<em>Cracks of Doom</em>, <em>Gollum's Fate</em>)</li>
+        <li><code>Vale of Erech</code> &rarr; Mandatory staging site (<em>Stone of Erech</em>)</li>
+        <li><code>Dunharrow</code> &rarr; Mandatory expedition origin (<em>Paths of the Dead</em>)</li>
+        <li><code>L&oacute;rien</code> &rarr; Mandatory scrying site (<em>Mirror of Galadriel</em>)</li>
+        <li><code>Eagles' Eyrie</code> &rarr; Mandatory flight origin (<em>Eagle-mounts</em>)</li>
+        <li><code>Border-hold; Free-hold; Ruins &amp; Lairs</code> &rarr; Permitted recruitment holds for <em>A Chance Meeting</em></li>
+        <li><code>Border-hold; Dark-hold; Free-hold; Shadow-hold</code> &rarr; Permitted holding holds for <em>Rescue Prisoners</em></li>
+        <li><code>Information!=[Blank]</code> &rarr; Dynamic predicate matching any site where <em>Information</em> is playable for Sage lore rituals (<em>And&uacute;ril</em>, <em>Dreams of Lore</em>, <em>Far-sight</em>, <em>Reforging</em>, <em>Ringlore</em>)</li>
+        <li><code>[Blank]</code> &rarr; Standard open combat, travel, and protection events playable anywhere</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Region Requirement</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Assigned when an event alters transit between specific named territories (such as Ranger mountain passes) or triggers based on canonical terrain types in the company's site path.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>An&oacute;rien; Dagorlad; Harondor; Ithilien; Lebennin; Rohan</code> &rarr; Transit regions for <em>Anduin River</em></li>
+        <li><code>Dagorlad; Gorgoroth; Horse Plains</code> &rarr; Transit regions for <em>Ash Mountains</em></li>
+        <li><code>Anduin Vales; Dunland; Fangorn; Hollin; Rhudaur; Wold &amp; Foothills</code> &rarr; Transit regions for <em>Misty Mountains</em></li>
+        <li><code>Gorgoroth; Harondor; Ithilien; Nurn</code> &rarr; Transit regions for <em>Mountains of Shadow</em></li>
+        <li><code>Anfalas; An&oacute;rien; Lamedon; Old P&ucirc;kel-land; Rohan</code> &rarr; Transit regions for <em>White Mountains</em></li>
+        <li><code>Dagorlad; Ud&ucirc;n</code> &rarr; Sub-company infiltration path for <em>Morannon</em></li>
+        <li><code>Wilderness</code> &rarr; Terrain hazard reductions for <em>Fair Travels in Wilderness</em> and <em>Ford</em></li>
+        <li><code>Border-land</code> &rarr; Terrain hazard reduction for <em>Fair Travels in Border-lands</em></li>
+        <li><code>Free-domain</code> &rarr; Terrain hazard reduction for <em>Fair Travels in Free-domains</em></li>
+        <li><code>Shadow-land</code> &rarr; Terrain hazard reduction for <em>Fair Travels in Shadow-lands</em></li>
+        <li><code>Dark-domain</code> &rarr; Terrain hazard reduction for <em>Fair Travels in Dark-domains</em></li>
+        <li><code>Coastal Sea</code> &rarr; Maritime travel protection for <em>Fair Sailing</em> and <em>Great Ship</em></li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Prerequisite &amp; Prerequisite For</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Connects multi-card storyline objectives and enabler events without title hardcoding:
+    </p>
+    <ul>
+        <li><code>Prerequisite: Narsil; Reforging</code> &rarr; Relic and event required by <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>Prerequisite: The One Ring</code> &rarr; Artifact required to complete <em>Cracks of Doom</em> and <em>Gollum's Fate</em></li>
+        <li><code>Prerequisite: Sapling of the White Tree</code> &rarr; Stored relic required to blossom <em>The White Tree</em></li>
+        <li><code>Prerequisite: Men of Lamedon</code> &rarr; Recruited faction required to awaken <em>Stone of Erech</em></li>
+        <li><code>Prerequisite For: Army of the Dead</code> &rarr; Assigned to <em>Paths of the Dead</em> to shield it from non-quest decks</li>
+        <li><code>Prerequisite For: And&uacute;ril, the Flame of the West</code> &rarr; Assigned to <em>Reforging</em> to shield it until the quest is drafted</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Target Item</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Identifies general item classifications or rules keywords that the event specifically requires, tests, or manipulates:
+    </p>
+    <ul>
+        <li><code>Gold Ring</code> &rarr; Tested by Sage and Wizard rituals (<em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>)</li>
+        <li><code>Palant&iacute;r</code> &rarr; Aligned and activated by Sage seeing stone events (<em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>)</li>
+        <li><code>Armor; Weapon</code> &rarr; Retrieved from discard by <em>Reforging</em></li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Target Species</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Identifies biological species or creature races that the event specifically buffs, protects, cancels, or targets in combat:
+    </p>
+    <ul>
+        <li><code>Wizard</code> &rarr; Mandatory caster race for Istari spells (<em>Kindling of the Spirit</em>, <em>Sacrifice of Form</em>, <em>True F&aacute;na</em>, <em>Vanishment</em>, <em>Wizard's Fire</em>, <em>Wizard's Flame</em>, <em>Wizard's Laughter</em>, <em>Wizard's River-horses</em>, <em>Wizard's Voice</em>)</li>
+        <li><code>Hobbit</code> &rarr; Exclusive evasion and endurance perks (<em>Halfling Stealth</em>, <em>Halfling Strength</em>)</li>
+        <li><code>Elf</code> &rarr; Species prowess buff on <em>The Evenstar</em></li>
+        <li><code>D&uacute;nadan; Man</code> &rarr; Daytime combat prowess buff on <em>Sun</em></li>
+        <li><code>D&uacute;nadan</code> &rarr; Bearer untapping stamina on <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>Man; Orc; Troll</code> &rarr; Attack cancellation on <em>Dark Quarrels</em></li>
+        <li><code>Troll</code> &rarr; Attack cancellation on <em>The Cock Crows</em></li>
+        <li><code>Nazg&ucirc;l</code> &rarr; Event/attack cancellation on <em>Praise to Elbereth</em> and <em>Wizard's River-horses</em></li>
+        <li><code>Race!=Nazg&ucirc;l</code> &rarr; Printed exclusion on <em>The Old Thrush</em> (cannot target Nazg&ucirc;l attacks)</li>
+    </ul>
+
+    <div class="note">
+        <strong>What is Intentionally OMITTED on Resource Events:</strong>
+        <ul>
+            <li><strong>No Redundant Species Tags for Unique Character Locks:</strong> Events tied to a single unique character (such as <em>Aragorn II</em> on <em>Return of the King</em>, <em>Gandalf</em> on <em>Narya</em>, <em>Galadriel</em> on <em>Nenya</em>, or <em>Elrond</em> on <em>Vilya</em>) rely on the official database attribute <code>Specific: [Name]</code>. They do not duplicate <code>Target Species: Elf</code> or <code>Target Species: D&uacute;nadan</code>.</li>
+            <li><strong>No Soft Triggers as Hard Site Requirements (*Vilya*):</strong> Although *Vilya* shuffles 3 resources from discard into your play deck if Elrond is at Rivendell, its primary +4 prowess, +2 body, and +6 direct influence mode is playable anywhere on Middle-earth. Leaving <code>Site Requirement</code> <strong><code>[Blank]</code></strong> ensures open Elrond decks can draft it as high-impact combat and influence utility.</li>
+            <li><strong>No Mandatory Sites on Autonomous Ring Spells (*Narya*, *Nenya*):</strong> While *Nenya* receives a minor corruption bonus if played at a haven, it is playable anywhere. It leaves <code>Site Requirement</code> blank.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Class-Shielded Universal Utility Suite</h4>
+    <p>
+        When drafting open protection, movement, and card flow events for an arbitrary company, combine <code>"Skill": "[Blank]"</code> and <code>"Specific": "[Blank]"</code> to guarantee that every drafted card can be played by any company, with zero risk of dead cards locked to Sages, Rangers, Scouts, or specific heroes:
+    </p>
+    <pre><code>{
+  "Name": "Universal Protection &amp; Flow Events",
+  "Section": "Resources",
+  "Count": 6,
+  "Attributes": {
+    "Primary": "Resource",
+    "Skill": "[Blank]",
+    "Specific": "[Blank]"
+  },
+  "Categories": {
+    "Role": "Protection; Card Flow; Movement",
+    "Prerequisite For": "[Blank]"
+  }
+}</code></pre>
+
+    <h4>Pattern B: The Wizard Spell Arsenal</h4>
+    <p>
+        Drafts powerful Istari combat tricks and cancellation spells tailored specifically for decks featuring an active Wizard avatar:
+    </p>
+    <pre><code>{
+  "Name": "Istari Spells",
+  "Section": "Resources",
+  "Count": 4,
+  "Attributes": {
+    "Primary": "Resource",
+    "Secondary": "Short-event; Permanent-event"
+  },
+  "Categories": {
+    "Role": "Combat; Protection",
+    "Target Species": "Wizard"
+  }
+}</code></pre>
+
+    <h4>Pattern C: The Ranger Mountain Pathfinding Engine</h4>
+    <p>
+        Drafts region movement shortcuts tailored to companies with a Ranger, automatically matching the operational regions of the active Geographic Theater:
+    </p>
+    <pre><code>{
+  "Name": "Ranger Regional Shortcuts",
+  "Section": "Resources",
+  "Count": 2,
+  "Attributes": {
+    "Primary": "Resource",
+    "Skill": "Ranger"
+  },
+  "Categories": {
+    "Role": "Movement",
+    "Region Requirement": "{Theater.Region}"
+  }
+}</code></pre>
+
+    <h4>Pattern D: The Gates of Morning Daylight Suite</h4>
+    <p>
+        Drafts <em>Gates of Morning</em> paired automatically with daylight-enhanced combat and environment support events:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Foundational Daylight Anchor",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Name": "Gates of Morning"
+    }
+  },
+  {
+    "Name": "Daylight Combat &amp; Protection Events",
+    "Section": "Resources",
+    "Count": 4,
+    "Attributes": {
+      "Primary": "Resource"
+    },
+    "Categories": {
+      "Environment Stance": "Gates of Morning",
+      "Role": "Combat; Protection; Terrain"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern E: The Sage Lore &amp; Relic Retrieval Engine</h4>
+    <p>
+        Drafts Sage rituals that interact with <em>Information</em> sites to tutor cards, retrieve weapons from discard, or score Marshalling Points:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Sage Lore Rituals",
+    "SaveAs": "SageRitual",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Skill": "Sage"
+    },
+    "Categories": {
+      "Role": "Card Flow; Item; Quest"
+    }
+  },
+  {
+    "Name": "Information Study Destination",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{SageRitual.Category:Site Requirement}"
+    }
+  }
+]</code></pre>
+
     <div class="back-to-top">
         <a href="#catalog-directory">&#9650; Back to Partition Directory</a> &bull;
         <a href="#top">&#9650; Top of Page</a>
     </div>
 
     <!-- ================================================================== -->
-    <!-- PLAYBOOK CHAPTER: SITES & HAVENS (PLACEHOLDER)                     -->
+    <!-- PLAYBOOK CHAPTER: SITES & HAVENS                                   -->
     <!-- ================================================================== -->
-    <h2 id="sites-playbook">Sites &amp; Havens (Topography &amp; Paths)</h2>
+    <h2 id="sites-playbook">Sites &amp; Havens (Topography, Guardians &amp; Deep Paths)</h2>
     <p>
-        <em>[Chapter under authoring &mdash; covers discrete item flags vs. Playable strings; Under-deeps surface entrance modeling; site automatic attack guardians; and Region Type terrain propagation.]</em>
+        Site cards represent the physical topography of Middle-earth: peaceful havens where companies heal and organize, fortified strongholds where factions are recruited, and perilous ruins or dragon lairs where items are found and guardian automatic attacks must be faced. In <em>The Wizards</em> (METW), the catalog contains 69 site cards across six structural classifications: 4 Havens (<em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, <em>Edhellond</em>), 10 Free-holds, 17 Border-holds, 22 Ruins &amp; Lairs, 11 Shadow-holds, and 5 Dark-holds. Under official MECCG tournament rules, **sites are strictly unique across the site deck** (maximum 1 copy per site title). Because sites govern both destination item playability and movement pathing, taxonomy tagging focuses on their <strong>guardian species</strong>, <strong>regional terrain types</strong>, <strong>subterranean adjacencies</strong>, and <strong>discrete item playability flags</strong>.
     </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR SITES -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+
+    <h4 class="entry-heading-sub">Automatic Attack</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Site</span>
+    </div>
+    <p>
+        Indexes the guardian creature species printed on site cards using normalized singular nouns (matching official creature race attributes). Peaceful strongholds and Havens leave this category <strong><code>[Blank]</code></strong>.
+    </p>
+    <ul>
+        <li><code>Dragon</code> &rarr; Dragon lairs with automatic hoard attacks (<em>Caves of &Ucirc;lund</em>, <em>Dancing Spire</em>, <em>Irerock</em>, <em>The Lonely Mountain</em>)</li>
+        <li><code>Man</code> &rarr; Outlaw and bandit encampments (<em>Bandit Lair</em>)</li>
+        <li><code>Orc</code> &rarr; Strongholds and lairs guarded by Orc warbands (<em>Carn D&ucirc;m</em>, <em>Cirith Ungol</em>, <em>Dimrill Dale</em>, <em>Goblin-gate</em>, <em>Moria</em>, <em>Mount Gram</em>, <em>Mount Gundabad</em>, <em>Sarn Goriwing</em>, <em>Shelob's Lair</em>, <em>The Wind Throne</em>)</li>
+        <li><code>Orc; Troll</code> &rarr; Fortress dual-attacks featuring both Orc swarms and Troll muscle (<em>Barad-d&ucirc;r</em>, <em>Dol Guldur</em>)</li>
+        <li><code>P&ucirc;kel-creature</code> &rarr; Ancient stone guardians and watcher statues (<em>Glittering Caves</em>, <em>Stone-circle</em>, <em>The Stones</em>)</li>
+        <li><code>Spider</code> &rarr; Webbed ruins and infested towers (<em>Ruined Signal Tower</em>)</li>
+        <li><code>Troll</code> &rarr; Troll-fells and cave dens (<em>Ettenmoors</em>)</li>
+        <li><code>Undead</code> &rarr; Cursed barrows, marshes, and ancient tombs (<em>Amon Hen</em>, <em>Barrow-downs</em>, <em>Dead Marshes</em>, <em>Gladden Fields</em>, <em>Himring</em>, <em>Isles of the Dead that Live</em>, <em>Lossadan Cairn</em>, <em>Minas Morgul</em>, <em>Tolfalas</em>)</li>
+        <li><code>Wolf</code> &rarr; Wilderness ruins haunted by hunting packs (<em>Isengard</em>, <em>Ost-in-Edhil</em>, <em>The White Towers</em>, <em>Weathertop</em>)</li>
+        <li><code>[Blank]</code> &rarr; All 4 Havens and 30 peaceful Free-holds and Border-holds (<em>Bag End</em>, <em>Bree</em>, <em>Edoras</em>, <em>Minas Tirith</em>, <em>Rivendell</em>, <em>Wellinghall</em>)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Region Type</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Site</span> &bull; <span class="scope-pill">Region</span>
+    </div>
+    <p>
+        Propagates the canonical terrain classification printed on region cards directly down to every site located within that territory. This enables procedural generation templates to filter adventure destinations by environmental terrain (e.g. drafting only sites in <em>Wilderness</em>, or avoiding lethal <em>Dark-domain</em> and <em>Shadow-land</em> sites).
+    </p>
+    <ul>
+        <li><code>Free-domain</code> &rarr; Sites in civilized and sheltered realms (<em>Bag End</em> in The Shire; <em>Dr&uacute;adan Forest</em> and <em>Minas Tirith</em> in An&oacute;rien; <em>Dol Amroth</em> in Belfalas; <em>Pelargir</em> in Lebennin; <em>Grey Havens</em> in Lindon)</li>
+        <li><code>Border-land</code> &rarr; Sites in transitional and border territories (<em>Beorn's House</em> and <em>Eagles' Eyrie</em> in Anduin Vales; <em>Dunharrow</em> and <em>Edoras</em> in Rohan; <em>Glittering Caves</em> and <em>Isengard</em> in Gap of Isen; <em>Thranduil's Halls</em> in Woodland Realm; <em>Shrel-Kain</em> in Dorwinion; <em>Vale of Erech</em> in Lamedon)</li>
+        <li><code>Wilderness</code> &rarr; Sites in untamed territories and highland passes (<em>Bree</em>, <em>Cameth Brin</em>, <em>Carn D&ucirc;m</em>, <em>Dimrill Dale</em>, <em>Moria</em>, <em>Old Forest</em>, <em>Ost-in-Edhil</em>, <em>Rivendell</em>, <em>Weathertop</em>, <em>Wellinghall</em>)</li>
+        <li><code>Shadow-land</code> &rarr; Sites in hostile frontier zones and blighted wastes (<em>Bandit Lair</em> in Brown Lands; <em>Carn D&ucirc;m</em> in Angmar; <em>Cirith Ungol</em>, <em>Minas Morgul</em>, and <em>Shelob's Lair</em> in Imlad Morgul; <em>Dead Marshes</em> in Dagorlad; <em>The Wind Throne</em> in Grey Mountain Narrows)</li>
+        <li><code>Dark-domain</code> &rarr; Sites inside fortress provinces of the Dark Lord (<em>Barad-d&ucirc;r</em> and <em>Mount Doom</em> in Gorgoroth; <em>Dol Guldur</em> and <em>Rhosgobel</em> in Southern Mirkwood; <em>Mount Gundabad</em> in Gundabad)</li>
+        <li><code>Coastal Sea</code> &rarr; Island ruins and maritime anchorages (<em>Himring</em> in Elven Shores; <em>Isles of the Dead that Live</em> in Eriadoran Coast; <em>Tolfalas</em> in Mouths of the Anduin)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Adjacent Sites</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Site</span> (Under-deeps sites only; surface sites strictly remain <code>[Blank]</code>)
+    </div>
+    <p>
+        Records all physical locations directly accessible from an Under-deeps site (introduced in <em>The Dragons</em>, <em>The Lidless Eye</em>, and <em>The Balrog</em>)—including both <strong>surface site entrances</strong> and <strong>contiguous deep holds</strong>—with movement test numbers stripped so they match cleanly as card titles.
+    </p>
+    <div class="note">
+        <strong>The "No Orphans" Rule:</strong> An Under-deeps site cannot be reached by standard overland movement; companies must travel to an adjacent surface site and make a subterranean test. Under-deeps sites left without their surface entrance are completely unplayable in-game.<br /><br />
+        Because all 69 sites in <em>The Wizards</em> (METW) are surface sites or Havens, they strictly leave <code>Adjacent Sites</code> <strong><code>[Blank]</code></strong>. This allows procedural deck rules to draft an Under-deeps destination and then auto-draft its surface entrance by filtering for <code>"Adjacent Sites": "[Blank]"</code>, guaranteeing 100% playable paths with zero orphaned sites.
+    </div>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Blue Mountain Dwarf-hold; Remains of Thangorodrim; The Under-vaults</code> &rarr; Accessible surface and deep sites for <em>The Drowning-deeps</em> (MEBA)</li>
+        <li><code>Barad-d&ucirc;r; The Under-galleries; The Under-leas</code> &rarr; Accessible surface and deep sites for <em>The Under-gates</em> (MELE)</li>
+        <li><code>[Blank]</code> &rarr; All 69 surface sites and Havens in <em>The Wizards</em> (METW)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Discrete Item Flags vs. Composite Playable Strings</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Official Database Attributes</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Site</span>
+    </div>
+    <p>
+        On physical cards, item playability is printed in a summary box (e.g. <em>"Playable: Information, Items (minor, major)"</em>). In Cardnum's raw database, this was stored as an unpunctuated string (<code>"Information Items (minor, major)"</code>), producing dozens of fragmented dropdown entries.
+    </p>
+    <p>
+        MECCG Deck Builder indexes Cardnum's dedicated boolean attributes instead. Procedural rules and catalog filters should always query these discrete attributes:
+    </p>
+    <ul>
+        <li><code>MinorItem</code> &rarr; <code>yes</code> if minor items can be played here (28 sites in METW)</li>
+        <li><code>MajorItem</code> &rarr; <code>yes</code> if major items can be played here (20 sites in METW)</li>
+        <li><code>GreaterItem</code> &rarr; <code>yes</code> if greater items can be played here (8 sites in METW)</li>
+        <li><code>GoldRing</code> &rarr; <code>yes</code> if Gold Rings can be tested or played here (11 sites in METW)</li>
+        <li><code>Hoard</code> &rarr; <code>yes</code> if Hoard items can be played here (4 Dragon lair sites in METW: <em>Caves of &Ucirc;lund</em>, <em>Dancing Spire</em>, <em>Irerock</em>, <em>The Lonely Mountain</em>)</li>
+        <li><code>Information</code> &rarr; <code>Y</code> if Information resource events can be played here (<em>Amon Hen</em>, <em>Dimrill Dale</em>, <em>Stone-circle</em>, <em>Weathertop</em>)</li>
+        <li><code>Palantiri</code> &rarr; <code>yes</code> if Palant&iacute;ri can be played here (<em>Lossadan Cairn</em>, which restricts its printed greater slot strictly to Palant&iacute;ri)</li>
+        <li><code>Scroll</code> &rarr; <code>yes</code> if Scrolls can be played here (<em>Tolfalas</em>, which restricts its printed greater slot strictly to <em>Scroll of Isildur</em>)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">The Dual-Duty Haven Attribute</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Official Database Attribute</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Site</span>
+    </div>
+    <p>
+        The <code>Haven</code> attribute performs two distinct roles depending on site depth:
+    </p>
+    <ul>
+        <li><strong>Surface Sites:</strong> Records the nearest printed standard haven (<em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, or <em>Edhellond</em>). The 4 Havens themselves list their own names in this field. Used by the Geographic Theater engine to construct Starter Movement hubs.</li>
+        <li><strong>Under-deeps Sites:</strong> Cardnum repurposes this attribute to store the site's primary <strong>Adjacent Surface Site</strong> along with its movement difficulty (e.g. <code>Barad-d&ucirc;r [0]</code> or <code>Iron Hill Dwarf-hold [13]</code>). Variable or entrance-free deep sites store <code>Special</code>.</li>
+    </ul>
+
+    <div class="note">
+        <strong>What is Intentionally OMITTED on Sites:</strong>
+        <ul>
+            <li><strong>No <code>Role</code> Tags:</strong> Sites are physical destination coordinates, not tactical action cards. Tagging them with <code>Role: Item</code>, <code>Role: Movement</code>, or <code>Role: Combat</code> would cause generic event queries to draft site cards into resource or hazard decks.</li>
+            <li><strong>No <code>Region Requirement</code> on Sites:</strong> A site's geographic location is an official first-class database property tracked under the <code>Region</code> attribute. Procedural rules query <code>"Region": "{Theater.Region}"</code> directly.</li>
+            <li><strong>No <code>Adjacent Regions</code> on Sites:</strong> Regional adjacencies represent Middle-earth's overland border graph and belong exclusively to <code>Primary = Region</code> cards.</li>
+            <li><strong>No Redundant <code>Hoard: yes</code> on Non-Dragon Sites:</strong> Under official ICE rules, only sites guarded by a true Dragon automatic attack or sites that explicitly state "Contains a hoard" feature hoards. Peaceful sites and standard ruins never carry hoard tags.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Haven-Tethered Starter Hub (0 Region Cards)</h4>
+    <p>
+        Drafts destination adventure sites located within starter movement distance of a chosen Haven anchor, guaranteeing that every site is reachable without adding region movement cards to the site deck:
+    </p>
+    <pre><code>[
+  {
+    "RuleType": "GeographicTheater",
+    "Name": "Rivendell Expedition Hub",
+    "Mode": "Starter Only",
+    "Haven": "Rivendell",
+    "RegionCount": 4
+  },
+  {
+    "Name": "Haven-Tethered Adventure Sites",
+    "Section": "Sites",
+    "Count": 6,
+    "Attributes": {
+      "Primary": "Site",
+      "Haven": "{Theater.Haven}",
+      "Site": "Free-hold; Border-hold; Ruins &amp; Lairs"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern B: Terrain-Constrained Adventure Sites (Safe Roaming)</h4>
+    <p>
+        Drafts adventure sites located strictly in civilized or wilderness territories while filtering out dangerous Shadow-land and Dark-domain automatic attacks:
+    </p>
+    <pre><code>{
+  "Name": "Low-Hazard Adventure Sites",
+  "Section": "Sites",
+  "Count": 5,
+  "Attributes": {
+    "Primary": "Site",
+    "Site": "!=Dark-hold; !=Shadow-hold"
+  },
+  "Categories": {
+    "Region Type": "Free-domain; Border-land; Wilderness"
+  }
+}</code></pre>
+
+    <h4>Pattern C: The Dragon Hoard Lair Expedition</h4>
+    <p>
+        Drafts high-value hoard items into Resources and automatically pulls matching dragon lair destinations into the site deck:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Expedition Hoard Gear",
+    "Section": "Resources",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Resource",
+      "Hoard": "yes"
+    }
+  },
+  {
+    "Name": "Guaranteed Dragon Lair Destinations",
+    "Section": "Sites",
+    "Count": 2,
+    "Attributes": {
+      "Primary": "Site",
+      "Hoard": "yes"
+    },
+    "Categories": {
+      "Automatic Attack": "Dragon"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern D: Connected Under-deeps Expeditions (Guaranteed Surface Entrances)</h4>
+    <p>
+        Drafts a subterranean destination lair, then uses <code>"Adjacent Sites": "[Blank]"</code> to auto-draft its matching surface entrance:
+    </p>
+    <pre><code>[
+  {
+    "Name": "Deep Lair Destination",
+    "SaveAs": "DeepLair",
+    "Section": "Sites",
+    "Count": 1,
+    "Categories": {
+      "Adjacent Sites": "!=[Blank]"
+    }
+  },
+  {
+    "Name": "Required Surface Entrance",
+    "Section": "Sites",
+    "Count": 1,
+    "Attributes": {
+      "Primary": "Site",
+      "Name": "{DeepLair.Category:Adjacent Sites}"
+    },
+    "Categories": {
+      "Adjacent Sites": "[Blank]"
+    }
+  }
+]</code></pre>
+
+    <h4>Pattern E: Dynamic Predicate Site Selection (Class-Safe Holds)</h4>
+    <p>
+        Uses dynamic rules predicates (<code>Site=...</code>) to draft unfortified, low-risk holds without hardcoding specific card titles:
+    </p>
+    <pre><code>{
+  "Name": "Open Frontier Holds",
+  "Section": "Sites",
+  "Count": 4,
+  "Attributes": {
+    "Primary": "Site",
+    "Name": "Site=Border-hold; Site=Free-hold",
+    "Region": "{Theater.Region}"
+  }
+}</code></pre>
+
+    <div class="back-to-top">
+        <a href="#catalog-directory">&#9650; Back to Partition Directory</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- PLAYBOOK CHAPTER: REGIONS                                          -->
+    <!-- ================================================================== -->
+    <h2 id="regions-playbook">Regions (Geography, Graph Layer &amp; Movement)</h2>
+    <p>
+        Region cards define the contiguous spatial geography of Middle-earth. In <em>The Wizards</em> (METW), there are 52 canonical region cards spanning the continent from Lindon and Forochel in the northwest to Khand and Gorgoroth in the southeast. While Region cards do not award Marshalling Points or provide combat buffs directly, they form the underlying topological graph that enables overland company transit, controls hazard limits during the movement/hazard phase, and establishes operational boundaries for regional creatures and environmental events. Because regions represent land and sea rather than entities or items, taxonomy tagging focuses on their <strong>contiguous regional adjacencies</strong> and <strong>canonical terrain classifications</strong>.
+    </p>
+
+    <!-- SECTION 1: TAGGING APPROACH FOR REGIONS -->
+    <h3>1. Tagging Approach &amp; Scope Discipline</h3>
+
+    <h4 class="entry-heading-sub">Adjacent Regions</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Region</span> (Strictly reserved for Region cards; blank on Sites)
+    </div>
+    <p>
+        Records all physical territories sharing a contiguous border with this region. In the application's procedural engine, this category forms the in-memory <strong>adjacency graph of Middle-earth</strong>.
+    </p>
+    <ul>
+        <li><strong>Bidirectional Integrity:</strong> If Region A borders Region B, Region B must border Region A. The engine's graph constructor automatically validates and enforces bidirectionality across all loaded region cards.</li>
+        <li><strong>Breadth-First Search (BFS) Transit:</strong> When authoring Geographic Theater rules with <code>"IncludeOverlandPath": true</code>, the engine uses this graph layer to compute the shortest contiguous hiking path from <em>Rhudaur</em> (Rivendell) to any destination theater across Middle-earth.</li>
+        <li><strong>Contiguous Cluster Expansion:</strong> When expanding a roaming theater of 3 to 6 regions, the engine traverses this graph starting from the haven's home territory (e.g. expanding from <em>Rhudaur</em> into <em>Cardolan</em>, <em>Arthedain</em>, and <em>The Shire</em>).</li>
+    </ul>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Angmar; Cardolan; Forochel; Lindon; N&uacute;meriador; Rhudaur; The Shire</code> &rarr; Regional borders for <em>Arthedain</em></li>
+        <li><code>Anduin Vales; Dagorlad; Southern Mirkwood; Wold &amp; Foothills</code> &rarr; Regional borders for <em>Brown Lands</em></li>
+        <li><code>Anfalas; Bay of Belfalas; Lamedon; Lebennin; Mouths of the Anduin</code> &rarr; Regional borders for <em>Belfalas</em></li>
+        <li><code>Gorgoroth</code> &rarr; Border connection for <em>Ud&ucirc;n</em></li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Region Type</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Region</span> &bull; <span class="scope-pill">Site</span>
+    </div>
+    <p>
+        Classifies the canonical terrain symbol printed on the face of the region card. This terrain type dictates how hazardous travel is through the province and serves as the primary key for wandering creatures (e.g. <em>Wilderness</em> predators) and environmental conversions (e.g. <em>Fog</em>, <em>Moon</em>).
+    </p>
+    <ul>
+        <li><code>Free-domain</code> &rarr; Civilized, secure realms where hazard limits are low and companies move freely (<em>The Shire</em>, <em>Lindon</em>, <em>An&oacute;rien</em>, <em>Belfalas</em>, <em>Lebennin</em>)</li>
+        <li><code>Border-land</code> &rarr; Settled border realms and transition zones (<em>Anduin Vales</em>, <em>Rohan</em>, <em>Dorwinion</em>, <em>Gap of Isen</em>, <em>Lamedon</em>, <em>Woodland Realm</em>)</li>
+        <li><code>Wilderness</code> &rarr; Untamed hills, forests, and mountain highlands representing the bulk of Middle-earth (<em>Arthedain</em>, <em>Cardolan</em>, <em>Rhudaur</em>, <em>Ithilien</em>, <em>Hollin</em>, <em>Dunland</em>, <em>Fangorn</em>, <em>Heart of Mirkwood</em>, <em>High Pass</em>, <em>Redhorn Gate</em>, <em>Wold &amp; Foothills</em>)</li>
+        <li><code>Shadow-land</code> &rarr; Dangerous frontier territories blighted by ancient evils or fallen power (<em>Dagorlad</em>, <em>Brown Lands</em>, <em>Imlad Morgul</em>, <em>Angmar</em>, <em>Grey Mountain Narrows</em>, <em>Horse Plains</em>, <em>Khand</em>)</li>
+        <li><code>Dark-domain</code> &rarr; Lethal core provinces under the direct shadow of Sauron (<em>Gorgoroth</em>, <em>Ud&ucirc;n</em>, <em>Nurn</em>, <em>Southern Mirkwood</em>, <em>Gundabad</em>)</li>
+        <li><code>Coastal Sea</code> &rarr; Maritime sea routes and coastal waters (<em>Andrast Coast</em>, <em>Bay of Belfalas</em>, <em>Elven Shores</em>, <em>Eriadoran Coast</em>, <em>Mouths of the Anduin</em>)</li>
+    </ul>
+
+    <div class="note">
+        <strong>What is Intentionally OMITTED on Region Cards:</strong>
+        <ul>
+            <li><strong>No <code>Automatic Attack</code> on Regions:</strong> Automatic attacks are guardian barriers stationed at physical strongholds (sites). Moving through a region triggers hazard limit draws and creature attacks from the hazard deck, not automatic site strikes.</li>
+            <li><strong>No <code>Adjacent Sites</code> on Regions:</strong> <code>Adjacent Sites</code> is reserved exclusively for subterranean Under-deeps sites to map surface entrances.</li>
+            <li><strong>No <code>Role</code> on Regions:</strong> Regions are spatial map tiles, not action cards or tactical mechanisms.</li>
+            <li><strong>No <code>Region Requirement</code> on Regions:</strong> A region's geographic identity is represented by its card name and self-referencing <code>Region</code> attribute.</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTENDED PROCEDURAL DRAFTING PATTERNS -->
+    <h3>2. Intended Procedural Drafting Patterns</h3>
+
+    <h4>Pattern A: The Contiguous Roaming Cluster (Geographic Theater)</h4>
+    <p>
+        Uses the <code>Adjacent Regions</code> graph layer to expand a tight cluster of 4 contiguous regions around <em>Rivendell</em> (or <em>L&oacute;rien</em>), automatically drafting the matching <code>&lt;Region&gt;</code> cards into the site deck:
+    </p>
+    <pre><code>[
+  {
+    "RuleType": "GeographicTheater",
+    "Name": "Eriador Roaming Cluster",
+    "Mode": "Starter + Region",
+    "Haven": "Rivendell",
+    "RegionCount": 4
+  },
+  {
+    "Name": "Roaming Destination Sites",
+    "Section": "Sites",
+    "Count": 5,
+    "Attributes": {
+      "Primary": "Site",
+      "Region": "{Theater.Region}"
+    }
+  }
+]</code></pre>
+    <p>
+        The engine seeds the cluster at <em>Rhudaur</em> (the home territory of Rivendell) and queries <code>Adjacent Regions</code> to add neighboring territories (such as <em>Cardolan</em>, <em>Arthedain</em>, and <em>The Shire</em>) so any site-to-site move is reachable in a single turn.
+    </p>
+
+    <h4>Pattern B: Overland Hiking Transit via BFS Pathfinding</h4>
+    <p>
+        When operating in an operational theater far from Rivendell (such as Gondor or Southern Mirkwood), setting <code>"IncludeOverlandPath": true</code> executes a Breadth-First Search across <code>Adjacent Regions</code> to draft the shortest legal highway of contiguous region cards:
+    </p>
+    <pre><code>{
+  "RuleType": "GeographicTheater",
+  "Name": "Southern Gondor Expedition",
+  "Mode": "Starter + Region",
+  "Haven": "Edhellond",
+  "RegionCount": 3,
+  "IncludeOverlandPath": true
+}</code></pre>
+
+    <h4>Pattern C: Safe Terrain Filtering (Hobbit &amp; Scout Paths)</h4>
+    <p>
+        Constrains the contiguous cluster strictly to safe, low-hazard terrain by combining <code>Adjacent Regions</code> with terrain exclusions:
+    </p>
+    <pre><code>{
+  "RuleType": "GeographicTheater",
+  "Name": "Safe Western Lands",
+  "Mode": "Starter + Region",
+  "Haven": "Rivendell",
+  "RegionCount": 4,
+  "RegionType": "Free-domain; Border-land; Wilderness",
+  "SiteType": "Free-hold; Border-hold; Ruins &amp; Lairs"
+}</code></pre>
+
     <div class="back-to-top">
         <a href="#catalog-directory">&#9650; Back to Partition Directory</a> &bull;
         <a href="#top">&#9650; Top of Page</a>
