@@ -168,6 +168,17 @@
     - Authored Chapters 9 (Resource Events), 10 (Sites & Havens), and 11 (Regions) in `tagging_and_drafting_playbook.html`.
     - Overhauled `rules_support_tags.html` with full 15-category `.chapter-nav` navigation, `.back-to-top` links, `Adjacent Regions` documentation, and a clean cross-reference bridge in Section 3.
     - Transferred the `{Leader.Home}` machine predicate execution walkthrough into Chapter 3 of the Playbook.
+  - [x] Issue #47: Interactive Modeless Workbench: 4-Tab Drafting Studio, Character Composition Grids, Avatar Rules & Atomic Theater Chaining
+    - Converted `DeckAssemblyMatrixDialog` from modal (`ShowDialog`) to modeless (`Show(owner)`) with single-instance focus handling and bi-directional live UI sync (`RefreshMainDeckUI`).
+    - Tab 1 (General Settings): Added unified Play Deck Size (30/30) and Sideboard Size spinners with live composition status strip.
+    - Tab 2 (Starting Company): Built 5-row tactical roster (`Starter 1–5`) with Skill, Species, Mind, DI, per-row `[ ✕ ]` clear buttons, and optional Theater region constraint.
+    - Enforced the official $\le 20$ Mind starting pool cap via mathematical feasibility pre-checking and 100-attempt backtracking search.
+    - Tab 3 (Non-Starting Characters): Added dedicated Avatar / Wizard controls enforcing official tournament allowances (3× of one, or 2+1 split; max 3 total; 3 different blocked).
+    - Built symmetrical 10-row recruit grid with live budget validation guard disabling Run/Save when Wizards + Companions > 10.
+    - Tab 4 (Geographic Theater): Streamlined controls with automated Rivendell BFS overland routing and stepping-stone havens.
+    - Implemented atomic budget pre-checking in Geographic Theater to guarantee non-starter home sites and regions fit without orphan characters.
+    - Fixed ListBox index inversion bug on sorted deck tabs by sorting underlying `Deck` sections before refreshing listboxes.
+    - Repaired Home site matching for hyphens/spaces and resolved `Home Region` lookups through `_filterService`.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
