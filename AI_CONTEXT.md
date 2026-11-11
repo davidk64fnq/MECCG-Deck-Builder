@@ -179,6 +179,15 @@
     - Implemented atomic budget pre-checking in Geographic Theater to guarantee non-starter home sites and regions fit without orphan characters.
     - Fixed ListBox index inversion bug on sorted deck tabs by sorting underlying `Deck` sections before refreshing listboxes.
     - Repaired Home site matching for hyphens/spaces and resolved `Home Region` lookups through `_filterService`.
+  - [x] Issue #48: Decoupled Avatar / Non-Avatar Resource Character Allowances, 3-Row Sideboard Reserve Grid, and Secondary Wizard Destination Routing
+    - Decoupled Avatar allowance (up to 3 cards; 3x of one or 2+1 split) from the 10 companion rows on Tab 3 in `DeckAssemblyMatrixDialog.cs`. Selecting Wizards no longer penalizes the player's companion allowance.
+    - Added dedicated Secondary Wizard destination control (`_cmbWizard2Dest`: `Sideboard` [default] vs. `Resources`), enabling the classic competitive tournament mirror-shield configuration (2 copies of Primary in Resources + 1 copy of Secondary in Sideboard).
+    - Added a dedicated 3-row "Sideboard Contingency Characters (Sideboard - Up to 3)" grid (`Reserve 1–3`) with identical columns (Skill, Species, Mind, DI, Clear button).
+    - Compacted vertical row spacing to 26px and expanded workbench client size to 860 x 650, fitting 10 Recruits + 3 Reserves + Wizard selection without scrollbars.
+    - Enforced the Sideboard Size limit as a dynamic validation guard for reserve rows and any Sideboard Wizard.
+    - Extended Run, Clear, Save, and Recall actions to handle both Resources companions and Sideboard reserve characters, enforcing global 1-copy uniqueness across the whole deck.
+    - Updated Tab 1 live composition summary: distinguishes non-Avatar companions, Avatars, and Sideboard characters against official tournament limits.
+    - Enhanced `RunGeographicTheaterDraft`: audits required home sites for Resource companions as the primary baseline, then opportunistically incorporates Sideboard character home sites if site and region budgets permit.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

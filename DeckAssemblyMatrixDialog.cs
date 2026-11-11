@@ -17,6 +17,7 @@ namespace MECCG_Deck_Builder
         // Session memory snapshots
         private List<Card> _savedPool;
         private List<Card> _savedNonStarters;
+        private List<Card> _savedSideboardCharacters;
         private List<Card> _savedSites;
 
         // Tab Controls
@@ -33,14 +34,16 @@ namespace MECCG_Deck_Builder
         private readonly CheckBox _chkConstrainStarterToTheater;
         private readonly Label _lblStarterStatus;
 
-        // --- TAB 3: NON-STARTING CHARACTERS & AVATARS CONTROLS ---
+        // --- TAB 3: NON-STARTING CHARACTERS, AVATARS & SIDEBOARD CONTROLS ---
         private readonly ComboBox _cmbWizard1;
         private readonly ComboBox _cmbWizard1Copies;
         private readonly ComboBox _cmbWizard2;
         private readonly ComboBox _cmbWizard2Copies;
+        private readonly ComboBox _cmbWizard2Dest;
         private bool _isUpdatingWizardControls;
 
         private readonly List<CharacterRowControls> _recruitRows = [];
+        private readonly List<CharacterRowControls> _reserveRows = [];
         private readonly Button _btnRunRecruits;
         private readonly Button _btnSaveRecruits;
         private readonly Label _lblRecruitStatus;
@@ -68,7 +71,7 @@ namespace MECCG_Deck_Builder
             _notifyDeckChanged = notifyDeckChanged ?? (() => { });
 
             Text = "Modular Deck Assembly Workbench";
-            ClientSize = new Size(820, 560);
+            ClientSize = new Size(860, 650);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -89,7 +92,7 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Target Deck Sizing & Nomenclature",
                 Location = new Point(16, 16),
-                Size = new Size(770, 150)
+                Size = new Size(810, 150)
             };
 
             var lblTitle = new Label { Text = "Deck Title:", Location = new Point(16, 30), Size = new Size(110, 20) };
@@ -133,7 +136,11 @@ namespace MECCG_Deck_Builder
                 Maximum = 30,
                 Value = 20
             };
-            _numSideboardSize.ValueChanged += (s, e) => UpdateDeckSummary();
+            _numSideboardSize.ValueChanged += (s, e) =>
+            {
+                UpdateDeckSummary();
+                ValidateRecruitTabBudget();
+            };
 
             var lblSideSizeHint = new Label
             {
@@ -153,13 +160,13 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Live Deck Composition Status",
                 Location = new Point(16, 180),
-                Size = new Size(770, 310)
+                Size = new Size(810, 410)
             };
 
             _lblDeckSummary = new Label
             {
                 Location = new Point(20, 35),
-                Size = new Size(730, 250),
+                Size = new Size(770, 350),
                 Font = new Font("Segoe UI", 10.0f),
                 ForeColor = Color.FromArgb(26, 54, 93)
             };
@@ -238,7 +245,7 @@ namespace MECCG_Deck_Builder
             _lblStarterStatus = new Label
             {
                 Location = new Point(16, 288),
-                Size = new Size(760, 45),
+                Size = new Size(790, 45),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Italic)
             };
@@ -250,78 +257,114 @@ namespace MECCG_Deck_Builder
             ]);
 
             // ==========================================
-            // TAB 3: NON-STARTING CHARACTERS (RESOURCES)
+            // TAB 3: NON-STARTING CHARACTERS & SIDEBOARD
             // ==========================================
-            var tabRecruits = new TabPage("Non-Starting Characters (Resources)");
+            var tabRecruits = new TabPage("Non-Starting Characters & Sideboard");
 
             var grpWizards = new GroupBox
             {
-                Text = "Avatar / Wizard Selection (Max 3 copies total; 3× of one or 2+1 split)",
+                Text = "Avatar / Wizard Selection (Primary: Resources | Secondary: Sideboard or Resources)",
                 Location = new Point(16, 8),
-                Size = new Size(770, 52)
+                Size = new Size(810, 52)
             };
 
-            var lblWiz1 = new Label { Text = "Primary Wizard:", Location = new Point(12, 23), Size = new Size(95, 18) };
+            var lblWiz1 = new Label { Text = "Primary Wizard:", Location = new Point(10, 23), Size = new Size(95, 18) };
             _cmbWizard1 = new ComboBox
             {
-                Location = new Point(108, 20),
-                Size = new Size(135, 23),
+                Location = new Point(105, 20),
+                Size = new Size(120, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbWizard1.Items.AddRange(["(None)", "Random", "Alatar", "Gandalf", "Pallando", "Radagast", "Saruman"]);
             _cmbWizard1.SelectedIndex = 0;
 
-            var lblWiz1Cop = new Label { Text = "Copies:", Location = new Point(250, 23), Size = new Size(48, 18) };
+            var lblWiz1Cop = new Label { Text = "Copies:", Location = new Point(232, 23), Size = new Size(46, 18) };
             _cmbWizard1Copies = new ComboBox
             {
-                Location = new Point(300, 20),
-                Size = new Size(50, 23),
+                Location = new Point(280, 20),
+                Size = new Size(45, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
             _cmbWizard1Copies.Items.AddRange(["1", "2", "3"]);
             _cmbWizard1Copies.SelectedIndex = 0;
 
-            var lblWiz2 = new Label { Text = "Secondary Wizard:", Location = new Point(385, 23), Size = new Size(110, 18) };
+            var lblWiz2 = new Label { Text = "Secondary Wizard:", Location = new Point(345, 23), Size = new Size(110, 18) };
             _cmbWizard2 = new ComboBox
             {
-                Location = new Point(498, 20),
-                Size = new Size(135, 23),
+                Location = new Point(456, 20),
+                Size = new Size(120, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
             _cmbWizard2.Items.AddRange(["(None)", "Random", "Alatar", "Gandalf", "Pallando", "Radagast", "Saruman"]);
             _cmbWizard2.SelectedIndex = 0;
 
-            var lblWiz2Cop = new Label { Text = "Copies:", Location = new Point(640, 23), Size = new Size(48, 18) };
+            var lblWiz2Cop = new Label { Text = "Copies:", Location = new Point(584, 23), Size = new Size(46, 18) };
             _cmbWizard2Copies = new ComboBox
             {
-                Location = new Point(690, 20),
-                Size = new Size(50, 23),
+                Location = new Point(632, 20),
+                Size = new Size(45, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
             };
             _cmbWizard2Copies.Items.AddRange(["1", "2"]);
             _cmbWizard2Copies.SelectedIndex = 0;
 
+            var lblWiz2Dest = new Label { Text = "To:", Location = new Point(685, 23), Size = new Size(22, 18) };
+            _cmbWizard2Dest = new ComboBox
+            {
+                Location = new Point(710, 20),
+                Size = new Size(90, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Enabled = false
+            };
+            _cmbWizard2Dest.Items.AddRange(["Sideboard", "Resources"]);
+            _cmbWizard2Dest.SelectedIndex = 0;
+
             _cmbWizard1.SelectedIndexChanged += WizardSelection_Changed;
             _cmbWizard1Copies.SelectedIndexChanged += WizardSelection_Changed;
             _cmbWizard2.SelectedIndexChanged += WizardSelection_Changed;
             _cmbWizard2Copies.SelectedIndexChanged += WizardSelection_Changed;
+            _cmbWizard2Dest.SelectedIndexChanged += WizardSelection_Changed;
 
             grpWizards.Controls.AddRange([
                 lblWiz1, _cmbWizard1, lblWiz1Cop, _cmbWizard1Copies,
-                lblWiz2, _cmbWizard2, lblWiz2Cop, _cmbWizard2Copies
+                lblWiz2, _cmbWizard2, lblWiz2Cop, _cmbWizard2Copies,
+                lblWiz2Dest, _cmbWizard2Dest
             ]);
             tabRecruits.Controls.Add(grpWizards);
 
-            // 10 Companion Rows below Wizard box
-            BuildCharacterGrid(tabRecruits, _recruitRows, 10, "Recruit", 86, 32, ValidateRecruitTabBudget);
+            var lblRecruitsHdr = new Label
+            {
+                Text = "Play Deck Companions (Resources - Up to 10)",
+                Location = new Point(16, 66),
+                Size = new Size(400, 18),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(26, 54, 93)
+            };
+            tabRecruits.Controls.Add(lblRecruitsHdr);
+
+            // 10 Companion Rows for Resources
+            BuildCharacterGrid(tabRecruits, _recruitRows, 10, "Recruit", 102, 26, ValidateRecruitTabBudget);
+
+            var lblReservesHdr = new Label
+            {
+                Text = "Sideboard Contingency Characters (Sideboard - Up to 3)",
+                Location = new Point(16, 370),
+                Size = new Size(450, 18),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(26, 54, 93)
+            };
+            tabRecruits.Controls.Add(lblReservesHdr);
+
+            // 3 Reserve Rows for Sideboard
+            BuildCharacterGrid(tabRecruits, _reserveRows, 3, "Reserve", 406, 26, ValidateRecruitTabBudget);
 
             _btnRunRecruits = new Button
             {
                 Text = "Run",
-                Location = new Point(16, 412),
+                Location = new Point(16, 492),
                 Size = new Size(90, 28),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
@@ -330,55 +373,61 @@ namespace MECCG_Deck_Builder
             var btnClearRecruits = new Button
             {
                 Text = "Clear",
-                Location = new Point(112, 412),
+                Location = new Point(112, 492),
                 Size = new Size(80, 28)
             };
             btnClearRecruits.Click += (s, e) =>
             {
                 _deck.Resources.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
+                _deck.Sideboard.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
                 _notifyDeckChanged();
                 _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Text = "Non-starting characters cleared from Resources.";
+                _lblRecruitStatus.Text = "Non-starting characters cleared from Resources and Sideboard.";
             };
 
             _btnSaveRecruits = new Button
             {
                 Text = "Save",
-                Location = new Point(198, 412),
+                Location = new Point(198, 492),
                 Size = new Size(80, 28)
             };
             _btnSaveRecruits.Click += (s, e) =>
             {
                 _savedNonStarters = [.. _deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase))];
+                _savedSideboardCharacters = [.. _deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase))];
                 _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Text = $"Session Snapshot Saved ({_savedNonStarters.Count} cards).";
+                _lblRecruitStatus.Text = $"Session Snapshot Saved ({_savedNonStarters.Count} in Resources, {_savedSideboardCharacters.Count} in Sideboard).";
             };
 
             var btnRecallRecruits = new Button
             {
                 Text = "Recall",
-                Location = new Point(284, 412),
+                Location = new Point(284, 492),
                 Size = new Size(80, 28)
             };
             btnRecallRecruits.Click += (s, e) =>
             {
-                if (_savedNonStarters == null)
+                if (_savedNonStarters == null && _savedSideboardCharacters == null)
                 {
                     MessageBox.Show(this, "No saved session snapshot for Non-Starting Characters.", "Recall", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 _deck.Resources.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
-                _deck.Resources.AddRange(_savedNonStarters);
+                if (_savedNonStarters != null) _deck.Resources.AddRange(_savedNonStarters);
+
+                _deck.Sideboard.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
+                if (_savedSideboardCharacters != null) _deck.Sideboard.AddRange(_savedSideboardCharacters);
+
                 _deck.SortSections();
                 _notifyDeckChanged();
                 _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Text = $"Restored from Snapshot ({_savedNonStarters.Count} cards).";
+                _lblRecruitStatus.Text = $"Restored from Snapshot ({_savedNonStarters?.Count ?? 0} in Resources, {_savedSideboardCharacters?.Count ?? 0} in Sideboard).";
             };
 
             _lblRecruitStatus = new Label
             {
-                Location = new Point(16, 446),
-                Size = new Size(770, 48),
+                Location = new Point(16, 526),
+                Size = new Size(790, 52),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Italic)
             };
@@ -397,14 +446,14 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Movement Mode & Havens",
                 Location = new Point(16, 16),
-                Size = new Size(370, 230)
+                Size = new Size(385, 230)
             };
 
             var lblMode = new Label { Text = "Movement Mode:", Location = new Point(12, 28), Size = new Size(110, 20) };
             _cmbMode = new ComboBox
             {
                 Location = new Point(130, 25),
-                Size = new Size(225, 23),
+                Size = new Size(235, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbMode.Items.AddRange(["Starter + Region (Roaming)", "Starter Only (Haven Hub)"]);
@@ -421,7 +470,7 @@ namespace MECCG_Deck_Builder
             _cmbHaven = new ComboBox
             {
                 Location = new Point(130, 62),
-                Size = new Size(225, 23),
+                Size = new Size(235, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbHaven.Items.AddRange(["Auto (Nearest Haven)", "Rivendell", "Lórien", "Grey Havens", "Edhellond", "Random"]);
@@ -451,7 +500,7 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Note: BFS overland highway from Rivendell and intermediate stepping-stone havens are automatically included in Starter + Region mode.",
                 Location = new Point(12, 170),
-                Size = new Size(345, 50),
+                Size = new Size(355, 50),
                 ForeColor = Color.DimGray
             };
 
@@ -466,8 +515,8 @@ namespace MECCG_Deck_Builder
             var grpFilters = new GroupBox
             {
                 Text = "Terrain & Hold Classifications",
-                Location = new Point(400, 16),
-                Size = new Size(385, 230)
+                Location = new Point(415, 16),
+                Size = new Size(390, 230)
             };
 
             var lblRegTypes = new Label { Text = "Region Terrains (None = Any):", Location = new Point(12, 22), Size = new Size(170, 16) };
@@ -547,7 +596,7 @@ namespace MECCG_Deck_Builder
             _lblTheaterStatus = new Label
             {
                 Location = new Point(16, 300),
-                Size = new Size(760, 50),
+                Size = new Size(790, 50),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Italic)
             };
@@ -581,16 +630,24 @@ namespace MECCG_Deck_Builder
             if (IsDisposed) return;
 
             int poolMind = _deck.Pool.Sum(c => ParseCardMind(c.Mind));
-            int charsInResources = _deck.CountCharactersInResources();
+            int nonAvatarCharsInRes = _deck.Resources.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c));
+            int avatarsInRes = _deck.Resources.Count(IsAvatar);
+            int nonAvatarCharsInSideboard = _deck.Sideboard.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c));
+            int avatarsInSideboard = _deck.Sideboard.Count(IsAvatar);
             int regionsInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase));
             int sitesInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase));
+
+            string avatarResNote = avatarsInRes > 0 ? $" + {avatarsInRes} Avatar(s)" : "";
+            string sideDetailNote = (nonAvatarCharsInSideboard > 0 || avatarsInSideboard > 0)
+                ? $" ({nonAvatarCharsInSideboard} companions{(avatarsInSideboard > 0 ? $" + {avatarsInSideboard} Avatar" : "")})"
+                : "";
 
             _lblDeckSummary.Text =
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
                 $"Pool:             {_deck.Pool.Count} characters ({poolMind} Mind)  [Official limit: <= 20 Mind]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({charsInResources} characters)  [Official limit: <= 10 characters]\n" +
+                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote})  [Official limits: <= 10 non-Avatar characters, <= 3 Avatars]\n" +
                 $"Hazards:          {_deck.Hazards.Count} cards\n" +
-                $"Sideboard:        {_deck.Sideboard.Count} cards\n" +
+                $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({regionsInSites} Regions, {sitesInSites} Sites)\n\n" +
                 $"Play Deck Status: {_deck.Resources.Count} Resources / {_deck.Hazards.Count} Hazards (Target: {_numPlayDeckSize.Value}/{_numPlayDeckSize.Value})\n" +
                 $"Sideboard Status: {_deck.Sideboard.Count} / {_numSideboardSize.Value}";
@@ -618,6 +675,7 @@ namespace MECCG_Deck_Builder
                 {
                     _cmbWizard2.SelectedIndex = 0;
                     _cmbWizard2Copies.Enabled = false;
+                    _cmbWizard2Dest.Enabled = false;
                 }
                 else
                 {
@@ -631,6 +689,7 @@ namespace MECCG_Deck_Builder
 
                     bool hasWiz2 = _cmbWizard2.SelectedIndex > 0;
                     _cmbWizard2Copies.Enabled = hasWiz2;
+                    _cmbWizard2Dest.Enabled = hasWiz2;
 
                     if (hasWiz2)
                     {
@@ -647,6 +706,16 @@ namespace MECCG_Deck_Builder
 
                         int idx = _cmbWizard2Copies.FindStringExact(prevWiz2Cop);
                         _cmbWizard2Copies.SelectedIndex = idx >= 0 ? idx : 0;
+
+                        if (_cmbWizard2Dest.SelectedIndex < 0)
+                        {
+                            _cmbWizard2Dest.SelectedIndex = 0; // Default to Sideboard
+                        }
+                    }
+                    else
+                    {
+                        _cmbWizard2Copies.Enabled = false;
+                        _cmbWizard2Dest.Enabled = false;
                     }
                 }
             }
@@ -658,47 +727,75 @@ namespace MECCG_Deck_Builder
             ValidateRecruitTabBudget();
         }
 
-        private int GetSelectedWizardCount()
+        private int GetSelectedWizard1Count()
         {
-            int total = 0;
             if (_cmbWizard1.SelectedIndex > 0 && int.TryParse(_cmbWizard1Copies.SelectedItem?.ToString(), out int c1))
             {
-                total += c1;
+                return c1;
             }
+            return 0;
+        }
+
+        private int GetSelectedWizard2Count()
+        {
             if (_cmbWizard2.Enabled && _cmbWizard2.SelectedIndex > 0 && int.TryParse(_cmbWizard2Copies.SelectedItem?.ToString(), out int c2))
             {
-                total += c2;
+                return c2;
             }
-            return total;
+            return 0;
+        }
+
+        private bool IsWizard2InSideboard()
+        {
+            return _cmbWizard2.Enabled && _cmbWizard2.SelectedIndex > 0 &&
+                   string.Equals(_cmbWizard2Dest.SelectedItem?.ToString(), "Sideboard", StringComparison.OrdinalIgnoreCase);
         }
 
         private void ValidateRecruitTabBudget()
         {
             if (_btnRunRecruits == null || _lblRecruitStatus == null) return;
 
-            int wizardCount = GetSelectedWizardCount();
-            int companionCount = _recruitRows.Count(r => r.IsActive);
-            int totalSelected = wizardCount + companionCount;
+            int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
+            int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
 
-            if (totalSelected > 10)
+            int companionCount = _recruitRows.Count(r => r.IsActive);
+            int reserveCount = _reserveRows.Count(r => r.IsActive);
+
+            // Official rules: Max 10 non-Avatar characters in Resources; Avatars up to 3 separately
+            if (companionCount > 10)
             {
                 _btnRunRecruits.Enabled = false;
                 _btnSaveRecruits.Enabled = false;
                 _lblRecruitStatus.ForeColor = Color.Firebrick;
                 _lblRecruitStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
                 _lblRecruitStatus.Text =
-                    $"⚠ Selection exceeds the 10-character limit: {totalSelected}/10 selected ({wizardCount} Wizard(s) + {companionCount} Companion(s)).\n" +
-                    $"Clear {totalSelected - 10} companion row(s) or reduce Wizard copies to enable Run and Save.";
+                    $"⚠ Selection exceeds the 10-companion limit for Resources: {companionCount}/10 companions configured.\n" +
+                    $"Clear {companionCount - 10} companion row(s) to proceed.";
+                return;
             }
-            else
+
+            int totalSideboardChars = reserveCount + wizInSide;
+            if (totalSideboardChars > (int)_numSideboardSize.Value)
             {
-                _btnRunRecruits.Enabled = true;
-                _btnSaveRecruits.Enabled = true;
-                _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _btnRunRecruits.Enabled = false;
+                _btnSaveRecruits.Enabled = false;
+                _lblRecruitStatus.ForeColor = Color.Firebrick;
+                _lblRecruitStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
                 _lblRecruitStatus.Text =
-                    $"Configured: {totalSelected}/10 Resource characters ({wizardCount} Wizard(s) + {companionCount} Companion(s)).";
+                    $"⚠ Sideboard characters ({totalSideboardChars}: {reserveCount} reserves{(wizInSide > 0 ? $" + {wizInSide} Wizard" : "")}) exceed the Sideboard Size limit ({(int)_numSideboardSize.Value}) set in General Settings.\n" +
+                    $"Please increase Sideboard Size, change the Secondary Wizard destination, or clear a reserve row.";
+                return;
             }
+
+            _btnRunRecruits.Enabled = true;
+            _btnSaveRecruits.Enabled = true;
+            _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblRecruitStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+
+            string wizResText = wizInRes > 0 ? $", {wizInRes} Wizard(s)" : "";
+            string wizSideText = wizInSide > 0 ? $" + {wizInSide} Wizard" : "";
+            _lblRecruitStatus.Text =
+                $"Configured: {companionCount}/10 Resource companions{wizResText}  |  {reserveCount}/3 Sideboard reserves{wizSideText}.";
         }
 
         #endregion
@@ -714,11 +811,11 @@ namespace MECCG_Deck_Builder
             int rowSpacing,
             Action onRowChanged)
         {
-            var lblHdrSlot = new Label { Text = "#", Location = new Point(16, startY - 19), Size = new Size(70, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrSkill = new Label { Text = "Skill Focus", Location = new Point(95, startY - 19), Size = new Size(130, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrRace = new Label { Text = "Species / Race", Location = new Point(235, startY - 19), Size = new Size(130, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrMind = new Label { Text = "Mind (e.g. <=3)", Location = new Point(375, startY - 19), Size = new Size(110, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrDI = new Label { Text = "DI (e.g. >=2)", Location = new Point(495, startY - 19), Size = new Size(110, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrSlot = new Label { Text = "#", Location = new Point(16, startY - 18), Size = new Size(70, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrSkill = new Label { Text = "Skill Focus", Location = new Point(95, startY - 18), Size = new Size(130, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrRace = new Label { Text = "Species / Race", Location = new Point(235, startY - 18), Size = new Size(130, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrMind = new Label { Text = "Mind (e.g. <=3)", Location = new Point(375, startY - 18), Size = new Size(110, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrDI = new Label { Text = "DI (e.g. >=2)", Location = new Point(495, startY - 18), Size = new Size(110, 16), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
 
             page.Controls.AddRange([lblHdrSlot, lblHdrSkill, lblHdrRace, lblHdrMind, lblHdrDI]);
 
@@ -826,7 +923,8 @@ namespace MECCG_Deck_Builder
             {
                 var picked = new List<Card>();
                 var usedTitles = new HashSet<string>(
-                    _deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)).Select(c => c.Name),
+                    _deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)).Select(c => c.Name)
+                    .Concat(_deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)).Select(c => c.Name)),
                     StringComparer.OrdinalIgnoreCase);
 
                 bool validPermutation = true;
@@ -878,16 +976,18 @@ namespace MECCG_Deck_Builder
 
         private void RunNonStartingCharactersDraft()
         {
-            int wizardCount = GetSelectedWizardCount();
-            var activeRows = _recruitRows.Where(r => r.IsActive).ToList();
+            int wiz1Count = GetSelectedWizard1Count();
+            int wiz2Count = GetSelectedWizard2Count();
+            var activeRecruitRows = _recruitRows.Where(r => r.IsActive).ToList();
+            var activeReserveRows = _reserveRows.Where(r => r.IsActive).ToList();
 
-            if (wizardCount == 0 && activeRows.Count == 0)
+            if (wiz1Count == 0 && wiz2Count == 0 && activeRecruitRows.Count == 0 && activeReserveRows.Count == 0)
             {
-                MessageBox.Show(this, "No Wizards or companion rows are selected. Please configure at least 1 character.", "Non-Starting Characters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(this, "No Wizards, Resource companions, or Sideboard reserves are configured. Please select at least 1 character.", "Non-Starting Characters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (wizardCount + activeRows.Count > 10)
+            if (activeRecruitRows.Count > 10)
             {
                 ValidateRecruitTabBudget();
                 return;
@@ -896,8 +996,9 @@ namespace MECCG_Deck_Builder
             var activeSets = _getActiveSets();
             var allCards = _catalog.Cards;
             var pickedRecruits = new List<Card>();
+            var pickedReserves = new List<Card>();
 
-            // 1. Draft Selected Wizards (Primary & Secondary)
+            // 1. Draft Selected Wizards (Primary into Resources; Secondary into Sideboard or Resources)
             var allWizards = allCards.Where(c =>
                 string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) &&
                 string.Equals(c.Race, "Wizard", StringComparison.OrdinalIgnoreCase) &&
@@ -905,7 +1006,7 @@ namespace MECCG_Deck_Builder
 
             string chosenPrimaryWizardName = null;
 
-            if (_cmbWizard1.SelectedIndex > 0 && int.TryParse(_cmbWizard1Copies.SelectedItem?.ToString(), out int copies1) && copies1 > 0)
+            if (wiz1Count > 0)
             {
                 string wiz1Choice = _cmbWizard1.SelectedItem.ToString();
                 Card wiz1Card = null;
@@ -929,13 +1030,13 @@ namespace MECCG_Deck_Builder
                 }
 
                 chosenPrimaryWizardName = wiz1Card.Name;
-                for (int i = 0; i < copies1; i++)
+                for (int i = 0; i < wiz1Count; i++)
                 {
                     pickedRecruits.Add(wiz1Card);
                 }
             }
 
-            if (_cmbWizard2.Enabled && _cmbWizard2.SelectedIndex > 0 && int.TryParse(_cmbWizard2Copies.SelectedItem?.ToString(), out int copies2) && copies2 > 0)
+            if (wiz2Count > 0)
             {
                 string wiz2Choice = _cmbWizard2.SelectedItem.ToString();
                 Card wiz2Card = null;
@@ -962,26 +1063,42 @@ namespace MECCG_Deck_Builder
                     return;
                 }
 
-                for (int i = 0; i < copies2; i++)
+                bool toSideboard = IsWizard2InSideboard();
+                for (int i = 0; i < wiz2Count; i++)
                 {
-                    pickedRecruits.Add(wiz2Card);
+                    if (toSideboard)
+                    {
+                        pickedReserves.Add(wiz2Card);
+                    }
+                    else
+                    {
+                        pickedRecruits.Add(wiz2Card);
+                    }
                 }
             }
 
-            // 2. Draft Non-Wizard Companions from Active Rows
+            // 2. Draft Non-Wizard Companions into Resources
             var currentSites = _deck.Sites.Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase)).ToList();
             bool hasTheaterSites = currentSites.Count > 0;
             var currentSiteNames = new HashSet<string>(currentSites.Select(s => s.Name.Trim()), StringComparer.OrdinalIgnoreCase);
 
-            var candidatesPerRow = new List<List<Card>>();
-            for (int i = 0; i < activeRows.Count; i++)
+            var usedTitles = new HashSet<string>(_deck.Pool.Select(c => c.Name), StringComparer.OrdinalIgnoreCase);
+            foreach (var w in pickedRecruits.Concat(pickedReserves))
             {
-                var row = activeRows[i];
+                if (string.Equals(w.Unique, "Unique", StringComparison.OrdinalIgnoreCase))
+                {
+                    usedTitles.Add(w.Name);
+                }
+            }
+
+            for (int i = 0; i < activeRecruitRows.Count; i++)
+            {
+                var row = activeRecruitRows[i];
                 var candidates = GetCandidatesForCharacterRow(row, allCards, activeSets, null);
 
                 if (hasTheaterSites)
                 {
-                    candidates = [.. candidates.Where(c =>
+                    var constrained = candidates.Where(c =>
                     {
                         if (string.IsNullOrWhiteSpace(c.Home)) return false;
                         string cleanHome = c.Home.Trim();
@@ -990,28 +1107,20 @@ namespace MECCG_Deck_Builder
                             CardFilterService.EqualsWithDiacriticFallback(s.Name, cleanHome) ||
                             string.Equals(s.Name.Replace("-", " "), cleanHome.Replace("-", " "), StringComparison.OrdinalIgnoreCase) ||
                             CardFilterService.MatchesPredicate(s, cleanHome, _filterService));
-                    })];
+                    }).ToList();
+
+                    if (constrained.Count > 0)
+                    {
+                        candidates = constrained;
+                    }
                 }
 
-                if (candidates.Count == 0)
-                {
-                    string hint = hasTheaterSites ? " (constrained by current Theater sites)" : "";
-                    MessageBox.Show(this, $"No matching cards found for Recruit Row {i + 1}{hint}. Clear or adjust Theater sites, or change row criteria.", "Non-Starting Characters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-                candidatesPerRow.Add(candidates);
-            }
-
-            var usedTitles = new HashSet<string>(_deck.Pool.Select(c => c.Name), StringComparer.OrdinalIgnoreCase);
-
-            for (int i = 0; i < candidatesPerRow.Count; i++)
-            {
-                var candidates = candidatesPerRow[i];
                 var eligible = candidates.Where(c => !usedTitles.Contains(c.Name)).ToList();
 
                 if (eligible.Count == 0)
                 {
-                    MessageBox.Show(this, $"Unable to draft unique companion for Row {i + 1} without duplicating an existing character. Try broadening your criteria.", "Non-Starting Characters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    string hint = hasTheaterSites ? " (constrained by current Theater sites)" : "";
+                    MessageBox.Show(this, $"No matching cards found for Recruit Row {i + 1}{hint}. Clear or adjust Theater sites, or change row criteria.", "Non-Starting Characters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -1023,15 +1132,67 @@ namespace MECCG_Deck_Builder
                 }
             }
 
+            // 3. Draft Sideboard Reserve Characters into Sideboard
+            for (int i = 0; i < activeReserveRows.Count; i++)
+            {
+                var row = activeReserveRows[i];
+                var candidates = GetCandidatesForCharacterRow(row, allCards, activeSets, null);
+
+                if (hasTheaterSites)
+                {
+                    var constrained = candidates.Where(c =>
+                    {
+                        if (string.IsNullOrWhiteSpace(c.Home)) return false;
+                        string cleanHome = c.Home.Trim();
+                        if (currentSiteNames.Contains(cleanHome)) return true;
+                        return currentSites.Any(s =>
+                            CardFilterService.EqualsWithDiacriticFallback(s.Name, cleanHome) ||
+                            string.Equals(s.Name.Replace("-", " "), cleanHome.Replace("-", " "), StringComparison.OrdinalIgnoreCase) ||
+                            CardFilterService.MatchesPredicate(s, cleanHome, _filterService));
+                    }).ToList();
+
+                    if (constrained.Count > 0)
+                    {
+                        candidates = constrained;
+                    }
+                }
+
+                var eligible = candidates.Where(c => !usedTitles.Contains(c.Name)).ToList();
+
+                if (eligible.Count == 0)
+                {
+                    MessageBox.Show(this, $"No matching cards found for Sideboard Reserve Row {i + 1}. Try broadening your criteria.", "Sideboard Reserve", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var chosen = eligible[Random.Shared.Next(eligible.Count)];
+                pickedReserves.Add(chosen);
+                if (string.Equals(chosen.Unique, "Unique", StringComparison.OrdinalIgnoreCase))
+                {
+                    usedTitles.Add(chosen.Name);
+                }
+            }
+
+            // 4. Update Deck partitions
             _deck.Resources.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             _deck.Resources.AddRange(pickedRecruits);
+
+            _deck.Sideboard.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
+            _deck.Sideboard.AddRange(pickedReserves);
+
             _deck.SortSections();
             _notifyDeckChanged();
 
-            string recruitNames = string.Join(", ", pickedRecruits.Select(c => c.Name));
+            // 5. Update Status
+            string recruitNames = pickedRecruits.Count > 0 ? string.Join(", ", pickedRecruits.Select(c => c.Name)) : "(None)";
+            string reserveNames = pickedReserves.Count > 0 ? string.Join(", ", pickedReserves.Select(c => c.Name)) : "(None)";
+
             _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblRecruitStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblRecruitStatus.Text = $"Drafted {pickedRecruits.Count} characters into Resources:\n{recruitNames}";
+            _lblRecruitStatus.Text =
+                $"Drafted {pickedRecruits.Count} into Resources and {pickedReserves.Count} into Sideboard:\n" +
+                $"• Resources: {recruitNames}\n" +
+                $"• Sideboard: {reserveNames}";
         }
 
         private void RunGeographicTheaterDraft()
@@ -1043,15 +1204,15 @@ namespace MECCG_Deck_Builder
             int maxRegions = isStarterPlusRegion ? (int)_numRegionCount.Value : 0;
             int siteCount = (int)_numSiteCount.Value;
 
-            // 1. Gather required home sites for non-starter companions (excluding Avatars, who can enter at Rivendell)
-            var nonStarters = _deck.Resources
+            // 1. Gather required home sites for Resource non-starter companions (excluding Avatars, who can enter at Rivendell)
+            var resourceNonStarters = _deck.Resources
                 .Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c))
                 .ToList();
 
             var requiredHomeSites = new List<Card>();
             var requiredHomeRegions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var charCard in nonStarters)
+            foreach (var charCard in resourceNonStarters)
             {
                 if (string.IsNullOrWhiteSpace(charCard.Home)) continue;
                 string cleanHome = charCard.Home.Trim();
@@ -1075,7 +1236,7 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Atomic Pre-Check on Site and Region Budgets
+            // 2. Atomic Pre-Check on Baseline Site and Region Budgets for Resources
             int requiredAdventureSitesCount = requiredHomeSites.Count(s => !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase));
             bool siteBudgetDeficit = requiredAdventureSitesCount > siteCount;
             bool regionBudgetDeficit = isStarterPlusRegion && requiredHomeRegions.Count > maxRegions;
@@ -1093,7 +1254,7 @@ namespace MECCG_Deck_Builder
 
                 MessageBox.Show(this,
                     $"Cannot assemble Geographic Theater:\n\n" +
-                    $"Your drafted non-starting characters require home sites that exceed your current Theater settings:\n" +
+                    $"Your drafted non-starting characters in Resources require home sites that exceed your current Theater settings:\n" +
                     $"{siteBulletList}\n\n" +
                     $"Budget shortfalls:\n" +
                     $"{siteMsg}{regMsg}\n" +
@@ -1107,13 +1268,54 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // 3. Resolve Haven Anchor & Graph
+            // 3. Opportunistically include Sideboard non-starters' home sites if budget allows
+            var sideboardNonStarters = _deck.Sideboard
+                .Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c))
+                .ToList();
+
+            foreach (var charCard in sideboardNonStarters)
+            {
+                if (string.IsNullOrWhiteSpace(charCard.Home)) continue;
+                string cleanHome = charCard.Home.Trim();
+
+                var homeMatch = allCards.FirstOrDefault(s =>
+                    string.Equals(s.Primary, "Site", StringComparison.OrdinalIgnoreCase) &&
+                    (CardFilterService.EqualsWithDiacriticFallback(s.Name, cleanHome) ||
+                     string.Equals(s.Name.Replace("-", " "), cleanHome.Replace("-", " "), StringComparison.OrdinalIgnoreCase) ||
+                     CardFilterService.MatchesPredicate(s, cleanHome, _filterService)));
+
+                if (homeMatch != null && !requiredHomeSites.Any(s => string.Equals(s.Name, homeMatch.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    bool isAdvSite = !string.Equals(homeMatch.Site, "Haven", StringComparison.OrdinalIgnoreCase);
+                    int currentAdvCount = requiredHomeSites.Count(s => !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase));
+
+                    bool regionFits = true;
+                    if (isStarterPlusRegion && !string.IsNullOrWhiteSpace(homeMatch.Region) && !requiredHomeRegions.Contains(homeMatch.Region.Trim()))
+                    {
+                        regionFits = (requiredHomeRegions.Count + 1) <= maxRegions;
+                    }
+
+                    if ((!isAdvSite || currentAdvCount < siteCount) && regionFits)
+                    {
+                        requiredHomeSites.Add(homeMatch);
+                        if (!string.IsNullOrWhiteSpace(homeMatch.Region))
+                        {
+                            requiredHomeRegions.Add(homeMatch.Region.Trim());
+                        }
+                    }
+                }
+            }
+
+            // Recalculate adventure site count after optional sideboard additions
+            requiredAdventureSitesCount = requiredHomeSites.Count(s => !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase));
+
+            // 4. Resolve Haven Anchor & Graph
             string rawHaven = _cmbHaven.SelectedItem?.ToString() ?? "Rivendell";
             string selectedHaven = "Rivendell";
 
             if (rawHaven.StartsWith("Auto", StringComparison.OrdinalIgnoreCase))
             {
-                var nonStarterWithHome = nonStarters.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.Home));
+                var nonStarterWithHome = resourceNonStarters.Concat(sideboardNonStarters).FirstOrDefault(c => !string.IsNullOrWhiteSpace(c.Home));
                 if (nonStarterWithHome != null)
                 {
                     var homeSite = allCards.FirstOrDefault(s => string.Equals(s.Primary, "Site", StringComparison.OrdinalIgnoreCase) && CardFilterService.EqualsWithDiacriticFallback(s.Name, nonStarterWithHome.Home));
@@ -1148,7 +1350,7 @@ namespace MECCG_Deck_Builder
             var checkedHolds = _clbSiteTypes.CheckedItems.Cast<string>().ToList();
             string holdFilter = checkedHolds.Count > 0 ? string.Join("; ", checkedHolds) : null;
 
-            // 4. Expand Regional Cluster
+            // 5. Expand Regional Cluster
             var activeRegions = new List<string>();
             if (isStarterPlusRegion)
             {
@@ -1185,7 +1387,7 @@ namespace MECCG_Deck_Builder
 
             var draftedSitesAndRegions = new List<Card>();
 
-            // 5. Assemble Sites & Regions
+            // 6. Assemble Sites & Regions
             var rivendell = allCards.FirstOrDefault(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && string.Equals(c.Name, "Rivendell", StringComparison.OrdinalIgnoreCase));
             if (rivendell != null) draftedSitesAndRegions.Add(rivendell);
 
@@ -1303,7 +1505,7 @@ namespace MECCG_Deck_Builder
                 if (!string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)) return false;
                 if (activeSets.Count > 0 && !activeSets.Contains(c.Set)) return false;
 
-                // Companion rows never draft Avatars (Wizards / Ringwraiths are handled in the Avatar box)
+                // Companion and Reserve rows never draft Avatars (Wizards / Ringwraiths are handled in the Avatar box)
                 if (IsAvatar(c)) return false;
 
                 if (row.CmbSkill.SelectedIndex > 0)
