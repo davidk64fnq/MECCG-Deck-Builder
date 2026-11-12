@@ -21,7 +21,7 @@
     </div>
 
     <h2>Dual-Layer Filtering Architecture</h2>
-    <p>Located beneath the main workspace, four vertical column pairs of ComboBoxes provide fine-grained catalog search:</p>
+    <p>Located beneath the main workspace, six vertical column pairs of ComboBoxes (three per GroupBox) provide fine-grained catalog search:</p>
     <table>
         <tr>
             <th>Filter GroupBox</th>
@@ -29,12 +29,12 @@
             <th>Behavior</th>
         </tr>
         <tr>
-            <td><strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1 &amp; 2)</td>
+            <td><strong>Left GroupBox:<br />Card Attributes (Official Database)</strong><br />(Slots 1&ndash;3)</td>
             <td><strong>Official Database:</strong> Canonical rules statistics (Primary, Alignment, Race, Skill, Mind, Prowess).</td>
             <td>Fixed, read-only rules attributes. Supports <code>[Blank]</code> for unpopulated fields. See <a href="attributes_reference.html">Official Attributes Reference</a>.</td>
         </tr>
         <tr>
-            <td><strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 3 &amp; 4)</td>
+            <td><strong>Right GroupBox:<br />Custom Tags (User Taxonomy)</strong><br />(Slots 4&ndash;6)</td>
             <td><strong>User Taxonomy:</strong> Custom categories and tags managed locally.</td>
             <td>Editable classification categories. Supports <code>[Blank]</code> for untagged cards. See <a href="custom_taxonomy.html">Custom Taxonomy &amp; Tag Management</a>.</td>
         </tr>
@@ -55,7 +55,7 @@
             The lower dropdowns (<strong>Value</strong> and <strong>Tag</strong>) automatically prune their lists in real time. Each dropdown displays all valid options present on cards that satisfy your active expansion sets <em>and the criteria in all other active filter slots</em> (excluding itself).
             <ul>
                 <li><strong>Why the dropdown can show more items than the Master List:</strong> The Master List filters by <em>all active slots combined</em>. The open dropdown evaluates against all <em>peer slots</em>, showing every alternative option you can freely switch to without producing an empty result.</li>
-                <li><em>Example:</em> If Slot 3 is set to <code>Target Species = Wolf</code> and Slot 1 is set to <code>Secondary = Creature/Permanent-event</code>, the Master List displays only <em>Dwar of Waw</em> (the only card with both traits). Opening Slot 1's dropdown still displays <code>Long-event</code> and <code>Minor Item</code> because cards of those types also target wolves, allowing you to switch between card types without having to reset your filter first.</li>
+                <li><em>Example:</em> If Slot 4 is set to <code>Target Species = Wolf</code> and Slot 1 is set to <code>Secondary = Creature/Permanent-event</code>, the Master List displays only <em>Dwar of Waw</em> (the only card with both traits). Opening Slot 1's dropdown still displays <code>Long-event</code> and <code>Minor Item</code> because cards of those types also target wolves, allowing you to switch between card types without having to reset your filter first.</li>
             </ul>
         </li>
         <li>
@@ -94,7 +94,7 @@
         <tr>
             <td><strong>Global Reset</strong></td>
             <td><strong>Taxonomy &gt; Clear All Active Filters</strong> / <kbd>Ctrl+R</kbd></td>
-            <td>Resets all 4 filter slots to blank instantly.</td>
+            <td>Resets all 6 filter slots to blank instantly.</td>
         </tr>
         <tr>
             <td><strong>Slot Context Menu</strong></td>

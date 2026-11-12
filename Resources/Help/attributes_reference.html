@@ -10,7 +10,7 @@
 
     <h1>Official Card Attributes Reference</h1>
     <p>
-        Every card in the catalog carries official rules attributes synchronized directly from the Cardnum open database. Depending on the attribute, values can be filtered in the lower panel (Slots 1 &amp; 2), queried in procedural deck rules, or inspected in the right-click <strong>Card Attributes</strong> monospace view.
+        Every card in the catalog carries official rules attributes synchronized directly from the Cardnum open database. Depending on the attribute, values can be filtered in the lower panel (Slots 1&ndash;3), queried in procedural deck rules, or inspected in the right-click <strong>Card Attributes</strong> monospace view.
     </p>
 
     <div class="note">
@@ -79,9 +79,9 @@
     </table>
 
     <!-- SECTION 2: THE 29 DUAL-SURFACE ATTRIBUTES -->
-    <h2 id="dual-surface-attributes">2. Official Gameplay Attributes (Dropdown Slots 1 &amp; 2)</h2>
+    <h2 id="dual-surface-attributes">2. Official Gameplay Attributes (Dropdown Slots 1&ndash;3)</h2>
     <p>
-        The following 29 attributes represent official rules criteria. All 29 appear in alphabetical order in the <strong>Attribute</strong> dropdowns of <strong>Filter Slots 1 &amp; 2</strong>. In the right-click <strong>Card Attributes</strong> menu, any of these attributes that carry a non-empty value on the selected card are displayed in the monospace readout.
+        The following 29 attributes represent official rules criteria. All 29 appear in alphabetical order in the <strong>Attribute</strong> dropdowns of <strong>Filter Slots 1&ndash;3</strong>. In the right-click <strong>Card Attributes</strong> menu, any of these attributes that carry a non-empty value on the selected card are displayed in the monospace readout.
     </p>
 
     <div class="note" id="stat-modifiers-note">
@@ -357,7 +357,7 @@
             <strong>Composite <code>Playable</code> Strings vs. Discrete Item Flags:</strong>
             On physical site cards, playable entries are comma-separated (e.g., <em>"Playable: Information, Items (minor)"</em>). In Cardnum's raw database (<code>cards-dc.json</code>), category commas were omitted, resulting in run-on strings like <code>"Information Items (minor)"</code> or <code>"Scroll of Isildur Palantiri Items (minor, major)"</code>.
             <ul>
-                <li>Because the application indexes official attributes directly, each unique permutation appears as a single dropdown item in Filter Slots 1 &amp; 2.</li>
+                <li>Because the application indexes official attributes directly, each unique permutation appears as a single dropdown item in Filter Slots 1&ndash;3.</li>
                 <li>Cardnum already decomposed all playability criteria into individual boolean flag attributes: <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>GoldRing</code>, <code>Information</code>, <code>Palantiri</code>, <code>Scroll</code>, and <code>Hoard</code>.</li>
                 <li>For procedural deck rules and filter searches, query the specific attribute (e.g., <code>"MinorItem": "yes"</code> or <code>"Information": "yes"</code>) rather than matching against the composite <code>Playable</code> string.</li>
             </ul>
@@ -389,7 +389,7 @@
     <ol>
         <li>Right-click the card and select <strong>Assign Tag &gt; [+ Author New Tag...]</strong> (or open <strong>Taxonomy &gt; Manage Custom Tags...</strong>).</li>
         <li>Enter your preferred category and tag (for example, <code>Corruption Resistance: +2</code>, <code>Combat Role: Scout Support</code>, or <code>Skill Fix: Sage</code>).</li>
-        <li>Filter by these terms using <strong>Custom Tags (Slots 3 &amp; 4)</strong> in the filter bar.</li>
+        <li>Filter by these terms using <strong>Custom Tags (Slots 4&ndash;6)</strong> in the filter bar.</li>
         <li>Back up your assignments at any time via <strong>Taxonomy &gt; Save Tag Set...</strong> so they can be preserved or shared across machines.</li>
     </ol>
 

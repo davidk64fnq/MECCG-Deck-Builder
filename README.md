@@ -16,9 +16,9 @@ An offline-capable Windows desktop application for building, organizing, filteri
 - Dynamic Stats Summary: Window title bar displays live card counts per section with dedicated character counts: (Pool / Res [Characters] / Haz / Side / Site).
 - Card Artwork Preview & Caching: On-demand card artwork download from Cardnum with local disk caching (METW/, MEDM/, etc.) and an in-memory cache. ICE errata cards load corrected artwork automatically.
 - Dual-Layer Filtering:
-  - Official Card Attributes (Slots 1 & 2): Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more. Supports `[Blank]` / `[None]` to audit cards with unpopulated fields.
-  - Custom User Taxonomy (Slots 3 & 4): Filter by custom categories and tags (e.g., Strategy -> Ring Destruction, Role -> Scout Support). Supports `[Blank]` to identify untagged cards awaiting classification.
-- Live Card Taxonomy Inspector: Inspect card metadata and author custom tags in-situ with column-aligned wrapping, filter synchronization, checkmark tracking, natural alphabetical sorting, and a pinned Quick Assign toolbar.
+  - Official Card Attributes (Slots 1–3): Filter by Primary type, Alignment, Race, Skills, Stats, Unique status, Sites, and more. Supports `[Blank]` / `[None]` to audit cards with unpopulated fields.
+  - Custom User Taxonomy (Slots 4–6): Filter by custom categories and tags (e.g., Strategy -> Ring Destruction, Role -> Scout Support). Supports `[Blank]` to identify untagged cards awaiting classification.
+- Live Card Taxonomy Inspector: Inspect card metadata and author custom tags side-by-side with the card artwork and deck partitions, featuring column-aligned wrapping, filter synchronization, checkmark tracking, natural alphabetical sorting, and a pinned Quick Assign toolbar.
 - Multi-Platform Export Formats:
   - Tabletop Simulator (.json): Generates ready-to-use deck files compatible with TTS MECCG mods.
   - Play MECCG (.play & .playPBEM): Native format for online play.

@@ -14,7 +14,7 @@
 
 ## Application Architecture & Core Files
 
-- Form1.cs / Form1.Designer.cs: Main UI: master listbox, picture box, dual-mode right pane (`Deck Builder` vs `Card Taxonomy Inspector` with monospace metadata view and pinned Quick Assign bar), two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Flush height alignment across master list, card artwork, and right pane.- AddTagDialog.cs / PromptDialog.cs: Quick modal dialogs for assigning and authoring tags from context menus.
+- Form1.cs / Form1.Designer.cs: Main UI: 4-column workspace (`Master List`, `Card Image`, `Card Taxonomy Inspector` with monospace metadata view and pinned Quick Assign bar, and `Deck Partitions`), 3+3 two-tier filter GroupBoxes, four-header workflow menu bar (`Deck`, `Catalog`, `Taxonomy`, `Help`). Flush height alignment across all four upper panes.
 - Card.cs: Strongly-typed card domain model with dynamic attribute map.
 - CardSet.cs: Strongly-typed set domain model.
 - CardCatalogService.cs: Card catalog management, local JSON loading, filter option discovery; normalizes Tolkien lore sub-races (*Elf -> Elf, *Dwarf -> Dwarf) with raw values retained in `Subrace`.
@@ -35,18 +35,20 @@
 - `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, dual-source cross-card attribute/category lookups (supporting official attributes and custom taxonomy), and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 - RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
+- `DeckAssemblyMatrixDialog.cs`: Modeless 4-tab drafting workbench (`General Settings`, `Starting Company`, `Non-Starting Characters & Sideboard`, `Geographic Theater`) with `.workbench.json` profile persistence and live deck synchronization.
+- `ExportTaxonomyDialog.cs`: Partition-scoped CSV taxonomy draft exporter with preset column templates and custom category registration.
 
 ---
 
 ## Standardized Taxonomy & Filtering Vocabulary
 
-1. **Official Card Attributes (Filter Slots 1 & 2):**
+1. **Official Card Attributes (Filter Slots 1–3):**
    - Housed inside `GroupBoxCardAttributes` ("Card Attributes (Official Database)").
    - Canonical rules properties: `Attribute` (e.g. *Race*, *Skill*, *Specific*) and `Value` (e.g. *Dúnadan*, *Warrior*).
    - Inspected via context menu item: `Card Attributes`.
    - Expansion sets filtered globally via top **Catalog** menu checkboxes.
 
-2. **Custom User Taxonomy (Filter Slots 3 & 4):**
+2. **Custom User Taxonomy (Filter Slots 4–6):**
    - Housed inside `GroupBoxCustomTags` ("Custom Tags (User Taxonomy)").
    - User-defined taxonomy: `Category` (e.g. *Role*, *Region Requirement*, *Prerequisite*) and `Tag` (e.g. *Card Flow*, *Gorgoroth*, *Paths of the Dead*).
    - Inspected via context menu item: `Assigned Tags` and the live **Card Taxonomy Inspector** pane.
@@ -219,6 +221,14 @@
     - Added inline amber warning notices (`Color.FromArgb(180, 83, 9)`) for region, site, and budget shortfalls.
     - Fixed WinForms ampersand suppression by setting `UseMnemonic = false` on status labels (`Wold & Foothills`).
     - Resolved `IDE1006` naming violations (`NotifyDeckChanged`).
+  - [x] Issue #51: Side-by-Side Card Taxonomy & Deck Workspace, 3+3 Faceted Filter Bar, and Selection Sync Fixes
+    - Widened `Form1` (`1242 x 682`) to display `PanelTaxonomy` and `TabControlDeck` simultaneously in a 4-column layout (`[Master] | [Image] | [Taxonomy] | [Deck]`) with flush `Y=37, H=505` alignment.
+    - Removed `BtnModeDeck` / `BtnModeTaxonomy` mode-toggle buttons, expanding `RichTextBoxTaxonomy` and deck partition listboxes vertically by 29px.
+    - Expanded the bottom filter bar from 2+2 (4 slots) to 3+3 (6 slots: Slots 1–3 for Official Card Attributes, Slots 4–6 for Custom User Tags) with `AdjustWidthComboBox_DropDown` across all 12 dropdowns.
+    - Updated Quick Assign category synchronization and `ExportTaxonomyDialog` to support all 6 filter slots.
+    - Fixed re-entrant `ListBox_SelectedIndexChanged` wipe (`_isSyncingListSelection`) when switching focus from `ListBoxMaster` to a deck tab.
+    - Fixed `RemoveCardFromSection` to advance selection or fall back to `ListBoxMaster[0]` / clear preview when deleting or moving an inspected card.
+    - Updated all 9 affected CHM help HTML topics (`interface.html`, `sets_and_faceting.html`, `attributes_reference.html`, `custom_taxonomy.html`, `deck_operations.html`, `index.html`, `spreadsheet_pipeline.html`, `tagging_and_drafting_playbook.html`, `taxonomy_extraction_tools.html`).
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
@@ -238,44 +248,3 @@ To eliminate the inconsistencies, historical quirks, and unstructured text burde
    - Import into MECCG Deck Builder via `Taxonomy > Import Taxonomy (CSV)...` to inspect and review the taxonomy live in the UI and filter slots.
 6. **Unified Master Schema Consolidation:** Once all partitions are finalized, consolidate the schemas into a unified local master catalog (`cards-dc.json` / `Card.cs`).
 
-## Modular Slot Matrix Architecture & Parametric Deck Assembly
-
-### 1. Vision & Core Objectives
-To evolve procedural generation beyond monolithic `.json` templates into a modular, workbench-style deck constructor:
-- **Decoupled Components:** Split full deck rule sets into reusable, modular `.json` components by theme and section (e.g., Company packages, Hazard suites, Regional site routes, and Strategy/Quest engines).
-- **Interactive Assembly Matrix (Alternative B):** A unified configuration dialog where players select modules via dropdown slots (e.g., *Company*, *Theater/Region*, *Strategy*, *Hazard Suite*) rather than stepping through a rigid multi-page wizard or editing raw JSON files.
-- **In-App Visual Designer (Long-Term):** Future capability to visually author, parameterize, and export component files directly inside the application using existing faceted filter controls.
-
----
-
-### 2. Parametric Budgeting & Variable Deck Sizing
-To prevent components from hardcoding static integer counts (`"Count": 7`) that break when deck sizes change (e.g., 25/25 starter, 30/30 tournament, 36/36, 40/40 drafts):
-- **Runtime Budget Injection:** The Matrix UI lets the user select target deck sizes (e.g., 30 Resources / 30 Hazards / 20 Sideboard) and passes these targets into the orchestrator.
-- **Proportional Allocation (`Percent`):** Component rules can declare fractional budgets (e.g., `"Percent": 20` for combat gear, `"Percent": 10` for factions, `"Percent": 70` for open utility events).
-- **Integer Resolution & Surplus Absorption:** The orchestrator converts percentages to integer counts (`Budget * Percent`) and allocates any rounding remainders to the largest open utility rule.
-
----
-
-### 3. Multi-Directional / Order-Independent Assembly (Inverted Drivers)
-Because deck construction does not always originate from the leader character outward, the execution pipeline supports flexible dependency chaining:
-- **Leader-First Construction (Outward):**
-  1. `Company Module` selects a leader (e.g., *Dáin II*) $\rightarrow$ `SaveAs: "Leader"`.
-  2. `Site Module` queries `{Leader.Category:Home Region}` and `{Leader.Home}` to draft matching strongholds and contiguous regions.
-  3. `Resource Module` queries `{Leader.Category:Faction Bonus}` to draft matching faction cards.
-- **Region-First Construction (Inward / Geographic Anchor):**
-  1. `Theater/Region Module` establishes a geographic territory (e.g., *Gondor / Anórien*) $\rightarrow$ `SaveAs: "AnchorRegion"`.
-  2. `Company Module` queries `"Home Region": "{AnchorRegion.Region}"`, constraining candidate leaders strictly to characters native to that theater (*Boromir*, *Faramir*, *Beregond*).
-  3. `Site Module` drafts contiguous site paths and strongholds within that regional cluster.
-  4. `Hazard Module` keys regional hazards and creatures directly to the theater's terrain and region requirements.
-- **Strategy/Quest-First Construction:**
-  1. `Quest Module` selects an objective (e.g., *Army of the Dead*) $\rightarrow$ `SaveAs: "Quest"`.
-  2. Chained modules resolve required champions (`{Quest.Specific}` $\rightarrow$ *Aragorn II*), prerequisites (`{Quest.Category:Prerequisite}` $\rightarrow$ *Paths of the Dead*), and staging sites (`{Quest.Category:Site Requirement}`).
-
----
-
-### 4. Component Contracts & Context Continuity
-- **Shared In-Memory Context:** Leverages the existing `contextVariables` dictionary (`SaveAs` / `{...}`) across sequential component executions without modifying core generation evaluation logic.
-- **Contract Declarations:** Component headers declare their context dependencies:
-  - `"RequiresContext": [ "Leader" ]` (Prerequisites that must be present in memory).
-  - `"ProvidesContext": [ "Leader", "ExpeditionSites" ]` (Variables populated for downstream modules).
-- **Global Constraints Maintained:** Deck uniqueness limits, 3-copy rules, and alignment compatibility remain globally enforced across all evaluated components.

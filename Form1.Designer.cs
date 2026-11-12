@@ -57,8 +57,6 @@
             ToolStripMenuTabDeleteCard = new System.Windows.Forms.ToolStripMenuItem();
             ToolStripMenuTabCardnumFilters = new System.Windows.Forms.ToolStripMenuItem();
             PictureBoxCardImage = new System.Windows.Forms.PictureBox();
-            BtnModeDeck = new System.Windows.Forms.Button();
-            BtnModeTaxonomy = new System.Windows.Forms.Button();
             TabControlDeck = new System.Windows.Forms.TabControl();
             TabPagePool = new System.Windows.Forms.TabPage();
             ListBoxPool = new System.Windows.Forms.ListBox();
@@ -117,15 +115,23 @@
             ComboBoxKey2 = new System.Windows.Forms.ComboBox();
             LblSlot2Value = new System.Windows.Forms.Label();
             ComboBoxValue2 = new System.Windows.Forms.ComboBox();
-            GroupBoxCustomTags = new System.Windows.Forms.GroupBox();
             LblSlot3Key = new System.Windows.Forms.Label();
             ComboBoxKey3 = new System.Windows.Forms.ComboBox();
             LblSlot3Value = new System.Windows.Forms.Label();
             ComboBoxValue3 = new System.Windows.Forms.ComboBox();
+            GroupBoxCustomTags = new System.Windows.Forms.GroupBox();
             LblSlot4Key = new System.Windows.Forms.Label();
             ComboBoxKey4 = new System.Windows.Forms.ComboBox();
             LblSlot4Value = new System.Windows.Forms.Label();
             ComboBoxValue4 = new System.Windows.Forms.ComboBox();
+            LblSlot5Key = new System.Windows.Forms.Label();
+            ComboBoxKey5 = new System.Windows.Forms.ComboBox();
+            LblSlot5Value = new System.Windows.Forms.Label();
+            ComboBoxValue5 = new System.Windows.Forms.ComboBox();
+            LblSlot6Key = new System.Windows.Forms.Label();
+            ComboBoxKey6 = new System.Windows.Forms.ComboBox();
+            LblSlot6Value = new System.Windows.Forms.Label();
+            ComboBoxValue6 = new System.Windows.Forms.ComboBox();
             ContextMenuStripMaster.SuspendLayout();
             ContextMenuStripTabs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)PictureBoxCardImage).BeginInit();
@@ -338,198 +344,15 @@
             PictureBoxCardImage.TabIndex = 1;
             PictureBoxCardImage.TabStop = false;
             // 
-            // BtnModeDeck
-            // 
-            BtnModeDeck.BackColor = System.Drawing.SystemColors.Window;
-            BtnModeDeck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            BtnModeDeck.Location = new System.Drawing.Point(608, 37);
-            BtnModeDeck.Name = "BtnModeDeck";
-            BtnModeDeck.Size = new System.Drawing.Size(151, 26);
-            BtnModeDeck.TabIndex = 2;
-            BtnModeDeck.Text = "Deck Builder";
-            BtnModeDeck.UseVisualStyleBackColor = false;
-            // 
-            // BtnModeTaxonomy
-            // 
-            BtnModeTaxonomy.BackColor = System.Drawing.SystemColors.Control;
-            BtnModeTaxonomy.Font = new System.Drawing.Font("Segoe UI", 9F);
-            BtnModeTaxonomy.Location = new System.Drawing.Point(761, 37);
-            BtnModeTaxonomy.Name = "BtnModeTaxonomy";
-            BtnModeTaxonomy.Size = new System.Drawing.Size(153, 26);
-            BtnModeTaxonomy.TabIndex = 3;
-            BtnModeTaxonomy.Text = "Card Taxonomy";
-            BtnModeTaxonomy.UseVisualStyleBackColor = false;
-            // 
-            // TabControlDeck
-            // 
-            TabControlDeck.Controls.Add(TabPagePool);
-            TabControlDeck.Controls.Add(TabPageResources);
-            TabControlDeck.Controls.Add(TabPageHazards);
-            TabControlDeck.Controls.Add(TabPageSideboard);
-            TabControlDeck.Controls.Add(TabPageSites);
-            TabControlDeck.ItemSize = new System.Drawing.Size(58, 20);
-            TabControlDeck.Location = new System.Drawing.Point(608, 66);
-            TabControlDeck.Name = "TabControlDeck";
-            TabControlDeck.SelectedIndex = 0;
-            TabControlDeck.Size = new System.Drawing.Size(306, 476);
-            TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-            TabControlDeck.TabIndex = 4;
-            // 
-            // TabPagePool
-            // 
-            TabPagePool.Controls.Add(ListBoxPool);
-            TabPagePool.Location = new System.Drawing.Point(4, 24);
-            TabPagePool.Name = "TabPagePool";
-            TabPagePool.Padding = new System.Windows.Forms.Padding(3);
-            TabPagePool.Size = new System.Drawing.Size(298, 448);
-            TabPagePool.TabIndex = 0;
-            TabPagePool.Text = "Pool";
-            TabPagePool.UseVisualStyleBackColor = true;
-            // 
-            // ListBoxPool
-            // 
-            ListBoxPool.AllowDrop = true;
-            ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxPool.FormattingEnabled = true;
-            ListBoxPool.IntegralHeight = false;
-            ListBoxPool.ItemHeight = 15;
-            ListBoxPool.Location = new System.Drawing.Point(3, 3);
-            ListBoxPool.Name = "ListBoxPool";
-            ListBoxPool.Size = new System.Drawing.Size(292, 442);
-            ListBoxPool.Sorted = true;
-            ListBoxPool.TabIndex = 0;
-            ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxPool.DragDrop += ListBoxTab_DragDrop;
-            ListBoxPool.DragOver += ListBoxTab_DragOver;
-            ListBoxPool.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxPool.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // TabPageResources
-            // 
-            TabPageResources.Controls.Add(ListBoxResources);
-            TabPageResources.Location = new System.Drawing.Point(4, 24);
-            TabPageResources.Name = "TabPageResources";
-            TabPageResources.Padding = new System.Windows.Forms.Padding(3);
-            TabPageResources.Size = new System.Drawing.Size(298, 448);
-            TabPageResources.TabIndex = 1;
-            TabPageResources.Text = "Res";
-            TabPageResources.UseVisualStyleBackColor = true;
-            // 
-            // ListBoxResources
-            // 
-            ListBoxResources.AllowDrop = true;
-            ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxResources.FormattingEnabled = true;
-            ListBoxResources.IntegralHeight = false;
-            ListBoxResources.ItemHeight = 15;
-            ListBoxResources.Location = new System.Drawing.Point(3, 3);
-            ListBoxResources.Name = "ListBoxResources";
-            ListBoxResources.Size = new System.Drawing.Size(292, 442);
-            ListBoxResources.Sorted = true;
-            ListBoxResources.TabIndex = 0;
-            ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxResources.DragDrop += ListBoxTab_DragDrop;
-            ListBoxResources.DragOver += ListBoxTab_DragOver;
-            ListBoxResources.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxResources.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // TabPageHazards
-            // 
-            TabPageHazards.Controls.Add(ListBoxHazards);
-            TabPageHazards.Location = new System.Drawing.Point(4, 24);
-            TabPageHazards.Name = "TabPageHazards";
-            TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
-            TabPageHazards.Size = new System.Drawing.Size(298, 448);
-            TabPageHazards.TabIndex = 2;
-            TabPageHazards.Text = "Haz";
-            TabPageHazards.UseVisualStyleBackColor = true;
-            // 
-            // ListBoxHazards
-            // 
-            ListBoxHazards.AllowDrop = true;
-            ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxHazards.FormattingEnabled = true;
-            ListBoxHazards.IntegralHeight = false;
-            ListBoxHazards.ItemHeight = 15;
-            ListBoxHazards.Location = new System.Drawing.Point(3, 3);
-            ListBoxHazards.Name = "ListBoxHazards";
-            ListBoxHazards.Size = new System.Drawing.Size(292, 442);
-            ListBoxHazards.Sorted = true;
-            ListBoxHazards.TabIndex = 0;
-            ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxHazards.DragDrop += ListBoxTab_DragDrop;
-            ListBoxHazards.DragOver += ListBoxTab_DragOver;
-            ListBoxHazards.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxHazards.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // TabPageSideboard
-            // 
-            TabPageSideboard.Controls.Add(ListBoxSideboard);
-            TabPageSideboard.Location = new System.Drawing.Point(4, 24);
-            TabPageSideboard.Name = "TabPageSideboard";
-            TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSideboard.Size = new System.Drawing.Size(298, 448);
-            TabPageSideboard.TabIndex = 3;
-            TabPageSideboard.Text = "Side";
-            TabPageSideboard.UseVisualStyleBackColor = true;
-            // 
-            // ListBoxSideboard
-            // 
-            ListBoxSideboard.AllowDrop = true;
-            ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxSideboard.FormattingEnabled = true;
-            ListBoxSideboard.IntegralHeight = false;
-            ListBoxSideboard.ItemHeight = 15;
-            ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
-            ListBoxSideboard.Name = "ListBoxSideboard";
-            ListBoxSideboard.Size = new System.Drawing.Size(292, 442);
-            ListBoxSideboard.Sorted = true;
-            ListBoxSideboard.TabIndex = 0;
-            ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxSideboard.DragDrop += ListBoxTab_DragDrop;
-            ListBoxSideboard.DragOver += ListBoxTab_DragOver;
-            ListBoxSideboard.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxSideboard.MouseDown += ListBoxTab_MouseDown;
-            // 
-            // TabPageSites
-            // 
-            TabPageSites.Controls.Add(ListBoxSites);
-            TabPageSites.Location = new System.Drawing.Point(4, 24);
-            TabPageSites.Name = "TabPageSites";
-            TabPageSites.Padding = new System.Windows.Forms.Padding(3);
-            TabPageSites.Size = new System.Drawing.Size(298, 448);
-            TabPageSites.TabIndex = 4;
-            TabPageSites.Text = "Site";
-            TabPageSites.UseVisualStyleBackColor = true;
-            // 
-            // ListBoxSites
-            // 
-            ListBoxSites.AllowDrop = true;
-            ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
-            ListBoxSites.FormattingEnabled = true;
-            ListBoxSites.IntegralHeight = false;
-            ListBoxSites.ItemHeight = 15;
-            ListBoxSites.Location = new System.Drawing.Point(3, 3);
-            ListBoxSites.Name = "ListBoxSites";
-            ListBoxSites.Size = new System.Drawing.Size(292, 442);
-            ListBoxSites.Sorted = true;
-            ListBoxSites.TabIndex = 0;
-            ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
-            ListBoxSites.DragDrop += ListBoxTab_DragDrop;
-            ListBoxSites.DragOver += ListBoxTab_DragOver;
-            ListBoxSites.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
-            ListBoxSites.MouseDown += ListBoxTab_MouseDown;
-            // 
             // PanelTaxonomy
             // 
             PanelTaxonomy.Controls.Add(LblTaxonomyCardTitle);
             PanelTaxonomy.Controls.Add(RichTextBoxTaxonomy);
             PanelTaxonomy.Controls.Add(GroupBoxQuickAssign);
-            PanelTaxonomy.Location = new System.Drawing.Point(608, 66);
+            PanelTaxonomy.Location = new System.Drawing.Point(608, 37);
             PanelTaxonomy.Name = "PanelTaxonomy";
-            PanelTaxonomy.Size = new System.Drawing.Size(306, 476);
-            PanelTaxonomy.TabIndex = 5;
-            PanelTaxonomy.Visible = false;
+            PanelTaxonomy.Size = new System.Drawing.Size(306, 505);
+            PanelTaxonomy.TabIndex = 2;
             // 
             // LblTaxonomyCardTitle
             // 
@@ -554,7 +377,7 @@
             RichTextBoxTaxonomy.Name = "RichTextBoxTaxonomy";
             RichTextBoxTaxonomy.ReadOnly = true;
             RichTextBoxTaxonomy.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            RichTextBoxTaxonomy.Size = new System.Drawing.Size(302, 338);
+            RichTextBoxTaxonomy.Size = new System.Drawing.Size(302, 367);
             RichTextBoxTaxonomy.TabIndex = 1;
             RichTextBoxTaxonomy.Text = "";
             RichTextBoxTaxonomy.WordWrap = true;
@@ -568,7 +391,7 @@
             GroupBoxQuickAssign.Controls.Add(BtnAssignTag);
             GroupBoxQuickAssign.Controls.Add(BtnRemoveTag);
             GroupBoxQuickAssign.Controls.Add(BtnAuthorTag);
-            GroupBoxQuickAssign.Location = new System.Drawing.Point(2, 368);
+            GroupBoxQuickAssign.Location = new System.Drawing.Point(2, 397);
             GroupBoxQuickAssign.Name = "GroupBoxQuickAssign";
             GroupBoxQuickAssign.Size = new System.Drawing.Size(302, 106);
             GroupBoxQuickAssign.TabIndex = 2;
@@ -638,6 +461,166 @@
             BtnAuthorTag.Text = "New Tag...";
             BtnAuthorTag.UseVisualStyleBackColor = true;
             // 
+            // TabControlDeck
+            // 
+            TabControlDeck.Controls.Add(TabPagePool);
+            TabControlDeck.Controls.Add(TabPageResources);
+            TabControlDeck.Controls.Add(TabPageHazards);
+            TabControlDeck.Controls.Add(TabPageSideboard);
+            TabControlDeck.Controls.Add(TabPageSites);
+            TabControlDeck.ItemSize = new System.Drawing.Size(58, 20);
+            TabControlDeck.Location = new System.Drawing.Point(924, 37);
+            TabControlDeck.Name = "TabControlDeck";
+            TabControlDeck.SelectedIndex = 0;
+            TabControlDeck.Size = new System.Drawing.Size(306, 505);
+            TabControlDeck.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            TabControlDeck.TabIndex = 3;
+            // 
+            // TabPagePool
+            // 
+            TabPagePool.Controls.Add(ListBoxPool);
+            TabPagePool.Location = new System.Drawing.Point(4, 24);
+            TabPagePool.Name = "TabPagePool";
+            TabPagePool.Padding = new System.Windows.Forms.Padding(3);
+            TabPagePool.Size = new System.Drawing.Size(298, 477);
+            TabPagePool.TabIndex = 0;
+            TabPagePool.Text = "Pool";
+            TabPagePool.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxPool
+            // 
+            ListBoxPool.AllowDrop = true;
+            ListBoxPool.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxPool.FormattingEnabled = true;
+            ListBoxPool.IntegralHeight = false;
+            ListBoxPool.ItemHeight = 15;
+            ListBoxPool.Location = new System.Drawing.Point(3, 3);
+            ListBoxPool.Name = "ListBoxPool";
+            ListBoxPool.Size = new System.Drawing.Size(292, 471);
+            ListBoxPool.Sorted = true;
+            ListBoxPool.TabIndex = 0;
+            ListBoxPool.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxPool.DragDrop += ListBoxTab_DragDrop;
+            ListBoxPool.DragOver += ListBoxTab_DragOver;
+            ListBoxPool.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxPool.MouseDown += ListBoxTab_MouseDown;
+            // 
+            // TabPageResources
+            // 
+            TabPageResources.Controls.Add(ListBoxResources);
+            TabPageResources.Location = new System.Drawing.Point(4, 24);
+            TabPageResources.Name = "TabPageResources";
+            TabPageResources.Padding = new System.Windows.Forms.Padding(3);
+            TabPageResources.Size = new System.Drawing.Size(298, 477);
+            TabPageResources.TabIndex = 1;
+            TabPageResources.Text = "Res";
+            TabPageResources.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxResources
+            // 
+            ListBoxResources.AllowDrop = true;
+            ListBoxResources.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxResources.FormattingEnabled = true;
+            ListBoxResources.IntegralHeight = false;
+            ListBoxResources.ItemHeight = 15;
+            ListBoxResources.Location = new System.Drawing.Point(3, 3);
+            ListBoxResources.Name = "ListBoxResources";
+            ListBoxResources.Size = new System.Drawing.Size(292, 471);
+            ListBoxResources.Sorted = true;
+            ListBoxResources.TabIndex = 0;
+            ListBoxResources.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxResources.DragDrop += ListBoxTab_DragDrop;
+            ListBoxResources.DragOver += ListBoxTab_DragOver;
+            ListBoxResources.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxResources.MouseDown += ListBoxTab_MouseDown;
+            // 
+            // TabPageHazards
+            // 
+            TabPageHazards.Controls.Add(ListBoxHazards);
+            TabPageHazards.Location = new System.Drawing.Point(4, 24);
+            TabPageHazards.Name = "TabPageHazards";
+            TabPageHazards.Padding = new System.Windows.Forms.Padding(3);
+            TabPageHazards.Size = new System.Drawing.Size(298, 477);
+            TabPageHazards.TabIndex = 2;
+            TabPageHazards.Text = "Haz";
+            TabPageHazards.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxHazards
+            // 
+            ListBoxHazards.AllowDrop = true;
+            ListBoxHazards.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxHazards.FormattingEnabled = true;
+            ListBoxHazards.IntegralHeight = false;
+            ListBoxHazards.ItemHeight = 15;
+            ListBoxHazards.Location = new System.Drawing.Point(3, 3);
+            ListBoxHazards.Name = "ListBoxHazards";
+            ListBoxHazards.Size = new System.Drawing.Size(292, 471);
+            ListBoxHazards.Sorted = true;
+            ListBoxHazards.TabIndex = 0;
+            ListBoxHazards.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxHazards.DragDrop += ListBoxTab_DragDrop;
+            ListBoxHazards.DragOver += ListBoxTab_DragOver;
+            ListBoxHazards.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxHazards.MouseDown += ListBoxTab_MouseDown;
+            // 
+            // TabPageSideboard
+            // 
+            TabPageSideboard.Controls.Add(ListBoxSideboard);
+            TabPageSideboard.Location = new System.Drawing.Point(4, 24);
+            TabPageSideboard.Name = "TabPageSideboard";
+            TabPageSideboard.Padding = new System.Windows.Forms.Padding(3);
+            TabPageSideboard.Size = new System.Drawing.Size(298, 477);
+            TabPageSideboard.TabIndex = 3;
+            TabPageSideboard.Text = "Side";
+            TabPageSideboard.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxSideboard
+            // 
+            ListBoxSideboard.AllowDrop = true;
+            ListBoxSideboard.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxSideboard.FormattingEnabled = true;
+            ListBoxSideboard.IntegralHeight = false;
+            ListBoxSideboard.ItemHeight = 15;
+            ListBoxSideboard.Location = new System.Drawing.Point(3, 3);
+            ListBoxSideboard.Name = "ListBoxSideboard";
+            ListBoxSideboard.Size = new System.Drawing.Size(292, 471);
+            ListBoxSideboard.Sorted = true;
+            ListBoxSideboard.TabIndex = 0;
+            ListBoxSideboard.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxSideboard.DragDrop += ListBoxTab_DragDrop;
+            ListBoxSideboard.DragOver += ListBoxTab_DragOver;
+            ListBoxSideboard.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxSideboard.MouseDown += ListBoxTab_MouseDown;
+            // 
+            // TabPageSites
+            // 
+            TabPageSites.Controls.Add(ListBoxSites);
+            TabPageSites.Location = new System.Drawing.Point(4, 24);
+            TabPageSites.Name = "TabPageSites";
+            TabPageSites.Padding = new System.Windows.Forms.Padding(3);
+            TabPageSites.Size = new System.Drawing.Size(298, 477);
+            TabPageSites.TabIndex = 4;
+            TabPageSites.Text = "Site";
+            TabPageSites.UseVisualStyleBackColor = true;
+            // 
+            // ListBoxSites
+            // 
+            ListBoxSites.AllowDrop = true;
+            ListBoxSites.Dock = System.Windows.Forms.DockStyle.Fill;
+            ListBoxSites.FormattingEnabled = true;
+            ListBoxSites.IntegralHeight = false;
+            ListBoxSites.ItemHeight = 15;
+            ListBoxSites.Location = new System.Drawing.Point(3, 3);
+            ListBoxSites.Name = "ListBoxSites";
+            ListBoxSites.Size = new System.Drawing.Size(292, 471);
+            ListBoxSites.Sorted = true;
+            ListBoxSites.TabIndex = 0;
+            ListBoxSites.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            ListBoxSites.DragDrop += ListBoxTab_DragDrop;
+            ListBoxSites.DragOver += ListBoxTab_DragOver;
+            ListBoxSites.MouseDoubleClick += ListBoxTab_MouseDoubleClick;
+            ListBoxSites.MouseDown += ListBoxTab_MouseDown;
+            // 
             // MenuStrip1
             // 
             MenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -648,8 +631,8 @@
             });
             MenuStrip1.Location = new System.Drawing.Point(0, 0);
             MenuStrip1.Name = "MenuStrip1";
-            MenuStrip1.Size = new System.Drawing.Size(926, 24);
-            MenuStrip1.TabIndex = 6;
+            MenuStrip1.Size = new System.Drawing.Size(1242, 24);
+            MenuStrip1.TabIndex = 4;
             MenuStrip1.Text = "Main Menu";
             // 
             // ToolStripMenuDeck
@@ -896,10 +879,14 @@
             GroupBoxCardAttributes.Controls.Add(ComboBoxKey2);
             GroupBoxCardAttributes.Controls.Add(LblSlot2Value);
             GroupBoxCardAttributes.Controls.Add(ComboBoxValue2);
+            GroupBoxCardAttributes.Controls.Add(LblSlot3Key);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxKey3);
+            GroupBoxCardAttributes.Controls.Add(LblSlot3Value);
+            GroupBoxCardAttributes.Controls.Add(ComboBoxValue3);
             GroupBoxCardAttributes.Location = new System.Drawing.Point(12, 552);
             GroupBoxCardAttributes.Name = "GroupBoxCardAttributes";
-            GroupBoxCardAttributes.Size = new System.Drawing.Size(444, 118);
-            GroupBoxCardAttributes.TabIndex = 7;
+            GroupBoxCardAttributes.Size = new System.Drawing.Size(602, 118);
+            GroupBoxCardAttributes.TabIndex = 5;
             GroupBoxCardAttributes.TabStop = false;
             GroupBoxCardAttributes.Text = "Card Attributes (Official Database)";
             // 
@@ -907,7 +894,7 @@
             // 
             LblSlot1Key.Location = new System.Drawing.Point(12, 20);
             LblSlot1Key.Name = "LblSlot1Key";
-            LblSlot1Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot1Key.Size = new System.Drawing.Size(184, 15);
             LblSlot1Key.TabIndex = 0;
             LblSlot1Key.Text = "Attribute:";
             // 
@@ -919,15 +906,16 @@
             ComboBoxKey1.FormattingEnabled = true;
             ComboBoxKey1.Location = new System.Drawing.Point(12, 37);
             ComboBoxKey1.Name = "ComboBoxKey1";
-            ComboBoxKey1.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey1.Size = new System.Drawing.Size(184, 23);
             ComboBoxKey1.TabIndex = 1;
+            ComboBoxKey1.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxKey1.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
             // 
             // LblSlot1Value
             // 
             LblSlot1Value.Location = new System.Drawing.Point(12, 65);
             LblSlot1Value.Name = "LblSlot1Value";
-            LblSlot1Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot1Value.Size = new System.Drawing.Size(184, 15);
             LblSlot1Value.TabIndex = 2;
             LblSlot1Value.Text = "Value:";
             // 
@@ -939,16 +927,16 @@
             ComboBoxValue1.FormattingEnabled = true;
             ComboBoxValue1.Location = new System.Drawing.Point(12, 82);
             ComboBoxValue1.Name = "ComboBoxValue1";
-            ComboBoxValue1.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue1.Size = new System.Drawing.Size(184, 23);
             ComboBoxValue1.TabIndex = 3;
             ComboBoxValue1.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue1.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
             // 
             // LblSlot2Key
             // 
-            LblSlot2Key.Location = new System.Drawing.Point(228, 20);
+            LblSlot2Key.Location = new System.Drawing.Point(209, 20);
             LblSlot2Key.Name = "LblSlot2Key";
-            LblSlot2Key.Size = new System.Drawing.Size(200, 15);
+            LblSlot2Key.Size = new System.Drawing.Size(184, 15);
             LblSlot2Key.TabIndex = 4;
             LblSlot2Key.Text = "Attribute:";
             // 
@@ -958,17 +946,18 @@
             ComboBoxKey2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxKey2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey2.FormattingEnabled = true;
-            ComboBoxKey2.Location = new System.Drawing.Point(228, 37);
+            ComboBoxKey2.Location = new System.Drawing.Point(209, 37);
             ComboBoxKey2.Name = "ComboBoxKey2";
-            ComboBoxKey2.Size = new System.Drawing.Size(200, 23);
+            ComboBoxKey2.Size = new System.Drawing.Size(184, 23);
             ComboBoxKey2.TabIndex = 5;
+            ComboBoxKey2.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxKey2.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
             // 
             // LblSlot2Value
             // 
-            LblSlot2Value.Location = new System.Drawing.Point(228, 65);
+            LblSlot2Value.Location = new System.Drawing.Point(209, 65);
             LblSlot2Value.Name = "LblSlot2Value";
-            LblSlot2Value.Size = new System.Drawing.Size(200, 15);
+            LblSlot2Value.Size = new System.Drawing.Size(184, 15);
             LblSlot2Value.TabIndex = 6;
             LblSlot2Value.Text = "Value:";
             // 
@@ -978,37 +967,20 @@
             ComboBoxValue2.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue2.FormattingEnabled = true;
-            ComboBoxValue2.Location = new System.Drawing.Point(228, 82);
+            ComboBoxValue2.Location = new System.Drawing.Point(209, 82);
             ComboBoxValue2.Name = "ComboBoxValue2";
-            ComboBoxValue2.Size = new System.Drawing.Size(200, 23);
+            ComboBoxValue2.Size = new System.Drawing.Size(184, 23);
             ComboBoxValue2.TabIndex = 7;
             ComboBoxValue2.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue2.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
             // 
-            // GroupBoxCustomTags
-            // 
-            GroupBoxCustomTags.Controls.Add(LblSlot3Key);
-            GroupBoxCustomTags.Controls.Add(ComboBoxKey3);
-            GroupBoxCustomTags.Controls.Add(LblSlot3Value);
-            GroupBoxCustomTags.Controls.Add(ComboBoxValue3);
-            GroupBoxCustomTags.Controls.Add(LblSlot4Key);
-            GroupBoxCustomTags.Controls.Add(ComboBoxKey4);
-            GroupBoxCustomTags.Controls.Add(LblSlot4Value);
-            GroupBoxCustomTags.Controls.Add(ComboBoxValue4);
-            GroupBoxCustomTags.Location = new System.Drawing.Point(470, 552);
-            GroupBoxCustomTags.Name = "GroupBoxCustomTags";
-            GroupBoxCustomTags.Size = new System.Drawing.Size(444, 118);
-            GroupBoxCustomTags.TabIndex = 8;
-            GroupBoxCustomTags.TabStop = false;
-            GroupBoxCustomTags.Text = "Custom Tags (User Taxonomy)";
-            // 
             // LblSlot3Key
             // 
-            LblSlot3Key.Location = new System.Drawing.Point(12, 20);
+            LblSlot3Key.Location = new System.Drawing.Point(406, 20);
             LblSlot3Key.Name = "LblSlot3Key";
-            LblSlot3Key.Size = new System.Drawing.Size(200, 15);
-            LblSlot3Key.TabIndex = 0;
-            LblSlot3Key.Text = "Category:";
+            LblSlot3Key.Size = new System.Drawing.Size(184, 15);
+            LblSlot3Key.TabIndex = 8;
+            LblSlot3Key.Text = "Attribute:";
             // 
             // ComboBoxKey3
             // 
@@ -1016,19 +988,20 @@
             ComboBoxKey3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxKey3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey3.FormattingEnabled = true;
-            ComboBoxKey3.Location = new System.Drawing.Point(12, 37);
+            ComboBoxKey3.Location = new System.Drawing.Point(406, 37);
             ComboBoxKey3.Name = "ComboBoxKey3";
-            ComboBoxKey3.Size = new System.Drawing.Size(200, 23);
-            ComboBoxKey3.TabIndex = 1;
+            ComboBoxKey3.Size = new System.Drawing.Size(184, 23);
+            ComboBoxKey3.TabIndex = 9;
+            ComboBoxKey3.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxKey3.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
             // 
             // LblSlot3Value
             // 
-            LblSlot3Value.Location = new System.Drawing.Point(12, 65);
+            LblSlot3Value.Location = new System.Drawing.Point(406, 65);
             LblSlot3Value.Name = "LblSlot3Value";
-            LblSlot3Value.Size = new System.Drawing.Size(200, 15);
-            LblSlot3Value.TabIndex = 2;
-            LblSlot3Value.Text = "Tag:";
+            LblSlot3Value.Size = new System.Drawing.Size(184, 15);
+            LblSlot3Value.TabIndex = 10;
+            LblSlot3Value.Text = "Value:";
             // 
             // ComboBoxValue3
             // 
@@ -1036,19 +1009,40 @@
             ComboBoxValue3.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue3.FormattingEnabled = true;
-            ComboBoxValue3.Location = new System.Drawing.Point(12, 82);
+            ComboBoxValue3.Location = new System.Drawing.Point(406, 82);
             ComboBoxValue3.Name = "ComboBoxValue3";
-            ComboBoxValue3.Size = new System.Drawing.Size(200, 23);
-            ComboBoxValue3.TabIndex = 3;
+            ComboBoxValue3.Size = new System.Drawing.Size(184, 23);
+            ComboBoxValue3.TabIndex = 11;
             ComboBoxValue3.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue3.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
             // 
+            // GroupBoxCustomTags
+            // 
+            GroupBoxCustomTags.Controls.Add(LblSlot4Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey4);
+            GroupBoxCustomTags.Controls.Add(LblSlot4Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue4);
+            GroupBoxCustomTags.Controls.Add(LblSlot5Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey5);
+            GroupBoxCustomTags.Controls.Add(LblSlot5Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue5);
+            GroupBoxCustomTags.Controls.Add(LblSlot6Key);
+            GroupBoxCustomTags.Controls.Add(ComboBoxKey6);
+            GroupBoxCustomTags.Controls.Add(LblSlot6Value);
+            GroupBoxCustomTags.Controls.Add(ComboBoxValue6);
+            GroupBoxCustomTags.Location = new System.Drawing.Point(628, 552);
+            GroupBoxCustomTags.Name = "GroupBoxCustomTags";
+            GroupBoxCustomTags.Size = new System.Drawing.Size(602, 118);
+            GroupBoxCustomTags.TabIndex = 6;
+            GroupBoxCustomTags.TabStop = false;
+            GroupBoxCustomTags.Text = "Custom Tags (User Taxonomy)";
+            // 
             // LblSlot4Key
             // 
-            LblSlot4Key.Location = new System.Drawing.Point(228, 20);
+            LblSlot4Key.Location = new System.Drawing.Point(12, 20);
             LblSlot4Key.Name = "LblSlot4Key";
-            LblSlot4Key.Size = new System.Drawing.Size(200, 15);
-            LblSlot4Key.TabIndex = 4;
+            LblSlot4Key.Size = new System.Drawing.Size(184, 15);
+            LblSlot4Key.TabIndex = 0;
             LblSlot4Key.Text = "Category:";
             // 
             // ComboBoxKey4
@@ -1057,18 +1051,19 @@
             ComboBoxKey4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxKey4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxKey4.FormattingEnabled = true;
-            ComboBoxKey4.Location = new System.Drawing.Point(228, 37);
+            ComboBoxKey4.Location = new System.Drawing.Point(12, 37);
             ComboBoxKey4.Name = "ComboBoxKey4";
-            ComboBoxKey4.Size = new System.Drawing.Size(200, 23);
-            ComboBoxKey4.TabIndex = 5;
+            ComboBoxKey4.Size = new System.Drawing.Size(184, 23);
+            ComboBoxKey4.TabIndex = 1;
+            ComboBoxKey4.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxKey4.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
             // 
             // LblSlot4Value
             // 
-            LblSlot4Value.Location = new System.Drawing.Point(228, 65);
+            LblSlot4Value.Location = new System.Drawing.Point(12, 65);
             LblSlot4Value.Name = "LblSlot4Value";
-            LblSlot4Value.Size = new System.Drawing.Size(200, 15);
-            LblSlot4Value.TabIndex = 6;
+            LblSlot4Value.Size = new System.Drawing.Size(184, 15);
+            LblSlot4Value.TabIndex = 2;
             LblSlot4Value.Text = "Tag:";
             // 
             // ComboBoxValue4
@@ -1077,22 +1072,104 @@
             ComboBoxValue4.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             ComboBoxValue4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             ComboBoxValue4.FormattingEnabled = true;
-            ComboBoxValue4.Location = new System.Drawing.Point(228, 82);
+            ComboBoxValue4.Location = new System.Drawing.Point(12, 82);
             ComboBoxValue4.Name = "ComboBoxValue4";
-            ComboBoxValue4.Size = new System.Drawing.Size(200, 23);
-            ComboBoxValue4.TabIndex = 7;
+            ComboBoxValue4.Size = new System.Drawing.Size(184, 23);
+            ComboBoxValue4.TabIndex = 3;
             ComboBoxValue4.DropDown += AdjustWidthComboBox_DropDown;
             ComboBoxValue4.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot5Key
+            // 
+            LblSlot5Key.Location = new System.Drawing.Point(209, 20);
+            LblSlot5Key.Name = "LblSlot5Key";
+            LblSlot5Key.Size = new System.Drawing.Size(184, 15);
+            LblSlot5Key.TabIndex = 4;
+            LblSlot5Key.Text = "Category:";
+            // 
+            // ComboBoxKey5
+            // 
+            ComboBoxKey5.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey5.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey5.FormattingEnabled = true;
+            ComboBoxKey5.Location = new System.Drawing.Point(209, 37);
+            ComboBoxKey5.Name = "ComboBoxKey5";
+            ComboBoxKey5.Size = new System.Drawing.Size(184, 23);
+            ComboBoxKey5.TabIndex = 5;
+            ComboBoxKey5.DropDown += AdjustWidthComboBox_DropDown;
+            ComboBoxKey5.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot5Value
+            // 
+            LblSlot5Value.Location = new System.Drawing.Point(209, 65);
+            LblSlot5Value.Name = "LblSlot5Value";
+            LblSlot5Value.Size = new System.Drawing.Size(184, 15);
+            LblSlot5Value.TabIndex = 6;
+            LblSlot5Value.Text = "Tag:";
+            // 
+            // ComboBoxValue5
+            // 
+            ComboBoxValue5.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxValue5.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxValue5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxValue5.FormattingEnabled = true;
+            ComboBoxValue5.Location = new System.Drawing.Point(209, 82);
+            ComboBoxValue5.Name = "ComboBoxValue5";
+            ComboBoxValue5.Size = new System.Drawing.Size(184, 23);
+            ComboBoxValue5.TabIndex = 7;
+            ComboBoxValue5.DropDown += AdjustWidthComboBox_DropDown;
+            ComboBoxValue5.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot6Key
+            // 
+            LblSlot6Key.Location = new System.Drawing.Point(406, 20);
+            LblSlot6Key.Name = "LblSlot6Key";
+            LblSlot6Key.Size = new System.Drawing.Size(184, 15);
+            LblSlot6Key.TabIndex = 8;
+            LblSlot6Key.Text = "Category:";
+            // 
+            // ComboBoxKey6
+            // 
+            ComboBoxKey6.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxKey6.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxKey6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxKey6.FormattingEnabled = true;
+            ComboBoxKey6.Location = new System.Drawing.Point(406, 37);
+            ComboBoxKey6.Name = "ComboBoxKey6";
+            ComboBoxKey6.Size = new System.Drawing.Size(184, 23);
+            ComboBoxKey6.TabIndex = 9;
+            ComboBoxKey6.DropDown += AdjustWidthComboBox_DropDown;
+            ComboBoxKey6.SelectedIndexChanged += KeyName_ComboBox_SelectedIndexChanged;
+            // 
+            // LblSlot6Value
+            // 
+            LblSlot6Value.Location = new System.Drawing.Point(406, 65);
+            LblSlot6Value.Name = "LblSlot6Value";
+            LblSlot6Value.Size = new System.Drawing.Size(184, 15);
+            LblSlot6Value.TabIndex = 10;
+            LblSlot6Value.Text = "Tag:";
+            // 
+            // ComboBoxValue6
+            // 
+            ComboBoxValue6.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            ComboBoxValue6.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            ComboBoxValue6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            ComboBoxValue6.FormattingEnabled = true;
+            ComboBoxValue6.Location = new System.Drawing.Point(406, 82);
+            ComboBoxValue6.Name = "ComboBoxValue6";
+            ComboBoxValue6.Size = new System.Drawing.Size(184, 23);
+            ComboBoxValue6.TabIndex = 11;
+            ComboBoxValue6.DropDown += AdjustWidthComboBox_DropDown;
+            ComboBoxValue6.SelectedIndexChanged += KeyValue_ComboBox_SelectedIndexChanged;
             // 
             // Form1
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(926, 682);
+            ClientSize = new System.Drawing.Size(1242, 682);
             Controls.Add(GroupBoxCardAttributes);
             Controls.Add(GroupBoxCustomTags);
-            Controls.Add(BtnModeDeck);
-            Controls.Add(BtnModeTaxonomy);
             Controls.Add(TabControlDeck);
             Controls.Add(PanelTaxonomy);
             Controls.Add(PictureBoxCardImage);
@@ -1107,7 +1184,7 @@
             TabControlDeck.ResumeLayout(false);
             TabPagePool.ResumeLayout(false);
             TabPageResources.ResumeLayout(false);
-            TabPageHazards.ResumeLayout(false);
+            TabPageHazards.SuspendLayout();
             TabPageSideboard.ResumeLayout(false);
             TabPageSites.ResumeLayout(false);
             PanelTaxonomy.ResumeLayout(false);
@@ -1118,15 +1195,12 @@
             GroupBoxCustomTags.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
-
         }
 
         #endregion
 
         private System.Windows.Forms.ListBox ListBoxMaster;
         private System.Windows.Forms.PictureBox PictureBoxCardImage;
-        private System.Windows.Forms.Button BtnModeDeck;
-        private System.Windows.Forms.Button BtnModeTaxonomy;
         private System.Windows.Forms.TabControl TabControlDeck;
         private System.Windows.Forms.TabPage TabPagePool;
         private System.Windows.Forms.ListBox ListBoxPool;
@@ -1224,14 +1298,22 @@
         private System.Windows.Forms.ComboBox ComboBoxKey2;
         private System.Windows.Forms.Label LblSlot2Value;
         private System.Windows.Forms.ComboBox ComboBoxValue2;
-        private System.Windows.Forms.GroupBox GroupBoxCustomTags;
         private System.Windows.Forms.Label LblSlot3Key;
         private System.Windows.Forms.ComboBox ComboBoxKey3;
         private System.Windows.Forms.Label LblSlot3Value;
         private System.Windows.Forms.ComboBox ComboBoxValue3;
+        private System.Windows.Forms.GroupBox GroupBoxCustomTags;
         private System.Windows.Forms.Label LblSlot4Key;
         private System.Windows.Forms.ComboBox ComboBoxKey4;
         private System.Windows.Forms.Label LblSlot4Value;
         private System.Windows.Forms.ComboBox ComboBoxValue4;
+        private System.Windows.Forms.Label LblSlot5Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey5;
+        private System.Windows.Forms.Label LblSlot5Value;
+        private System.Windows.Forms.ComboBox ComboBoxValue5;
+        private System.Windows.Forms.Label LblSlot6Key;
+        private System.Windows.Forms.ComboBox ComboBoxKey6;
+        private System.Windows.Forms.Label LblSlot6Value;
+        private System.Windows.Forms.ComboBox ComboBoxValue6;
     }
 }

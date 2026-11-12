@@ -13,10 +13,6 @@ namespace MECCG_Deck_Builder
         private readonly CardFilterService _filterService;
         private readonly ISet<string> _activeSets;
         private readonly IReadOnlyList<Card> _currentMasterCards;
-        private readonly string _initialSlot1Attr;
-        private readonly string _initialSlot2Attr;
-        private readonly string _initialSlot3Cat;
-        private readonly string _initialSlot4Cat;
 
         private readonly ComboBox _cmbPartition;
         private readonly Label _lblScopeCount;
@@ -28,24 +24,23 @@ namespace MECCG_Deck_Builder
         private List<Card> _cardsInScope = [];
         private bool _isUpdatingPreset;
 
+        private readonly IReadOnlyList<string> _initialAttrs;
+        private readonly IReadOnlyList<string> _initialCats;
+
         public ExportTaxonomyDialog(
             CardCatalogService catalog,
             CardFilterService filterService,
             ISet<string> activeSets,
             IReadOnlyList<Card> currentMasterCards,
-            string initialSlot1Attr = null,
-            string initialSlot2Attr = null,
-            string initialSlot3Cat = null,
-            string initialSlot4Cat = null)
+            IReadOnlyList<string> initialAttributes = null,
+            IReadOnlyList<string> initialCategories = null)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
             _activeSets = activeSets ?? new HashSet<string>();
             _currentMasterCards = currentMasterCards ?? [];
-            _initialSlot1Attr = initialSlot1Attr;
-            _initialSlot2Attr = initialSlot2Attr;
-            _initialSlot3Cat = initialSlot3Cat;
-            _initialSlot4Cat = initialSlot4Cat;
+            _initialAttrs = initialAttributes ?? [];
+            _initialCats = initialCategories ?? [];
 
             Text = "Export Taxonomy Draft (CSV)";
             ClientSize = new Size(680, 560);
@@ -394,17 +389,19 @@ namespace MECCG_Deck_Builder
 
         private string[] GetMasterListInitialAttributes()
         {
-            var list = new List<string>();
-            if (!string.IsNullOrWhiteSpace(_initialSlot1Attr)) list.Add(_initialSlot1Attr);
-            if (!string.IsNullOrWhiteSpace(_initialSlot2Attr) && !list.Contains(_initialSlot2Attr, StringComparer.OrdinalIgnoreCase)) list.Add(_initialSlot2Attr);
+            var list = _initialAttrs
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
             return list.Count > 0 ? [.. list] : ["Primary"];
         }
 
         private string[] GetMasterListInitialCategories()
         {
-            var list = new List<string>();
-            if (!string.IsNullOrWhiteSpace(_initialSlot3Cat)) list.Add(_initialSlot3Cat);
-            if (!string.IsNullOrWhiteSpace(_initialSlot4Cat) && !list.Contains(_initialSlot4Cat, StringComparer.OrdinalIgnoreCase)) list.Add(_initialSlot4Cat);
+            var list = _initialCats
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
             return list.Count > 0 ? [.. list] : ["Role"];
         }
 

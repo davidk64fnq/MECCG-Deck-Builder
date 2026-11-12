@@ -8,7 +8,7 @@
 <body>
     <div class="nav-bar"><a href="index.html">Home</a> &gt; Welcome &amp; Getting Started &gt; Interface Walkthrough</div>
     <h1>User Interface Walkthrough</h1>
-    <p>The application interface consists of a top workflow menu bar and four main functional zones:</p>
+    <p>The application interface consists of a top workflow menu bar and five main functional zones arranged from left to right:</p>
 
     <!-- WORKFLOW MENU BAR -->
     <h2>Workflow Menu Bar</h2>
@@ -53,25 +53,42 @@
     <p>Displays all cards matching your active expansion sets and filter criteria, sorted alphabetically.</p>
     <ul>
         <li><strong>Single-Click:</strong> Selects the card, renders its artwork in the preview pane, and updates the Card Taxonomy Inspector.</li>
-        <li><strong>Double-Click:</strong> Appends the card to the currently active deck tab on the right (even when Card Taxonomy mode is active).</li>
+        <li><strong>Double-Click:</strong> Appends the card to the currently active deck tab on the right.</li>
         <li><strong>Right-Click:</strong> Opens the master context menu to copy cards, inspect attributes, view tags, or assign custom tags.</li>
         <li><strong>Drag &amp; Drop:</strong> Left-click and drag the card title onto any deck listbox.</li>
     </ul>
 
-    <h2>Card Image Preview (Center Pane)</h2>
+    <h2>Card Image Preview (Center-Left Pane)</h2>
     <p>Displays high-resolution card artwork downloaded on demand from <code>cardnum.net</code> and cached locally in set folders (e.g., <code>METW/</code>, <code>MEDM/</code>).</p>
     <div class="note">
         <strong>Errata Notice:</strong> Cards flagged with ICE errata automatically load their corrected image counterpart prefixed with <code>ice-</code>.
     </div>
 
-    <!-- DUAL-MODE RIGHT PANE -->
-    <h2>Dual-Mode Workspace (Right Pane)</h2>
+    <h2>Card Taxonomy Inspector (Center-Right Pane)</h2>
     <p>
-        The right pane features an integrated mode switcher at the top, allowing you to alternate between constructing your deck partitions and inspecting or editing card taxonomy:
+        Positioned directly between the card artwork and the deck partitions, this persistent inspector displays live metadata for whichever card is currently selected in the Master List or any Deck tab:
     </p>
+    <ul>
+        <li><strong>Card Header:</strong> Displays the selected card's printed title and 4-letter set code.</li>
+        <li>
+            <strong>Live Monospace Metadata Readout:</strong>
+            A color-coded, scrollable viewer displaying all populated official attributes (slate navy) and assigned custom taxonomy tags (deep teal). Long multi-tag lists (such as <code>Home Region</code> or <code>Site Requirement</code>) and long rules descriptions wrap cleanly with a <strong>column-aligned hanging indent</strong> so colons stay strictly aligned and text is never clipped.
+        </li>
+        <li>
+            <strong>Pinned Quick Assign Bar:</strong>
+            A compact, non-scrolling tool docked at the bottom of the inspector:
+            <ul>
+                <li><strong>Category Dropdown:</strong> Automatically synchronizes with your active bottom custom filter criteria (Slots 4, 5, or 6). Changing the category dropdown refreshes the tag list instantly.</li>
+                <li><strong>Tag Dropdown:</strong> Lists all known tags for the selected category. Any tag that the currently inspected card already possesses is prefixed with a checkmark (<code>✓</code>).</li>
+                <li><strong><code>+ Assign</code>:</strong> Assigns the selected tag (or multiple tags separated by semicolons) to the card. The closed dropdown immediately updates to display <code>✓ [Tag]</code>.</li>
+                <li><strong><code>- Remove</code>:</strong> Removes the selected tag from the card. If the tag field is empty or doesn't match an assigned tag, clicking this button opens a popup picker listing all tags currently on the card for instant removal.</li>
+                <li><strong><code>New Tag...</code>:</strong> Opens the authoring dialog, pre-seeded with the active category, to register and assign a new tag in one action.</li>
+            </ul>
+        </li>
+    </ul>
 
-    <h3>A. Deck Builder Mode (<code>[ Deck (Count) ]</code>)</h3>
-    <p>Displays the five standard MECCG deck partitions across wide, easy-to-read tabs:</p>
+    <h2>Deck Partitions (Right Pane)</h2>
+    <p>Displays the five standard MECCG deck partitions across wide, easy-to-read tabs alongside the Card Taxonomy Inspector. Clicking any card inside a deck tab immediately displays both its artwork and taxonomy in the center panes:</p>
     <table>
         <tr>
             <th>Tab</th>
@@ -85,39 +102,12 @@
         <tr><td><code>Site</code></td><td>Sites</td><td>Site cards and movement region paths.</td></tr>
     </table>
 
-    <h3>B. Card Taxonomy Inspector Mode (<code>[ Card Taxonomy ]</code>)</h3>
-    <p>
-        Provides a dedicated, persistent inspection and tagging workspace for the currently selected card:
-    </p>
-    <ul>
-        <li><strong>Card Header:</strong> Displays the selected card's printed title and 4-letter set code.</li>
-        <li>
-            <strong>Live Monospace Metadata Readout:</strong>
-            A color-coded, scrollable viewer displaying all populated official attributes (slate navy) and assigned custom taxonomy tags (deep teal). Long multi-tag lists (such as <code>Home Region</code> or <code>Site Requirement</code>) and long rules descriptions wrap cleanly with a <strong>column-aligned hanging indent</strong> so colons stay strictly aligned and text is never clipped.
-        </li>
-        <li>
-            <strong>Pinned Quick Assign Bar:</strong>
-            A compact, non-scrolling tool docked at the bottom of the inspector:
-            <ul>
-                <li><strong>Category Dropdown:</strong> Automatically synchronizes with your active bottom filter criteria (Slot 3, falling back to Slot 4). Changing the category dropdown refreshes the tag list instantly.</li>
-                <li><strong>Tag Dropdown:</strong> Lists all known tags for the selected category. Any tag that the currently inspected card already possesses is prefixed with a checkmark (<code>✓</code>).</li>
-                <li><strong><code>+ Assign</code>:</strong> Assigns the selected tag (or multiple tags separated by semicolons) to the card. The closed dropdown immediately updates to display <code>✓ [Tag]</code>.</li>
-                <li><strong><code>- Remove</code>:</strong> Removes the selected tag from the card. If the tag field is empty or doesn't match an assigned tag, clicking this button opens a popup picker listing all tags currently on the card for instant removal.</li>
-                <li><strong><code>New Tag...</code>:</strong> Opens the authoring dialog, pre-seeded with the active category, to register and assign a new tag in one action.</li>
-            </ul>
-        </li>
-    </ul>
-
-    <div class="tip">
-        <strong>Dual-Action Workflow:</strong> Even while the <strong>Card Taxonomy</strong> inspector is visible, double-clicking any card in the Master List continues to deposit copies into your last-active deck tab without having to switch back to Deck Builder mode.
-    </div>
-
     <!-- FILTER BAR -->
     <h2>Filter Bar (Bottom Panel)</h2>
-    <p>Organized into two titled GroupBoxes providing context-sensitive faceted filtering:</p>
+    <p>Organized into two titled GroupBoxes providing six context-sensitive faceted filter slots:</p>
     <ul>
-        <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1 &amp; 2 query official rules properties (Attribute above Value).</li>
-        <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 3 &amp; 4 query your custom classification taxonomy (Category above Tag). Selecting categories or tags here automatically synchronizes the Quick Assign bar in the right pane.</li>
+        <li><strong>Left Box — Card Attributes (Official Database):</strong> Slots 1&ndash;3 query official rules properties (Attribute above Value).</li>
+        <li><strong>Right Box — Custom Tags (User Taxonomy):</strong> Slots 4&ndash;6 query your custom classification taxonomy (Category above Tag). Selecting categories or tags here automatically synchronizes the Quick Assign bar in the Card Taxonomy Inspector.</li>
     </ul>
 
     <h2>Dynamic Title Bar Summary</h2>

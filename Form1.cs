@@ -33,6 +33,7 @@ namespace MECCG_Deck_Builder
 
         private readonly FilterSlot[] _filterSlots;
         private bool _isUpdatingFilters;
+        private bool _isSyncingListSelection;
 
         private List<Card> _masterCards = [];
         private Card _inspectedCard;
@@ -51,8 +52,10 @@ namespace MECCG_Deck_Builder
             _filterSlots = [
                 new FilterSlot(0, FilterType.Cardnum, ComboBoxKey1, ComboBoxValue1),
                 new FilterSlot(1, FilterType.Cardnum, ComboBoxKey2, ComboBoxValue2),
-                new FilterSlot(2, FilterType.Custom, ComboBoxKey3, ComboBoxValue3),
-                new FilterSlot(3, FilterType.Custom, ComboBoxKey4, ComboBoxValue4)
+                new FilterSlot(2, FilterType.Cardnum, ComboBoxKey3, ComboBoxValue3),
+                new FilterSlot(3, FilterType.Custom, ComboBoxKey4, ComboBoxValue4),
+                new FilterSlot(4, FilterType.Custom, ComboBoxKey5, ComboBoxValue5),
+                new FilterSlot(5, FilterType.Custom, ComboBoxKey6, ComboBoxValue6)
             ];
 
             InitializeFilterClearing();
@@ -78,7 +81,6 @@ namespace MECCG_Deck_Builder
                 PopulateAssignCategories();
                 UpdateFacetedFilters();
                 UpdateFormTitle();
-                SetRightPaneMode(false); // Default to Deck Builder tab view
             }
             finally
             {
@@ -213,8 +215,10 @@ namespace MECCG_Deck_Builder
             {
                 SetKeyDropdownDataSource(ComboBoxKey1, _catalogService.GetFilterKeys());
                 SetKeyDropdownDataSource(ComboBoxKey2, _catalogService.GetFilterKeys());
-                SetKeyDropdownDataSource(ComboBoxKey3, _filterService.GetCustomKeyNames());
+                SetKeyDropdownDataSource(ComboBoxKey3, _catalogService.GetFilterKeys());
                 SetKeyDropdownDataSource(ComboBoxKey4, _filterService.GetCustomKeyNames());
+                SetKeyDropdownDataSource(ComboBoxKey5, _filterService.GetCustomKeyNames());
+                SetKeyDropdownDataSource(ComboBoxKey6, _filterService.GetCustomKeyNames());
             }
             finally
             {
@@ -254,9 +258,6 @@ namespace MECCG_Deck_Builder
 
         private void InitializeTaxonomyInspector()
         {
-            BtnModeDeck.Click += (s, e) => SetRightPaneMode(false);
-            BtnModeTaxonomy.Click += (s, e) => SetRightPaneMode(true);
-
             CmbAssignCategory.SelectedIndexChanged += (s, e) => PopulateAssignTagsForCategory();
             CmbAssignCategory.TextChanged += (s, e) => PopulateAssignTagsForCategory();
 
@@ -289,53 +290,6 @@ namespace MECCG_Deck_Builder
             }
         }
 
-        private void SetRightPaneMode(bool isTaxonomy)
-        {
-            if (isTaxonomy)
-            {
-                BtnModeTaxonomy.BackColor = SystemColors.Window;
-                BtnModeTaxonomy.Font = new Font(Font, FontStyle.Bold);
-                BtnModeDeck.BackColor = SystemColors.Control;
-                BtnModeDeck.Font = new Font(Font, FontStyle.Regular);
-
-                TabControlDeck.Visible = false;
-                PanelTaxonomy.Visible = true;
-
-                PopulateAssignCategories();
-                SyncAssignCategoryWithFilterSlots();
-                UpdateTaxonomyView(_inspectedCard);
-            }
-            else
-            {
-                BtnModeDeck.BackColor = SystemColors.Window;
-                BtnModeDeck.Font = new Font(Font, FontStyle.Bold);
-                BtnModeTaxonomy.BackColor = SystemColors.Control;
-                BtnModeTaxonomy.Font = new Font(Font, FontStyle.Regular);
-
-                PanelTaxonomy.Visible = false;
-                TabControlDeck.Visible = true;
-            }
-        }
-
-        private void SyncAssignCategoryWithFilterSlots()
-        {
-            string slot3Cat = ComboBoxKey3.Text.Trim();
-            string slot3Val = ComboBoxValue3.Text.Trim();
-            string slot4Cat = ComboBoxKey4.Text.Trim();
-            string slot4Val = ComboBoxValue4.Text.Trim();
-
-            if (!string.IsNullOrWhiteSpace(slot3Cat))
-            {
-                CmbAssignCategory.Text = slot3Cat;
-                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(slot3Val) ? slot3Val : null);
-            }
-            else if (!string.IsNullOrWhiteSpace(slot4Cat))
-            {
-                CmbAssignCategory.Text = slot4Cat;
-                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(slot4Val) ? slot4Val : null);
-            }
-        }
-
         private void PopulateAssignCategories()
         {
             string prevCategory = CmbAssignCategory.Text.Trim();
@@ -356,20 +310,15 @@ namespace MECCG_Deck_Builder
             }
             else if (keys.Count > 0)
             {
-                // Fall back to Slot 3 (if valid), then Slot 4 (if valid), or index 0
-                string slot3 = ComboBoxKey3.Text.Trim();
-                string slot4 = ComboBoxKey4.Text.Trim();
+                // Fall back to Custom Slots 4, 5, or 6 (if valid), or index 0
+                string[] activeCustomKeys = [ComboBoxKey4.Text.Trim(), ComboBoxKey5.Text.Trim(), ComboBoxKey6.Text.Trim()];
+                string matchedSlot = activeCustomKeys
+                    .Select(slot => keys.FirstOrDefault(k => string.Equals(k, slot, StringComparison.OrdinalIgnoreCase)))
+                    .FirstOrDefault(match => !string.IsNullOrEmpty(match));
 
-                var matchSlot3 = keys.FirstOrDefault(k => string.Equals(k, slot3, StringComparison.OrdinalIgnoreCase));
-                var matchSlot4 = keys.FirstOrDefault(k => string.Equals(k, slot4, StringComparison.OrdinalIgnoreCase));
-
-                if (!string.IsNullOrEmpty(matchSlot3))
+                if (!string.IsNullOrEmpty(matchedSlot))
                 {
-                    CmbAssignCategory.Text = matchSlot3;
-                }
-                else if (!string.IsNullOrEmpty(matchSlot4))
-                {
-                    CmbAssignCategory.Text = matchSlot4;
+                    CmbAssignCategory.Text = matchedSlot;
                 }
                 else
                 {
@@ -1091,6 +1040,7 @@ namespace MECCG_Deck_Builder
 
         private async void ListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_isSyncingListSelection) return;
             if (sender is not ListBox listBox) return;
 
             if (listBox.SelectedIndex < 0)
@@ -1130,12 +1080,20 @@ namespace MECCG_Deck_Builder
             UpdateTaxonomyView(selectedCard);
             PopulateAssignTagsForCategory();
 
-            if (listBox != ListBoxMaster) ListBoxMaster.ClearSelected();
-            if (listBox != ListBoxPool) ListBoxPool.ClearSelected();
-            if (listBox != ListBoxResources) ListBoxResources.ClearSelected();
-            if (listBox != ListBoxHazards) ListBoxHazards.ClearSelected();
-            if (listBox != ListBoxSideboard) ListBoxSideboard.ClearSelected();
-            if (listBox != ListBoxSites) ListBoxSites.ClearSelected();
+            _isSyncingListSelection = true;
+            try
+            {
+                if (listBox != ListBoxMaster) ListBoxMaster.ClearSelected();
+                if (listBox != ListBoxPool) ListBoxPool.ClearSelected();
+                if (listBox != ListBoxResources) ListBoxResources.ClearSelected();
+                if (listBox != ListBoxHazards) ListBoxHazards.ClearSelected();
+                if (listBox != ListBoxSideboard) ListBoxSideboard.ClearSelected();
+                if (listBox != ListBoxSites) ListBoxSites.ClearSelected();
+            }
+            finally
+            {
+                _isSyncingListSelection = false;
+            }
 
             string imageUrl = $"https://cardnum.net/img/cards/{selectedCard.Set}/{selectedCard.ImageName}";
 
@@ -1295,11 +1253,62 @@ namespace MECCG_Deck_Builder
         private void RemoveCardFromSection(DeckSectionType sectionType, int index)
         {
             var section = _currentDeck.GetSection(sectionType);
-            if (index >= 0 && index < section.Count)
+            if (index < 0 || index >= section.Count) return;
+
+            var listBox = GetListBoxFromSectionType(sectionType);
+            Card removedCard = section[index];
+            int prevSelectedIndex = listBox.SelectedIndex;
+
+            bool anyOtherListSelected =
+                (listBox != ListBoxMaster && ListBoxMaster.SelectedIndex >= 0) ||
+                (listBox != ListBoxPool && ListBoxPool.SelectedIndex >= 0) ||
+                (listBox != ListBoxResources && ListBoxResources.SelectedIndex >= 0) ||
+                (listBox != ListBoxHazards && ListBoxHazards.SelectedIndex >= 0) ||
+                (listBox != ListBoxSideboard && ListBoxSideboard.SelectedIndex >= 0) ||
+                (listBox != ListBoxSites && ListBoxSites.SelectedIndex >= 0);
+
+            bool wasActiveSelection = (prevSelectedIndex == index) ||
+                                      (prevSelectedIndex < 0 && !anyOtherListSelected && ReferenceEquals(_inspectedCard, removedCard));
+
+            section.RemoveAt(index);
+            RefreshSectionListBox(sectionType);
+            UpdateFormTitle();
+
+            if (wasActiveSelection)
             {
-                section.RemoveAt(index);
-                RefreshSectionListBox(sectionType);
-                UpdateFormTitle();
+                if (listBox.Items.Count > 0)
+                {
+                    int nextIndex = Math.Min(index, listBox.Items.Count - 1);
+                    listBox.SelectedIndex = -1;
+                    listBox.SelectedIndex = nextIndex;
+                }
+                else if (ListBoxMaster.Items.Count > 0)
+                {
+                    ListBoxMaster.SelectedIndex = -1;
+                    ListBoxMaster.SelectedIndex = 0;
+                }
+                else
+                {
+                    _imageLoadCts?.Cancel();
+                    PictureBoxCardImage.Image = null;
+                    _inspectedCard = null;
+                    UpdateTaxonomyView(null);
+                }
+            }
+            else if (prevSelectedIndex >= 0 && listBox.Items.Count > 0)
+            {
+                int adjustedIndex = prevSelectedIndex > index ? prevSelectedIndex - 1 : prevSelectedIndex;
+                adjustedIndex = Math.Clamp(adjustedIndex, 0, listBox.Items.Count - 1);
+
+                _isSyncingListSelection = true;
+                try
+                {
+                    listBox.SelectedIndex = adjustedIndex;
+                }
+                finally
+                {
+                    _isSyncingListSelection = false;
+                }
             }
         }
 
@@ -1362,14 +1371,6 @@ namespace MECCG_Deck_Builder
 
         private void UpdateFormTitle()
         {
-            int totalDeckCards = _currentDeck.Pool.Count +
-                                 _currentDeck.Resources.Count +
-                                 _currentDeck.Hazards.Count +
-                                 _currentDeck.Sideboard.Count +
-                                 _currentDeck.Sites.Count;
-
-            BtnModeDeck.Text = $"Deck ({totalDeckCards})";
-
             Text = $"{Constants.AppTitle} - \"{_currentDeck.Title}\" " +
                    $"({_currentDeck.Pool.Count}/" +
                    $"{_currentDeck.Resources.Count}[{_currentDeck.CountCharactersInResources()}]/" +
@@ -1949,7 +1950,7 @@ namespace MECCG_Deck_Builder
 
                 // Pass 2: Mutual constraint check across surviving peer criteria
                 bool changed;
-                int maxIterations = 4;
+                int maxIterations = _filterSlots.Length;
                 do
                 {
                     changed = false;
@@ -2051,15 +2052,20 @@ namespace MECCG_Deck_Builder
                     _isUpdatingFilters = false;
                 }
 
-                // Live-sync Quick Assign to whichever custom slot you just changed
-                if (sender == ComboBoxKey3 && !string.IsNullOrWhiteSpace(ComboBoxKey3.Text))
-                {
-                    CmbAssignCategory.Text = ComboBoxKey3.Text.Trim();
-                    PopulateAssignTagsForCategory();
-                }
-                else if (sender == ComboBoxKey4 && !string.IsNullOrWhiteSpace(ComboBoxKey4.Text))
+                // Live-sync Quick Assign to whichever custom slot (4, 5, or 6) you just changed
+                if (sender == ComboBoxKey4 && !string.IsNullOrWhiteSpace(ComboBoxKey4.Text))
                 {
                     CmbAssignCategory.Text = ComboBoxKey4.Text.Trim();
+                    PopulateAssignTagsForCategory();
+                }
+                else if (sender == ComboBoxKey5 && !string.IsNullOrWhiteSpace(ComboBoxKey5.Text))
+                {
+                    CmbAssignCategory.Text = ComboBoxKey5.Text.Trim();
+                    PopulateAssignTagsForCategory();
+                }
+                else if (sender == ComboBoxKey6 && !string.IsNullOrWhiteSpace(ComboBoxKey6.Text))
+                {
+                    CmbAssignCategory.Text = ComboBoxKey6.Text.Trim();
                     PopulateAssignTagsForCategory();
                 }
 
@@ -2071,17 +2077,23 @@ namespace MECCG_Deck_Builder
         {
             if (_isUpdatingFilters) return;
 
-            // Live-sync Quick Assign when changing custom tag values in Slot 3 or 4
-            if (sender == ComboBoxValue3 && !string.IsNullOrWhiteSpace(ComboBoxKey3.Text))
-            {
-                string tag = ComboBoxValue3.Text.Trim();
-                CmbAssignCategory.Text = ComboBoxKey3.Text.Trim();
-                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(tag) ? tag : null);
-            }
-            else if (sender == ComboBoxValue4 && !string.IsNullOrWhiteSpace(ComboBoxKey4.Text))
+            // Live-sync Quick Assign when changing custom tag values in Slots 4, 5, or 6
+            if (sender == ComboBoxValue4 && !string.IsNullOrWhiteSpace(ComboBoxKey4.Text))
             {
                 string tag = ComboBoxValue4.Text.Trim();
                 CmbAssignCategory.Text = ComboBoxKey4.Text.Trim();
+                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(tag) ? tag : null);
+            }
+            else if (sender == ComboBoxValue5 && !string.IsNullOrWhiteSpace(ComboBoxKey5.Text))
+            {
+                string tag = ComboBoxValue5.Text.Trim();
+                CmbAssignCategory.Text = ComboBoxKey5.Text.Trim();
+                PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(tag) ? tag : null);
+            }
+            else if (sender == ComboBoxValue6 && !string.IsNullOrWhiteSpace(ComboBoxKey6.Text))
+            {
+                string tag = ComboBoxValue6.Text.Trim();
+                CmbAssignCategory.Text = ComboBoxKey6.Text.Trim();
                 PopulateAssignTagsForCategory(!string.IsNullOrWhiteSpace(tag) ? tag : null);
             }
 
@@ -2127,11 +2139,13 @@ namespace MECCG_Deck_Builder
             filterContextMenu.Items.Add(clearAllItem);
 
             ComboBox[] filterBoxes = [
-                ComboBoxKey1, ComboBoxValue1,
-                ComboBoxKey2, ComboBoxValue2,
-                ComboBoxKey3, ComboBoxValue3,
-                ComboBoxKey4, ComboBoxValue4
-            ];
+             ComboBoxKey1, ComboBoxValue1,
+             ComboBoxKey2, ComboBoxValue2,
+             ComboBoxKey3, ComboBoxValue3,
+             ComboBoxKey4, ComboBoxValue4,
+             ComboBoxKey5, ComboBoxValue5,
+             ComboBoxKey6, ComboBoxValue6
+         ];
 
             foreach (var cb in filterBoxes)
             {
@@ -2204,6 +2218,8 @@ namespace MECCG_Deck_Builder
             if (control == ComboBoxKey2 || control == ComboBoxValue2) return 1;
             if (control == ComboBoxKey3 || control == ComboBoxValue3) return 2;
             if (control == ComboBoxKey4 || control == ComboBoxValue4) return 3;
+            if (control == ComboBoxKey5 || control == ComboBoxValue5) return 4;
+            if (control == ComboBoxKey6 || control == ComboBoxValue6) return 5;
             return -1;
         }
 
@@ -2628,10 +2644,8 @@ namespace MECCG_Deck_Builder
                 _filterService,
                 _currentDeck.IncludedSets,
                 _masterCards,
-                _filterSlots[0].CurrentKey,
-                _filterSlots[1].CurrentKey,
-                _filterSlots[2].CurrentKey,
-                _filterSlots[3].CurrentKey);
+                [_filterSlots[0].CurrentKey, _filterSlots[1].CurrentKey, _filterSlots[2].CurrentKey],
+                [_filterSlots[3].CurrentKey, _filterSlots[4].CurrentKey, _filterSlots[5].CurrentKey]);
 
             dlg.ShowDialog(this);
         }
