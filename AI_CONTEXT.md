@@ -188,6 +188,24 @@
     - Extended Run, Clear, Save, and Recall actions to handle both Resources companions and Sideboard reserve characters, enforcing global 1-copy uniqueness across the whole deck.
     - Updated Tab 1 live composition summary: distinguishes non-Avatar companions, Avatars, and Sideboard characters against official tournament limits.
     - Enhanced `RunGeographicTheaterDraft`: audits required home sites for Resource companions as the primary baseline, then opportunistically incorporates Sideboard character home sites if site and region budgets permit.
+  - [x] Issue #49: Configurable Character Home Site Inclusion Policy, Sideboard Reserve Home Sites, and Wizard Land Home Site Routing
+    - Added dedicated Wizard Land Home Site toggle (`_chkIncludeWizardHome`) in Avatar box: `Include Wizard's land home site in Site deck (Isengard for Saruman / Rhosgobel for Radagast)`.
+    - Added Home Site Policy ComboBox (`_cmbHomeSitePolicy`) on Tab 3 with three operational modes:
+      1. `Best Effort (Fit in budget, else Havens)` [Default]: Prioritizes and drafts all character/Wizard home sites that fit within Site Count and Region Count; reports any budget omissions with the reminder that characters deploy at Rivendell.
+      2. `Strict (Require all; abort on shortfall)`: Pre-checks mathematical feasibility against both site and region budgets; cleanly aborts if any required home site cannot fit.
+      3. `Havens Only (Do not force home sites)`: Omits all non-starter home sites, preserving site deck capacity purely for theater adventure sites and standard Havens.
+    - Added Sideboard Home Site toggle (`_chkIncludeSideboardHomeSites`): `Also attempt to include Sideboard character home sites (if budget permits)` (default: unchecked).
+    - Bi-directional coordination: Tab 3 Non-Starting Character draft respects the active policy when theater sites already exist, and Tab 4 Geographic Theater draft applies the policy when constructing the site deck and region highway.
+  - [x] Issue #49: Modular Workbench Studio: Profile Storage, Option A Layout, Natural Ranges, Dynamic Haven Selection, and Clean Theater Roaming
+    - Adopted Option A flush-left grid layout across Tabs 2 and 3, eliminating row labels and resolving header collision coordinates.
+    - Implemented `NormalizeNumericQuery` supporting natural range expressions (`>= 3 and <= 5`, `2-4`, `3 to 5`) with Roslyn `SYSLIB1045` suppression.
+    - Added `Home Region Policy` dropdown on Tab 2 (`Best Effort`, `Strict`, `Open / Anywhere`) to control regional company constraints.
+    - Restructured Wizard controls into two clean rows and replaced checkbox with `Wizard Home Site Policy` dropdown (`None` vs `Include Wizard Home Site(s)`).
+    - Rolled Sideboard home site inclusion directly into `Best Effort` as Tier 2 opportunistic priority, eliminating `_chkIncludeSideboardHomeSites`.
+    - Enhanced Haven Anchor with dynamic `Starting Company (Majority Vote)` (plurality winner with Rivendell tie-break) and `Nearest Haven (to Theater)` (BFS hop calculation from cluster to Haven home capitals).
+    - Decoupled theater roaming clusters from havens, dropped the overland BFS highway to ensure `Region Count` strictly equals region cards drafted, and removed the ghost wizard fallback.
+    - Added `Save Settings...` and `Load Settings...` profile persistence on Tab 1 via `*.workbench.json`.
+    - Standardized status text color to neutral slate gray across all tabs and expanded Tab 3 status label height to prevent clipping.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

@@ -1282,20 +1282,46 @@ namespace MECCG_Deck_Builder
         private static bool HasComparisonOperator(string val) =>
             val.Contains('>') || val.Contains('<') || val.Contains("!=") || val.Contains('=');
 
+#pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
+        /// <summary>
+        /// Normalizes natural language numeric expressions (e.g. ">= 3 and <= 5", "3-5", "2 to 4", "1, 2")
+        /// into standard semicolon-delimited comparison tokens.
+        /// </summary>
+        public static string NormalizeNumericQuery(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            string text = input.Trim();
+
+            // 1. Replace natural conjunctions ("and", "&&", "&", commas) with semicolons
+            text = Regex.Replace(text, @"\s+(?:and|&&|&)\s+", "; ", RegexOptions.IgnoreCase);
+            text = Regex.Replace(text, @",\s*", "; ");
+
+            // 2. Handle ranges like "3-5", "3 - 5", "3 to 5" (ensuring we don't misinterpret negative numbers like "-2")
+            var rangeMatch = Regex.Match(text, @"^(\d+)\s*(?:-|–|—|\bto\b)\s*(\d+)$", RegexOptions.IgnoreCase);
+            if (rangeMatch.Success)
+            {
+                return $">= {rangeMatch.Groups[1].Value}; <= {rangeMatch.Groups[2].Value}";
+            }
+
+            return text;
+        }
+#pragma warning restore SYSLIB1045
+
         internal static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
         {
             string rawCardVal = card.GetAttribute(attrKey);
+            string normalizedQuery = NormalizeNumericQuery(query);
 
             if (!TryParseCardStat(rawCardVal, out int cardStat))
             {
-                var fallbackTokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                var fallbackTokens = normalizedQuery.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 return fallbackTokens.Any(v =>
                     v == "*" ||
                     string.Equals(v, "All", StringComparison.OrdinalIgnoreCase) ||
                     CardFilterService.MatchesCardnumCriterion(card, attrKey, v));
             }
 
-            var tokens = query.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var tokens = normalizedQuery.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             var parsedConditions = new List<(string Op, int TargetVal, bool IsWildcard, bool IsBlank)>();
 
             foreach (var token in tokens)
