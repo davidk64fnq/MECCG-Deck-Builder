@@ -15,8 +15,13 @@ namespace MECCG_Deck_Builder
         private readonly Deck _deck;
         private readonly CardCatalogService _catalog;
         private readonly CardFilterService _filterService;
-        private readonly Func<ISet<string>> _getActiveSets;
-        private readonly Action _notifyDeckChanged;
+        private readonly Func<ISet<string>> _getActiveSets; 
+        private readonly Action<DeckSectionType?> _notifyDeckCallback;
+
+        private void NotifyDeckChanged(DeckSectionType? section = null)
+        {
+            _notifyDeckCallback?.Invoke(section);
+        }
 
         // Session memory snapshots
         private List<Card> _savedPool;
@@ -62,19 +67,22 @@ namespace MECCG_Deck_Builder
         private readonly CheckedListBox _clbRegionTypes;
         private readonly CheckedListBox _clbSiteTypes;
         private readonly Label _lblTheaterStatus;
+        private readonly ComboBox _cmbSeedRegion;
+        private bool _isUpdatingTheaterCombos;
+        private string _savedSeedRegion;
 
         public DeckAssemblyMatrixDialog(
-            Deck deck,
-            CardCatalogService catalog,
-            CardFilterService filterService,
-            Func<ISet<string>> getActiveSets,
-            Action notifyDeckChanged)
+    Deck deck,
+    CardCatalogService catalog,
+    CardFilterService filterService,
+    Func<ISet<string>> getActiveSets,
+    Action<DeckSectionType?> notifyDeckChanged)
         {
             _deck = deck ?? throw new ArgumentNullException(nameof(deck));
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _filterService = filterService ?? throw new ArgumentNullException(nameof(filterService));
             _getActiveSets = getActiveSets ?? (() => new HashSet<string>());
-            _notifyDeckChanged = notifyDeckChanged ?? (() => { });
+            _notifyDeckCallback = notifyDeckChanged ?? (_ => { });
 
             Text = "Modular Deck Assembly Workbench";
             ClientSize = new Size(860, 650);
@@ -111,7 +119,7 @@ namespace MECCG_Deck_Builder
             _txtDeckTitle.TextChanged += (s, e) =>
             {
                 _deck.Title = _txtDeckTitle.Text;
-                _notifyDeckChanged();
+                NotifyDeckChanged();
             };
 
             var lblPlaySize = new Label { Text = "Play Deck Size:", Location = new Point(16, 64), Size = new Size(110, 20) };
@@ -207,7 +215,8 @@ namespace MECCG_Deck_Builder
                 Location = new Point(20, 30),
                 Size = new Size(770, 335),
                 Font = new Font("Segoe UI", 10.0f),
-                ForeColor = Color.FromArgb(26, 54, 93)
+                ForeColor = Color.FromArgb(26, 54, 93),
+                UseMnemonic = false
             };
             grpSummary.Controls.Add(_lblDeckSummary);
 
@@ -258,7 +267,7 @@ namespace MECCG_Deck_Builder
             btnClearStarter.Click += (s, e) =>
             {
                 _deck.Pool.Clear();
-                _notifyDeckChanged();
+                NotifyDeckChanged(DeckSectionType.Pool);
                 RefreshHavenDropdown();
                 _lblStarterStatus.Text = "Starting Pool cleared.";
             };
@@ -291,7 +300,7 @@ namespace MECCG_Deck_Builder
                 _deck.Pool.Clear();
                 _deck.Pool.AddRange(_savedPool);
                 _deck.SortSections();
-                _notifyDeckChanged();
+                NotifyDeckChanged(DeckSectionType.Pool);
                 RefreshHavenDropdown();
                 _lblStarterStatus.Text = $"Restored from Snapshot ({_savedPool.Count} cards).";
             };
@@ -301,7 +310,8 @@ namespace MECCG_Deck_Builder
                 Location = new Point(16, 268),
                 Size = new Size(790, 50),
                 ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic)
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false
             };
 
             tabStarter.Controls.AddRange([
@@ -472,7 +482,7 @@ namespace MECCG_Deck_Builder
             {
                 _deck.Resources.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
                 _deck.Sideboard.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
-                _notifyDeckChanged();
+                NotifyDeckChanged(DeckSectionType.Resources);
                 _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
                 _lblRecruitStatus.Text = "Non-starting characters cleared from Resources and Sideboard.";
             };
@@ -511,7 +521,7 @@ namespace MECCG_Deck_Builder
                 if (_savedSideboardCharacters != null) _deck.Sideboard.AddRange(_savedSideboardCharacters);
 
                 _deck.SortSections();
-                _notifyDeckChanged();
+                NotifyDeckChanged(DeckSectionType.Resources);
                 _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
                 _lblRecruitStatus.Text = $"Restored from Snapshot ({_savedNonStarters?.Count ?? 0} in Resources, {_savedSideboardCharacters?.Count ?? 0} in Sideboard).";
             };
@@ -521,7 +531,8 @@ namespace MECCG_Deck_Builder
                 Location = new Point(16, 586),
                 Size = new Size(810, 54),
                 ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Italic)
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
+                UseMnemonic = false
             };
 
             tabRecruits.Controls.AddRange([
@@ -542,6 +553,7 @@ namespace MECCG_Deck_Builder
                 Size = new Size(385, 230)
             };
 
+            // Row 1: Movement Mode (Y = 25)
             var lblMode = new Label { Text = "Movement Mode:", Location = new Point(12, 28), Size = new Size(110, 20) };
             _cmbMode = new ComboBox
             {
@@ -555,10 +567,42 @@ namespace MECCG_Deck_Builder
             {
                 bool isStarterOnly = _cmbMode.SelectedIndex == 1;
                 _numRegionCount.Enabled = !isStarterOnly;
-                if (isStarterOnly) _numRegionCount.Value = 0;
-                else if (_numRegionCount.Value == 0) _numRegionCount.Value = 4;
+                _cmbSeedRegion.Enabled = !isStarterOnly;
+
+                // 1. Rebuild Haven dropdown (strips "Nearest Haven" in Starter Only mode)
+                RefreshHavenDropdown();
+
+                // 2. Manage Seed Region placeholder
+                if (isStarterOnly)
+                {
+                    _numRegionCount.Value = 0;
+
+                    // Save current selection before showing placeholder
+                    string curSeed = _cmbSeedRegion.SelectedItem?.ToString();
+                    if (!string.IsNullOrWhiteSpace(curSeed) && !curSeed.StartsWith("(N/A", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _savedSeedRegion = curSeed;
+                    }
+
+                    _cmbSeedRegion.BeginUpdate();
+                    _cmbSeedRegion.Items.Clear();
+                    _cmbSeedRegion.Items.Add("(N/A - Haven Hub)");
+                    _cmbSeedRegion.SelectedIndex = 0;
+                    _cmbSeedRegion.EndUpdate();
+                }
+                else
+                {
+                    if (_numRegionCount.Value == 0)
+                    {
+                        _numRegionCount.Value = 4;
+                    }
+
+                    // Restore normal region list and previous choice (e.g. Khand)
+                    PopulateSeedRegionDropdown(_savedSeedRegion);
+                }
             };
 
+            // Row 2: Haven Anchor (Y = 62)
             var lblHaven = new Label { Text = "Haven Anchor:", Location = new Point(12, 65), Size = new Size(110, 20) };
             _cmbHaven = new ComboBox
             {
@@ -567,31 +611,96 @@ namespace MECCG_Deck_Builder
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
 
-            var lblRegCount = new Label { Text = "Region Count:", Location = new Point(12, 102), Size = new Size(110, 20) };
+            // Row 3: Seed Region (Y = 99) <-- NEW
+            var lblSeed = new Label { Text = "Seed Region:", Location = new Point(12, 102), Size = new Size(110, 20) };
+            _cmbSeedRegion = new ComboBox
+            {
+                Location = new Point(130, 99),
+                Size = new Size(235, 23),
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+
+            // Row 4: Region Count (Shifted down to Y = 136)
+            var lblRegCount = new Label { Text = "Region Count:", Location = new Point(12, 138), Size = new Size(110, 20) };
             _numRegionCount = new NumericUpDown
             {
-                Location = new Point(130, 100),
+                Location = new Point(130, 136),
                 Size = new Size(60, 23),
                 Minimum = 0,
                 Maximum = 12,
                 Value = 4
             };
 
-            var lblSiteCount = new Label { Text = "Site Count:", Location = new Point(12, 138), Size = new Size(110, 20) };
+            // Row 5: Site Count (Shifted down to Y = 172)
+            var lblSiteCount = new Label { Text = "Site Count:", Location = new Point(12, 174), Size = new Size(110, 20) };
             _numSiteCount = new NumericUpDown
             {
-                Location = new Point(130, 136),
+                Location = new Point(130, 172),
                 Size = new Size(60, 23),
                 Minimum = 0,
                 Maximum = 30,
                 Value = 8
             };
 
+            // Inside DeckAssemblyMatrixDialog constructor:
+            _cmbHaven.SelectedIndexChanged += (s, e) =>
+            {
+                if (_isUpdatingTheaterCombos) return;
+
+                string havenChoice = _cmbHaven.SelectedItem?.ToString() ?? "";
+                if (havenChoice.StartsWith("Nearest Haven", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Haven is following Theater -> Theater cannot follow Haven!
+                    string seedChoice = _cmbSeedRegion.SelectedItem?.ToString() ?? "";
+                    if (seedChoice.StartsWith("Auto", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _isUpdatingTheaterCombos = true;
+                        try
+                        {
+                            int rndIdx = _cmbSeedRegion.FindStringExact("Random (Across Middle-earth)");
+                            if (rndIdx >= 0) _cmbSeedRegion.SelectedIndex = rndIdx;
+                        }
+                        finally
+                        {
+                            _isUpdatingTheaterCombos = false;
+                        }
+                    }
+                }
+            };
+
+            _cmbSeedRegion.SelectedIndexChanged += (s, e) =>
+            {
+                if (_isUpdatingTheaterCombos) return;
+
+                string seedChoice = _cmbSeedRegion.SelectedItem?.ToString() ?? "";
+                if (seedChoice.StartsWith("Auto", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Theater is following Haven -> Haven cannot follow Theater!
+                    string havenChoice = _cmbHaven.SelectedItem?.ToString() ?? "";
+                    if (havenChoice.StartsWith("Nearest Haven", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _isUpdatingTheaterCombos = true;
+                        try
+                        {
+                            int compIdx = _cmbHaven.FindStringExact("Company Haven (Majority Vote)");
+                            if (compIdx >= 0) _cmbHaven.SelectedIndex = compIdx;
+                            else _cmbHaven.SelectedIndex = 0;
+                        }
+                        finally
+                        {
+                            _isUpdatingTheaterCombos = false;
+                        }
+                    }
+                }
+            };
+
+            // MUST include lblSeed and _cmbSeedRegion here:
             grpTheaterOpts.Controls.AddRange([
                 lblMode, _cmbMode,
-                lblHaven, _cmbHaven,
-                lblRegCount, _numRegionCount,
-                lblSiteCount, _numSiteCount
+    lblHaven, _cmbHaven,
+    lblSeed, _cmbSeedRegion,         // <-- Check that both of these are in this list!
+    lblRegCount, _numRegionCount,
+    lblSiteCount, _numSiteCount
             ]);
 
             var grpFilters = new GroupBox
@@ -639,7 +748,7 @@ namespace MECCG_Deck_Builder
             btnClearTheater.Click += (s, e) =>
             {
                 _deck.Sites.Clear();
-                _notifyDeckChanged();
+                NotifyDeckChanged(DeckSectionType.Sites);
                 _lblTheaterStatus.Text = "Site deck cleared.";
             };
 
@@ -671,16 +780,17 @@ namespace MECCG_Deck_Builder
                 _deck.Sites.Clear();
                 _deck.Sites.AddRange(_savedSites);
                 _deck.SortSections();
-                _notifyDeckChanged();
+                NotifyDeckChanged(DeckSectionType.Sites);
                 _lblTheaterStatus.Text = $"Restored from Snapshot ({_savedSites.Count} cards).";
             };
 
             _lblTheaterStatus = new Label
             {
-                Location = new Point(16, 300),
-                Size = new Size(790, 50),
+                Location = new Point(16, 298),
+                Size = new Size(790, 60), // Increased height to fit 2-3 lines comfortably
                 ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic)
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false
             };
 
             tabTheater.Controls.AddRange([
@@ -693,6 +803,7 @@ namespace MECCG_Deck_Builder
             Controls.Add(_tabControl);
 
             RefreshHavenDropdown();
+            PopulateSeedRegionDropdown();
             UpdateDeckSummary();
             ValidateRecruitTabBudget();
         }
@@ -756,22 +867,67 @@ namespace MECCG_Deck_Builder
         private void RefreshHavenDropdown()
         {
             string currentSelection = _cmbHaven.SelectedItem?.ToString() ?? "";
-            bool hasPool = _deck.Pool.Count > 0;
+            bool isStarterOnly = _cmbMode != null && _cmbMode.SelectedIndex == 1;
 
             _cmbHaven.BeginUpdate();
             _cmbHaven.Items.Clear();
 
-            if (hasPool)
+            _cmbHaven.Items.Add("Company Haven (Majority Vote)");
+
+            // Only available in Starter + Region roaming mode
+            if (!isStarterOnly)
             {
-                _cmbHaven.Items.Add("Starting Company (Majority Vote)");
+                _cmbHaven.Items.Add("Nearest Haven (to Theater)");
             }
 
-            _cmbHaven.Items.Add("Nearest Haven (to Theater)");
             _cmbHaven.Items.AddRange(["Rivendell", "Lórien", "Grey Havens", "Edhellond", "Random"]);
 
             int idx = _cmbHaven.FindStringExact(currentSelection);
-            _cmbHaven.SelectedIndex = idx >= 0 ? idx : 0;
+            if (idx >= 0)
+            {
+                _cmbHaven.SelectedIndex = idx;
+            }
+            else
+            {
+                _cmbHaven.SelectedIndex = 0; // Default to Company Haven if "Nearest Haven" was removed
+            }
+
             _cmbHaven.EndUpdate();
+        }
+
+        private void PopulateSeedRegionDropdown(string targetSelection = null)
+        {
+            string prev = targetSelection
+                ?? _cmbSeedRegion.SelectedItem?.ToString()
+                ?? "Auto (From Haven Anchor)";
+
+            if (prev.StartsWith("(N/A", StringComparison.OrdinalIgnoreCase))
+            {
+                prev = "Auto (From Haven Anchor)";
+            }
+
+            _cmbSeedRegion.BeginUpdate();
+            _cmbSeedRegion.Items.Clear();
+
+            _cmbSeedRegion.Items.Add("Auto (From Haven Anchor)");
+            _cmbSeedRegion.Items.Add("Random (Across Middle-earth)");
+
+            var activeSets = _getActiveSets();
+            var allRegions = _catalog.Cards
+                .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
+                            (activeSets.Count == 0 || activeSets.Contains(c.Set)))
+                .Select(c => c.Name.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(r => r, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var reg in allRegions)
+            {
+                _cmbSeedRegion.Items.Add(reg);
+            }
+
+            int idx = _cmbSeedRegion.FindStringExact(prev);
+            _cmbSeedRegion.SelectedIndex = idx >= 0 ? idx : 0;
+            _cmbSeedRegion.EndUpdate();
         }
 
         private static string FindNearestHavenToCluster(
@@ -1370,7 +1526,7 @@ namespace MECCG_Deck_Builder
             _deck.Pool.Clear();
             _deck.Pool.AddRange(bestCompany);
             _deck.SortSections();
-            _notifyDeckChanged();
+            NotifyDeckChanged(DeckSectionType.Pool); 
 
             RefreshHavenDropdown();
 
@@ -1577,7 +1733,7 @@ namespace MECCG_Deck_Builder
             _deck.Sideboard.AddRange(pickedReserves);
 
             _deck.SortSections();
-            _notifyDeckChanged();
+            NotifyDeckChanged(DeckSectionType.Resources);
 
             // 5. Update Status
             string recruitNames = pickedRecruits.Count > 0 ? string.Join(", ", pickedRecruits.Select(c => c.Name)) : "(None)";
@@ -1601,9 +1757,11 @@ namespace MECCG_Deck_Builder
             int siteCount = (int)_numSiteCount.Value;
 
             int homeSitePolicy = _cmbHomeSitePolicy.SelectedIndex; // 0 = Best Effort, 1 = Strict, 2 = Havens Only
-            bool includeWizardHomes = _cmbWizardHomePolicy.SelectedIndex == 1; // 0 = None, 1 = Include Wizard Home Site(s)
+            bool includeWizardHomes = _cmbWizardHomePolicy.SelectedIndex == 1;
 
-            // 1. Gather Candidate Characters for Home Sites
+            // =========================================================================
+            // 1. GATHER CANDIDATE CHARACTERS FOR HOME SITES
+            // =========================================================================
             var resourceNonStarters = _deck.Resources
                 .Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c))
                 .ToList();
@@ -1612,12 +1770,11 @@ namespace MECCG_Deck_Builder
                 .Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c))
                 .ToList();
 
-            var tier1CandidateEntries = new List<(string Owner, Card SiteCard)>(); // Resources + Wizards (Priority)
-            var tier2CandidateEntries = new List<(string Owner, Card SiteCard)>(); // Sideboard (Opportunistic)
+            var tier1CandidateEntries = new List<(string Owner, Card SiteCard)>();
+            var tier2CandidateEntries = new List<(string Owner, Card SiteCard)>();
 
-            if (homeSitePolicy != 2) // Not "Havens Only"
+            if (homeSitePolicy != 2)
             {
-                // A. Resource Non-Starter Companions
                 foreach (var charCard in resourceNonStarters)
                 {
                     if (string.IsNullOrWhiteSpace(charCard.Home)) continue;
@@ -1635,7 +1792,6 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                // B. Wizard Land Home Sites (Strictly inspect wizards actually in the deck!)
                 if (includeWizardHomes)
                 {
                     var wizards = _deck.Resources.Concat(_deck.Sideboard).Where(IsAvatar).Select(w => w.Name).ToList();
@@ -1661,8 +1817,7 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                // C. Sideboard Non-Starters (Tier 2 Opportunistic)
-                if (homeSitePolicy == 0) // Best Effort only
+                if (homeSitePolicy == 0)
                 {
                     foreach (var charCard in sideboardNonStarters)
                     {
@@ -1683,12 +1838,14 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 2. Evaluate Candidate Home Sites Under the Selected Policy
+            // =========================================================================
+            // 2. EVALUATE CANDIDATE HOME SITES UNDER ACTIVE POLICY
+            // =========================================================================
             var acceptedHomeSites = new List<Card>();
             var acceptedHomeRegions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var shortfallList = new List<(string Owner, string SiteName, string Region)>();
 
-            if (homeSitePolicy == 1) // Strict mode (enforces Tier 1 only)
+            if (homeSitePolicy == 1)
             {
                 var distinctCandidateSites = tier1CandidateEntries
                     .Select(e => e.SiteCard)
@@ -1706,12 +1863,8 @@ namespace MECCG_Deck_Builder
                 {
                     var siteBulletList = string.Join("\n", distinctCandidateSites.Select(s => $"  • {s.Name} ({s.Region})"));
 
-                    string siteMsg = siteDeficit
-                        ? $"• Site Count needed: at least {requiredAdventureCount} (current setting: {siteCount})\n"
-                        : "";
-                    string regMsg = regionDeficit
-                        ? $"• Region Count needed: at least {candidateRegions.Count} (current setting: {maxRegions})\n"
-                        : "";
+                    string siteMsg = siteDeficit ? $"• Site Count needed: at least {requiredAdventureCount} (current setting: {siteCount})\n" : "";
+                    string regMsg = regionDeficit ? $"• Region Count needed: at least {candidateRegions.Count} (current setting: {maxRegions})\n" : "";
 
                     MessageBox.Show(this,
                         $"Cannot assemble Geographic Theater (Strict Home Site Policy):\n\n" +
@@ -1742,7 +1895,7 @@ namespace MECCG_Deck_Builder
                     }
                 }
             }
-            else if (homeSitePolicy == 0) // Best Effort mode (processes Tier 1, then Tier 2 if capacity allows)
+            else if (homeSitePolicy == 0)
             {
                 var combinedEntries = tier1CandidateEntries.Concat(tier2CandidateEntries).ToList();
 
@@ -1782,9 +1935,12 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 3. Resolve Operational Cluster Seed & Graph
+            // =========================================================================
+            // 3. BUILD TERRAIN FILTER AND ALLOWED REGIONS (CRITICAL FIX FOR ISSUE 2)
+            // =========================================================================
             var graph = _filterService.BuildRegionAdjacencyGraph(allCards);
-            string rawHaven = _cmbHaven.SelectedItem?.ToString() ?? "Rivendell";
+            string rawHaven = _cmbHaven.SelectedItem?.ToString() ?? "Company Haven (Majority Vote)";
+            string selectedHaven = "Rivendell";
 
             var checkedTerrains = _clbRegionTypes.CheckedItems.Cast<string>().ToList();
             string terrainFilter = checkedTerrains.Count > 0 ? string.Join("; ", checkedTerrains) : null;
@@ -1792,87 +1948,37 @@ namespace MECCG_Deck_Builder
             var checkedHolds = _clbSiteTypes.CheckedItems.Cast<string>().ToList();
             string holdFilter = checkedHolds.Count > 0 ? string.Join("; ", checkedHolds) : null;
 
-            string seedRegion = "Rhudaur";
-            if (acceptedHomeRegions.Count > 0)
+            // Build the set of all regions satisfying the checked terrain filter
+            HashSet<string> allowedRegions = null;
+            if (!string.IsNullOrWhiteSpace(terrainFilter))
             {
-                seedRegion = acceptedHomeRegions.First();
-            }
-            else if (rawHaven.StartsWith("Nearest Haven", StringComparison.OrdinalIgnoreCase) ||
-                     rawHaven.Equals("Random", StringComparison.OrdinalIgnoreCase))
-            {
-                // Decoupled Expeditionary: pick a random seed region across Middle-earth (filtering by terrain if checked)
-                var candidateSeeds = allCards
-                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
-                                (activeSets.Count == 0 || activeSets.Contains(c.Set)))
-                    .ToList();
-
-                if (!string.IsNullOrWhiteSpace(terrainFilter))
+                var matching = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var regCard in allCards.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
                 {
-                    var filtered = candidateSeeds.Where(c =>
-                        DeckGenerationService.MatchesRegionTypeFilter(DeckGenerationService.GetRegionTypesForCard(c, allCards, _filterService), terrainFilter))
-                        .ToList();
-
-                    if (filtered.Count > 0) candidateSeeds = filtered;
-                }
-
-                if (candidateSeeds.Count > 0)
-                {
-                    seedRegion = candidateSeeds[Random.Shared.Next(candidateSeeds.Count)].Name.Trim();
-                }
-            }
-            else if (!rawHaven.StartsWith("Starting Company", StringComparison.OrdinalIgnoreCase))
-            {
-                // Specific Haven chosen (Rivendell, Lórien, Grey Havens, Edhellond)
-                var hCard = allCards.FirstOrDefault(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && CardFilterService.EqualsWithDiacriticFallback(c.Name, rawHaven));
-                if (hCard != null && !string.IsNullOrWhiteSpace(hCard.Region))
-                {
-                    seedRegion = hCard.Region.Trim();
-                }
-            }
-
-            // 4. Expand Contiguous Regional Cluster
-            var activeRegions = new List<string>();
-            if (isStarterPlusRegion)
-            {
-                var seedRegions = new List<string> { seedRegion };
-                foreach (var hr in acceptedHomeRegions)
-                {
-                    if (!seedRegions.Contains(hr, StringComparer.OrdinalIgnoreCase))
+                    var rTypes = DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService);
+                    if (DeckGenerationService.MatchesRegionTypeFilter(rTypes, terrainFilter))
                     {
-                        seedRegions.Add(hr);
+                        matching.Add(regCard.Name.Trim());
                     }
                 }
 
-                foreach (var sr in seedRegions)
+                if (matching.Count > 0)
                 {
-                    if (activeRegions.Count < maxRegions && !activeRegions.Contains(sr, StringComparer.OrdinalIgnoreCase))
-                    {
-                        activeRegions.Add(sr);
-                    }
-                }
-
-                if (activeRegions.Count < maxRegions)
-                {
-                    var cluster = DeckGenerationService.ExpandContiguousRegionCluster(graph, seedRegion, maxRegions);
-                    foreach (var cr in cluster)
-                    {
-                        if (activeRegions.Count >= maxRegions) break;
-                        if (!activeRegions.Contains(cr, StringComparer.OrdinalIgnoreCase))
-                        {
-                            activeRegions.Add(cr);
-                        }
-                    }
+                    allowedRegions = matching;
                 }
             }
 
-            // 5. Resolve Final Haven Anchor
-            string selectedHaven = "Rivendell";
-
-            if (rawHaven.StartsWith("Starting Company", StringComparison.OrdinalIgnoreCase))
+            // A. Resolve Haven Anchor
+            if (rawHaven.StartsWith("Company Haven", StringComparison.OrdinalIgnoreCase) ||
+                rawHaven.StartsWith("Starting Company", StringComparison.OrdinalIgnoreCase))
             {
                 var votes = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-                foreach (var starter in _deck.Pool)
+                var charactersToVote = _deck.Pool.Count > 0
+                    ? _deck.Pool
+                    : _deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c)).ToList();
+
+                foreach (var starter in charactersToVote)
                 {
                     if (string.IsNullOrWhiteSpace(starter.Home)) continue;
                     string cleanHome = starter.Home.Trim();
@@ -1895,25 +2001,216 @@ namespace MECCG_Deck_Builder
                 {
                     int maxVotes = votes.Values.Max();
                     var top = votes.Where(kvp => kvp.Value == maxVotes).Select(kvp => kvp.Key).ToList();
-                    selectedHaven = top.Count == 1 ? top[0] : "Rivendell"; // Plurality wins; tie falls back to Rivendell
+                    selectedHaven = top[Random.Shared.Next(top.Count)];
                 }
-            }
-            else if (rawHaven.StartsWith("Nearest Haven", StringComparison.OrdinalIgnoreCase))
-            {
-                selectedHaven = FindNearestHavenToCluster(graph, activeRegions);
+                else
+                {
+                    // Empty pool: Use smart haven selection in Starter Only mode instead of a blind roll!
+                    if (!isStarterPlusRegion && siteCount > 0)
+                    {
+                        selectedHaven = PickBestHavenForStarterHub();
+                    }
+                    else
+                    {
+                        selectedHaven = HeroHavens[Random.Shared.Next(HeroHavens.Length)];
+                    }
+                }
             }
             else if (rawHaven.Equals("Random", StringComparison.OrdinalIgnoreCase))
             {
-                selectedHaven = HeroHavens[Random.Shared.Next(HeroHavens.Length)];
+                if (!isStarterPlusRegion && siteCount > 0)
+                {
+                    selectedHaven = PickBestHavenForStarterHub();
+                }
+                else
+                {
+                    selectedHaven = HeroHavens[Random.Shared.Next(HeroHavens.Length)];
+                }
             }
-            else
+            else if (!rawHaven.StartsWith("Nearest Haven", StringComparison.OrdinalIgnoreCase))
             {
                 selectedHaven = rawHaven;
             }
 
-            var havenCard = allCards.FirstOrDefault(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && CardFilterService.EqualsWithDiacriticFallback(c.Name, selectedHaven));
+            // --- Helper function placed inside RunGeographicTheaterDraft ---
+            string PickBestHavenForStarterHub()
+            {
+                var shuffledHavens = HeroHavens.OrderBy(_ => Random.Shared.Next()).ToList();
+                string bestHaven = shuffledHavens[0];
+                int bestCount = -1;
 
-            // 6. Assemble Sites & Regions (Overland BFS chain dropped: Region Count strictly respected!)
+                foreach (var h in shuffledHavens)
+                {
+                    int count = allCards.Count(c =>
+                        string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase) &&
+                        (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                        CardFilterService.EqualsWithDiacriticFallback(c.Haven, h) &&
+                        (string.IsNullOrWhiteSpace(holdFilter) || DeckGenerationService.MatchesSiteTypeFilter(c, holdFilter)) &&
+                        (string.IsNullOrWhiteSpace(terrainFilter) || DeckGenerationService.MatchesRegionTypeFilter(DeckGenerationService.GetRegionTypesForCard(c, allCards, _filterService), terrainFilter)));
+
+                    if (count > bestCount)
+                    {
+                        bestCount = count;
+                        bestHaven = h;
+                    }
+
+                    if (count >= siteCount)
+                    {
+                        bestHaven = h;
+                        break;
+                    }
+                }
+
+                return bestHaven;
+            }
+
+            // =========================================================================
+            // 3.B & 4. RESOLVE SEED REGION & EXPAND CLUSTER (MULTI-ATTEMPT FOR RANDOM)
+            // =========================================================================
+            string seedChoice = _cmbSeedRegion?.SelectedItem?.ToString() ?? "Auto (From Haven Anchor)";
+            bool isRandomSeed = string.Equals(seedChoice, "Random (Across Middle-earth)", StringComparison.OrdinalIgnoreCase);
+
+            var candidateSeeds = allCards
+                .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
+                            (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                            (allowedRegions == null || allowedRegions.Contains(c.Name.Trim())))
+                .ToList();
+
+            string seedRegion = "Rhudaur";
+            var activeRegions = new List<string>();
+
+            int maxAttempts = (isRandomSeed || siteCount > 0) ? 100 : 1;
+            string bestSeed = null;
+            List<string> bestCluster = [];
+            int bestFulfillmentScore = -1;
+
+            for (int attempt = 0; attempt < maxAttempts; attempt++)
+            {
+                string trialSeed;
+
+                if (isRandomSeed && candidateSeeds.Count > 0)
+                {
+                    trialSeed = candidateSeeds[Random.Shared.Next(candidateSeeds.Count)].Name.Trim();
+                }
+                else if (!seedChoice.StartsWith("Auto", StringComparison.OrdinalIgnoreCase))
+                {
+                    trialSeed = seedChoice;
+                }
+                else
+                {
+                    // Auto: Seeds from character home regions first, else Haven's home territory
+                    if (acceptedHomeRegions.Count > 0)
+                    {
+                        trialSeed = acceptedHomeRegions.First();
+                    }
+                    else
+                    {
+                        var hCard = allCards.FirstOrDefault(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && CardFilterService.EqualsWithDiacriticFallback(c.Name, selectedHaven));
+                        trialSeed = (hCard != null && !string.IsNullOrWhiteSpace(hCard.Region)) ? hCard.Region.Trim() : "Rhudaur";
+                    }
+                }
+
+                // If the trial seed is outside allowed terrain, hop to the closest matching region
+                if (allowedRegions != null && !allowedRegions.Contains(trialSeed))
+                {
+                    var pathToAllowed = DeckGenerationService.FindShortestRegionPath(graph, trialSeed, allowedRegions);
+                    if (pathToAllowed.Count > 0)
+                    {
+                        trialSeed = pathToAllowed[^1];
+                    }
+                }
+
+                // Expand trial cluster
+                var trialCluster = new List<string>();
+                if (isStarterPlusRegion)
+                {
+                    var seedRegions = new List<string>();
+                    if (allowedRegions == null || allowedRegions.Contains(trialSeed))
+                    {
+                        seedRegions.Add(trialSeed);
+                    }
+
+                    foreach (var hr in acceptedHomeRegions)
+                    {
+                        if ((allowedRegions == null || allowedRegions.Contains(hr)) && !seedRegions.Contains(hr, StringComparer.OrdinalIgnoreCase))
+                        {
+                            seedRegions.Add(hr);
+                        }
+                    }
+
+                    foreach (var sr in seedRegions)
+                    {
+                        if (trialCluster.Count < maxRegions && !trialCluster.Contains(sr, StringComparer.OrdinalIgnoreCase))
+                        {
+                            trialCluster.Add(sr);
+                        }
+                    }
+
+                    if (trialCluster.Count < maxRegions && seedRegions.Count > 0)
+                    {
+                        var cluster = DeckGenerationService.ExpandContiguousRegionCluster(graph, seedRegions[0], maxRegions, allowedRegions);
+                        foreach (var cr in cluster)
+                        {
+                            if (trialCluster.Count >= maxRegions) break;
+                            if (!trialCluster.Contains(cr, StringComparer.OrdinalIgnoreCase))
+                            {
+                                trialCluster.Add(cr);
+                            }
+                        }
+                    }
+                }
+
+                // Count how many matching adventure sites exist in this trial cluster
+                int matchingSitesInCluster = 0;
+                if (siteCount > 0)
+                {
+                    matchingSitesInCluster = allCards.Count(c =>
+                        string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) &&
+                        !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase) &&
+                        (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                        (!isStarterPlusRegion || trialCluster.Contains(c.Region, StringComparer.OrdinalIgnoreCase)) &&
+                        (isStarterPlusRegion || CardFilterService.EqualsWithDiacriticFallback(c.Haven, selectedHaven)) &&
+                        (string.IsNullOrWhiteSpace(holdFilter) || DeckGenerationService.MatchesSiteTypeFilter(c, holdFilter)) &&
+                        (string.IsNullOrWhiteSpace(terrainFilter) || DeckGenerationService.MatchesRegionTypeFilter(DeckGenerationService.GetRegionTypesForCard(c, allCards, _filterService), terrainFilter)));
+                }
+
+                // Scoring: Full regions + ability to fulfill sites
+                int currentScore = (trialCluster.Count * 10) + Math.Min(matchingSitesInCluster, siteCount);
+
+                if (currentScore > bestFulfillmentScore)
+                {
+                    bestFulfillmentScore = currentScore;
+                    bestSeed = trialSeed;
+                    bestCluster = trialCluster;
+                }
+
+                // Perfect match: Got full region count and enough matching sites!
+                bool regionsSatisfied = !isStarterPlusRegion || trialCluster.Count >= maxRegions;
+                bool sitesSatisfied = siteCount == 0 || matchingSitesInCluster >= siteCount;
+
+                if (regionsSatisfied && sitesSatisfied)
+                {
+                    bestSeed = trialSeed;
+                    bestCluster = trialCluster;
+                    break; // Stop searching early!
+                }
+            }
+
+            seedRegion = bestSeed ?? "Rhudaur";
+            activeRegions = bestCluster;
+
+            // C. Snap Nearest Haven to the winning theater
+            if (rawHaven.StartsWith("Nearest Haven", StringComparison.OrdinalIgnoreCase))
+            {
+                selectedHaven = FindNearestHavenToCluster(graph, activeRegions);
+            }
+
+            var havenCard = allCards.FirstOrDefault(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && CardFilterService.EqualsWithDiacriticFallback(c.Name, selectedHaven));
+            
+            // =========================================================================
+            // 5. ASSEMBLE SITES & REGIONS
+            // =========================================================================
             var draftedSitesAndRegions = new List<Card>();
 
             var rivendell = allCards.FirstOrDefault(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && string.Equals(c.Name, "Rivendell", StringComparison.OrdinalIgnoreCase));
@@ -1996,23 +2293,67 @@ namespace MECCG_Deck_Builder
                 }
             }
 
+            // =========================================================================
+            // 6. UPDATE DECK, SORT, AND REFRESH UI
+            // =========================================================================
             _deck.Sites.Clear();
             _deck.Sites.AddRange(draftedSitesAndRegions);
             _deck.SortSections();
-            _notifyDeckChanged();
+            NotifyDeckChanged(DeckSectionType.Sites); // 1. Uses renamed PascalCase method
 
             int finalRegions = draftedSitesAndRegions.Count(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase));
             int finalSites = draftedSitesAndRegions.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase));
 
-            string statusMsg = $"Drafted {draftedSitesAndRegions.Count} cards ({finalRegions} Regions, {finalSites} Sites). Haven: {selectedHaven}";
+            // Count actual non-Haven adventure sites drafted in the deck
+            int adventureSitesCount = draftedSitesAndRegions.Count(s =>
+                string.Equals(s.Primary, "Site", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase));
 
+            // Distinguish between roaming region clusters and stationary haven hubs
+            string hubNote = isStarterPlusRegion
+                ? $"(Seed: {seedRegion})"
+                : $"(Starter Hub: {selectedHaven})";
+
+            string statusMsg = $"Drafted {draftedSitesAndRegions.Count} cards ({finalRegions} Regions, {finalSites} Sites). Haven: {selectedHaven} {hubNote}";
+
+            var warnings = new List<string>();
+
+            // A. Contiguous Region Shortfall
+            if (isStarterPlusRegion && activeRegions.Count < maxRegions)
+            {
+                string terrainNote = !string.IsNullOrWhiteSpace(terrainFilter) ? $" matching '{terrainFilter}'" : "";
+                warnings.Add($"Region Shortfall: Found only {activeRegions.Count} of {maxRegions} contiguous regions{terrainNote}.");
+            }
+
+            // B. Adventure Site Shortfall (Uses adventureSitesCount)
+            if (siteCount > 0 && adventureSitesCount < siteCount)
+            {
+                warnings.Add($"Site Shortfall: Found only {adventureSitesCount} of {siteCount} requested adventure sites.");
+            }
+
+            // C. Character Home Sites Omitted Due to Budget
             if (shortfallList.Count > 0)
             {
                 var omittedBrief = string.Join(", ", shortfallList.Select(s => $"{s.Owner} -> {s.SiteName}"));
-                statusMsg += $"\n⚠ Omitted {shortfallList.Count} home site(s) due to budget (deploy at Rivendell): {omittedBrief}";
+                warnings.Add($"Omitted {shortfallList.Count} home site(s) due to budget (deploy at Rivendell): {omittedBrief}");
             }
 
-            _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            // Style and apply the status message
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblTheaterStatus.ForeColor = Color.FromArgb(180, 83, 9); // Amber / Warning Dark Orange
+                _lblTheaterStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104); // Default Muted Slate Gray
+                _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
             _lblTheaterStatus.Text = statusMsg;
         }
 

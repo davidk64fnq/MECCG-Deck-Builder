@@ -206,6 +206,19 @@
     - Decoupled theater roaming clusters from havens, dropped the overland BFS highway to ensure `Region Count` strictly equals region cards drafted, and removed the ghost wizard fallback.
     - Added `Save Settings...` and `Load Settings...` profile persistence on Tab 1 via `*.workbench.json`.
     - Standardized status text color to neutral slate gray across all tabs and expanded Tab 3 status label height to prevent clipping.
+  - [x] Issue #50: Decoupled Geographic Theater Architecture: Dedicated Seed Region, Terrain-Enforced Clusters, Multi-Attempt Search & UI Preview Synchronization
+    - Added dedicated `Seed Region` dropdown (`_cmbSeedRegion`) with `Auto (From Haven Anchor)`, `Random (Across Middle-earth)`, and alphabetical region discovery.
+    - Decoupled Haven Anchor from seed region: travel to/from Havens uses Starter Movement (0 region cards); `Region Count` strictly equals contiguous theater regions without drafting disconnected haven territory cards into the site deck.
+    - Permanent `Company Haven (Majority Vote)` in `_cmbHaven` with fair random tie-breaking and smart haven candidate evaluation when the pool is empty.
+    - Prevented circular dependency ("mutual reflection") between `Nearest Haven (to Theater)` and `Auto (From Haven Anchor)` via dynamic auto-switching.
+    - In `Starter Only` mode, dynamically stripped `Nearest Haven (to Theater)` from the Haven list and replaced `Seed Region` with `(N/A - Haven Hub)`, saving and restoring previous selections on mode toggle.
+    - Enforced `allowedRegions` constraint in `DeckGenerationService.ExpandContiguousRegionCluster` so all cluster neighbors strictly obey checked terrain filters (e.g. Wilderness).
+    - Implemented a 100-attempt Monte Carlo retry search in `RunGeographicTheaterDraft` for random seeds and whenever `Site Count > 0` to hunt for site-dense branches before graceful fallback.
+    - Refactored `RefreshMainDeckUI` to accept `DeckSectionType?`, automatically switching tabs, resetting `SelectedIndex = 0`, and updating artwork/taxonomy preview on Run, with fallback to `ListBoxMaster[0]` on Clear.
+    - Updated all workbench Run, Clear, and Recall actions across Starting Company (`Pool`), Recruits (`Resources`), and Theater (`Sites`) to pass section types.
+    - Added inline amber warning notices (`Color.FromArgb(180, 83, 9)`) for region, site, and budget shortfalls.
+    - Fixed WinForms ampersand suppression by setting `UseMnemonic = false` on status labels (`Wold & Foothills`).
+    - Resolved `IDE1006` naming violations (`NotifyDeckChanged`).
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

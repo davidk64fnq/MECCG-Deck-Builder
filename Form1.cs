@@ -2250,19 +2250,24 @@ namespace MECCG_Deck_Builder
             if (_assemblyWorkbench == null || _assemblyWorkbench.IsDisposed)
             {
                 _assemblyWorkbench = new DeckAssemblyMatrixDialog(
-                    _currentDeck,
-                    _catalogService,
-                    _filterService,
-                    () => _currentDeck.IncludedSets,
-                    RefreshMainDeckUI);
+    _currentDeck,
+    _catalogService,
+    _filterService,
+    () => _currentDeck.IncludedSets,
+    section => RefreshMainDeckUI(section));
             }
 
             _assemblyWorkbench.Show(this);
             _assemblyWorkbench.BringToFront();
         }
 
-        internal void RefreshMainDeckUI()
+        internal void RefreshMainDeckUI(DeckSectionType? targetSection = null)
         {
+            if (targetSection.HasValue)
+            {
+                TabControlDeck.SelectedIndex = (int)targetSection.Value;
+            }
+
             _currentDeck.SortSections();
             foreach (DeckSectionType sectionType in Enum.GetValues<DeckSectionType>())
             {
@@ -2270,6 +2275,33 @@ namespace MECCG_Deck_Builder
             }
             UpdateFormTitle();
             _assemblyWorkbench?.UpdateDeckSummary();
+
+            int activeTabIndex = Math.Clamp(TabControlDeck.SelectedIndex, 0, 4);
+            var activeListBox = GetListBoxFromSectionType((DeckSectionType)activeTabIndex);
+
+            if (activeListBox.Items.Count > 0)
+            {
+                // Toggling to -1 then 0 guarantees WinForms fires SelectedIndexChanged 100% of the time
+                activeListBox.SelectedIndex = -1;
+                activeListBox.SelectedIndex = 0;
+            }
+            else
+            {
+                // ISSUE 1 FIX: When the active deck tab is empty or cleared,
+                // fall back to the first card in the Master List to display its artwork
+                if (ListBoxMaster.Items.Count > 0)
+                {
+                    ListBoxMaster.SelectedIndex = -1;
+                    ListBoxMaster.SelectedIndex = 0;
+                }
+                else
+                {
+                    _imageLoadCts?.Cancel();
+                    PictureBoxCardImage.Image = null;
+                    _inspectedCard = null;
+                    UpdateTaxonomyView(null);
+                }
+            }
         }
 
         private async void ToolStripMenuToolsGetImages_Click(object sender, EventArgs e)
