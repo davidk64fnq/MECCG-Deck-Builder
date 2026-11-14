@@ -35,8 +35,15 @@
 - `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, dual-source cross-card attribute/category lookups (supporting official attributes and custom taxonomy), and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 - RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
-- `DeckAssemblyMatrixDialog.cs`: Modeless 4-tab drafting workbench (`General Settings`, `Starting Company`, `Non-Starting Characters & Sideboard`, `Geographic Theater`) with `.workbench.json` profile persistence and live deck synchronization.
+- `DeckAssemblyMatrixDialog.cs`: Modeless 4-tab drafting workbench (`General Settings`, `Starting Company`, `Non-Starting Characters & Sideboard`, `Geographic Theater`) with `.workbench.json` profile persistence (including `ExecutionOrder`), generic `RunnableTabInfo` execution pipeline with best-snapshot retry, dynamic tooltips, and live deck synchronization.
 - `ExportTaxonomyDialog.cs`: Partition-scoped CSV taxonomy draft exporter with preset column templates and custom category registration.
+
+---
+
+## Workbench Architectural Conventions (Future Tabs)
+- **Tab Self-Containment & Slice Ownership:** Each tab owns only the options governing its own `Run`. Tabs writing into shared partitions (`Resources`, `Sideboard`) must clear/replace only their own card slice (e.g., `Primary == "Character"`, `Secondary == "Faction"`), never the entire partition.
+- **Theater Scope Isolation:** Downstream tabs (`Starting Company`, `Non-Starting Characters`, and future `Factions`, `Items`, `Allies`, `Hazards` tabs) must separate the Theater's active cluster (`Primary == "Region"` cards + non-Haven adventure `Site` cards) from Starter-Movement or character Havens (`Site == "Haven"`, e.g., `Rivendell`, stepping-stone Havens, `Grey Havens`). `Strict` constrains only to the Theater cluster/adventure sites; `Best Effort` prioritizes Theater -> Havens -> Open.
+- **Generic Pipeline Registration:** Register every new runnable tab in `_tabInfo` (`RunnableTabInfo(Runner, StatusLabel)`) with a `bool silent = false` runner signature, and prefix soft warnings in the tab's status label with `⚠` so `RunPipelineDraft()` handles retries, snapshots, and warning surfacing automatically.
 
 ---
 
