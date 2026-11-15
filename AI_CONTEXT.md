@@ -35,15 +35,15 @@
 - `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, dual-source cross-card attribute/category lookups (supporting official attributes and custom taxonomy), and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 - RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
-- `DeckAssemblyMatrixDialog.cs`: Modeless 4-tab drafting workbench (`General Settings`, `Starting Company`, `Non-Starting Characters & Sideboard`, `Geographic Theater`) with `.workbench.json` profile persistence (including `ExecutionOrder`), generic `RunnableTabInfo` execution pipeline with best-snapshot retry, dynamic tooltips, and live deck synchronization.
+- `DeckAssemblyMatrixDialog.cs`: Modeless 4-tab drafting workbench (`General Settings`, `Regions & Sites`, `Starting Company`, `Wizards & Recruits`) with `.workbench.json` profile persistence, centralized pipeline execution (`RunnableTabInfo` registry with 25-attempt retry and whole-deck `DeckSnapshot` save/recall), `Min`/`Max Adventure Sites` bounds, strict Tier 1 -> Tier 2 character prioritization, multiline tooltips, and live deck synchronization.
 - `ExportTaxonomyDialog.cs`: Partition-scoped CSV taxonomy draft exporter with preset column templates and custom category registration.
 
 ---
 
 ## Workbench Architectural Conventions (Future Tabs)
-- **Tab Self-Containment & Slice Ownership:** Each tab owns only the options governing its own `Run`. Tabs writing into shared partitions (`Resources`, `Sideboard`) must clear/replace only their own card slice (e.g., `Primary == "Character"`, `Secondary == "Faction"`), never the entire partition.
-- **Theater Scope Isolation:** Downstream tabs (`Starting Company`, `Non-Starting Characters`, and future `Factions`, `Items`, `Allies`, `Hazards` tabs) must separate the Theater's active cluster (`Primary == "Region"` cards + non-Haven adventure `Site` cards) from Starter-Movement or character Havens (`Site == "Haven"`, e.g., `Rivendell`, stepping-stone Havens, `Grey Havens`). `Strict` constrains only to the Theater cluster/adventure sites; `Best Effort` prioritizes Theater -> Havens -> Open.
-- **Generic Pipeline Registration:** Register every new runnable tab in `_tabInfo` (`RunnableTabInfo(Runner, StatusLabel)`) with a `bool silent = false` runner signature, and prefix soft warnings in the tab's status label with `⚠` so `RunPipelineDraft()` handles retries, snapshots, and warning surfacing automatically.
+- **Centralized Pipeline & Slice Ownership:** Tabs 2+ are pure configuration views driven from `General Settings` (`Run Pipeline`, `Clear Deck`, `Save/Recall Snapshot`). Tabs writing into shared partitions (`Resources`, `Sideboard`) must clear/replace only their own card slice (e.g., `Primary == "Character"`, `Secondary == "Faction"`), never the entire partition.
+- **Local Group vs. Outside Haven Scope:** Downstream tabs (`Starting Company`, `Wizards & Recruits`, and future `Factions`, `Items`, `Allies`, `Hazards` tabs) separate cards tied to the drafted region group—including Havens located inside those drafted regions—(Tier 1) from Havens outside the drafted region group (Tier 2).
+- **Generic Pipeline Registration:** Register every new runnable tab in `_tabInfo` (`RunnableTabInfo(Runner, StatusLabel)`) and `_pipelineOrder` with a `bool silent = false` runner signature, and prefix soft warnings in the tab's status label with `⚠` so `RunPipelineDraft()` handles retries, snapshots, and warning surfacing automatically.
 
 ---
 
@@ -236,6 +236,18 @@
     - Fixed re-entrant `ListBox_SelectedIndexChanged` wipe (`_isSyncingListSelection`) when switching focus from `ListBoxMaster` to a deck tab.
     - Fixed `RemoveCardFromSection` to advance selection or fall back to `ListBoxMaster[0]` / clear preview when deleting or moving an inspected card.
     - Updated all 9 affected CHM help HTML topics (`interface.html`, `sets_and_faceting.html`, `attributes_reference.html`, `custom_taxonomy.html`, `deck_operations.html`, `index.html`, `spreadsheet_pipeline.html`, `tagging_and_drafting_playbook.html`, `taxonomy_extraction_tools.html`).
+  - [x] Issue #52: Multi-Tab Execution Pipeline, Tab Responsibility Decoupling, Theater Scope Isolation & Contiguous BFS Spanning
+    - Added dynamic pipeline step-order dropdowns (`Step 1`..`Step N`) on `General Settings` inside `_pnlPipelineSteps` with `(None)` support, duplicate auto-swapping, `Reset Order`, and `ExecutionOrder` persistence in `.workbench.json` (`DeckAssemblySettings`).
+    - Introduced `RunnableTabInfo` (`Runner`, `StatusLabel`) registry, pre-run clear confirmation, `bool silent = false` runner signatures, and a 25-attempt pipeline retry loop with Step-1 early-stop, best-valid-snapshot retention, and diagnostic fallback.
+    - Decoupled Tab 3 and Tab 4 responsibilities: replaced `Wizard Home Site Policy` with a non-blocking amber `⚠` notice in `_lblRecruitStatus` (`Saruman`/`Isengard`, `Radagast`/`Rhosgobel`), moved `Non-Starter Sites/Regs` (`_cmbTheaterHomeSitePolicy`: `Ignore`, `Best Effort`, `Strict`) onto Tab 4, unified `Resources` and `Sideboard` character handling, and added Sideboard size validation with 25-attempt tightest-row-first retry in `RunNonStartingCharactersDraft`.
+    - Isolated non-Haven Theater scope (Tier 1) from Haven scope (Tier 2) in `RunStartingCompanyDraft` (`primaryTheaterRegions` vs. `havenRegions`) and `RunNonStartingCharactersDraft` (`theaterAdventureSites` vs. `havenSitesInDeck`), excluded `Haven` sites from `requiredHomeRegions`/`acceptedHomeRegions`, added `FindContiguousSpanningBackbone` and `ExpandClusterToTarget` for `Strict` multi-region BFS spanning, and set `Edhellond` home region capital in `FindNearestHavenToCluster` to `"Anfalas"`.
+    - Standardized `"Match Haven Anchor"` and `"Random"` seed options, added dynamic `ToolTip` descriptions (disposed in `Dispose(bool)`), and escaped `&&` mnemonics in Tab 1 and Tab 4 `GroupBox` titles.
+  - [x] Issue #53: Workbench Simplification, Tab Reordering, Min/Max Adventure Sites & Strict Tier 1->2 Character Prioritization
+    - Reordered tabs to match execution sequence (`General Settings`, `Regions & Sites`, `Starting Company`, `Wizards & Recruits`) and replaced military/math jargon with plain MECCG terminology.
+    - Removed per-tab `Run`/`Clear`/`Save`/`Recall` buttons and Step 1–3 order dropdowns; centralized `Run Pipeline`, `Clear Deck`, `Save Snapshot`, and `Recall Snapshot` (`DeckSnapshot`) on `General Settings` with `ValidateWorkbenchReadiness()` guards.
+    - Simplified `Regions & Sites` by retiring `Movement Mode`, `Base Haven`, `Site Count`, and `Non-Starter` policy; always drafts all 4 Hero Havens (preferring Hero printings), `Region Count` (`4–12`) connected regions, and matching adventure sites bounded by linked `Min`/`Max Adventure Sites` (`0–50`, default `4–12`).
+    - Removed `Haven` from `Site Holds`, defaulted all `Region Terrains` and `Site Holds` items to checked (`Uncheck to exclude`), and refreshed `Seed Region` on dialog visibility changes.
+    - Removed character policy dropdowns and implemented strict Tier 1 -> Tier 2 character prioritization (drafted regions/sites + local Havens first, outside Havens as fallback) across `Starting Company` and `Wizards & Recruits`, fixing un-drafted Haven-region leaks and `CA1859`.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
