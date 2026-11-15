@@ -11,9 +11,17 @@ namespace MECCG_Deck_Builder
     public sealed class DeckAssemblyMatrixDialog : Form
     {
         private static readonly string[] HeroHavens = ["Rivendell", "Lórien", "Grey Havens", "Edhellond"];
+
         private const string StarterIdleStatusText =
-    "Total Mind limit: <= 20.\n" +
-    "Starting characters prioritize the drafted region group (including Havens in those regions), falling back to outside Havens if needed.";
+            "Total Mind limit: <= 20.\n" +
+            "Starting characters prioritize the drafted region group (including Havens in those regions), falling back to outside Havens if needed.";
+
+        private const string TheaterIdleStatusText =
+            "Configure seed region, region/site counts, and terrain/hold filters, then click Run Pipeline on General Settings.";
+
+        private const string FactionIdleStatusText =
+            "Factions are strictly limited to those playable at Sites/Havens in the drafted Site deck.\n" +
+            "Auto-drafted prerequisite cards (e.g. Paths of the Dead) are added alongside their faction if their own site requirements are met.";
 
         private readonly Deck _deck;
         private readonly CardCatalogService _catalog;
@@ -36,7 +44,7 @@ namespace MECCG_Deck_Builder
         private readonly TabControl _tabControl;
         private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
-        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits"];
+        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions"];
 
         // --- TAB 1: GENERAL SETTINGS & CONTROLS ---
         private readonly TextBox _txtDeckTitle;
@@ -73,6 +81,11 @@ namespace MECCG_Deck_Builder
         private readonly List<CharacterRowControls> _recruitRows = [];
         private readonly List<CharacterRowControls> _reserveRows = [];
         private readonly Label _lblRecruitStatus;
+
+        // --- TAB 5: FACTIONS ---
+        private readonly NumericUpDown _numResourceFactions;
+        private readonly NumericUpDown _numSideboardFactions;
+        private readonly Label _lblFactionStatus;
 
         private readonly ToolTip _toolTip = new()
         {
@@ -142,7 +155,11 @@ namespace MECCG_Deck_Builder
                 Maximum = 60,
                 Value = 30
             };
-            _numPlayDeckSize.ValueChanged += (s, e) => UpdateDeckSummary();
+            _numPlayDeckSize.ValueChanged += (s, e) =>
+            {
+                UpdateDeckSummary();
+                ValidateWorkbenchReadiness();
+            };
 
             var lblPlaySizeHint = new Label
             {
@@ -223,7 +240,7 @@ namespace MECCG_Deck_Builder
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites  ->  2. Starting Company  ->  3. Wizards & Recruits",
+                Text = "Execution Order:   1. Regions & Sites  ->  2. Starting Company  ->  3. Wizards & Recruits  ->  4. Factions",
                 Location = new Point(16, 22),
                 Size = new Size(778, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
@@ -241,8 +258,8 @@ namespace MECCG_Deck_Builder
             _btnRunPipeline.Click += (s, e) => RunPipelineDraft();
             _toolTip.SetToolTip(
                 _btnRunPipeline,
-                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits).\n" +
-                "Automatically retries up to 25 times if random region rolls fail downstream character constraints.");
+                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions).\n" +
+                "Automatically retries up to 25 times if random region rolls fail downstream constraints.");
 
             _btnClearDeck = new Button
             {
@@ -425,7 +442,6 @@ namespace MECCG_Deck_Builder
                 Location = new Point(12, 22),
                 Size = new Size(172, 16)
             };
-
             _clbRegionTypes = new CheckedListBox
             {
                 Location = new Point(12, 42),
@@ -446,7 +462,6 @@ namespace MECCG_Deck_Builder
                 Location = new Point(196, 22),
                 Size = new Size(172, 16)
             };
-
             _clbSiteTypes = new CheckedListBox
             {
                 Location = new Point(196, 42),
@@ -471,7 +486,7 @@ namespace MECCG_Deck_Builder
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
                 UseMnemonic = false,
-                Text = "Configure seed region, region/site counts, and terrain/hold filters, then click Run Pipeline on General Settings."
+                Text = TheaterIdleStatusText
             };
 
             tabTheater.Controls.AddRange([grpDraftOpts, grpFilters, _lblTheaterStatus]);
@@ -608,11 +623,113 @@ namespace MECCG_Deck_Builder
 
             tabRecruits.Controls.Add(_lblRecruitStatus);
 
+            // ==========================================
+            // TAB 5: FACTIONS
+            // ==========================================
+            var tabFactions = new TabPage("Factions");
+
+            var grpFactions = new GroupBox
+            {
+                Text = "Faction Drafting Counts && Priority Rules",
+                Location = new Point(16, 16),
+                Size = new Size(810, 186)
+            };
+
+            var lblResFactions = new Label
+            {
+                Text = "Factions in Play Deck (Resources):",
+                Location = new Point(16, 30),
+                Size = new Size(210, 20)
+            };
+            _numResourceFactions = new NumericUpDown
+            {
+                Location = new Point(232, 27),
+                Size = new Size(60, 23),
+                Minimum = 0,
+                Maximum = 15,
+                Value = 1
+            };
+            string resFactionsTip =
+                "Number of factions to draft into the Play Deck (Resources).\n" +
+                "Default is 1 (minimum needed for Council scoring).";
+            _toolTip.SetToolTip(lblResFactions, resFactionsTip);
+            _toolTip.SetToolTip(_numResourceFactions, resFactionsTip);
+
+            var lblResFactionsHint = new Label
+            {
+                Text = "factions in Resources (1 minimum for Council scoring; highest-priority matches placed here first).",
+                Location = new Point(304, 29),
+                Size = new Size(495, 32),
+                ForeColor = Color.DimGray
+            };
+
+            var lblSideFactions = new Label
+            {
+                Text = "Factions in Sideboard:",
+                Location = new Point(16, 66),
+                Size = new Size(210, 20)
+            };
+            _numSideboardFactions = new NumericUpDown
+            {
+                Location = new Point(232, 63),
+                Size = new Size(60, 23),
+                Minimum = 0,
+                Maximum = 10,
+                Value = 1
+            };
+            string sideFactionsTip =
+                "Number of backup factions to draft into the Sideboard.\n" +
+                "Counts toward Sideboard Size on General Settings.";
+            _toolTip.SetToolTip(lblSideFactions, sideFactionsTip);
+            _toolTip.SetToolTip(_numSideboardFactions, sideFactionsTip);
+
+            var lblSideFactionsHint = new Label
+            {
+                Text = "backup factions in Sideboard (unique titles are never duplicated across Resources & Sideboard).",
+                Location = new Point(304, 65),
+                Size = new Size(495, 32),
+                ForeColor = Color.DimGray
+            };
+
+            _numResourceFactions.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
+            _numSideboardFactions.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
+
+            var lblFactionRulesNote = new Label
+            {
+                Location = new Point(16, 102),
+                Size = new Size(778, 68),
+                ForeColor = Color.DimGray,
+                UseMnemonic = false,
+                Text =
+                    "Priority Order (among factions playable at drafted Sites/Havens with Specific & Prerequisite requirements met):\n" +
+                    "  1. Character Faction Bonus (Pool -> Resources -> Sideboard)      2. Character Race Match (Pool -> Resources -> Sideboard)\n" +
+                    "  3. Local Region Group Sites before Outside Havens                4. Remaining Eligible Factions"
+            };
+
+            grpFactions.Controls.AddRange([
+                lblResFactions, _numResourceFactions, lblResFactionsHint,
+                lblSideFactions, _numSideboardFactions, lblSideFactionsHint,
+                lblFactionRulesNote
+            ]);
+
+            _lblFactionStatus = new Label
+            {
+                Location = new Point(16, 216),
+                Size = new Size(805, 160),
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false,
+                Text = FactionIdleStatusText
+            };
+
+            tabFactions.Controls.AddRange([grpFactions, _lblFactionStatus]);
+
             // Tabs ordered to match pipeline execution order
-            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits]);
+            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
             _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
+            _tabInfo["Factions"] = new(RunFactionsDraft, _lblFactionStatus);
 
             Controls.Add(_tabControl);
 
@@ -660,8 +777,7 @@ namespace MECCG_Deck_Builder
         {
             if (IsDisposed) return;
 
-            int poolChars = _deck.Pool.Count;
-            if (poolChars == 0 && !string.Equals(_lblStarterStatus.Text, StarterIdleStatusText, StringComparison.Ordinal))
+            if (_deck.Pool.Count == 0 && !string.Equals(_lblStarterStatus.Text, StarterIdleStatusText, StringComparison.Ordinal))
             {
                 _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
                 _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
@@ -670,7 +786,10 @@ namespace MECCG_Deck_Builder
 
             int totalResChars = _deck.Resources.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             int totalSideChars = _deck.Sideboard.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
-            if (totalResChars == 0 && totalSideChars == 0 && !_lblRecruitStatus.Text.StartsWith("Configured:", StringComparison.OrdinalIgnoreCase))
+            int resFactions = _deck.Resources.Count(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase));
+            int sideFactions = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase));
+
+            if (totalResChars == 0 && totalSideChars == 0 && resFactions == 0 && sideFactions == 0)
             {
                 ValidateWorkbenchReadiness();
             }
@@ -685,14 +804,18 @@ namespace MECCG_Deck_Builder
             int advSitesInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase));
 
             string avatarResNote = avatarsInRes > 0 ? $" + {avatarsInRes} Avatar(s)" : "";
-            string sideDetailNote = (nonAvatarCharsInSideboard > 0 || avatarsInSideboard > 0)
-                ? $" ({nonAvatarCharsInSideboard} characters{(avatarsInSideboard > 0 ? $" + {avatarsInSideboard} Avatar" : "")})"
-                : "";
+            string resFactionNote = resFactions > 0 ? $", {resFactions} faction(s)" : "";
+
+            var sideParts = new List<string>();
+            if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
+            if (avatarsInSideboard > 0) sideParts.Add($"{avatarsInSideboard} Avatar");
+            if (sideFactions > 0) sideParts.Add($"{sideFactions} faction(s)");
+            string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
 
             _lblDeckSummary.Text =
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
                 $"Pool:             {_deck.Pool.Count} characters ({poolMind} Mind)  [Official limit: <= 20 Mind]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote})  [Official limits: <= 10 non-Avatar characters, <= 3 Avatars]\n" +
+                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
                 $"Hazards:          {_deck.Hazards.Count} cards\n" +
                 $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
@@ -773,11 +896,15 @@ namespace MECCG_Deck_Builder
 
             _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblTheaterStatus.Text = "Site deck cleared. Configure options and click Run Pipeline on General Settings.";
+            _lblTheaterStatus.Text = TheaterIdleStatusText;
 
             _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblStarterStatus.Text = StarterIdleStatusText;
+
+            _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblFactionStatus.Text = FactionIdleStatusText;
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -960,7 +1087,10 @@ namespace MECCG_Deck_Builder
                     Species = r.CmbSpecies.SelectedItem?.ToString() ?? "Any",
                     Mind = r.TxtMind.Text,
                     DI = r.TxtDI.Text
-                })]
+                })],
+
+                ResourceFactionCount = (int)_numResourceFactions.Value,
+                SideboardFactionCount = (int)_numSideboardFactions.Value
             };
         }
 
@@ -1022,6 +1152,9 @@ namespace MECCG_Deck_Builder
                     ApplyRowSettings(_reserveRows[i], config.ReserveRows[i]);
                 }
             }
+
+            _numResourceFactions.Value = Math.Clamp(config.ResourceFactionCount, (int)_numResourceFactions.Minimum, (int)_numResourceFactions.Maximum);
+            _numSideboardFactions.Value = Math.Clamp(config.SideboardFactionCount, (int)_numSideboardFactions.Minimum, (int)_numSideboardFactions.Maximum);
 
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
@@ -1161,10 +1294,11 @@ namespace MECCG_Deck_Builder
 
         private void ValidateWorkbenchReadiness()
         {
-            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null) return;
+            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null || _lblFactionStatus == null) return;
 
-            bool hasRecruitError = false;
             bool hasTheaterError = false;
+            bool hasRecruitError = false;
+            bool hasFactionError = false;
 
             int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
             int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
@@ -1173,36 +1307,12 @@ namespace MECCG_Deck_Builder
             int reserveCount = _reserveRows.Count(r => r.IsActive);
             int totalSideboardChars = reserveCount + wizInSide;
 
-            if (companionCount > 10)
-            {
-                hasRecruitError = true;
-                _lblRecruitStatus.ForeColor = Color.Firebrick;
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblRecruitStatus.Text =
-                    $"⚠ Selection exceeds the 10-character limit for Play Deck Characters (Resources): {companionCount}/10 configured.\n" +
-                    $"Clear {companionCount - 10} row(s) to proceed.";
-            }
-            else if (totalSideboardChars > (int)_numSideboardSize.Value)
-            {
-                hasRecruitError = true;
-                _lblRecruitStatus.ForeColor = Color.Firebrick;
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblRecruitStatus.Text =
-                    $"⚠ Sideboard characters ({totalSideboardChars}: {reserveCount} Sideboard row(s){(wizInSide > 0 ? $" + {wizInSide} Wizard" : "")}) exceed the Sideboard Size limit ({(int)_numSideboardSize.Value}) set in General Settings.\n" +
-                    $"Increase Sideboard Size, change Secondary Wizard destination, or clear a Sideboard row.";
-            }
-            else
-            {
-                _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+            int resFactions = (int)_numResourceFactions.Value;
+            int sideFactions = (int)_numSideboardFactions.Value;
+            int playDeckLimit = (int)_numPlayDeckSize.Value;
+            int sideboardLimit = (int)_numSideboardSize.Value;
 
-                string wizResText = wizInRes > 0 ? $", {wizInRes} Wizard(s)" : "";
-                string wizSideText = wizInSide > 0 ? $" + {wizInSide} Wizard" : "";
-                _lblRecruitStatus.Text =
-    $"Configured: {companionCount}/10 Resources{wizResText}  |  {reserveCount}/3 Sideboard{wizSideText}.\n" +
-    "Recruits prioritize local sites (including Havens in the region group), falling back to outside Havens if needed.";
-            }
-
+            // --- Tab 2 Validation ---
             if (_clbRegionTypes.CheckedItems.Count == 0 || _clbSiteTypes.CheckedItems.Count == 0)
             {
                 hasTheaterError = true;
@@ -1216,16 +1326,83 @@ namespace MECCG_Deck_Builder
             {
                 _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104);
                 _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblTheaterStatus.Text = "Configure seed region, region/site counts, and terrain/hold filters, then click Run Pipeline on General Settings.";
+                _lblTheaterStatus.Text = TheaterIdleStatusText;
             }
 
-            _btnRunPipeline.Enabled = !hasRecruitError && !hasTheaterError;
+            // --- Tab 4 Validation ---
+            if (companionCount > 10)
+            {
+                hasRecruitError = true;
+                _lblRecruitStatus.ForeColor = Color.Firebrick;
+                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+                _lblRecruitStatus.Text =
+                    $"⚠ Selection exceeds the 10-character limit for Play Deck Characters (Resources): {companionCount}/10 configured.\n" +
+                    $"Clear {companionCount - 10} row(s) to proceed.";
+            }
+            else if (totalSideboardChars > sideboardLimit)
+            {
+                hasRecruitError = true;
+                _lblRecruitStatus.ForeColor = Color.Firebrick;
+                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+                _lblRecruitStatus.Text =
+                    $"⚠ Sideboard characters ({totalSideboardChars}: {reserveCount} Sideboard row(s){(wizInSide > 0 ? $" + {wizInSide} Wizard" : "")}) exceed the Sideboard Size limit ({sideboardLimit}) set in General Settings.\n" +
+                    "Increase Sideboard Size, change Secondary Wizard destination, or clear a Sideboard row.";
+            }
+            else
+            {
+                _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
 
-            if (hasRecruitError || hasTheaterError)
+                string wizResText = wizInRes > 0 ? $", {wizInRes} Wizard(s)" : "";
+                string wizSideText = wizInSide > 0 ? $" + {wizInSide} Wizard" : "";
+                _lblRecruitStatus.Text =
+                    $"Configured: {companionCount}/10 Resources{wizResText}  |  {reserveCount}/3 Sideboard{wizSideText}.\n" +
+                    "Recruits prioritize local sites (including Havens in the region group), falling back to outside Havens if needed.";
+            }
+
+            // --- Tab 5 Validation ---
+            int totalConfiguredRes = companionCount + wizInRes + resFactions;
+            int totalConfiguredSide = totalSideboardChars + sideFactions;
+
+            if (totalConfiguredRes > playDeckLimit)
+            {
+                hasFactionError = true;
+                _lblFactionStatus.ForeColor = Color.Firebrick;
+                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblFactionStatus.Text =
+                    $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions) exceed Play Deck Size ({playDeckLimit}).\n" +
+                    "Reduce Factions in Play Deck or increase Play Deck Size on General Settings.";
+            }
+            else if (totalConfiguredSide > sideboardLimit)
+            {
+                hasFactionError = true;
+                _lblFactionStatus.ForeColor = Color.Firebrick;
+                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblFactionStatus.Text =
+                    $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions) exceed Sideboard Size ({sideboardLimit}).\n" +
+                    "Reduce Factions in Sideboard or increase Sideboard Size on General Settings.";
+            }
+            else if ((_lblFactionStatus.ForeColor == Color.Firebrick &&
+                      (_lblFactionStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _lblFactionStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+                     (_deck.Resources.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) &&
+                      _deck.Sideboard.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) &&
+                      !_lblFactionStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_lblFactionStatus.Text.StartsWith("No factions configured", StringComparison.OrdinalIgnoreCase)))
+            {
+                _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblFactionStatus.Text = FactionIdleStatusText;
+            }
+
+            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError;
+
+            if (hasTheaterError || hasRecruitError || hasFactionError)
             {
                 var blockedTabs = new List<string>();
                 if (hasTheaterError) blockedTabs.Add("Regions & Sites");
                 if (hasRecruitError) blockedTabs.Add("Wizards & Recruits");
+                if (hasFactionError) blockedTabs.Add("Factions");
 
                 _lblPipelineStatus.ForeColor = Color.Firebrick;
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
@@ -1330,7 +1507,6 @@ namespace MECCG_Deck_Builder
 
             var graph = _filterService.BuildRegionAdjacencyGraph(allCards);
 
-            // 1. Build allowed region set strictly from checked terrains
             var allowedRegions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (var regCard in allCards.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
             {
@@ -1350,7 +1526,6 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            // 2. Resolve Seed Region
             string seedChoice = _cmbSeedRegion.SelectedItem?.ToString() ?? "Random";
             bool isRandomSeed = string.Equals(seedChoice, "Random", StringComparison.OrdinalIgnoreCase);
 
@@ -1394,7 +1569,6 @@ namespace MECCG_Deck_Builder
                 seedChoice = nearestAllowed;
             }
 
-            // 3. Expand connected region group (multi-attempt to satisfy Region Count and Min Adventure Sites)
             int maxAttempts = isRandomSeed ? 50 : 25;
             string bestSeed = seedChoice;
             List<string> bestCluster = [];
@@ -1443,11 +1617,9 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 4. Assemble Sites Deck: All 4 Havens + Drafted Regions + Matching Adventure Sites (up to maxSites)
             var draftedSitesAndRegions = new List<Card>();
             var addedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // 4a. All 4 Hero Havens
             foreach (var havenName in HeroHavens)
             {
                 var havenCard = FindHeroPreferredCard(allCards, activeSets, "Site", havenName);
@@ -1457,7 +1629,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 4b. Connected Region Cards
             foreach (var regName in bestCluster)
             {
                 var regCard = FindHeroPreferredCard(allCards, activeSets, "Region", regName);
@@ -1467,7 +1638,6 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            // 4c. Matching Adventure Sites inside the final region group (deduplicated by Name, preferring Hero)
             var matchingAdventureSites = allCards
                 .Where(c =>
                     string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) &&
@@ -1590,8 +1760,6 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            // Tier 1: Drafted regions (including Havens inside those regions)
-            // Tier 2: Havens outside the drafted region group
             var localHavens = havenSites
                 .Where(h => !string.IsNullOrWhiteSpace(h.Region) && draftedRegions.Contains(h.Region.Trim()))
                 .ToList();
@@ -1874,8 +2042,6 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            // Tier 1: Drafted adventure sites + any Haven located inside the drafted region group
-            // Tier 2: Remaining Havens outside the drafted region group
             var tier1Sites = allSitesInDeck
                 .Where(s =>
                     !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase) ||
@@ -2000,7 +2166,6 @@ namespace MECCG_Deck_Builder
                     usedTitles.Add(wiz2Card.Name);
                 }
 
-                // Attempt 0: process tightest Tier 1 rows first, then Tier 2-only rows
                 var orderedSpecs = attempt == 0
                     ? [.. rowSpecs
                         .OrderBy(r => r.Tier1.Count > 0 ? 0 : 1)
@@ -2139,6 +2304,491 @@ namespace MECCG_Deck_Builder
             return true;
         }
 
+        private bool RunFactionsDraft(bool silent = false)
+        {
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+
+            // 1. Clean Factions slice + any prerequisite cards whose "Prerequisite For" matches a Faction card
+            var allFactionNames = new HashSet<string>(
+                allCards
+                    .Where(c => string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+                                string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase))
+                    .Select(c => c.Name),
+                StringComparer.OrdinalIgnoreCase);
+
+            bool IsFactionOrFactionPrerequisite(Card card)
+            {
+                if (string.Equals(card.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) return true;
+                var prereqFor = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite For");
+                return prereqFor.Any(p => allFactionNames.Contains(p));
+            }
+
+            _deck.Resources.RemoveAll(IsFactionOrFactionPrerequisite);
+            _deck.Sideboard.RemoveAll(IsFactionOrFactionPrerequisite);
+
+            int reqRes = (int)_numResourceFactions.Value;
+            int reqSide = (int)_numSideboardFactions.Value;
+
+            if (reqRes == 0 && reqSide == 0)
+            {
+                _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblFactionStatus.Text = "No factions configured (0 drafted).";
+                return true;
+            }
+
+            // 2. Gather Sites and drafted character groups
+            var draftedRegions = new HashSet<string>(
+                _deck.Sites
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()),
+                StringComparer.OrdinalIgnoreCase);
+
+            var allSitesInDeck = _deck.Sites
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (allSitesInDeck.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        this,
+                        "Factions requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Factions",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var localSites = allSitesInDeck
+                .Where(s =>
+                    !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrWhiteSpace(s.Region) && draftedRegions.Contains(s.Region.Trim())))
+                .ToList();
+
+            var outsideHavens = allSitesInDeck
+                .Where(s =>
+                    string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase) &&
+                    (string.IsNullOrWhiteSpace(s.Region) || !draftedRegions.Contains(s.Region.Trim())))
+                .ToList();
+
+            var poolChars = _deck.Pool;
+            var resChars = _deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)).ToList();
+            var sideChars = _deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)).ToList();
+            var allDraftedChars = poolChars.Concat(resChars).Concat(sideChars).ToList();
+
+            // 3. Build eligible faction candidates (grouped by Name, preferring Hero alignment)
+            var factionGroups = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase) &&
+                    IsHeroPlayableAlignment(c.Alignment))
+                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(PickHeroPreferredFromGroup)
+                .Where(c => c != null)
+                .ToList();
+
+            var scoredCandidates = new List<(
+                Card Faction,
+                List<Card> Prerequisites,
+                int PrimaryTier,
+                int SourceRank,
+                int LocalRank,
+                int TieBreaker)>();
+
+            foreach (var faction in factionGroups)
+            {
+                // 3a. Named character "Specific" check
+                if (!string.IsNullOrWhiteSpace(faction.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, faction.Specific)))
+                {
+                    continue;
+                }
+
+                // 3b. Site Requirement check (must match at least one Site/Haven in _deck.Sites)
+                var siteReqTags = _filterService.GetCardTagsForCategory(faction.Id, "Site Requirement");
+                if (siteReqTags.Count == 0) continue;
+
+                bool playableLocal = siteReqTags.Any(req => MatchesAnySiteRequirement(localSites, req, _filterService));
+                bool playableOutside = !playableLocal && siteReqTags.Any(req => MatchesAnySiteRequirement(outsideHavens, req, _filterService));
+
+                if (!playableLocal && !playableOutside) continue;
+
+                // 3c. Resolve complete Prerequisite chain (and verify prerequisites' own Site Requirements & Specific)
+                var resolvedPrereqs = new List<Card>();
+                if (!TryResolvePrerequisiteChain(
+                    faction,
+                    allCards,
+                    activeSets,
+                    allSitesInDeck,
+                    allDraftedChars,
+                    resolvedPrereqs,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                // 3d. Evaluate priority tier:
+                // 1 = Character Faction Bonus (Pool > Resources > Sideboard; ignores "*" / "All")
+                // 2 = Character Race Match (Pool > Resources > Sideboard)
+                // 3 = Local Site vs Outside Haven
+                // 4 = Remaining Eligible Factions
+                int localRank = playableLocal ? 0 : 1;
+
+                int bonusSourceRank = GetBestFactionBonusSourceRank(faction, poolChars, resChars, sideChars);
+                int primaryTier;
+                int sourceRank;
+
+                if (bonusSourceRank < 3)
+                {
+                    primaryTier = 1;
+                    sourceRank = bonusSourceRank;
+                }
+                else
+                {
+                    int raceSourceRank = GetBestCharacterRaceSourceRank(faction, poolChars, resChars, sideChars);
+                    if (raceSourceRank < 3)
+                    {
+                        primaryTier = 2;
+                        sourceRank = raceSourceRank;
+                    }
+                    else
+                    {
+                        primaryTier = playableLocal ? 3 : 4;
+                        sourceRank = 3;
+                    }
+                }
+
+                scoredCandidates.Add((faction, resolvedPrereqs, primaryTier, sourceRank, localRank, Random.Shared.Next()));
+            }
+
+            var orderedCandidates = scoredCandidates
+                .OrderBy(x => x.PrimaryTier)
+                .ThenBy(x => x.SourceRank)
+                .ThenBy(x => x.LocalRank)
+                .ThenBy(x => x.TieBreaker)
+                .ToList();
+
+            // 4. Draft into Resources first, then Sideboard
+            var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in _deck.Resources.Concat(_deck.Sideboard))
+            {
+                usedCountsByName[c.Name] = usedCountsByName.GetValueOrDefault(c.Name, 0) + 1;
+            }
+
+            int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
+            int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
+
+            var draftedResFactions = new List<Card>();
+            var draftedResPrereqs = new List<Card>();
+            int resCardsAdded = 0;
+
+            DraftFactionsIntoSection(
+                orderedCandidates,
+                _deck.Resources,
+                reqRes,
+                resCapacity,
+                usedCountsByName,
+                draftedResFactions,
+                draftedResPrereqs,
+                ref resCardsAdded);
+
+            var draftedSideFactions = new List<Card>();
+            var draftedSidePrereqs = new List<Card>();
+            int sideCardsAdded = 0;
+
+            DraftFactionsIntoSection(
+                orderedCandidates,
+                _deck.Sideboard,
+                reqSide,
+                sideCapacity,
+                usedCountsByName,
+                draftedSideFactions,
+                draftedSidePrereqs,
+                ref sideCardsAdded);
+
+            _deck.SortSections();
+            if (!silent)
+            {
+                NotifyDeckChanged(draftedResFactions.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
+            }
+
+            // 5. Build Status Message
+            string resText = draftedResFactions.Count > 0
+                ? string.Join(", ", draftedResFactions.Select(f => f.Name)) +
+                  (draftedResPrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedResPrereqs.Select(p => p.Name))})" : "")
+                : "(None)";
+
+            string sideText = draftedSideFactions.Count > 0
+                ? string.Join(", ", draftedSideFactions.Select(f => f.Name)) +
+                  (draftedSidePrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedSidePrereqs.Select(p => p.Name))})" : "")
+                : "(None)";
+
+            string statusMsg =
+                $"Drafted {draftedResFactions.Count} faction(s) into Resources and {draftedSideFactions.Count} into Sideboard:\n" +
+                $"• Resources: {resText}\n" +
+                $"• Sideboard: {sideText}";
+
+            var warnings = new List<string>();
+            if (draftedResFactions.Count < reqRes)
+            {
+                warnings.Add($"Resources Faction Shortfall: Drafted only {draftedResFactions.Count} of {reqRes} playable faction(s).");
+            }
+            if (draftedSideFactions.Count < reqSide)
+            {
+                warnings.Add($"Sideboard Faction Shortfall: Drafted only {draftedSideFactions.Count} of {reqSide} playable faction(s).");
+            }
+
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblFactionStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblFactionStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
+            _lblFactionStatus.Text = statusMsg;
+            return true;
+        }
+
+        private static void DraftFactionsIntoSection(
+            List<(Card Faction, List<Card> Prerequisites, int PrimaryTier, int SourceRank, int LocalRank, int TieBreaker)> orderedCandidates,
+            List<Card> targetSection,
+            int requestedFactions,
+            int sectionCapacity,
+            Dictionary<string, int> usedCountsByName,
+            List<Card> draftedFactionsOut,
+            List<Card> draftedPrereqsOut,
+            ref int totalCardsAdded)
+        {
+            if (requestedFactions <= 0 || sectionCapacity <= 0) return;
+
+            bool CanAddCopy(Card card)
+            {
+                int current = usedCountsByName.GetValueOrDefault(card.Name, 0);
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                return current < max;
+            }
+
+            // First pass prioritizes distinct titles; subsequent passes only allow non-unique duplicates if needed
+            for (int copyTier = 0; copyTier < 3 && draftedFactionsOut.Count < requestedFactions; copyTier++)
+            {
+                foreach (var (Faction, Prerequisites, PrimaryTier, SourceRank, LocalRank, TieBreaker) in orderedCandidates)
+                {
+                    if (draftedFactionsOut.Count >= requestedFactions) break;
+
+                    var faction = Faction;
+                    int curCount = usedCountsByName.GetValueOrDefault(faction.Name, 0);
+                    if (curCount != copyTier || !CanAddCopy(faction)) continue;
+
+                    var neededPrereqs = new List<Card>();
+                    bool prereqLegal = true;
+
+                    foreach (var prereq in Prerequisites)
+                    {
+                        bool alreadyInSection = targetSection.Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, prereq.Name));
+                        if (alreadyInSection) continue;
+
+                        if (!CanAddCopy(prereq))
+                        {
+                            prereqLegal = false;
+                            break;
+                        }
+                        neededPrereqs.Add(prereq);
+                    }
+
+                    if (!prereqLegal) continue;
+
+                    int neededSlots = 1 + neededPrereqs.Count;
+                    if (totalCardsAdded + neededSlots > sectionCapacity) continue;
+
+                    targetSection.Add(faction);
+                    usedCountsByName[faction.Name] = curCount + 1;
+                    draftedFactionsOut.Add(faction);
+
+                    foreach (var prereq in neededPrereqs)
+                    {
+                        targetSection.Add(prereq);
+                        usedCountsByName[prereq.Name] = usedCountsByName.GetValueOrDefault(prereq.Name, 0) + 1;
+                        draftedPrereqsOut.Add(prereq);
+                    }
+
+                    totalCardsAdded += neededSlots;
+                }
+            }
+        }
+
+        private bool TryResolvePrerequisiteChain(
+            Card card,
+            IReadOnlyList<Card> allCards,
+            ISet<string> activeSets,
+            List<Card> allSitesInDeck,
+            List<Card> allDraftedChars,
+            List<Card> resolvedPrereqs,
+            HashSet<string> visitedNames)
+        {
+            if (card == null || !visitedNames.Add(card.Name)) return true;
+
+            var prereqTags = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite");
+            if (prereqTags.Count == 0) return true;
+
+            foreach (var prereqName in prereqTags)
+            {
+                var prereqCard = allCards
+                    .Where(c =>
+                        (activeSets == null || activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                        CardFilterService.EqualsWithDiacriticFallback(c.Name, prereqName) &&
+                        IsHeroPlayableAlignment(c.Alignment))
+                    .OrderBy(c => string.Equals(c.Alignment, "Hero", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                    .FirstOrDefault();
+
+                if (prereqCard == null) return false;
+
+                if (!string.IsNullOrWhiteSpace(prereqCard.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, prereqCard.Specific)))
+                {
+                    return false;
+                }
+
+                var prereqSiteReqs = _filterService.GetCardTagsForCategory(prereqCard.Id, "Site Requirement");
+                if (prereqSiteReqs.Count > 0 &&
+                    !prereqSiteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService)))
+                {
+                    return false;
+                }
+
+                if (!resolvedPrereqs.Any(p => CardFilterService.EqualsWithDiacriticFallback(p.Name, prereqCard.Name)))
+                {
+                    resolvedPrereqs.Add(prereqCard);
+                }
+
+                if (!TryResolvePrerequisiteChain(
+                    prereqCard,
+                    allCards,
+                    activeSets,
+                    allSitesInDeck,
+                    allDraftedChars,
+                    resolvedPrereqs,
+                    visitedNames))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private int GetBestFactionBonusSourceRank(
+            Card faction,
+            List<Card> poolChars,
+            List<Card> resChars,
+            List<Card> sideChars)
+        {
+            if (AnyCharacterHasFactionBonus(poolChars, faction)) return 0;
+            if (AnyCharacterHasFactionBonus(resChars, faction)) return 1;
+            if (AnyCharacterHasFactionBonus(sideChars, faction)) return 2;
+            return 3;
+        }
+
+        private bool AnyCharacterHasFactionBonus(List<Card> chars, Card faction)
+        {
+            if (chars == null || chars.Count == 0) return false;
+
+            foreach (var ch in chars)
+            {
+                var bonusTags = _filterService.GetCardTagsForCategory(ch.Id, "Faction Bonus");
+                foreach (var tag in bonusTags)
+                {
+                    if (string.IsNullOrWhiteSpace(tag) ||
+                        tag == "*" ||
+                        string.Equals(tag, "All", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    if (CardFilterService.TryParsePredicate(tag, out _, out _, out _))
+                    {
+                        if (CardFilterService.MatchesPredicate(faction, tag, _filterService))
+                        {
+                            return true;
+                        }
+                    }
+                    else if (CardFilterService.EqualsWithDiacriticFallback(faction.Name, tag))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static int GetBestCharacterRaceSourceRank(
+            Card faction,
+            List<Card> poolChars,
+            List<Card> resChars,
+            List<Card> sideChars)
+        {
+            if (string.IsNullOrWhiteSpace(faction.Race)) return 3;
+
+            if (AnyCharacterMatchesFactionRace(poolChars, faction.Race)) return 0;
+            if (AnyCharacterMatchesFactionRace(resChars, faction.Race)) return 1;
+            if (AnyCharacterMatchesFactionRace(sideChars, faction.Race)) return 2;
+            return 3;
+        }
+
+        private static bool AnyCharacterMatchesFactionRace(List<Card> chars, string factionRace)
+        {
+            if (chars == null || chars.Count == 0 || string.IsNullOrWhiteSpace(factionRace)) return false;
+
+            var factionRaces = factionRace.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var ch in chars)
+            {
+                if (string.IsNullOrWhiteSpace(ch.Race)) continue;
+                var charRaces = ch.Race.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (charRaces.Any(cr => factionRaces.Any(fr => CardFilterService.EqualsWithDiacriticFallback(cr, fr))))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool MatchesAnySiteRequirement(List<Card> sites, string requirement, CardFilterService filterService)
+        {
+            if (sites == null || sites.Count == 0 || string.IsNullOrWhiteSpace(requirement)) return false;
+
+            string cleanReq = requirement.Trim();
+            if (CardFilterService.TryParsePredicate(cleanReq, out _, out _, out _))
+            {
+                return sites.Any(s => CardFilterService.MatchesPredicate(s, cleanReq, filterService));
+            }
+
+            return sites.Any(s =>
+                CardFilterService.EqualsWithDiacriticFallback(s.Name, cleanReq) ||
+                string.Equals(s.Name.Replace("-", " "), cleanReq.Replace("-", " "), StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool IsHeroPlayableAlignment(string alignment)
+        {
+            if (string.IsNullOrWhiteSpace(alignment)) return true;
+            return string.Equals(alignment, "Hero", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(alignment, "Neutral", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(alignment, "Dual", StringComparison.OrdinalIgnoreCase);
+        }
+
         private void RunPipelineDraft()
         {
             var stepsToRun = new List<(int StepNumber, string TabName, RunnableTabInfo Info)>();
@@ -2263,7 +2913,6 @@ namespace MECCG_Deck_Builder
                 }
                 else if (failedIndex == 0 && attempt == 1)
                 {
-                    // Step 1 itself failed on attempt 1 (already runs its own internal search); stop immediately
                     break;
                 }
             }
@@ -2295,7 +2944,6 @@ namespace MECCG_Deck_Builder
                 return;
             }
 
-            // Diagnostic pass with silent = false to display the hard-lock message
             ResetAttemptState();
             NotifyDeckChanged(null);
 
@@ -2573,5 +3221,9 @@ namespace MECCG_Deck_Builder
 
         public List<CharacterRowSettings> RecruitRows { get; set; } = [];
         public List<CharacterRowSettings> ReserveRows { get; set; } = [];
+
+        // Tab 5: Factions
+        public int ResourceFactionCount { get; set; } = 1;
+        public int SideboardFactionCount { get; set; } = 1;
     }
 }

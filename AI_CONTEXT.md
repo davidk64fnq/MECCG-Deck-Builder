@@ -35,14 +35,14 @@
 - `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, dual-source cross-card attribute/category lookups (supporting official attributes and custom taxonomy), and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 - RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
-- `DeckAssemblyMatrixDialog.cs`: Modeless 4-tab drafting workbench (`General Settings`, `Regions & Sites`, `Starting Company`, `Wizards & Recruits`) with `.workbench.json` profile persistence, centralized pipeline execution (`RunnableTabInfo` registry with 25-attempt retry and whole-deck `DeckSnapshot` save/recall), `Min`/`Max Adventure Sites` bounds, strict Tier 1 -> Tier 2 character prioritization, multiline tooltips, and live deck synchronization.
+- `DeckAssemblyMatrixDialog.cs`: Modeless 5-tab drafting workbench (`General Settings`, `Regions & Sites`, `Starting Company`, `Wizards & Recruits`, `Factions`) with `.workbench.json` profile persistence, centralized pipeline execution (`RunnableTabInfo` registry with 25-attempt retry and whole-deck `DeckSnapshot` save/recall), `Min`/`Max Adventure Sites` bounds, strict Tier 1 -> Tier 2 character prioritization, 4-tier faction prioritization with `Prerequisite` auto-drafting, multiline tooltips, and live deck synchronization.
 - `ExportTaxonomyDialog.cs`: Partition-scoped CSV taxonomy draft exporter with preset column templates and custom category registration.
 
 ---
 
 ## Workbench Architectural Conventions (Future Tabs)
-- **Centralized Pipeline & Slice Ownership:** Tabs 2+ are pure configuration views driven from `General Settings` (`Run Pipeline`, `Clear Deck`, `Save/Recall Snapshot`). Tabs writing into shared partitions (`Resources`, `Sideboard`) must clear/replace only their own card slice (e.g., `Primary == "Character"`, `Secondary == "Faction"`), never the entire partition.
-- **Local Group vs. Outside Haven Scope:** Downstream tabs (`Starting Company`, `Wizards & Recruits`, and future `Factions`, `Items`, `Allies`, `Hazards` tabs) separate cards tied to the drafted region group—including Havens located inside those drafted regions—(Tier 1) from Havens outside the drafted region group (Tier 2).
+- **Centralized Pipeline & Slice Ownership:** Tabs 2+ are pure configuration views driven from `General Settings` (`Run Pipeline`, `Clear Deck`, `Save/Recall Snapshot`). Tabs writing into shared partitions (`Resources`, `Sideboard`) must clear/replace only their own card slice (e.g., `Primary == "Character"`, `Secondary == "Faction"` plus faction `Prerequisite For` enablers), never the entire partition.
+- **Local Group vs. Outside Haven Scope:** Downstream tabs (`Starting Company`, `Wizards & Recruits`, `Factions`, and future `Items`, `Allies`, `Hazards` tabs) separate cards tied to the drafted region group—including Havens located inside those drafted regions—(Tier 1) from Havens outside the drafted region group (Tier 2).
 - **Generic Pipeline Registration:** Register every new runnable tab in `_tabInfo` (`RunnableTabInfo(Runner, StatusLabel)`) and `_pipelineOrder` with a `bool silent = false` runner signature, and prefix soft warnings in the tab's status label with `⚠` so `RunPipelineDraft()` handles retries, snapshots, and warning surfacing automatically.
 
 ---
@@ -248,6 +248,11 @@
     - Simplified `Regions & Sites` by retiring `Movement Mode`, `Base Haven`, `Site Count`, and `Non-Starter` policy; always drafts all 4 Hero Havens (preferring Hero printings), `Region Count` (`4–12`) connected regions, and matching adventure sites bounded by linked `Min`/`Max Adventure Sites` (`0–50`, default `4–12`).
     - Removed `Haven` from `Site Holds`, defaulted all `Region Terrains` and `Site Holds` items to checked (`Uncheck to exclude`), and refreshed `Seed Region` on dialog visibility changes.
     - Removed character policy dropdowns and implemented strict Tier 1 -> Tier 2 character prioritization (drafted regions/sites + local Havens first, outside Havens as fallback) across `Starting Company` and `Wizards & Recruits`, fixing un-drafted Haven-region leaks and `CA1859`.
+  - [x] Issue #54: Modular Workbench Tab 5 (Factions) with Priority Ranking & Prerequisite Auto-Drafting
+    - Added Tab 5 (`Factions`) with `Factions in Play Deck (Resources)` (`0–15`, default `1`) and `Factions in Sideboard` (`0–10`, default `1`), `.workbench.json` profile persistence, live summary counts, and `Play Deck Size` / `Sideboard Size` budget validation.
+    - Registered `RunFactionsDraft` as Step 4 of `_pipelineOrder`, scoping slice cleanup to `Secondary == "Faction"` and cards tagged with `Prerequisite For` a Faction card.
+    - Enforced Hero-playable alignment, `Site Requirement` in `_deck.Sites`, `Specific` character presence, and recursive `TryResolvePrerequisiteChain` validation (checking each prerequisite's own `Site Requirement` and `Specific` character).
+    - Implemented 4-tier prioritization (`Faction Bonus` [`Pool > Resources > Sideboard`, ignoring `*`/`All`] -> Character `Race` [`Pool > Resources > Sideboard`] -> Local region-group sites/Havens before outside Havens -> Remaining eligible), combined `Resources + Sideboard` copy limits, and same-section `Prerequisite` auto-drafting.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline
