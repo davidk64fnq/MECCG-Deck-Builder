@@ -265,7 +265,8 @@
       "Home Region": "The Shire",
       "id": "15",
       "name": "Bilbo",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "Combat Bonus": "Orc",
@@ -341,7 +342,8 @@
       "Home Region": "The Shire",
       "id": "33",
       "name": "Fatty Bolger",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "fullCode": "Forlong (TW)",
@@ -355,7 +357,8 @@
       "Home Region": "The Shire",
       "id": "36",
       "name": "Frodo",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "Combat Bonus": "Orc",
@@ -423,7 +426,8 @@
       "Home Region": "The Shire",
       "id": "54",
       "name": "Merry",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "Combat Bonus": "Orc",
@@ -469,7 +473,8 @@
       "Home Region": "The Shire",
       "id": "61",
       "name": "Pippin",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "fullCode": "Radagast [H] (TW)",
@@ -483,14 +488,16 @@
       "Home Region": "The Shire",
       "id": "63",
       "name": "Robin Smallburrow",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "fullCode": "Sam Gamgee (TW)",
       "Home Region": "The Shire",
       "id": "64",
       "name": "Sam Gamgee",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Bag End"
     },
     {
       "fullCode": "Saruman [H] (TW)",

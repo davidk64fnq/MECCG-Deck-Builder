@@ -12,9 +12,10 @@ namespace MECCG_Deck_Builder
     {
         private static readonly string[] HeroHavens = ["Rivendell", "Lórien", "Grey Havens", "Edhellond"];
 
+        // Near top of DeckAssemblyMatrixDialog (line 16):
         private const string StarterIdleStatusText =
             "Total Mind limit: <= 20.\n" +
-            "Starting characters prioritize the drafted region group (including Havens in those regions), falling back to outside Havens if needed.";
+            "Starting characters prioritize: 1) drafted region group (including local Havens), 2) outside Havens, 3) any matching character.";
 
         private const string TheaterIdleStatusText =
             "Configure seed region, region/site counts, and terrain/hold filters, then click Run Pipeline on General Settings.";
@@ -418,7 +419,7 @@ namespace MECCG_Deck_Builder
                 Text =
                     "Automatic Site Deck Rules:\n" +
                     "• Always drafts all 4 Havens (Rivendell, Lórien, Grey Havens, Edhellond).\n" +
-                    "• Starting Company & Recruits strictly match these regions, sites, & Havens."
+                    "• Starting Company & Recruits prioritize these regions, sites, & Havens."
             };
 
             grpDraftOpts.Controls.AddRange([
@@ -702,8 +703,8 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false,
                 Text =
                     "Priority Order (among factions playable at drafted Sites/Havens with Specific & Prerequisite requirements met):\n" +
-                    "  1. Character Faction Bonus (Pool -> Resources -> Sideboard)      2. Character Race Match (Pool -> Resources -> Sideboard)\n" +
-                    "  3. Local Region Group Sites before Outside Havens                4. Remaining Eligible Factions"
+                    "  1. Faction Bonus / Specific Character (Pool -> Resources -> Sideboard)   2. Character Race Match (Pool -> Resources -> Sideboard)\n" +
+                    "  3. Local Region Group Sites before Outside Havens                       4. Remaining Eligible Factions"
             };
 
             grpFactions.Controls.AddRange([
@@ -1357,7 +1358,7 @@ namespace MECCG_Deck_Builder
                 string wizSideText = wizInSide > 0 ? $" + {wizInSide} Wizard" : "";
                 _lblRecruitStatus.Text =
                     $"Configured: {companionCount}/10 Resources{wizResText}  |  {reserveCount}/3 Sideboard{wizSideText}.\n" +
-                    "Recruits prioritize local sites (including Havens in the region group), falling back to outside Havens if needed.";
+                    "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.";
             }
 
             // --- Tab 5 Validation ---
@@ -1770,6 +1771,7 @@ namespace MECCG_Deck_Builder
 
             var tier1PerRow = new List<List<Card>>(activeRows.Count);
             var tier2PerRow = new List<List<Card>>(activeRows.Count);
+            var tier3PerRow = new List<List<Card>>(activeRows.Count);
             var allPerRow = new List<List<Card>>(activeRows.Count);
 
             for (int i = 0; i < activeRows.Count; i++)
@@ -1782,10 +1784,16 @@ namespace MECCG_Deck_Builder
                         .Where(c => !t1Ids.Contains(c.Id))
                         .ToList()
                     : [];
+                var t12Ids = new HashSet<string>(t1Ids.Concat(t2.Select(c => c.Id)), StringComparer.OrdinalIgnoreCase);
 
-                var combined = new List<Card>(t1.Count + t2.Count);
+                var t3 = GetCandidatesForCharacterRow(activeRows[i], allCards, activeSets, null, null)
+                    .Where(c => !t12Ids.Contains(c.Id))
+                    .ToList();
+
+                var combined = new List<Card>(t1.Count + t2.Count + t3.Count);
                 combined.AddRange(t1);
                 combined.AddRange(t2);
+                combined.AddRange(t3);
 
                 if (combined.Count == 0)
                 {
@@ -1793,8 +1801,7 @@ namespace MECCG_Deck_Builder
                     {
                         MessageBox.Show(
                             this,
-                            $"No matching characters found for Starting Company Row {i + 1} within the drafted regions ({string.Join(", ", draftedRegions)}) and Haven sites ({string.Join(", ", havenSites.Select(h => h.Name))}).\n\n" +
-                            "Try adjusting your row criteria, expanding Region Count, or broadening Region Terrains on Regions & Sites.",
+                            $"No matching characters found for Starting Company Row {i + 1} in your active expansion sets.",
                             "Starting Company",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Warning);
@@ -1804,6 +1811,7 @@ namespace MECCG_Deck_Builder
 
                 tier1PerRow.Add(t1);
                 tier2PerRow.Add(t2);
+                tier3PerRow.Add(t3);
                 allPerRow.Add(combined);
             }
 
@@ -1831,8 +1839,10 @@ namespace MECCG_Deck_Builder
                 StringComparer.OrdinalIgnoreCase);
 
             List<Card> bestCompany = null;
-            int bestT1Count = -1;
+            int bestScore = -1;
+            int bestT1Count = 0;
             int bestT2Count = 0;
+            int bestT3Count = 0;
 
             for (int attempt = 0; attempt < 100; attempt++)
             {
@@ -1848,6 +1858,7 @@ namespace MECCG_Deck_Builder
                 int remainingMinMind = minPossibleMindSum;
                 int t1Count = 0;
                 int t2Count = 0;
+                int t3Count = 0;
                 bool validPermutation = true;
 
                 foreach (int rowIdx in rowIndices)
@@ -1876,6 +1887,18 @@ namespace MECCG_Deck_Builder
                             chosen = eligibleT2[Random.Shared.Next(eligibleT2.Count)];
                             t2Count++;
                         }
+                        else
+                        {
+                            var eligibleT3 = tier3PerRow[rowIdx]
+                                .Where(c => !usedTitles.Contains(c.Name) && ParseCardMind(c.Mind) <= maxAllowedMind)
+                                .ToList();
+
+                            if (eligibleT3.Count > 0)
+                            {
+                                chosen = eligibleT3[Random.Shared.Next(eligibleT3.Count)];
+                                t3Count++;
+                            }
+                        }
                     }
 
                     if (chosen == null)
@@ -1889,11 +1912,14 @@ namespace MECCG_Deck_Builder
                     currentMind += ParseCardMind(chosen.Mind);
                 }
 
-                if (validPermutation && currentMind <= 20 && t1Count > bestT1Count)
+                int score = (t1Count * 10000) + (t2Count * 100);
+                if (validPermutation && currentMind <= 20 && score > bestScore)
                 {
                     bestCompany = picked;
+                    bestScore = score;
                     bestT1Count = t1Count;
                     bestT2Count = t2Count;
+                    bestT3Count = t3Count;
 
                     if (bestT1Count == activeRows.Count)
                     {
@@ -1908,7 +1934,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Unable to find a valid starting company combination totaling 20 Mind or less within the drafted regions & Haven sites (after 100 attempts).\n\n" +
+                        "Unable to find a valid starting company combination totaling 20 Mind or less (after 100 attempts).\n\n" +
                         "Try broadening skills/species, allowing lower-mind characters (Mind 1–3), or clearing a row.",
                         "Starting Company",
                         MessageBoxButtons.OK,
@@ -1928,9 +1954,14 @@ namespace MECCG_Deck_Builder
 
             int finalMind = bestCompany.Sum(c => ParseCardMind(c.Mind));
             string companyNames = string.Join(", ", bestCompany.Select(c => $"{c.Name} ({c.Mind} Mind)"));
-            string tierNote = bestT2Count > 0
-                ? $" [{bestT1Count} local region(s), {bestT2Count} outside Haven(s)]"
-                : " [All from drafted regions]";
+
+            var tierParts = new List<string>();
+            if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local region(s)");
+            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside Haven(s)");
+            if (bestT3Count > 0) tierParts.Add($"{bestT3Count} out-of-region");
+            string tierNote = (bestT2Count == 0 && bestT3Count == 0)
+                ? " [All from drafted regions]"
+                : $" [{string.Join(", ", tierParts)}]";
 
             _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
@@ -2054,72 +2085,65 @@ namespace MECCG_Deck_Builder
                     (string.IsNullOrWhiteSpace(s.Region) || !draftedRegions.Contains(s.Region.Trim())))
                 .ToList();
 
-            var rowSpecs = new List<(bool IsReserve, int RowNum, List<Card> Tier1, List<Card> Tier2)>();
+            var rowSpecs = new List<(bool IsReserve, int RowNum, List<Card> Tier1, List<Card> Tier2, List<Card> Tier3)>();
 
-            for (int i = 0; i < activeRecruitRows.Count; i++)
+            void AddRowSpec(CharacterRowControls row, bool isReserve, int rowNum)
             {
                 var t1 = tier1Sites.Count > 0
-                    ? GetCandidatesForCharacterRow(activeRecruitRows[i], allCards, activeSets, null, tier1Sites)
+                    ? GetCandidatesForCharacterRow(row, allCards, activeSets, null, tier1Sites)
+                        .Where(c => SatisfiesRecruitSiteRequirement(c, allSitesInDeck))
+                        .ToList()
                     : [];
                 var t1Ids = new HashSet<string>(t1.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
 
                 var t2 = tier2Sites.Count > 0
-                    ? GetCandidatesForCharacterRow(activeRecruitRows[i], allCards, activeSets, null, tier2Sites)
-                        .Where(c => !t1Ids.Contains(c.Id))
+                    ? GetCandidatesForCharacterRow(row, allCards, activeSets, null, tier2Sites)
+                        .Where(c => !t1Ids.Contains(c.Id) && SatisfiesRecruitSiteRequirement(c, allSitesInDeck))
                         .ToList()
                     : [];
+                var t12Ids = new HashSet<string>(t1Ids.Concat(t2.Select(c => c.Id)), StringComparer.OrdinalIgnoreCase);
 
-                if (t1.Count == 0 && t2.Count == 0)
-                {
-                    if (!silent)
-                    {
-                        MessageBox.Show(
-                            this,
-                            $"No matching characters found for Play Deck Character Row {i + 1} whose home site is in the drafted Site deck (Adventure Sites + Havens).\n\n" +
-                            "Try broadening row criteria or including additional Site Holds (e.g. Free-hold, Border-hold) on Regions & Sites.",
-                            "Wizards & Recruits",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning);
-                    }
-                    return false;
-                }
-                rowSpecs.Add((false, i + 1, t1, t2));
+                var t3 = GetCandidatesForCharacterRow(row, allCards, activeSets, null, null)
+                    .Where(c => !t12Ids.Contains(c.Id) && SatisfiesRecruitSiteRequirement(c, allSitesInDeck))
+                    .ToList();
+
+                rowSpecs.Add((isReserve, rowNum, t1, t2, t3));
+            }
+
+            for (int i = 0; i < activeRecruitRows.Count; i++)
+            {
+                AddRowSpec(activeRecruitRows[i], false, i + 1);
             }
 
             for (int i = 0; i < activeReserveRows.Count; i++)
             {
-                var t1 = tier1Sites.Count > 0
-                    ? GetCandidatesForCharacterRow(activeReserveRows[i], allCards, activeSets, null, tier1Sites)
-                    : [];
-                var t1Ids = new HashSet<string>(t1.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
+                AddRowSpec(activeReserveRows[i], true, i + 1);
+            }
 
-                var t2 = tier2Sites.Count > 0
-                    ? GetCandidatesForCharacterRow(activeReserveRows[i], allCards, activeSets, null, tier2Sites)
-                        .Where(c => !t1Ids.Contains(c.Id))
-                        .ToList()
-                    : [];
-
-                if (t1.Count == 0 && t2.Count == 0)
+            var emptyRow = rowSpecs.FirstOrDefault(r => r.Tier1.Count == 0 && r.Tier2.Count == 0 && r.Tier3.Count == 0);
+            if (emptyRow.Tier1 != null)
+            {
+                if (!silent)
                 {
-                    if (!silent)
-                    {
-                        MessageBox.Show(
-                            this,
-                            $"No matching characters found for Sideboard Character Row {i + 1} whose home site is in the drafted Site deck (Adventure Sites + Havens).\n\n" +
-                            "Try broadening row criteria or including additional Site Holds (e.g. Free-hold, Border-hold) on Regions & Sites.",
-                            "Wizards & Recruits",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Warning);
-                    }
-                    return false;
+                    string label = emptyRow.IsReserve
+                        ? $"Sideboard Character Row {emptyRow.RowNum}"
+                        : $"Play Deck Character Row {emptyRow.RowNum}";
+                    MessageBox.Show(
+                        this,
+                        $"No matching characters found for {label} whose Site Requirement is satisfied by the drafted Site deck.",
+                        "Wizards & Recruits",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
                 }
-                rowSpecs.Add((true, i + 1, t1, t2));
+                return false;
             }
 
             List<Card> finalRecruits = null;
             List<Card> finalReserves = null;
-            int bestT1Count = -1;
+            int bestScore = -1;
+            int bestT1Count = 0;
             int bestT2Count = 0;
+            int bestT3Count = 0;
             string lastFailureReason = null;
 
             for (int attempt = 0; attempt < 25; attempt++)
@@ -2168,15 +2192,16 @@ namespace MECCG_Deck_Builder
 
                 var orderedSpecs = attempt == 0
                     ? [.. rowSpecs
-                        .OrderBy(r => r.Tier1.Count > 0 ? 0 : 1)
-                        .ThenBy(r => r.Tier1.Count > 0 ? r.Tier1.Count : r.Tier2.Count)]
+                        .OrderBy(r => r.Tier1.Count > 0 ? 0 : (r.Tier2.Count > 0 ? 1 : 2))
+                        .ThenBy(r => r.Tier1.Count > 0 ? r.Tier1.Count : (r.Tier2.Count > 0 ? r.Tier2.Count : r.Tier3.Count))]
                     : rowSpecs.OrderBy(_ => Random.Shared.Next()).ToList();
 
                 int t1Count = 0;
                 int t2Count = 0;
+                int t3Count = 0;
                 bool failed = false;
 
-                foreach (var (IsReserve, RowNum, Tier1, Tier2) in orderedSpecs)
+                foreach (var (IsReserve, RowNum, Tier1, Tier2, Tier3) in orderedSpecs)
                 {
                     var availT1 = Tier1.Where(c => !usedTitles.Contains(c.Name)).ToList();
                     Card chosen = null;
@@ -2194,12 +2219,21 @@ namespace MECCG_Deck_Builder
                             chosen = availT2[Random.Shared.Next(availT2.Count)];
                             t2Count++;
                         }
+                        else
+                        {
+                            var availT3 = Tier3.Where(c => !usedTitles.Contains(c.Name)).ToList();
+                            if (availT3.Count > 0)
+                            {
+                                chosen = availT3[Random.Shared.Next(availT3.Count)];
+                                t3Count++;
+                            }
+                        }
                     }
 
                     if (chosen == null)
                     {
                         string label = IsReserve ? $"Sideboard Character Row {RowNum}" : $"Play Deck Character Row {RowNum}";
-                        lastFailureReason = $"Not enough distinct matching characters in the drafted Site deck to fill {label}.";
+                        lastFailureReason = $"Not enough distinct matching characters to fill {label}.";
                         failed = true;
                         break;
                     }
@@ -2213,12 +2247,15 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                if (!failed && t1Count > bestT1Count)
+                int score = (t1Count * 10000) + (t2Count * 100);
+                if (!failed && score > bestScore)
                 {
                     finalRecruits = attemptRecruits;
                     finalReserves = attemptReserves;
+                    bestScore = score;
                     bestT1Count = t1Count;
                     bestT2Count = t2Count;
+                    bestT3Count = t3Count;
 
                     if (bestT1Count == rowSpecs.Count)
                     {
@@ -2255,10 +2292,15 @@ namespace MECCG_Deck_Builder
 
             string recruitNames = finalRecruits.Count > 0 ? string.Join(", ", finalRecruits.Select(c => c.Name)) : "(None)";
             string reserveNames = finalReserves.Count > 0 ? string.Join(", ", finalReserves.Select(c => c.Name)) : "(None)";
+
+            var tierParts = new List<string>();
+            if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local site(s)");
+            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside Haven(s)");
+            if (bestT3Count > 0) tierParts.Add($"{bestT3Count} out-of-region");
             string tierNote = rowSpecs.Count > 0
-                ? (bestT2Count > 0
-                    ? $" [{bestT1Count} local site(s), {bestT2Count} outside Haven(s)]"
-                    : " [All from local sites]")
+                ? (bestT2Count == 0 && bestT3Count == 0
+                    ? " [All from local sites]"
+                    : $" [{string.Join(", ", tierParts)}]")
                 : string.Empty;
 
             var wizardNotes = new List<string>();
@@ -2433,20 +2475,23 @@ namespace MECCG_Deck_Builder
                 }
 
                 // 3d. Evaluate priority tier:
-                // 1 = Character Faction Bonus (Pool > Resources > Sideboard; ignores "*" / "All")
+                // 1 = Character Faction Bonus or Specific Character Match (Pool > Resources > Sideboard)
                 // 2 = Character Race Match (Pool > Resources > Sideboard)
                 // 3 = Local Site vs Outside Haven
                 // 4 = Remaining Eligible Factions
                 int localRank = playableLocal ? 0 : 1;
 
                 int bonusSourceRank = GetBestFactionBonusSourceRank(faction, poolChars, resChars, sideChars);
+                int specificSourceRank = GetBestSpecificCharacterSourceRank(faction, poolChars, resChars, sideChars);
+                int tier1SourceRank = Math.Min(bonusSourceRank, specificSourceRank);
+
                 int primaryTier;
                 int sourceRank;
 
-                if (bonusSourceRank < 3)
+                if (tier1SourceRank < 3)
                 {
                     primaryTier = 1;
-                    sourceRank = bonusSourceRank;
+                    sourceRank = tier1SourceRank;
                 }
                 else
                 {
@@ -2701,6 +2746,20 @@ namespace MECCG_Deck_Builder
             return 3;
         }
 
+        private static int GetBestSpecificCharacterSourceRank(
+            Card faction,
+            List<Card> poolChars,
+            List<Card> resChars,
+            List<Card> sideChars)
+        {
+            if (string.IsNullOrWhiteSpace(faction.Specific)) return 3;
+
+            if (poolChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, faction.Specific))) return 0;
+            if (resChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, faction.Specific))) return 1;
+            if (sideChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, faction.Specific))) return 2;
+            return 3;
+        }
+
         private bool AnyCharacterHasFactionBonus(List<Card> chars, Card faction)
         {
             if (chars == null || chars.Count == 0) return false;
@@ -2809,27 +2868,6 @@ namespace MECCG_Deck_Builder
                 _deck.Hazards.Count +
                 _deck.Sideboard.Count +
                 _deck.Sites.Count;
-
-            if (existingCardCount > 0)
-            {
-                var res = MessageBox.Show(
-                    this,
-                    $"The current deck already contains cards:\n" +
-                    $"• Pool: {_deck.Pool.Count}\n" +
-                    $"• Resources: {_deck.Resources.Count}\n" +
-                    $"• Hazards: {_deck.Hazards.Count}\n" +
-                    $"• Sideboard: {_deck.Sideboard.Count}\n" +
-                    $"• Sites: {_deck.Sites.Count}\n\n" +
-                    "Proceeding will clear these deck lists before running Step 1.\n\nDo you want to proceed?",
-                    "Clear Existing Deck & Run Pipeline",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (res != DialogResult.Yes)
-                {
-                    return;
-                }
-            }
 
             void ResetAttemptState()
             {
@@ -3151,6 +3189,13 @@ namespace MECCG_Deck_Builder
             return string.Equals(card.Secondary, "Avatar", StringComparison.OrdinalIgnoreCase) ||
                    string.Equals(card.Race, "Wizard", StringComparison.OrdinalIgnoreCase) ||
                    string.Equals(card.Race, "Ringwraith", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool SatisfiesRecruitSiteRequirement(Card character, List<Card> allSitesInDeck)
+        {
+            var siteReqs = _filterService.GetCardTagsForCategory(character.Id, "Site Requirement");
+            if (siteReqs.Count == 0) return true;
+            return siteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService));
         }
 
         private static int ParseCardMind(string mindStr)

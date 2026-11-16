@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Modular Workbench: Drafting Specific Cards</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+    <a id="top"></a>
+    <div class="nav-bar">
+        <a href="index.html">Home</a> &gt;
+        <a href="deck_operations.html">Deck Construction &amp; Formats</a> &gt;
+        <a href="deck_generation_engine.html">Generator Engine</a> &gt;
+        Modular Workbench Examples
+    </div>
+
+    <h1>Modular Workbench: Drafting Specific Cards</h1>
+
+    <div class="note">
+        <strong>Work in Progress:</strong> The <strong>Modular Deck Assembly Workbench</strong> (<strong>Deck &gt; Assemble from Components...</strong> [<kbd>Ctrl+M</kbd>]) is still under active development. Rather than documenting every workbench control in full, this page provides reproducible examples showing how to steer its priority-based pipeline toward specific card combinations.
+    </div>
+
+    <div class="chapter-nav">
+        <strong>Jump to Example:</strong>
+        <a href="#how-targeting-works">How Targeting Works</a> &bull;
+        <a href="#army-of-the-dead">Example 1: Army of the Dead (+ Paths of the Dead)</a> &bull;
+        <a href="#hobbit-recruits">Example 2: Hobbits in Recruits vs. Starting Company</a>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- HOW TARGETING WORKS                                                -->
+    <!-- ================================================================== -->
+    <h2 id="how-targeting-works">How to Coax Specific Cards Out of the Workbench</h2>
+    <p>
+        The workbench does not ask for exact card titles on character or faction rows. Instead, each tab filters and ranks eligible cards based on what earlier steps drafted into the deck:
+    </p>
+    <ul>
+        <li><strong>Regions &amp; Sites (Step 1):</strong> Determines which regions, adventure sites, and Havens are present in <code>Sites</code>.</li>
+        <li>
+            <strong>Starting Company (Step 2) &amp; Wizards &amp; Recruits (Step 3):</strong> Combine <code>Skill Focus</code>, <code>Species / Race</code>, <code>Mind</code>, and <code>DI</code> thresholds to narrow a row down to a specific character (or small group), while ranking candidates by home location:
+            <ol>
+                <li><strong>Tier 1:</strong> Characters tied to the drafted regions/sites (or Havens inside those regions).</li>
+                <li><strong>Tier 2:</strong> Characters tied to outside Havens (all 4 Hero Havens are always included in <code>Sites</code>).</li>
+                <li><strong>Tier 3:</strong> Any remaining matching character—provided their <code>Site Requirement</code> tag (if any) is satisfied in <code>Sites</code> for <strong>Wizards &amp; Recruits</strong>.</li>
+            </ol>
+        </li>
+        <li><strong>Factions (Step 4):</strong> Only considers factions playable at drafted sites/Havens whose <code>Specific</code> character and <code>Prerequisite</code> chain are all legal, then ranks <code>Faction Bonus</code> and <code>Specific</code> character matches at <strong>Tier 1</strong>.</li>
+    </ul>
+
+    <!-- ================================================================== -->
+    <!-- EXAMPLE 1: ARMY OF THE DEAD                                        -->
+    <!-- ================================================================== -->
+    <h2 id="army-of-the-dead">Example 1: Drafting <em>Army of the Dead</em> (and <em>Paths of the Dead</em>)</h2>
+    <p>
+        <em>Army of the Dead</em> requires three separate pieces across three different parts of Middle-earth: <em>Vale of Erech</em> (<code>Lamedon</code>), <em>Paths of the Dead</em> (playable at <em>Dunharrow</em> in <code>Rohan</code>), and <em>Aragorn II</em> (whose home site is <em>Bree</em> in <code>Arthedain</code>).
+    </p>
+
+    <h3>Reproducible Workbench Settings</h3>
+    <ol>
+        <li><strong>Catalog Menu:</strong> Ensure <em>The Wizards</em> (<code>METW</code>) is checked.</li>
+        <li>
+            <strong>Regions &amp; Sites tab:</strong>
+            <ul>
+                <li><strong>Seed Region:</strong> <code>Lamedon</code></li>
+                <li><strong>Region Count:</strong> <code>5</code></li>
+                <li><strong>Min / Max Adventure Sites:</strong> <code>4</code> / <code>12</code></li>
+                <li><strong>Region Terrains:</strong> Check <code>Border-land</code> and <code>Free-domain</code> only (uncheck all others).</li>
+                <li><strong>Site Holds:</strong> Check <code>Free-hold</code> and <code>Border-hold</code> only (uncheck all others).</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Starting Company tab:</strong> Configure <strong>Row 1</strong> only (leave Rows 2&ndash;5 blank):
+            <ul>
+                <li><strong>Skill Focus:</strong> <code>Ranger</code> (or <code>Diplomat</code>)</li>
+                <li><strong>Species / Race:</strong> <code>D&uacute;nadan</code></li>
+                <li><strong>Mind:</strong> <code>&gt;=9</code></li>
+            </ul>
+        </li>
+        <li><strong>Wizards &amp; Recruits tab:</strong> Leave blank (or configure any additional recruits you want).</li>
+        <li><strong>Factions tab:</strong> Keep defaults (<code>1</code> in Play Deck / Resources, <code>1</code> in Sideboard).</li>
+        <li>Return to <strong>General Settings</strong> and click <strong>Run Pipeline</strong>.</li>
+    </ol>
+
+    <h3>What Happens Under the Hood</h3>
+    <ul>
+        <li>
+            <strong>Why <code>Region Count = 5</code> instead of <code>4</code>:</strong> With only <code>Border-land</code> and <code>Free-domain</code> checked, <code>Belfalas</code> forms a triangle with <code>Lamedon</code> and <code>Lebennin</code>. At <code>Region Count = 4</code>, expanding from <code>Lamedon</code> picks <code>{Lamedon, Belfalas, Lebennin, An&oacute;rien}</code> 87.5% of the time and only reaches <code>Rohan</code> 12.5% of the time. Raising <code>Region Count</code> to <code>5</code> guarantees that both <code>Lamedon</code> (<em>Vale of Erech</em>) and <code>Rohan</code> (<em>Dunharrow</em>) are drafted every time.
+        </li>
+        <li>
+            <strong>Out-of-region <em>Aragorn II</em> via Tier 3:</strong> <em>Aragorn II</em> is the only <code>D&uacute;nadan</code> with <code>Mind &gt;= 9</code>. Because his home site (<em>Bree</em> in <code>Arthedain</code>) is outside the southern cluster, he drafts via <strong>Tier 3</strong> into <strong>Pool</strong>.
+        </li>
+        <li>
+            <strong>Automatic Prerequisite Drafting:</strong> In <strong>Factions</strong>, <em>Army of the Dead</em> sees <em>Aragorn II</em> (<code>Specific</code>), <em>Vale of Erech</em> (<code>Site Requirement</code>), and <em>Dunharrow</em> (<code>Paths of the Dead</code>'s <code>Site Requirement</code>). Because it matches a drafted character via <code>Specific</code>, it promotes to <strong>Tier 1</strong> and is drafted into <strong>Resources</strong> along with <em>Paths of the Dead</em> automatically.
+        </li>
+    </ul>
+
+    <div class="back-to-top">
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- EXAMPLE 2: HOBBITS IN RECRUITS VS STARTING COMPANY                 -->
+    <!-- ================================================================== -->
+    <h2 id="hobbit-recruits">Example 2: Drafting a Hobbit into Recruits vs. Starting Company</h2>
+    <p>
+        Under MECCG rules, Hobbits can begin in your <strong>Starting Company</strong> (<code>Pool</code>) at Rivendell regardless of whether <em>Bag End</em> is in your Site deck. During the game, however, Hobbits may only be brought into play at <em>Bag End</em> (never at a Haven).
+    </p>
+    <p>
+        To prevent dead cards, the workbench enforces each character's <code>Site Requirement</code> tag (<code>Bag End</code> on Hobbits) differently across the two tabs:
+    </p>
+    <ul>
+        <li><strong>Starting Company (<code>Pool</code>):</strong> Ignores <code>Site Requirement</code>. A <code>Hobbit</code> row drafts cleanly into <code>Pool</code> via Tier 3 even when <em>The Shire</em> / <em>Bag End</em> is not in <code>Sites</code>.</li>
+        <li><strong>Wizards &amp; Recruits (<code>Resources</code> / <code>Sideboard</code>):</strong> Requires <code>Site Requirement</code> to be present in <code>Sites</code>. A Hobbit will <strong>only</strong> draft into <code>Resources</code> or <code>Sideboard</code> if <em>Bag End</em> is already in the drafted Site deck.</li>
+    </ul>
+
+    <h3>Reproducible Settings to Draft a Hobbit into Recruits</h3>
+    <ol>
+        <li>
+            <strong>Regions &amp; Sites tab:</strong>
+            <ul>
+                <li><strong>Seed Region:</strong> <code>The Shire</code></li>
+                <li><strong>Region Count:</strong> <code>4</code> (or higher)</li>
+                <li><strong>Region Terrains:</strong> Ensure <code>Free-domain</code> is checked (<em>The Shire</em> is a <code>Free-domain</code>).</li>
+                <li><strong>Site Holds:</strong> Ensure <code>Free-hold</code> is checked (<em>Bag End</em> is a <code>Free-hold</code>).</li>
+            </ul>
+        </li>
+        <li>
+            <strong>Wizards &amp; Recruits tab:</strong> On any row under <strong>Play Deck Characters (Resources)</strong> or <strong>Sideboard Characters</strong>, set:
+            <ul>
+                <li><strong>Species / Race:</strong> <code>Hobbit</code></li>
+                <li><strong>Optional narrowing:</strong> e.g., <code>Skill Focus = Scout</code> and <code>Mind = &gt;=5</code> to target <em>Frodo</em> or <em>Bilbo</em>, or leave blank for any Hobbit.</li>
+            </ul>
+        </li>
+        <li>Return to <strong>General Settings</strong> and click <strong>Run Pipeline</strong>.</li>
+    </ol>
+    <p>
+        Because <code>The Shire</code> puts <em>Bag End</em> into <code>Sites</code>, the Hobbit satisfies <strong>Tier 1</strong> and is drafted into <code>Resources</code> (or <code>Sideboard</code>). If you run the same row with <em>Bag End</em> excluded (for example, <code>Seed Region = Lamedon</code> or <code>Free-hold</code> unchecked), <strong>Wizards &amp; Recruits</strong> will block the draft and report that the character's <code>Site Requirement</code> is not met in <code>Sites</code>.
+    </p>
+
+    <div class="back-to-top">
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
+</body>
+</html>

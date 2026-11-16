@@ -53,6 +53,10 @@
 			<param name="Name" value="Multi-Platform Export Formats">
 			<param name="Local" value="export_formats.html">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Modular Workbench: Drafting Specific Cards">
+			<param name="Local" value="workbench_examples.html">
+    </OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Card Catalog &amp; Artwork">
