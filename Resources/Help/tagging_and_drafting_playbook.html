@@ -74,7 +74,7 @@
                 <span style="font-size: 8.5pt; color: #4A5568;"><em>(Includes Avatars in catalog filter; separated in deck generator)</em></span>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Home Region</code>, <code>Faction Bonus</code>, <code>Combat Bonus</code><br />
+                <strong>Categories:</strong> <code>Home Region</code>, <code>Faction Bonus</code>, <code>Combat Bonus</code>, <code>Site Requirement</code><br />
                 <strong>Specialized Attributes:</strong> <code>Home</code> (structured predicates e.g. <code>Site=Dark-hold</code>), <code>Corruption</code> (inverted resistance e.g. <code>-2</code> on Hobbits)
             </td>
         </tr>
@@ -431,7 +431,7 @@
     <!-- ================================================================== -->
     <h2 id="characters-playbook">Characters (Pool &amp; Company Recruitment)</h2>
     <p>
-        Characters form the core engine of MECCG decks. They are drafted into the <code>Pool</code> (starting company) or <code>Resources</code> (deck characters recruited during play). Because character cards already possess rich official numerical attributes (<code>Mind</code>, <code>Direct</code>, <code>Prowess</code>, <code>Body</code>, <code>Corruption</code>, <code>Skills</code>, and <code>Race</code>), taxonomy tagging on characters is strictly restricted to three <strong>structural bridge categories</strong>.
+        Characters form the core engine of MECCG decks. They are drafted into the <code>Pool</code> (starting company) or <code>Resources</code> (deck characters recruited during play). Because character cards already possess rich official numerical attributes (<code>Mind</code>, <code>Direct</code>, <code>Prowess</code>, <code>Body</code>, <code>Corruption</code>, <code>Skills</code>, and <code>Race</code>), taxonomy tagging on characters is strictly restricted to four <strong>structural bridge categories</strong>.
     </p>
 
     <!-- SECTION 1: TAGGING PHILOSOPHY FOR CHARACTERS -->
@@ -482,6 +482,21 @@
     <ul>
         <li><code>Orc</code> &rarr; Prowess and body modifications against Orcs (<em>D&aacute;in II</em>, <em>Gimli</em>)</li>
         <li><code>Nazg&ucirc;l</code> &rarr; Combat prowess superiority against Ringwraiths (<em>&Eacute;owyn</em>)</li>
+    </ul>
+
+    <h4 class="entry-heading-sub">Site Requirement</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Character</span>
+    </div>
+    <p>
+        Standard characters can enter play at any Haven as well as their printed home site, so they leave <code>Site Requirement</code> <strong><code>[Blank]</code></strong>. This category is assigned strictly to characters whose printed rules forbid playing them at a Haven (requiring their specific home site to be in play when recruited during the game). Starting company rules ignore this tag because starting characters deploy at Rivendell.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Bag End</code> &rarr; Home-site-only recruitment restriction on Hobbits (<em>Bilbo</em>, <em>Fatty Bolger</em>, <em>Folco Boffin</em>, <em>Frodo</em>, <em>Merry</em>, <em>Pippin</em>, <em>Robin Smallburrow</em>, <em>Sam Gamgee</em>)</li>
+        <li><code>Framsburg</code> &rarr; Home-site-only recruitment restriction on <em>Fram Framson</em> (METD)</li>
+        <li><code>[Blank]</code> &rarr; Standard Haven-playable characters (<em>Aragorn II</em>, <em>Boromir II</em>, <em>Gimli</em>, <em>Legolas</em>)</li>
     </ul>
 
     <div class="note">
@@ -569,6 +584,24 @@
     "Name": "{Leader.Home}"
   }
 }</code></pre>
+
+    <h4>Pattern D: Safe Non-Starting Recruits (Haven-Playable Guard)</h4>
+    <p>
+        When drafting non-starting recruits into <code>Resources</code> or <code>Sideboard</code> without guaranteeing <em>Bag End</em> or specialized home sites in the site deck, filter for <code>"Site Requirement": "[Blank]"</code> so home-site-only characters are never drafted as dead cards:
+    </p>
+    <pre><code>{
+  "Name": "Haven-Playable Recruits",
+  "Section": "Resources",
+  "Count": 3,
+  "Attributes": {
+    "Primary": "Character",
+    "Secondary": "!=Avatar"
+  },
+  "Categories": {
+    "Site Requirement": "[Blank]"
+  }
+}</code></pre>
+
     <div class="note">
         <strong>Execution Walkthrough &mdash; Fixed Sites vs. Machine Predicates:</strong><br />
         A single rule handles 100% of Middle-earth starting characters with zero boilerplate:

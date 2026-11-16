@@ -155,8 +155,8 @@
         </tr>
         <tr>
             <td><a href="#site-requirement"><code>Site Requirement</code></a></td>
-            <td><span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span></td>
-            <td>Specific destination sites or hold types required to play/target</td>
+            <td><span class="scope-pill">Character</span> &bull; <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span></td>
+            <td>Specific destination sites or hold types required to play, recruit, or target</td>
         </tr>
         <tr>
             <td><a href="#target-item"><code>Target Item</code></a></td>
@@ -528,14 +528,15 @@
 
     <h3 id="site-requirement" class="entry-heading">Site Requirement</h3>
     <div class="scope-badge">
-        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span>
+        <strong>Card Scope:</strong> <span class="scope-pill">Character</span> &bull; <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span>
     </div>
     <p>
         Consolidates all card-to-site relationships into a single queryable category. Identifies:
     </p>
     <ol>
-        <li>The specific site(s) or hold type(s) where a company must be located to play the card (items, allies, factions, and site-phase events), and</li>
-        <li>The specific site(s) or hold type(s) an event attaches to, targets, or modifies.</li>
+        <li>The specific site(s) or hold type(s) where a company must be located to play the card (items, allies, factions, and site-phase events),</li>
+        <li>The specific site(s) or hold type(s) an event attaches to, targets, or modifies, and</li>
+        <li>Mandatory home sites for characters whose card text forbids bringing them into play at a Haven (such as Hobbits at <em>Bag End</em> or <em>Fram Framson</em> at <em>Framsburg</em>). Standard Haven-playable characters leave this category <strong><code>[Blank]</code></strong>.</li>
     </ol>
     <p>
         Supports specific named sites (e.g. <em>Minas Tirith</em>, <em>Moria</em>), structural site hold classifications (e.g. <code>Dark-hold</code>, <code>Shadow-hold</code>, <code>Ruins &amp; Lairs</code>, <code>Free-hold</code>, <code>Border-hold</code>, <code>Haven</code>), and dynamic site predicates (e.g. <code>Information!=[Blank]</code>).
@@ -561,6 +562,8 @@
         <li><code>Ruins &amp; Lairs</code> &rarr; Target holds for <em>Awaken Denizens</em></li>
         <li><code>Moria; L&oacute;rien</code> &rarr; Target sites for <em>Balrog of Moria</em></li>
         <li><code>[Blank]</code> &rarr; Standard open combat, travel, and protection events playable anywhere</li>
+        <li><code>Bag End</code> &rarr; Home-site-only recruitment restriction on Hobbits (playable in Starting Company <code>Pool</code> without <em>Bag End</em>, but requires <em>Bag End</em> when recruited into <code>Resources</code> or <code>Sideboard</code>)</li>
+        <li><code>Framsburg</code> &rarr; Home-site-only recruitment restriction on <em>Fram Framson</em> (METD)</li>
     </ul>
     <div class="back-to-top">
         <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;

@@ -35,7 +35,7 @@
 - `TaxonomyExtractionService.cs`: Text scanning, regex batch rule execution, dual-source cross-card attribute/category lookups (supporting official attributes and custom taxonomy), and two-way CSV spreadsheet pipeline.
 - UserSettings.cs: User settings model and UserSettingsService persisting expansion set selections and taxonomy extraction dialog state to user_settings.json.
 - RunTaxonomyRulesDialog.cs: Modal extraction dialog with four player-friendly tool modes: Scan Card Text for Catalog Entities, Cross-Card Attribute Lookup, Custom Pattern Search (Regex), and Batch Rules from File (.json).
-- `DeckAssemblyMatrixDialog.cs`: Modeless 5-tab drafting workbench (`General Settings`, `Regions & Sites`, `Starting Company`, `Wizards & Recruits`, `Factions`) with `.workbench.json` profile persistence, streamlined centralized pipeline execution (`RunnableTabInfo` registry with 25-attempt retry and whole-deck `DeckSnapshot` save/recall), `Min`/`Max Adventure Sites` bounds, Tier 1 -> Tier 2 -> Tier 3 character prioritization (with recruit `Site Requirement` enforcement), 4-tier faction prioritization (`Faction Bonus` / `Specific` character at Tier 1) with `Prerequisite` auto-drafting, multiline tooltips, and live deck synchronization.
+- `DeckAssemblyMatrixDialog.cs`: Modeless 6-tab drafting workbench (`General Settings`, `Regions & Sites`, `Starting Company`, `Wizards & Recruits`, `Factions`, `Allies`) with `.workbench.json` profile persistence, streamlined centralized pipeline execution (`RunnableTabInfo` registry with 25-attempt retry and whole-deck `DeckSnapshot` save/recall), `Min`/`Max Adventure Sites` bounds, Tier 1 -> Tier 2 -> Tier 3 character prioritization (with recruit `Site Requirement` enforcement), 4-tier faction prioritization, 2-tier ally prioritization with bipartite maximum matching site-collision prevention, multiline tooltips, and live deck synchronization.
 - `ExportTaxonomyDialog.cs`: Partition-scoped CSV taxonomy draft exporter with preset column templates and custom category registration.
 
 ---
@@ -259,6 +259,11 @@
     - Added `GetBestSpecificCharacterSourceRank` in `RunFactionsDraft` to promote `Specific` character matches into Tier 1 alongside `Faction Bonus` (`Pool > Resources > Sideboard`), enabling *Army of the Dead* (+ *Paths of the Dead*) to outrank generic racial matches.
     - Removed the pre-run confirmation `MessageBox` in `RunPipelineDraft()` for faster iteration (`Save Snapshot` / `Recall Snapshot` remain for rollback).
     - Tagged home-site-restricted characters with `Site Requirement` in `Rules_Support_Tags.json` and added `Resources/Help/workbench_examples.html` (linked from `deck_generation_engine.html` and compiled into `MECCG_Deck_Builder.chm`).
+  - [x] Issue #56: Modular Workbench Tab 6 (Allies) with Bipartite Site-Collision Prevention & Character Site Requirement Docs
+    - Added Tab 6 (`Allies`) with Resources/Sideboard ally spinners, `.workbench.json` persistence, live composition summary integration, and unified `Play Deck Size` / `Sideboard Size` budget validation.
+    - Registered `RunAlliesDraft` as Step 5 of `_pipelineOrder`, scoping slice cleanup to `Secondary == "Ally"` and ally `Prerequisite For` enablers while enforcing Hero alignment, uniqueness limits, and recursive prerequisite chains.
+    - Implemented bipartite maximum matching (`MaxSiteAssignments` / `TryMatchSite`) between Resources Factions and Allies to ensure both assets have distinct playable sites in 1-deck games, with a Pass 2 fallback and `⚠` notice enabling pipeline retry.
+    - Updated `rules_support_tags.html` and `tagging_and_drafting_playbook.html` to document `Site Requirement` on Character cards for home-site-only non-starter recruits (Hobbits at *Bag End*, *Fram Framson* at *Framsburg*) alongside drafting Pattern D.
 - [ ] **v1.0.0 - First Public Release**
 
 ## Clean-Slate Schema Enrichment Pipeline

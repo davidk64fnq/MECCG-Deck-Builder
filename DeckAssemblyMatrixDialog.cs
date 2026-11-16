@@ -24,6 +24,10 @@ namespace MECCG_Deck_Builder
             "Factions are strictly limited to those playable at Sites/Havens in the drafted Site deck.\n" +
             "Auto-drafted prerequisite cards (e.g. Paths of the Dead) are added alongside their faction if their own site requirements are met.";
 
+        private const string AllyIdleStatusText =
+            "Allies are strictly limited to those playable at Sites/Havens in the drafted Site deck.\n" +
+            "Prioritizes allies playable in the drafted region group before outside Havens.";
+
         private readonly Deck _deck;
         private readonly CardCatalogService _catalog;
         private readonly CardFilterService _filterService;
@@ -45,7 +49,7 @@ namespace MECCG_Deck_Builder
         private readonly TabControl _tabControl;
         private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
-        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions"];
+        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions", "Allies"];
 
         // --- TAB 1: GENERAL SETTINGS & CONTROLS ---
         private readonly TextBox _txtDeckTitle;
@@ -87,6 +91,11 @@ namespace MECCG_Deck_Builder
         private readonly NumericUpDown _numResourceFactions;
         private readonly NumericUpDown _numSideboardFactions;
         private readonly Label _lblFactionStatus;
+
+        // --- TAB 6: ALLIES ---
+        private readonly NumericUpDown _numResourceAllies;
+        private readonly NumericUpDown _numSideboardAllies;
+        private readonly Label _lblAllyStatus;
 
         private readonly ToolTip _toolTip = new()
         {
@@ -241,7 +250,7 @@ namespace MECCG_Deck_Builder
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites  ->  2. Starting Company  ->  3. Wizards & Recruits  ->  4. Factions",
+                Text = "Execution Order:   1. Regions & Sites  ->  2. Starting Company  ->  3. Wizards & Recruits  ->  4. Factions  ->  5. Allies",
                 Location = new Point(16, 22),
                 Size = new Size(778, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
@@ -259,7 +268,7 @@ namespace MECCG_Deck_Builder
             _btnRunPipeline.Click += (s, e) => RunPipelineDraft();
             _toolTip.SetToolTip(
                 _btnRunPipeline,
-                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions).\n" +
+                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies).\n" +
                 "Automatically retries up to 25 times if random region rolls fail downstream constraints.");
 
             _btnClearDeck = new Button
@@ -725,12 +734,113 @@ namespace MECCG_Deck_Builder
 
             tabFactions.Controls.AddRange([grpFactions, _lblFactionStatus]);
 
+            // ==========================================
+            // TAB 6: ALLIES
+            // ==========================================
+            var tabAllies = new TabPage("Allies");
+
+            var grpAllies = new GroupBox
+            {
+                Text = "Ally Drafting Counts && Priority Rules",
+                Location = new Point(16, 16),
+                Size = new Size(810, 172)
+            };
+
+            var lblResAllies = new Label
+            {
+                Text = "Allies in Play Deck (Resources):",
+                Location = new Point(16, 30),
+                Size = new Size(210, 20)
+            };
+            _numResourceAllies = new NumericUpDown
+            {
+                Location = new Point(232, 27),
+                Size = new Size(60, 23),
+                Minimum = 0,
+                Maximum = 15,
+                Value = 1
+            };
+            string resAlliesTip =
+                "Number of allies to draft into the Play Deck (Resources).\n" +
+                "Default is 1 (minimum needed for Council scoring).";
+            _toolTip.SetToolTip(lblResAllies, resAlliesTip);
+            _toolTip.SetToolTip(_numResourceAllies, resAlliesTip);
+
+            var lblResAlliesHint = new Label
+            {
+                Text = "allies in Resources (1 minimum for Council scoring; local region group matches prioritized first).",
+                Location = new Point(304, 29),
+                Size = new Size(495, 32),
+                ForeColor = Color.DimGray
+            };
+
+            var lblSideAllies = new Label
+            {
+                Text = "Allies in Sideboard:",
+                Location = new Point(16, 66),
+                Size = new Size(210, 20)
+            };
+            _numSideboardAllies = new NumericUpDown
+            {
+                Location = new Point(232, 63),
+                Size = new Size(60, 23),
+                Minimum = 0,
+                Maximum = 10,
+                Value = 1
+            };
+            string sideAlliesTip =
+                "Number of backup allies to draft into the Sideboard.\n" +
+                "Counts toward Sideboard Size on General Settings.";
+            _toolTip.SetToolTip(lblSideAllies, sideAlliesTip);
+            _toolTip.SetToolTip(_numSideboardAllies, sideAlliesTip);
+
+            var lblSideAlliesHint = new Label
+            {
+                Text = "backup allies in Sideboard (unique titles are never duplicated across Resources & Sideboard).",
+                Location = new Point(304, 65),
+                Size = new Size(495, 32),
+                ForeColor = Color.DimGray
+            };
+
+            _numResourceAllies.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
+            _numSideboardAllies.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
+
+            var lblAllyRulesNote = new Label
+            {
+                Location = new Point(16, 102),
+                Size = new Size(778, 54),
+                ForeColor = Color.DimGray,
+                UseMnemonic = false,
+                Text =
+                    "Priority Order (among allies playable at drafted Sites/Havens with Specific & Prerequisite requirements met):\n" +
+                    "  1. Local Region Group Sites (and local Havens)      2. Outside Havens"
+            };
+
+            grpAllies.Controls.AddRange([
+                lblResAllies, _numResourceAllies, lblResAlliesHint,
+                lblSideAllies, _numSideboardAllies, lblSideAlliesHint,
+                lblAllyRulesNote
+            ]);
+
+            _lblAllyStatus = new Label
+            {
+                Location = new Point(16, 202),
+                Size = new Size(805, 160),
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false,
+                Text = AllyIdleStatusText
+            };
+
+            tabAllies.Controls.AddRange([grpAllies, _lblAllyStatus]);
+
             // Tabs ordered to match pipeline execution order
-            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions]);
+            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions, tabAllies]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
             _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
             _tabInfo["Factions"] = new(RunFactionsDraft, _lblFactionStatus);
+            _tabInfo["Allies"] = new(RunAlliesDraft, _lblAllyStatus);
 
             Controls.Add(_tabControl);
 
@@ -789,8 +899,10 @@ namespace MECCG_Deck_Builder
             int totalSideChars = _deck.Sideboard.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             int resFactions = _deck.Resources.Count(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase));
             int sideFactions = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase));
+            int resAllies = _deck.Resources.Count(c => string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase));
+            int sideAllies = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase));
 
-            if (totalResChars == 0 && totalSideChars == 0 && resFactions == 0 && sideFactions == 0)
+            if (totalResChars == 0 && totalSideChars == 0 && resFactions == 0 && sideFactions == 0 && resAllies == 0 && sideAllies == 0)
             {
                 ValidateWorkbenchReadiness();
             }
@@ -806,17 +918,19 @@ namespace MECCG_Deck_Builder
 
             string avatarResNote = avatarsInRes > 0 ? $" + {avatarsInRes} Avatar(s)" : "";
             string resFactionNote = resFactions > 0 ? $", {resFactions} faction(s)" : "";
+            string resAllyNote = resAllies > 0 ? (resAllies == 1 ? ", 1 ally" : $", {resAllies} allies") : "";
 
             var sideParts = new List<string>();
             if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
             if (avatarsInSideboard > 0) sideParts.Add($"{avatarsInSideboard} Avatar");
             if (sideFactions > 0) sideParts.Add($"{sideFactions} faction(s)");
+            if (sideAllies > 0) sideParts.Add(sideAllies == 1 ? "1 ally" : $"{sideAllies} allies");
             string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
 
             _lblDeckSummary.Text =
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
                 $"Pool:             {_deck.Pool.Count} characters ({poolMind} Mind)  [Official limit: <= 20 Mind]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
+                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
                 $"Hazards:          {_deck.Hazards.Count} cards\n" +
                 $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
@@ -906,6 +1020,10 @@ namespace MECCG_Deck_Builder
             _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblFactionStatus.Text = FactionIdleStatusText;
+
+            _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblAllyStatus.Text = AllyIdleStatusText;
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -1091,7 +1209,10 @@ namespace MECCG_Deck_Builder
                 })],
 
                 ResourceFactionCount = (int)_numResourceFactions.Value,
-                SideboardFactionCount = (int)_numSideboardFactions.Value
+                SideboardFactionCount = (int)_numSideboardFactions.Value,
+
+                ResourceAllyCount = (int)_numResourceAllies.Value,
+                SideboardAllyCount = (int)_numSideboardAllies.Value
             };
         }
 
@@ -1156,6 +1277,9 @@ namespace MECCG_Deck_Builder
 
             _numResourceFactions.Value = Math.Clamp(config.ResourceFactionCount, (int)_numResourceFactions.Minimum, (int)_numResourceFactions.Maximum);
             _numSideboardFactions.Value = Math.Clamp(config.SideboardFactionCount, (int)_numSideboardFactions.Minimum, (int)_numSideboardFactions.Maximum);
+
+            _numResourceAllies.Value = Math.Clamp(config.ResourceAllyCount, (int)_numResourceAllies.Minimum, (int)_numResourceAllies.Maximum);
+            _numSideboardAllies.Value = Math.Clamp(config.SideboardAllyCount, (int)_numSideboardAllies.Minimum, (int)_numSideboardAllies.Maximum);
 
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
@@ -1295,11 +1419,12 @@ namespace MECCG_Deck_Builder
 
         private void ValidateWorkbenchReadiness()
         {
-            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null || _lblFactionStatus == null) return;
+            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null || _lblFactionStatus == null || _lblAllyStatus == null) return;
 
             bool hasTheaterError = false;
             bool hasRecruitError = false;
             bool hasFactionError = false;
+            bool hasAllyError = false;
 
             int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
             int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
@@ -1310,6 +1435,8 @@ namespace MECCG_Deck_Builder
 
             int resFactions = (int)_numResourceFactions.Value;
             int sideFactions = (int)_numSideboardFactions.Value;
+            int resAllies = (int)_numResourceAllies.Value;
+            int sideAllies = (int)_numSideboardAllies.Value;
             int playDeckLimit = (int)_numPlayDeckSize.Value;
             int sideboardLimit = (int)_numSideboardSize.Value;
 
@@ -1361,27 +1488,31 @@ namespace MECCG_Deck_Builder
                     "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.";
             }
 
-            // --- Tab 5 Validation ---
-            int totalConfiguredRes = companionCount + wizInRes + resFactions;
-            int totalConfiguredSide = totalSideboardChars + sideFactions;
+            // --- Tab 5 (Factions) & Tab 6 (Allies) Shared Budget Validation ---
+            int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies;
+            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies;
 
-            if (totalConfiguredRes > playDeckLimit)
+            string resOverMsg =
+                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies) exceed Play Deck Size ({playDeckLimit}).\n" +
+                "Reduce Factions/Allies in Play Deck or increase Play Deck Size on General Settings.";
+
+            string sideOverMsg =
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies) exceed Sideboard Size ({sideboardLimit}).\n" +
+                "Reduce Factions/Allies in Sideboard or increase Sideboard Size on General Settings.";
+
+            if (totalConfiguredRes > playDeckLimit && resFactions > 0)
             {
                 hasFactionError = true;
                 _lblFactionStatus.ForeColor = Color.Firebrick;
                 _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblFactionStatus.Text =
-                    $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions) exceed Play Deck Size ({playDeckLimit}).\n" +
-                    "Reduce Factions in Play Deck or increase Play Deck Size on General Settings.";
+                _lblFactionStatus.Text = resOverMsg;
             }
-            else if (totalConfiguredSide > sideboardLimit)
+            else if (totalConfiguredSide > sideboardLimit && sideFactions > 0)
             {
                 hasFactionError = true;
                 _lblFactionStatus.ForeColor = Color.Firebrick;
                 _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblFactionStatus.Text =
-                    $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions) exceed Sideboard Size ({sideboardLimit}).\n" +
-                    "Reduce Factions in Sideboard or increase Sideboard Size on General Settings.";
+                _lblFactionStatus.Text = sideOverMsg;
             }
             else if ((_lblFactionStatus.ForeColor == Color.Firebrick &&
                       (_lblFactionStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
@@ -1396,14 +1527,42 @@ namespace MECCG_Deck_Builder
                 _lblFactionStatus.Text = FactionIdleStatusText;
             }
 
-            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError;
+            if (totalConfiguredRes > playDeckLimit && resAllies > 0)
+            {
+                hasAllyError = true;
+                _lblAllyStatus.ForeColor = Color.Firebrick;
+                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblAllyStatus.Text = resOverMsg;
+            }
+            else if (totalConfiguredSide > sideboardLimit && sideAllies > 0)
+            {
+                hasAllyError = true;
+                _lblAllyStatus.ForeColor = Color.Firebrick;
+                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblAllyStatus.Text = sideOverMsg;
+            }
+            else if ((_lblAllyStatus.ForeColor == Color.Firebrick &&
+                      (_lblAllyStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _lblAllyStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+                     (_deck.Resources.All(c => !string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase)) &&
+                      _deck.Sideboard.All(c => !string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase)) &&
+                      !_lblAllyStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_lblAllyStatus.Text.StartsWith("No allies configured", StringComparison.OrdinalIgnoreCase)))
+            {
+                _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblAllyStatus.Text = AllyIdleStatusText;
+            }
 
-            if (hasTheaterError || hasRecruitError || hasFactionError)
+            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError && !hasAllyError;
+
+            if (hasTheaterError || hasRecruitError || hasFactionError || hasAllyError)
             {
                 var blockedTabs = new List<string>();
                 if (hasTheaterError) blockedTabs.Add("Regions & Sites");
                 if (hasRecruitError) blockedTabs.Add("Wizards & Recruits");
                 if (hasFactionError) blockedTabs.Add("Factions");
+                if (hasAllyError) blockedTabs.Add("Allies");
 
                 _lblPipelineStatus.ForeColor = Color.Firebrick;
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
@@ -2674,6 +2833,463 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private bool RunAlliesDraft(bool silent = false)
+        {
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+
+            // 1. Clean Allies slice + any prerequisite cards whose "Prerequisite For" matches an Ally card
+            var allAllyNames = new HashSet<string>(
+                allCards
+                    .Where(c => string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+                                string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase))
+                    .Select(c => c.Name),
+                StringComparer.OrdinalIgnoreCase);
+
+            bool IsAllyOrAllyPrerequisite(Card card)
+            {
+                if (string.Equals(card.Secondary, "Ally", StringComparison.OrdinalIgnoreCase)) return true;
+                var prereqFor = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite For");
+                return prereqFor.Any(p => allAllyNames.Contains(p));
+            }
+
+            _deck.Resources.RemoveAll(IsAllyOrAllyPrerequisite);
+            _deck.Sideboard.RemoveAll(IsAllyOrAllyPrerequisite);
+
+            int reqRes = (int)_numResourceAllies.Value;
+            int reqSide = (int)_numSideboardAllies.Value;
+
+            if (reqRes == 0 && reqSide == 0)
+            {
+                _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblAllyStatus.Text = "No allies configured (0 drafted).";
+                return true;
+            }
+
+            // 2. Gather Sites and drafted characters
+            var draftedRegions = new HashSet<string>(
+                _deck.Sites
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()),
+                StringComparer.OrdinalIgnoreCase);
+
+            var allSitesInDeck = _deck.Sites
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (allSitesInDeck.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        this,
+                        "Allies requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Allies",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var localSites = allSitesInDeck
+                .Where(s =>
+                    !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase) ||
+                    (!string.IsNullOrWhiteSpace(s.Region) && draftedRegions.Contains(s.Region.Trim())))
+                .ToList();
+
+            var outsideHavens = allSitesInDeck
+                .Where(s =>
+                    string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase) &&
+                    (string.IsNullOrWhiteSpace(s.Region) || !draftedRegions.Contains(s.Region.Trim())))
+                .ToList();
+
+            var allDraftedChars = _deck.Pool
+                .Concat(_deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .Concat(_deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            // 3. Build eligible ally candidates (grouped by Name, preferring Hero alignment)
+            var allyGroups = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase) &&
+                    IsHeroPlayableAlignment(c.Alignment))
+                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(PickHeroPreferredFromGroup)
+                .Where(c => c != null)
+                .ToList();
+
+            var scoredCandidates = new List<(
+                Card Ally,
+                List<Card> Prerequisites,
+                int LocalRank,
+                int TieBreaker)>();
+
+            foreach (var ally in allyGroups)
+            {
+                // 3a. Named character "Specific" check
+                if (!string.IsNullOrWhiteSpace(ally.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, ally.Specific)))
+                {
+                    continue;
+                }
+
+                // 3b. Site Requirement check (must match at least one Site/Haven in _deck.Sites)
+                var siteReqTags = _filterService.GetCardTagsForCategory(ally.Id, "Site Requirement");
+                if (siteReqTags.Count == 0) continue;
+
+                bool playableLocal = siteReqTags.Any(req => MatchesAnySiteRequirement(localSites, req, _filterService));
+                bool playableOutside = !playableLocal && siteReqTags.Any(req => MatchesAnySiteRequirement(outsideHavens, req, _filterService));
+
+                if (!playableLocal && !playableOutside) continue;
+
+                // 3c. Resolve complete Prerequisite chain (future-safe for later expansions)
+                var resolvedPrereqs = new List<Card>();
+                if (!TryResolvePrerequisiteChain(
+                    ally,
+                    allCards,
+                    activeSets,
+                    allSitesInDeck,
+                    allDraftedChars,
+                    resolvedPrereqs,
+                    new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                // 3d. Prioritize local region-group sites/Havens before outside Havens
+                int localRank = playableLocal ? 0 : 1;
+                scoredCandidates.Add((ally, resolvedPrereqs, localRank, Random.Shared.Next()));
+            }
+
+            var orderedCandidates = scoredCandidates
+                .OrderBy(x => x.LocalRank)
+                .ThenBy(x => x.TieBreaker)
+                .ToList();
+
+            // 4. Draft into Resources first (preferring distinct sites from Resources Factions), then Sideboard
+            var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in _deck.Resources.Concat(_deck.Sideboard))
+            {
+                usedCountsByName[c.Name] = usedCountsByName.GetValueOrDefault(c.Name, 0) + 1;
+            }
+
+            int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
+            int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
+
+            var resourceFactions = _deck.Resources
+                .Where(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var siteOccupyingCards = new List<Card>(resourceFactions);
+            int currentSiteMatches = MaxSiteAssignments(siteOccupyingCards, allSitesInDeck);
+
+            var draftedResAllies = new List<Card>();
+            var draftedResPrereqs = new List<Card>();
+            var overlappingResAllies = new List<Card>();
+            int resCardsAdded = 0;
+
+            // Pass 1: Disjoint sites only (so Resource Allies and Factions don't share the same sole site)
+            DraftAlliesIntoSection(
+                orderedCandidates,
+                _deck.Resources,
+                reqRes,
+                resCapacity,
+                usedCountsByName,
+                allSitesInDeck,
+                siteOccupyingCards,
+                ref currentSiteMatches,
+                requireDistinctSite: true,
+                draftedResAllies,
+                draftedResPrereqs,
+                overlappingOut: null,
+                ref resCardsAdded);
+
+            // Pass 2: Fallback only if Pass 1 couldn't fill reqRes (emits ⚠ warning so pipeline can retry)
+            if (draftedResAllies.Count < reqRes)
+            {
+                DraftAlliesIntoSection(
+                    orderedCandidates,
+                    _deck.Resources,
+                    reqRes,
+                    resCapacity,
+                    usedCountsByName,
+                    allSitesInDeck,
+                    siteOccupyingCards,
+                    ref currentSiteMatches,
+                    requireDistinctSite: false,
+                    draftedResAllies,
+                    draftedResPrereqs,
+                    overlappingOut: overlappingResAllies,
+                    ref resCardsAdded);
+            }
+
+            // Sideboard backup allies (no disjoint-site restriction)
+            var draftedSideAllies = new List<Card>();
+            var draftedSidePrereqs = new List<Card>();
+            int sideCardsAdded = 0;
+            int unusedSiteMatches = 0;
+
+            DraftAlliesIntoSection(
+                orderedCandidates,
+                _deck.Sideboard,
+                reqSide,
+                sideCapacity,
+                usedCountsByName,
+                allSitesInDeck,
+                siteOccupyingCards: null,
+                ref unusedSiteMatches,
+                requireDistinctSite: false,
+                draftedSideAllies,
+                draftedSidePrereqs,
+                overlappingOut: null,
+                ref sideCardsAdded);
+
+            _deck.SortSections();
+            if (!silent)
+            {
+                NotifyDeckChanged(draftedResAllies.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
+            }
+
+            // 5. Build Status Message
+            string resText = draftedResAllies.Count > 0
+                ? string.Join(", ", draftedResAllies.Select(a => a.Name)) +
+                  (draftedResPrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedResPrereqs.Select(p => p.Name))})" : "")
+                : "(None)";
+
+            string sideText = draftedSideAllies.Count > 0
+                ? string.Join(", ", draftedSideAllies.Select(a => a.Name)) +
+                  (draftedSidePrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedSidePrereqs.Select(p => p.Name))})" : "")
+                : "(None)";
+
+            string statusMsg =
+                $"Drafted {draftedResAllies.Count} ally/allies into Resources and {draftedSideAllies.Count} into Sideboard:\n" +
+                $"• Resources: {resText}\n" +
+                $"• Sideboard: {sideText}";
+
+            var warnings = new List<string>();
+            if (draftedResAllies.Count < reqRes)
+            {
+                warnings.Add($"Resources Ally Shortfall: Drafted only {draftedResAllies.Count} of {reqRes} playable ally/allies.");
+            }
+            if (draftedSideAllies.Count < reqSide)
+            {
+                warnings.Add($"Sideboard Ally Shortfall: Drafted only {draftedSideAllies.Count} of {reqSide} playable ally/allies.");
+            }
+
+            foreach (var overlapAlly in overlappingResAllies)
+            {
+                var allySiteNames = GetPlayableSiteIndices(overlapAlly, allSitesInDeck)
+                    .Select(idx => allSitesInDeck[idx].Name)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                var conflictingFactions = resourceFactions
+                    .Where(f => GetPlayableSiteIndices(f, allSitesInDeck).Any(idx => allySiteNames.Contains(allSitesInDeck[idx].Name)))
+                    .Select(f => f.Name)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                string siteList = string.Join(", ", allySiteNames);
+                string factionList = conflictingFactions.Count > 0
+                    ? $" with Resource Faction(s): {string.Join(", ", conflictingFactions)}"
+                    : string.Empty;
+
+                warnings.Add($"Site overlap in Resources: {overlapAlly.Name} ({siteList}) shares its playable site(s){factionList}.");
+            }
+
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblAllyStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblAllyStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
+            _lblAllyStatus.Text = statusMsg;
+            return true;
+        }
+
+        private void DraftAlliesIntoSection(
+            List<(Card Ally, List<Card> Prerequisites, int LocalRank, int TieBreaker)> orderedCandidates,
+            List<Card> targetSection,
+            int requestedAllies,
+            int sectionCapacity,
+            Dictionary<string, int> usedCountsByName,
+            List<Card> allSitesInDeck,
+            List<Card> siteOccupyingCards,
+            ref int currentSiteMatches,
+            bool requireDistinctSite,
+            List<Card> draftedAlliesOut,
+            List<Card> draftedPrereqsOut,
+            List<Card> overlappingOut,
+            ref int totalCardsAdded)
+        {
+            if (requestedAllies <= 0 || sectionCapacity <= 0) return;
+
+            bool CanAddCopy(Card card)
+            {
+                int current = usedCountsByName.GetValueOrDefault(card.Name, 0);
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                return current < max;
+            }
+
+            for (int copyTier = 0; copyTier < 3 && draftedAlliesOut.Count < requestedAllies; copyTier++)
+            {
+                foreach (var (Ally, Prerequisites, LocalRank, TieBreaker) in orderedCandidates)
+                {
+                    if (draftedAlliesOut.Count >= requestedAllies) break;
+
+                    int curCount = usedCountsByName.GetValueOrDefault(Ally.Name, 0);
+                    if (curCount != copyTier || !CanAddCopy(Ally)) continue;
+
+                    var neededPrereqs = new List<Card>();
+                    bool prereqLegal = true;
+
+                    foreach (var prereq in Prerequisites)
+                    {
+                        bool alreadyInSection = targetSection.Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, prereq.Name));
+                        if (alreadyInSection) continue;
+
+                        if (!CanAddCopy(prereq))
+                        {
+                            prereqLegal = false;
+                            break;
+                        }
+                        neededPrereqs.Add(prereq);
+                    }
+
+                    if (!prereqLegal) continue;
+
+                    int neededSlots = 1 + neededPrereqs.Count;
+                    if (totalCardsAdded + neededSlots > sectionCapacity) continue;
+
+                    int newSiteMatches = currentSiteMatches;
+                    bool isDistinctSite = true;
+
+                    if (siteOccupyingCards != null)
+                    {
+                        var testCards = new List<Card>(siteOccupyingCards) { Ally };
+                        newSiteMatches = MaxSiteAssignments(testCards, allSitesInDeck);
+                        isDistinctSite = newSiteMatches > currentSiteMatches;
+
+                        if (requireDistinctSite && !isDistinctSite)
+                        {
+                            continue;
+                        }
+                    }
+
+                    targetSection.Add(Ally);
+                    usedCountsByName[Ally.Name] = curCount + 1;
+                    draftedAlliesOut.Add(Ally);
+
+                    if (siteOccupyingCards != null)
+                    {
+                        siteOccupyingCards.Add(Ally);
+                        currentSiteMatches = newSiteMatches;
+                        if (!isDistinctSite)
+                        {
+                            overlappingOut?.Add(Ally);
+                        }
+                    }
+
+                    foreach (var prereq in neededPrereqs)
+                    {
+                        targetSection.Add(prereq);
+                        usedCountsByName[prereq.Name] = usedCountsByName.GetValueOrDefault(prereq.Name, 0) + 1;
+                        draftedPrereqsOut.Add(prereq);
+                    }
+
+                    totalCardsAdded += neededSlots;
+                }
+            }
+        }
+
+        private List<int> GetPlayableSiteIndices(Card card, List<Card> allSitesInDeck)
+        {
+            var indices = new List<int>();
+            if (card == null || allSitesInDeck == null || allSitesInDeck.Count == 0) return indices;
+
+            var siteReqTags = _filterService.GetCardTagsForCategory(card.Id, "Site Requirement");
+            if (siteReqTags.Count == 0) return indices;
+
+            for (int i = 0; i < allSitesInDeck.Count; i++)
+            {
+                var site = allSitesInDeck[i];
+                bool matches = siteReqTags.Any(req =>
+                {
+                    string cleanReq = req.Trim();
+                    if (CardFilterService.TryParsePredicate(cleanReq, out _, out _, out _))
+                    {
+                        return CardFilterService.MatchesPredicate(site, cleanReq, _filterService);
+                    }
+                    return CardFilterService.EqualsWithDiacriticFallback(site.Name, cleanReq) ||
+                           string.Equals(site.Name.Replace("-", " "), cleanReq.Replace("-", " "), StringComparison.OrdinalIgnoreCase);
+                });
+
+                if (matches)
+                {
+                    indices.Add(i);
+                }
+            }
+
+            return indices;
+        }
+
+        private int MaxSiteAssignments(List<Card> cards, List<Card> allSitesInDeck)
+        {
+            if (cards == null || cards.Count == 0 || allSitesInDeck == null || allSitesInDeck.Count == 0)
+            {
+                return 0;
+            }
+
+            var adj = new List<int>[cards.Count];
+            for (int i = 0; i < cards.Count; i++)
+            {
+                adj[i] = GetPlayableSiteIndices(cards[i], allSitesInDeck);
+            }
+
+            int[] siteOwner = new int[allSitesInDeck.Count];
+            Array.Fill(siteOwner, -1);
+
+            int matched = 0;
+            for (int u = 0; u < cards.Count; u++)
+            {
+                bool[] visited = new bool[allSitesInDeck.Count];
+                if (TryMatchSite(u, adj, siteOwner, visited))
+                {
+                    matched++;
+                }
+            }
+
+            return matched;
+        }
+
+        private static bool TryMatchSite(int u, List<int>[] adj, int[] siteOwner, bool[] visited)
+        {
+            foreach (int siteIdx in adj[u])
+            {
+                if (visited[siteIdx]) continue;
+                visited[siteIdx] = true;
+
+                if (siteOwner[siteIdx] < 0 || TryMatchSite(siteOwner[siteIdx], adj, siteOwner, visited))
+                {
+                    siteOwner[siteIdx] = u;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool TryResolvePrerequisiteChain(
             Card card,
             IReadOnlyList<Card> allCards,
@@ -3270,5 +3886,9 @@ namespace MECCG_Deck_Builder
         // Tab 5: Factions
         public int ResourceFactionCount { get; set; } = 1;
         public int SideboardFactionCount { get; set; } = 1;
+
+        // Tab 6: Allies
+        public int ResourceAllyCount { get; set; } = 1;
+        public int SideboardAllyCount { get; set; } = 1;
     }
 }
