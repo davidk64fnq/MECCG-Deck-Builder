@@ -5630,6 +5630,7 @@
       "fullCode": "Wizard's Ring (TW)",
       "id": "412",
       "name": "Wizard's Ring",
+      "Role": "Influence",
       "set": "METW",
       "Target Species": "Wizard"
     },

@@ -28,6 +28,15 @@ namespace MECCG_Deck_Builder
             "Allies are strictly limited to those playable at Sites/Havens in the drafted Site deck.\n" +
             "Prioritizes allies playable in the drafted region group before outside Havens.";
 
+        private const string ItemIdleStatusText =
+            "Minor, Major, Greater, and non-Ring/non-Palantír Special Items are drafted if playable at drafted Sites/Havens.\n" +
+            "Pool Minor Items (0-2) are drafted first; all items obey Role Focus, Region/Site Requirements, Specific, Prerequisite, and Hero Target Species.";
+
+        private static readonly HashSet<string> HeroTargetSpecies = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Dúnadan", "Dwarf", "Elf", "Hobbit", "Man", "Wizard"
+        };
+
         private readonly Deck _deck;
         private readonly CardCatalogService _catalog;
         private readonly CardFilterService _filterService;
@@ -49,7 +58,7 @@ namespace MECCG_Deck_Builder
         private readonly TabControl _tabControl;
         private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
-        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions", "Allies"];
+        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions", "Allies", "Items"];
 
         // --- TAB 1: GENERAL SETTINGS & CONTROLS ---
         private readonly TextBox _txtDeckTitle;
@@ -96,6 +105,19 @@ namespace MECCG_Deck_Builder
         private readonly NumericUpDown _numResourceAllies;
         private readonly NumericUpDown _numSideboardAllies;
         private readonly Label _lblAllyStatus;
+
+        // --- TAB 7: ITEMS ---
+        private readonly NumericUpDown _numPoolMinorItems;
+        private readonly NumericUpDown _numResourceMinorItems;
+        private readonly NumericUpDown _numSideboardMinorItems;
+        private readonly NumericUpDown _numResourceMajorItems;
+        private readonly NumericUpDown _numSideboardMajorItems;
+        private readonly NumericUpDown _numResourceGreaterItems;
+        private readonly NumericUpDown _numSideboardGreaterItems;
+        private readonly NumericUpDown _numResourceSpecialItems;
+        private readonly NumericUpDown _numSideboardSpecialItems;
+        private readonly CheckedListBox _clbItemRoles;
+        private readonly Label _lblItemStatus;
 
         private readonly ToolTip _toolTip = new()
         {
@@ -250,7 +272,7 @@ namespace MECCG_Deck_Builder
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites  ->  2. Starting Company  ->  3. Wizards & Recruits  ->  4. Factions  ->  5. Allies",
+                Text = "Execution Order:   1. Regions & Sites  ->  2. Starting Company  ->  3. Wizards & Recruits  ->  4. Factions  ->  5. Allies  ->  6. Items",
                 Location = new Point(16, 22),
                 Size = new Size(778, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
@@ -834,13 +856,135 @@ namespace MECCG_Deck_Builder
 
             tabAllies.Controls.AddRange([grpAllies, _lblAllyStatus]);
 
+            // ==========================================
+            // TAB 7: ITEMS
+            // ==========================================
+            var tabItems = new TabPage("Items");
+
+            var grpItemCounts = new GroupBox
+            {
+                Text = "Item Drafting Counts",
+                Location = new Point(16, 16),
+                Size = new Size(495, 220)
+            };
+
+            var lblHdrItemType = new Label { Text = "Item Tier", Location = new Point(16, 24), Size = new Size(130, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrPool = new Label { Text = "Pool (0-2)", Location = new Point(156, 24), Size = new Size(78, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrRes = new Label { Text = "Resources", Location = new Point(260, 24), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrSide = new Label { Text = "Sideboard", Location = new Point(365, 24), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+
+            NumericUpDown CreateItemSpinner(int x, int y, int min, int max, int defVal)
+            {
+                var nud = new NumericUpDown
+                {
+                    Location = new Point(x, y),
+                    Size = new Size(64, 23),
+                    Minimum = min,
+                    Maximum = max,
+                    Value = defVal
+                };
+                nud.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
+                return nud;
+            }
+
+            var lblMinor = new Label { Text = "Minor Items:", Location = new Point(16, 53), Size = new Size(130, 20) };
+            _numPoolMinorItems = CreateItemSpinner(156, 50, 0, 2, 1);
+            _numResourceMinorItems = CreateItemSpinner(260, 50, 0, 15, 1);
+            _numSideboardMinorItems = CreateItemSpinner(365, 50, 0, 10, 1);
+            _toolTip.SetToolTip(_numPoolMinorItems, "Starting Minor Items in Pool (0-2; counts toward 3-copy limit, does not consume Play Deck Size).");
+
+            var lblMajor = new Label { Text = "Major Items:", Location = new Point(16, 87), Size = new Size(130, 20) };
+            var lblMajorPoolNa = new Label { Text = "—", Location = new Point(176, 87), Size = new Size(30, 20), ForeColor = Color.DimGray };
+            _numResourceMajorItems = CreateItemSpinner(260, 84, 0, 15, 1);
+            _numSideboardMajorItems = CreateItemSpinner(365, 84, 0, 10, 1);
+
+            var lblGreater = new Label { Text = "Greater Items:", Location = new Point(16, 121), Size = new Size(130, 20) };
+            var lblGreaterPoolNa = new Label { Text = "—", Location = new Point(176, 121), Size = new Size(30, 20), ForeColor = Color.DimGray };
+            _numResourceGreaterItems = CreateItemSpinner(260, 118, 0, 15, 1);
+            _numSideboardGreaterItems = CreateItemSpinner(365, 118, 0, 10, 0);
+
+            var lblSpecial = new Label { Text = "Special Items:", Location = new Point(16, 155), Size = new Size(130, 20) };
+            var lblSpecialPoolNa = new Label { Text = "—", Location = new Point(176, 155), Size = new Size(30, 20), ForeColor = Color.DimGray };
+            _numResourceSpecialItems = CreateItemSpinner(260, 152, 0, 10, 0);
+            _numSideboardSpecialItems = CreateItemSpinner(365, 152, 0, 10, 0);
+
+            var lblItemScopeNote = new Label
+            {
+                Location = new Point(16, 188),
+                Size = new Size(465, 24),
+                ForeColor = Color.DimGray,
+                Font = new Font("Segoe UI", 8.5f),
+                UseMnemonic = false,
+                Text = "Excludes Gold Rings, Ring Special Items, and Palantíri (reserved for dedicated tabs)."
+            };
+
+            grpItemCounts.Controls.AddRange([
+                lblHdrItemType, lblHdrPool, lblHdrRes, lblHdrSide,
+                lblMinor, _numPoolMinorItems, _numResourceMinorItems, _numSideboardMinorItems,
+                lblMajor, lblMajorPoolNa, _numResourceMajorItems, _numSideboardMajorItems,
+                lblGreater, lblGreaterPoolNa, _numResourceGreaterItems, _numSideboardGreaterItems,
+                lblSpecial, lblSpecialPoolNa, _numResourceSpecialItems, _numSideboardSpecialItems,
+                lblItemScopeNote
+            ]);
+
+            var grpItemRoles = new GroupBox
+            {
+                Text = "Role Focus (Uncheck to exclude)",
+                Location = new Point(525, 16),
+                Size = new Size(300, 220)
+            };
+
+            _clbItemRoles = new CheckedListBox
+            {
+                Location = new Point(12, 24),
+                Size = new Size(276, 152),
+                CheckOnClick = true
+            };
+            _clbItemRoles.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(ValidateWorkbenchReadiness);
+                }
+            };
+            _toolTip.SetToolTip(_clbItemRoles, "Items must carry at least one checked Role tag to be drafted.");
+
+            var btnAllItemRoles = new Button { Text = "All", Location = new Point(12, 184), Size = new Size(65, 24) };
+            btnAllItemRoles.Click += (s, e) =>
+            {
+                SetAllChecked(_clbItemRoles, true);
+                ValidateWorkbenchReadiness();
+            };
+
+            var btnClearItemRoles = new Button { Text = "Clear", Location = new Point(83, 184), Size = new Size(65, 24) };
+            btnClearItemRoles.Click += (s, e) =>
+            {
+                SetAllChecked(_clbItemRoles, false);
+                ValidateWorkbenchReadiness();
+            };
+
+            grpItemRoles.Controls.AddRange([_clbItemRoles, btnAllItemRoles, btnClearItemRoles]);
+
+            _lblItemStatus = new Label
+            {
+                Location = new Point(16, 250),
+                Size = new Size(805, 220),
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false,
+                Text = ItemIdleStatusText
+            };
+
+            tabItems.Controls.AddRange([grpItemCounts, grpItemRoles, _lblItemStatus]);
+
             // Tabs ordered to match pipeline execution order
-            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions, tabAllies]);
+            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions, tabAllies, tabItems]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
             _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
             _tabInfo["Factions"] = new(RunFactionsDraft, _lblFactionStatus);
             _tabInfo["Allies"] = new(RunAlliesDraft, _lblAllyStatus);
+            _tabInfo["Items"] = new(RunItemsDraft, _lblItemStatus);
 
             Controls.Add(_tabControl);
 
@@ -849,11 +993,14 @@ namespace MECCG_Deck_Builder
                 if (Visible)
                 {
                     PopulateSeedRegionDropdown();
+                    PopulateItemRolesChecklist();
                     UpdateDeckSummary();
+                    ValidateWorkbenchReadiness();
                 }
             };
 
             PopulateSeedRegionDropdown();
+            PopulateItemRolesChecklist();
             UpdateSeedTooltip();
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
@@ -901,12 +1048,19 @@ namespace MECCG_Deck_Builder
             int sideFactions = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase));
             int resAllies = _deck.Resources.Count(c => string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase));
             int sideAllies = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase));
+            int poolItems = _deck.Pool.Count(IsItemCard);
+            int resItems = _deck.Resources.Count(IsItemCard);
+            int sideItems = _deck.Sideboard.Count(IsItemCard);
 
-            if (totalResChars == 0 && totalSideChars == 0 && resFactions == 0 && sideFactions == 0 && resAllies == 0 && sideAllies == 0)
+            if (totalResChars == 0 && totalSideChars == 0 &&
+                resFactions == 0 && sideFactions == 0 &&
+                resAllies == 0 && sideAllies == 0 &&
+                poolItems == 0 && resItems == 0 && sideItems == 0)
             {
                 ValidateWorkbenchReadiness();
             }
 
+            int poolChars = _deck.Pool.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             int poolMind = _deck.Pool.Sum(c => ParseCardMind(c.Mind));
             int nonAvatarCharsInRes = _deck.Resources.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c));
             int avatarsInRes = _deck.Resources.Count(IsAvatar);
@@ -916,21 +1070,24 @@ namespace MECCG_Deck_Builder
             int havensInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase));
             int advSitesInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase));
 
+            string poolItemNote = poolItems > 0 ? $" + {poolItems} item(s)" : "";
             string avatarResNote = avatarsInRes > 0 ? $" + {avatarsInRes} Avatar(s)" : "";
             string resFactionNote = resFactions > 0 ? $", {resFactions} faction(s)" : "";
             string resAllyNote = resAllies > 0 ? (resAllies == 1 ? ", 1 ally" : $", {resAllies} allies") : "";
+            string resItemNote = resItems > 0 ? $", {resItems} item(s)" : "";
 
             var sideParts = new List<string>();
             if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
             if (avatarsInSideboard > 0) sideParts.Add($"{avatarsInSideboard} Avatar");
             if (sideFactions > 0) sideParts.Add($"{sideFactions} faction(s)");
             if (sideAllies > 0) sideParts.Add(sideAllies == 1 ? "1 ally" : $"{sideAllies} allies");
+            if (sideItems > 0) sideParts.Add($"{sideItems} item(s)");
             string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
 
             _lblDeckSummary.Text =
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
-                $"Pool:             {_deck.Pool.Count} characters ({poolMind} Mind)  [Official limit: <= 20 Mind]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
+                $"Pool:             {_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]\n" +
+                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
                 $"Hazards:          {_deck.Hazards.Count} cards\n" +
                 $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
@@ -980,6 +1137,49 @@ namespace MECCG_Deck_Builder
             _cmbSeedRegion.EndUpdate();
         }
 
+        private void PopulateItemRolesChecklist()
+        {
+            var previouslyExcluded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbItemRoles.Items.Count; i++)
+            {
+                if (!_clbItemRoles.GetItemChecked(i))
+                {
+                    string role = _clbItemRoles.Items[i]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        previouslyExcluded.Add(role);
+                    }
+                }
+            }
+
+            var activeSets = _getActiveSets();
+            var roles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var card in _catalog.Cards)
+            {
+                if (activeSets.Count > 0 && !activeSets.Contains(card.Set)) continue;
+                if (!IsEligibleBaseItem(card)) continue;
+
+                foreach (var role in _filterService.GetCardTagsForCategory(card.Id, "Role"))
+                {
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        roles.Add(role.Trim());
+                    }
+                }
+            }
+
+            var sortedRoles = roles.OrderBy(r => r, StringComparer.OrdinalIgnoreCase).ToList();
+
+            _clbItemRoles.BeginUpdate();
+            _clbItemRoles.Items.Clear();
+            foreach (var role in sortedRoles)
+            {
+                _clbItemRoles.Items.Add(role, !previouslyExcluded.Contains(role));
+            }
+            _clbItemRoles.EndUpdate();
+        }
+
         #region TAB1_SESSION_ACTIONS
 
         private void BtnClearDeck_Click(object sender, EventArgs e)
@@ -1024,6 +1224,10 @@ namespace MECCG_Deck_Builder
             _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblAllyStatus.Text = AllyIdleStatusText;
+
+            _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblItemStatus.Text = ItemIdleStatusText;
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -1212,7 +1416,21 @@ namespace MECCG_Deck_Builder
                 SideboardFactionCount = (int)_numSideboardFactions.Value,
 
                 ResourceAllyCount = (int)_numResourceAllies.Value,
-                SideboardAllyCount = (int)_numSideboardAllies.Value
+                SideboardAllyCount = (int)_numSideboardAllies.Value,
+
+                PoolMinorItemCount = (int)_numPoolMinorItems.Value,
+                ResourceMinorItemCount = (int)_numResourceMinorItems.Value,
+                SideboardMinorItemCount = (int)_numSideboardMinorItems.Value,
+                ResourceMajorItemCount = (int)_numResourceMajorItems.Value,
+                SideboardMajorItemCount = (int)_numSideboardMajorItems.Value,
+                ResourceGreaterItemCount = (int)_numResourceGreaterItems.Value,
+                SideboardGreaterItemCount = (int)_numSideboardGreaterItems.Value,
+                ResourceSpecialItemCount = (int)_numResourceSpecialItems.Value,
+                SideboardSpecialItemCount = (int)_numSideboardSpecialItems.Value,
+                ExcludedItemRoles = [.. Enumerable.Range(0, _clbItemRoles.Items.Count)
+                    .Where(i => !_clbItemRoles.GetItemChecked(i))
+                    .Select(i => _clbItemRoles.Items[i]?.ToString() ?? string.Empty)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))]
             };
         }
 
@@ -1280,6 +1498,24 @@ namespace MECCG_Deck_Builder
 
             _numResourceAllies.Value = Math.Clamp(config.ResourceAllyCount, (int)_numResourceAllies.Minimum, (int)_numResourceAllies.Maximum);
             _numSideboardAllies.Value = Math.Clamp(config.SideboardAllyCount, (int)_numSideboardAllies.Minimum, (int)_numSideboardAllies.Maximum);
+
+            _numPoolMinorItems.Value = Math.Clamp(config.PoolMinorItemCount, (int)_numPoolMinorItems.Minimum, (int)_numPoolMinorItems.Maximum);
+            _numResourceMinorItems.Value = Math.Clamp(config.ResourceMinorItemCount, (int)_numResourceMinorItems.Minimum, (int)_numResourceMinorItems.Maximum);
+            _numSideboardMinorItems.Value = Math.Clamp(config.SideboardMinorItemCount, (int)_numSideboardMinorItems.Minimum, (int)_numSideboardMinorItems.Maximum);
+            _numResourceMajorItems.Value = Math.Clamp(config.ResourceMajorItemCount, (int)_numResourceMajorItems.Minimum, (int)_numResourceMajorItems.Maximum);
+            _numSideboardMajorItems.Value = Math.Clamp(config.SideboardMajorItemCount, (int)_numSideboardMajorItems.Minimum, (int)_numSideboardMajorItems.Maximum);
+            _numResourceGreaterItems.Value = Math.Clamp(config.ResourceGreaterItemCount, (int)_numResourceGreaterItems.Minimum, (int)_numResourceGreaterItems.Maximum);
+            _numSideboardGreaterItems.Value = Math.Clamp(config.SideboardGreaterItemCount, (int)_numSideboardGreaterItems.Minimum, (int)_numSideboardGreaterItems.Maximum);
+            _numResourceSpecialItems.Value = Math.Clamp(config.ResourceSpecialItemCount, (int)_numResourceSpecialItems.Minimum, (int)_numResourceSpecialItems.Maximum);
+            _numSideboardSpecialItems.Value = Math.Clamp(config.SideboardSpecialItemCount, (int)_numSideboardSpecialItems.Minimum, (int)_numSideboardSpecialItems.Maximum);
+
+            PopulateItemRolesChecklist();
+            var excludedRoles = new HashSet<string>(config.ExcludedItemRoles ?? [], StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbItemRoles.Items.Count; i++)
+            {
+                string roleName = _clbItemRoles.Items[i]?.ToString() ?? string.Empty;
+                _clbItemRoles.SetItemChecked(i, !excludedRoles.Contains(roleName));
+            }
 
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
@@ -1419,12 +1655,17 @@ namespace MECCG_Deck_Builder
 
         private void ValidateWorkbenchReadiness()
         {
-            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null || _lblFactionStatus == null || _lblAllyStatus == null) return;
+            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null ||
+                _lblFactionStatus == null || _lblAllyStatus == null || _lblItemStatus == null)
+            {
+                return;
+            }
 
             bool hasTheaterError = false;
             bool hasRecruitError = false;
             bool hasFactionError = false;
             bool hasAllyError = false;
+            bool hasItemError = false;
 
             int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
             int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
@@ -1437,6 +1678,11 @@ namespace MECCG_Deck_Builder
             int sideFactions = (int)_numSideboardFactions.Value;
             int resAllies = (int)_numResourceAllies.Value;
             int sideAllies = (int)_numSideboardAllies.Value;
+            int resItems = (int)_numResourceMinorItems.Value + (int)_numResourceMajorItems.Value +
+                           (int)_numResourceGreaterItems.Value + (int)_numResourceSpecialItems.Value;
+            int sideItems = (int)_numSideboardMinorItems.Value + (int)_numSideboardMajorItems.Value +
+                            (int)_numSideboardGreaterItems.Value + (int)_numSideboardSpecialItems.Value;
+
             int playDeckLimit = (int)_numPlayDeckSize.Value;
             int sideboardLimit = (int)_numSideboardSize.Value;
 
@@ -1488,18 +1734,19 @@ namespace MECCG_Deck_Builder
                     "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.";
             }
 
-            // --- Tab 5 (Factions) & Tab 6 (Allies) Shared Budget Validation ---
-            int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies;
-            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies;
+            // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5, 6, 7) ---
+            int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies + resItems;
+            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems;
 
             string resOverMsg =
-                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies) exceed Play Deck Size ({playDeckLimit}).\n" +
-                "Reduce Factions/Allies in Play Deck or increase Play Deck Size on General Settings.";
+                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items) exceed Play Deck Size ({playDeckLimit}).\n" +
+                "Reduce Resources card counts or increase Play Deck Size on General Settings.";
 
             string sideOverMsg =
-                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies) exceed Sideboard Size ({sideboardLimit}).\n" +
-                "Reduce Factions/Allies in Sideboard or increase Sideboard Size on General Settings.";
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items) exceed Sideboard Size ({sideboardLimit}).\n" +
+                "Reduce Sideboard card counts or increase Sideboard Size on General Settings.";
 
+            // --- Tab 5 (Factions) ---
             if (totalConfiguredRes > playDeckLimit && resFactions > 0)
             {
                 hasFactionError = true;
@@ -1527,6 +1774,7 @@ namespace MECCG_Deck_Builder
                 _lblFactionStatus.Text = FactionIdleStatusText;
             }
 
+            // --- Tab 6 (Allies) ---
             if (totalConfiguredRes > playDeckLimit && resAllies > 0)
             {
                 hasAllyError = true;
@@ -1554,15 +1802,54 @@ namespace MECCG_Deck_Builder
                 _lblAllyStatus.Text = AllyIdleStatusText;
             }
 
-            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError && !hasAllyError;
+            // --- Tab 7 (Items) ---
+            int totalRequestedItems = (int)_numPoolMinorItems.Value + resItems + sideItems;
+            if (totalRequestedItems > 0 && _clbItemRoles.Items.Count > 0 && _clbItemRoles.CheckedItems.Count == 0)
+            {
+                hasItemError = true;
+                _lblItemStatus.ForeColor = Color.Firebrick;
+                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblItemStatus.Text = "⚠ At least one Role must be checked under Role Focus when drafting items.";
+            }
+            else if (totalConfiguredRes > playDeckLimit && resItems > 0)
+            {
+                hasItemError = true;
+                _lblItemStatus.ForeColor = Color.Firebrick;
+                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblItemStatus.Text = resOverMsg;
+            }
+            else if (totalConfiguredSide > sideboardLimit && sideItems > 0)
+            {
+                hasItemError = true;
+                _lblItemStatus.ForeColor = Color.Firebrick;
+                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblItemStatus.Text = sideOverMsg;
+            }
+            else if ((_lblItemStatus.ForeColor == Color.Firebrick &&
+                      (_lblItemStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _lblItemStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _lblItemStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+                     (_deck.Pool.All(c => !IsItemCard(c)) &&
+                      _deck.Resources.All(c => !IsItemCard(c)) &&
+                      _deck.Sideboard.All(c => !IsItemCard(c)) &&
+                      !_lblItemStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_lblItemStatus.Text.StartsWith("No items configured", StringComparison.OrdinalIgnoreCase)))
+            {
+                _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblItemStatus.Text = ItemIdleStatusText;
+            }
 
-            if (hasTheaterError || hasRecruitError || hasFactionError || hasAllyError)
+            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError && !hasAllyError && !hasItemError;
+
+            if (hasTheaterError || hasRecruitError || hasFactionError || hasAllyError || hasItemError)
             {
                 var blockedTabs = new List<string>();
                 if (hasTheaterError) blockedTabs.Add("Regions & Sites");
                 if (hasRecruitError) blockedTabs.Add("Wizards & Recruits");
                 if (hasFactionError) blockedTabs.Add("Factions");
                 if (hasAllyError) blockedTabs.Add("Allies");
+                if (hasItemError) blockedTabs.Add("Items");
 
                 _lblPipelineStatus.ForeColor = Color.Firebrick;
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
@@ -2437,10 +2724,8 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            _deck.Resources.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             _deck.Resources.AddRange(finalRecruits);
 
-            _deck.Sideboard.RemoveAll(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             _deck.Sideboard.AddRange(finalReserves);
 
             _deck.SortSections();
@@ -2509,24 +2794,6 @@ namespace MECCG_Deck_Builder
         {
             var allCards = _catalog.Cards;
             var activeSets = _getActiveSets();
-
-            // 1. Clean Factions slice + any prerequisite cards whose "Prerequisite For" matches a Faction card
-            var allFactionNames = new HashSet<string>(
-                allCards
-                    .Where(c => string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
-                                string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase))
-                    .Select(c => c.Name),
-                StringComparer.OrdinalIgnoreCase);
-
-            bool IsFactionOrFactionPrerequisite(Card card)
-            {
-                if (string.Equals(card.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) return true;
-                var prereqFor = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite For");
-                return prereqFor.Any(p => allFactionNames.Contains(p));
-            }
-
-            _deck.Resources.RemoveAll(IsFactionOrFactionPrerequisite);
-            _deck.Sideboard.RemoveAll(IsFactionOrFactionPrerequisite);
 
             int reqRes = (int)_numResourceFactions.Value;
             int reqSide = (int)_numSideboardFactions.Value;
@@ -2837,24 +3104,6 @@ namespace MECCG_Deck_Builder
         {
             var allCards = _catalog.Cards;
             var activeSets = _getActiveSets();
-
-            // 1. Clean Allies slice + any prerequisite cards whose "Prerequisite For" matches an Ally card
-            var allAllyNames = new HashSet<string>(
-                allCards
-                    .Where(c => string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
-                                string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase))
-                    .Select(c => c.Name),
-                StringComparer.OrdinalIgnoreCase);
-
-            bool IsAllyOrAllyPrerequisite(Card card)
-            {
-                if (string.Equals(card.Secondary, "Ally", StringComparison.OrdinalIgnoreCase)) return true;
-                var prereqFor = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite For");
-                return prereqFor.Any(p => allAllyNames.Contains(p));
-            }
-
-            _deck.Resources.RemoveAll(IsAllyOrAllyPrerequisite);
-            _deck.Sideboard.RemoveAll(IsAllyOrAllyPrerequisite);
 
             int reqRes = (int)_numResourceAllies.Value;
             int reqSide = (int)_numSideboardAllies.Value;
@@ -3290,6 +3539,425 @@ namespace MECCG_Deck_Builder
             return false;
         }
 
+        private bool RunItemsDraft(bool silent = false)
+        {
+            int reqPoolMinor = (int)_numPoolMinorItems.Value;
+            int reqResMinor = (int)_numResourceMinorItems.Value;
+            int reqSideMinor = (int)_numSideboardMinorItems.Value;
+            int reqResMajor = (int)_numResourceMajorItems.Value;
+            int reqSideMajor = (int)_numSideboardMajorItems.Value;
+            int reqResGreater = (int)_numResourceGreaterItems.Value;
+            int reqSideGreater = (int)_numSideboardGreaterItems.Value;
+            int reqResSpecial = (int)_numResourceSpecialItems.Value;
+            int reqSideSpecial = (int)_numSideboardSpecialItems.Value;
+
+            int totalRequested = reqPoolMinor + reqResMinor + reqSideMinor +
+                                 reqResMajor + reqSideMajor +
+                                 reqResGreater + reqSideGreater +
+                                 reqResSpecial + reqSideSpecial;
+
+            if (totalRequested == 0)
+            {
+                _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblItemStatus.Text = "No items configured (0 drafted).";
+                return true;
+            }
+
+            var checkedRoles = new HashSet<string>(_clbItemRoles.CheckedItems.Cast<string>(), StringComparer.OrdinalIgnoreCase);
+            if (_clbItemRoles.Items.Count > 0 && checkedRoles.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        this,
+                        "Please select at least one Role under Role Focus on the Items tab.",
+                        "Items",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+
+            var allSitesInDeck = _deck.Sites
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var draftedRegionNames = new HashSet<string>(
+                _deck.Sites
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()),
+                StringComparer.OrdinalIgnoreCase);
+
+            var draftedRegionTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in _deck.Sites.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+            {
+                foreach (var rt in DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService))
+                {
+                    if (!string.IsNullOrWhiteSpace(rt))
+                    {
+                        draftedRegionTypes.Add(rt.Trim());
+                    }
+                }
+            }
+
+            var poolChars = _deck.Pool
+                .Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var allDraftedChars = poolChars
+                .Concat(_deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .Concat(_deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            var allDeckNonSiteCards = _deck.Pool
+                .Concat(_deck.Resources)
+                .Concat(_deck.Sideboard)
+                .ToList();
+
+            // Build base item pool (grouped by Name, preferring Hero alignment), excluding Rings & Palantíri
+            var candidateItems = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    IsEligibleBaseItem(c))
+                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(PickHeroPreferredFromGroup)
+                .Where(c => c != null)
+                .ToList();
+
+            bool PassesNonSiteGuards(Card item)
+            {
+                // Role Focus (strict)
+                var roleTags = _filterService.GetCardTagsForCategory(item.Id, "Role");
+                if (roleTags.Count == 0 || !roleTags.Any(r => checkedRoles.Contains(r)))
+                {
+                    return false;
+                }
+
+                // Region Requirement (hard guard)
+                if (!MatchesItemRegionRequirement(item, draftedRegionNames, draftedRegionTypes))
+                {
+                    return false;
+                }
+
+                // Specific character requirement
+                if (!string.IsNullOrWhiteSpace(item.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, item.Specific)))
+                {
+                    return false;
+                }
+
+                // Prerequisite (must already exist in Pool / Resources / Sideboard; ; = OR, && = AND)
+                if (!SatisfiesExistingPrerequisites(item, allDeckNonSiteCards))
+                {
+                    return false;
+                }
+
+                // Target Species (hard guard for Hero character races; Creature races ignored)
+                if (!MatchesItemTargetSpecies(item, allDraftedChars))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            List<Card> GetTierCandidates(string secondaryType, bool checkSites) =>
+                [.. candidateItems
+                    .Where(item =>
+                        string.Equals(item.Secondary, secondaryType, StringComparison.OrdinalIgnoreCase) &&
+                        PassesNonSiteGuards(item) &&
+                        (!checkSites || MatchesItemSitePlayability(item, allSitesInDeck)))
+                    .OrderBy(_ => Random.Shared.Next())];
+
+            var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in allDeckNonSiteCards)
+            {
+                usedCountsByName[c.Name] = usedCountsByName.GetValueOrDefault(c.Name, 0) + 1;
+            }
+
+            int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
+            int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
+
+            // Execution order:
+            // 1. Pool Minor Items (skipped site check; max 1 per starting character, up to 2)
+            // 2. Special Items (Resources -> Sideboard)
+            // 3. Greater Items (Resources -> Sideboard)
+            // 4. Major Items (Resources -> Sideboard)
+            // 5. Minor Items (Resources -> Sideboard)
+            int effectivePoolCap = Math.Min(reqPoolMinor, poolChars.Count);
+            var poolMinorCandidates = GetTierCandidates("Minor Item", checkSites: false);
+            var draftedPoolMinor = DraftItemsIntoSection(poolMinorCandidates, _deck.Pool, effectivePoolCap, effectivePoolCap, usedCountsByName);
+
+            var specialCandidates = GetTierCandidates("Special Item", checkSites: true);
+            var draftedResSpecial = DraftItemsIntoSection(specialCandidates, _deck.Resources, reqResSpecial, resCapacity, usedCountsByName);
+            resCapacity -= draftedResSpecial.Count;
+            var draftedSideSpecial = DraftItemsIntoSection(specialCandidates, _deck.Sideboard, reqSideSpecial, sideCapacity, usedCountsByName);
+            sideCapacity -= draftedSideSpecial.Count;
+
+            var greaterCandidates = GetTierCandidates("Greater Item", checkSites: true);
+            var draftedResGreater = DraftItemsIntoSection(greaterCandidates, _deck.Resources, reqResGreater, resCapacity, usedCountsByName);
+            resCapacity -= draftedResGreater.Count;
+            var draftedSideGreater = DraftItemsIntoSection(greaterCandidates, _deck.Sideboard, reqSideGreater, sideCapacity, usedCountsByName);
+            sideCapacity -= draftedSideGreater.Count;
+
+            var majorCandidates = GetTierCandidates("Major Item", checkSites: true);
+            var draftedResMajor = DraftItemsIntoSection(majorCandidates, _deck.Resources, reqResMajor, resCapacity, usedCountsByName);
+            resCapacity -= draftedResMajor.Count;
+            var draftedSideMajor = DraftItemsIntoSection(majorCandidates, _deck.Sideboard, reqSideMajor, sideCapacity, usedCountsByName);
+            sideCapacity -= draftedSideMajor.Count;
+
+            var minorCandidates = GetTierCandidates("Minor Item", checkSites: true);
+            var draftedResMinor = DraftItemsIntoSection(minorCandidates, _deck.Resources, reqResMinor, resCapacity, usedCountsByName);
+            var draftedSideMinor = DraftItemsIntoSection(minorCandidates, _deck.Sideboard, reqSideMinor, sideCapacity, usedCountsByName);
+
+            _deck.SortSections();
+            if (!silent)
+            {
+                NotifyDeckChanged(DeckSectionType.Resources);
+            }
+
+            var draftedResAll = draftedResMinor.Concat(draftedResMajor).Concat(draftedResGreater).Concat(draftedResSpecial).ToList();
+            var draftedSideAll = draftedSideMinor.Concat(draftedSideMajor).Concat(draftedSideGreater).Concat(draftedSideSpecial).ToList();
+
+            string poolText = draftedPoolMinor.Count > 0 ? string.Join(", ", draftedPoolMinor.Select(c => c.Name)) : "(None)";
+            string resText = draftedResAll.Count > 0 ? string.Join(", ", draftedResAll.Select(c => c.Name)) : "(None)";
+            string sideText = draftedSideAll.Count > 0 ? string.Join(", ", draftedSideAll.Select(c => c.Name)) : "(None)";
+
+            string statusMsg =
+                $"Drafted {draftedPoolMinor.Count} Pool, {draftedResAll.Count} Resources, and {draftedSideAll.Count} Sideboard item(s):\n" +
+                $"• Pool: {poolText}\n" +
+                $"• Resources: {resText}\n" +
+                $"• Sideboard: {sideText}";
+
+            var warnings = new List<string>();
+            if (reqPoolMinor > poolChars.Count)
+            {
+                warnings.Add($"Pool Minor Item Shortfall: Requested {reqPoolMinor}, but only {poolChars.Count} starting character(s) in Pool.");
+            }
+            else if (draftedPoolMinor.Count < reqPoolMinor)
+            {
+                warnings.Add($"Pool Minor Item Shortfall: Drafted only {draftedPoolMinor.Count} of {reqPoolMinor}.");
+            }
+
+            void CheckShortfall(string label, int drafted, int requested)
+            {
+                if (drafted < requested)
+                {
+                    warnings.Add($"{label} Shortfall: Drafted only {drafted} of {requested} eligible item(s).");
+                }
+            }
+
+            CheckShortfall("Resources Minor Item", draftedResMinor.Count, reqResMinor);
+            CheckShortfall("Sideboard Minor Item", draftedSideMinor.Count, reqSideMinor);
+            CheckShortfall("Resources Major Item", draftedResMajor.Count, reqResMajor);
+            CheckShortfall("Sideboard Major Item", draftedSideMajor.Count, reqSideMajor);
+            CheckShortfall("Resources Greater Item", draftedResGreater.Count, reqResGreater);
+            CheckShortfall("Sideboard Greater Item", draftedSideGreater.Count, reqSideGreater);
+            CheckShortfall("Resources Special Item", draftedResSpecial.Count, reqResSpecial);
+            CheckShortfall("Sideboard Special Item", draftedSideSpecial.Count, reqSideSpecial);
+
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblItemStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblItemStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
+            _lblItemStatus.Text = statusMsg;
+            return true;
+        }
+
+        private static List<Card> DraftItemsIntoSection(
+            List<Card> candidates,
+            List<Card> targetSection,
+            int requestedCount,
+            int sectionCapacity,
+            Dictionary<string, int> usedCountsByName)
+        {
+            var drafted = new List<Card>();
+            if (requestedCount <= 0 || sectionCapacity <= 0 || candidates.Count == 0)
+            {
+                return drafted;
+            }
+
+            bool CanAddCopy(Card card)
+            {
+                int current = usedCountsByName.GetValueOrDefault(card.Name, 0);
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                return current < max;
+            }
+
+            // Variety-first: pick distinct titles before adding duplicate non-unique copies
+            for (int copyTier = 0; copyTier < 3 && drafted.Count < requestedCount && drafted.Count < sectionCapacity; copyTier++)
+            {
+                foreach (var item in candidates)
+                {
+                    if (drafted.Count >= requestedCount || drafted.Count >= sectionCapacity) break;
+
+                    int curCount = usedCountsByName.GetValueOrDefault(item.Name, 0);
+                    if (curCount != copyTier || !CanAddCopy(item)) continue;
+
+                    targetSection.Add(item);
+                    usedCountsByName[item.Name] = curCount + 1;
+                    drafted.Add(item);
+                }
+            }
+
+            return drafted;
+        }
+
+        private static bool IsItemCard(Card card)
+        {
+            if (card == null || string.IsNullOrWhiteSpace(card.Secondary)) return false;
+            return card.Secondary.Contains("Item", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsEligibleBaseItem(Card card)
+        {
+            if (card == null) return false;
+            if (!string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase)) return false;
+            if (!IsHeroPlayableAlignment(card.Alignment)) return false;
+
+            bool isTargetItemTier =
+                string.Equals(card.Secondary, "Minor Item", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(card.Secondary, "Major Item", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(card.Secondary, "Greater Item", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(card.Secondary, "Special Item", StringComparison.OrdinalIgnoreCase);
+
+            if (!isTargetItemTier) return false;
+
+            // Exclude Palantíri (dedicated Palantíri tab)
+            if (HasRaceToken(card, "Palantír")) return false;
+
+            // Exclude Ring Special Items (Special Items with blank Site Requirement enter play via Gold Ring tests)
+            if (string.Equals(card.Secondary, "Special Item", StringComparison.OrdinalIgnoreCase) &&
+                _filterService.GetCardTagsForCategory(card.Id, "Site Requirement").Count == 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool HasRaceToken(Card card, string token)
+        {
+            if (card == null || string.IsNullOrWhiteSpace(card.Race) || string.IsNullOrWhiteSpace(token))
+            {
+                return false;
+            }
+
+            var parts = card.Race.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            return parts.Any(p => CardFilterService.EqualsWithDiacriticFallback(p, token));
+        }
+
+        private bool MatchesItemSitePlayability(Card item, List<Card> allSitesInDeck)
+        {
+            if (allSitesInDeck == null || allSitesInDeck.Count == 0) return false;
+
+            var siteReqs = _filterService.GetCardTagsForCategory(item.Id, "Site Requirement");
+            if (siteReqs.Count > 0)
+            {
+                return siteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService));
+            }
+
+            bool needsHoard = string.Equals(item.Hoard, "yes", StringComparison.OrdinalIgnoreCase);
+
+            return allSitesInDeck.Any(site =>
+            {
+                if (needsHoard && !string.Equals(site.Hoard, "yes", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                if (string.Equals(item.Secondary, "Minor Item", StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.Equals(site.MinorItem, "yes", StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (string.Equals(item.Secondary, "Major Item", StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.Equals(site.MajorItem, "yes", StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (string.Equals(item.Secondary, "Greater Item", StringComparison.OrdinalIgnoreCase))
+                {
+                    return string.Equals(site.GreaterItem, "yes", StringComparison.OrdinalIgnoreCase) ||
+                           (HasRaceToken(item, "Scroll") && string.Equals(site.Scroll, "yes", StringComparison.OrdinalIgnoreCase));
+                }
+
+                return false;
+            });
+        }
+
+        private bool MatchesItemRegionRequirement(
+            Card item,
+            HashSet<string> draftedRegionNames,
+            HashSet<string> draftedRegionTypes)
+        {
+            var regReqs = _filterService.GetCardTagsForCategory(item.Id, "Region Requirement");
+            if (regReqs.Count == 0) return true;
+
+            return regReqs.Any(req =>
+                draftedRegionNames.Any(rn => CardFilterService.EqualsWithDiacriticFallback(rn, req)) ||
+                draftedRegionTypes.Any(rt => CardFilterService.EqualsWithDiacriticFallback(rt, req)));
+        }
+
+        private bool MatchesItemTargetSpecies(Card item, List<Card> allDraftedChars)
+        {
+            var speciesTags = _filterService.GetCardTagsForCategory(item.Id, "Target Species");
+            if (speciesTags.Count == 0) return true;
+
+            var requiredHeroRaces = speciesTags
+                .Where(tag => HeroTargetSpecies.Any(hr => CardFilterService.EqualsWithDiacriticFallback(tag, hr)))
+                .ToList();
+
+            // Ignore Creature-only Target Species on Items
+            if (requiredHeroRaces.Count == 0) return true;
+
+            foreach (var ch in allDraftedChars)
+            {
+                if (string.IsNullOrWhiteSpace(ch.Race)) continue;
+                var charRaces = ch.Race.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (charRaces.Any(cr => requiredHeroRaces.Any(req => CardFilterService.EqualsWithDiacriticFallback(cr, req))))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool SatisfiesExistingPrerequisites(Card card, List<Card> existingDeckCards)
+        {
+            var prereqTags = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite");
+            if (prereqTags.Count == 0) return true;
+
+            foreach (var orBranch in prereqTags)
+            {
+                var andTerms = orBranch.Split("&&", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (andTerms.Length == 0) continue;
+
+                bool allPresent = andTerms.All(term =>
+                    existingDeckCards.Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, term)));
+
+                if (allPresent) return true;
+            }
+
+            return false;
+        }
+
         private bool TryResolvePrerequisiteChain(
             Card card,
             IReadOnlyList<Card> allCards,
@@ -3304,50 +3972,86 @@ namespace MECCG_Deck_Builder
             var prereqTags = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite");
             if (prereqTags.Count == 0) return true;
 
-            foreach (var prereqName in prereqTags)
+            // Semicolon-separated entries in Prerequisite are OR branches; "&&" inside an entry requires all terms (AND).
+            foreach (var orBranch in prereqTags)
             {
-                var prereqCard = allCards
-                    .Where(c =>
-                        (activeSets == null || activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
-                        CardFilterService.EqualsWithDiacriticFallback(c.Name, prereqName) &&
-                        IsHeroPlayableAlignment(c.Alignment))
-                    .OrderBy(c => string.Equals(c.Alignment, "Hero", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
-                    .FirstOrDefault();
+                var andTerms = orBranch.Split("&&", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (andTerms.Length == 0) continue;
 
-                if (prereqCard == null) return false;
+                var branchResolved = new List<Card>();
+                var branchVisited = new HashSet<string>(visitedNames, StringComparer.OrdinalIgnoreCase);
+                bool branchSucceeded = true;
 
-                if (!string.IsNullOrWhiteSpace(prereqCard.Specific) &&
-                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, prereqCard.Specific)))
+                foreach (var prereqName in andTerms)
                 {
-                    return false;
+                    var prereqCard = allCards
+                        .Where(c =>
+                            (activeSets == null || activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                            CardFilterService.EqualsWithDiacriticFallback(c.Name, prereqName) &&
+                            IsHeroPlayableAlignment(c.Alignment))
+                        .OrderBy(c => string.Equals(c.Alignment, "Hero", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                        .FirstOrDefault();
+
+                    if (prereqCard == null)
+                    {
+                        branchSucceeded = false;
+                        break;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(prereqCard.Specific) &&
+                        !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, prereqCard.Specific)))
+                    {
+                        branchSucceeded = false;
+                        break;
+                    }
+
+                    var prereqSiteReqs = _filterService.GetCardTagsForCategory(prereqCard.Id, "Site Requirement");
+                    if (prereqSiteReqs.Count > 0 &&
+                        !prereqSiteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService)))
+                    {
+                        branchSucceeded = false;
+                        break;
+                    }
+
+                    if (!resolvedPrereqs.Any(p => CardFilterService.EqualsWithDiacriticFallback(p.Name, prereqCard.Name)) &&
+                        !branchResolved.Any(p => CardFilterService.EqualsWithDiacriticFallback(p.Name, prereqCard.Name)))
+                    {
+                        branchResolved.Add(prereqCard);
+                    }
+
+                    if (!TryResolvePrerequisiteChain(
+                        prereqCard,
+                        allCards,
+                        activeSets,
+                        allSitesInDeck,
+                        allDraftedChars,
+                        branchResolved,
+                        branchVisited))
+                    {
+                        branchSucceeded = false;
+                        break;
+                    }
                 }
 
-                var prereqSiteReqs = _filterService.GetCardTagsForCategory(prereqCard.Id, "Site Requirement");
-                if (prereqSiteReqs.Count > 0 &&
-                    !prereqSiteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService)))
+                if (branchSucceeded)
                 {
-                    return false;
-                }
+                    foreach (var p in branchResolved)
+                    {
+                        if (!resolvedPrereqs.Any(existing => CardFilterService.EqualsWithDiacriticFallback(existing.Name, p.Name)))
+                        {
+                            resolvedPrereqs.Add(p);
+                        }
+                    }
 
-                if (!resolvedPrereqs.Any(p => CardFilterService.EqualsWithDiacriticFallback(p.Name, prereqCard.Name)))
-                {
-                    resolvedPrereqs.Add(prereqCard);
-                }
-
-                if (!TryResolvePrerequisiteChain(
-                    prereqCard,
-                    allCards,
-                    activeSets,
-                    allSitesInDeck,
-                    allDraftedChars,
-                    resolvedPrereqs,
-                    visitedNames))
-                {
-                    return false;
+                    foreach (var v in branchVisited)
+                    {
+                        visitedNames.Add(v);
+                    }
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         private int GetBestFactionBonusSourceRank(
@@ -3890,5 +4594,17 @@ namespace MECCG_Deck_Builder
         // Tab 6: Allies
         public int ResourceAllyCount { get; set; } = 1;
         public int SideboardAllyCount { get; set; } = 1;
+
+        // Tab 7: Items
+        public int PoolMinorItemCount { get; set; } = 1;
+        public int ResourceMinorItemCount { get; set; } = 1;
+        public int SideboardMinorItemCount { get; set; } = 1;
+        public int ResourceMajorItemCount { get; set; } = 1;
+        public int SideboardMajorItemCount { get; set; } = 1;
+        public int ResourceGreaterItemCount { get; set; } = 1;
+        public int SideboardGreaterItemCount { get; set; } = 0;
+        public int ResourceSpecialItemCount { get; set; } = 0;
+        public int SideboardSpecialItemCount { get; set; } = 0;
+        public List<string> ExcludedItemRoles { get; set; } = [];
     }
 }
