@@ -504,7 +504,8 @@
       "Home Region": "Gap of Isen",
       "id": "65",
       "name": "Saruman",
-      "set": "METW"
+      "set": "METW",
+      "Special Ability": "Palantír: Allow Use"
     },
     {
       "Combat Bonus": "Nazgûl",
@@ -3851,7 +3852,7 @@
       "name": "Align Palantír",
       "Role": "Item",
       "set": "METW",
-      "Target Item": "Palantír"
+      "Special Ability": "Palantír: Allow Use"
     },
     {
       "fullCode": "Andúril, the Flame of the West (TW)",
@@ -5383,7 +5384,7 @@
       "name": "Ringlore",
       "set": "METW",
       "Site Requirement": "Information!=[Blank]",
-      "Target Item": "Ring"
+      "Special Ability": "Gold Ring: Allow Test"
     },
     {
       "fullCode": "River (TW)",
@@ -5398,7 +5399,7 @@
       "name": "Scroll of Isildur",
       "Role": "Item",
       "set": "METW",
-      "Target Item": "Ring"
+      "Special Ability": "Gold Ring: Aid Test"
     },
     {
       "fullCode": "Secret Entrance (TW)",
@@ -5442,14 +5443,14 @@
       "id": "387",
       "name": "Test of Form",
       "set": "METW",
-      "Target Item": "Ring"
+      "Special Ability": "Gold Ring: Allow Test"
     },
     {
       "fullCode": "Test of Lore (TW)",
       "id": "388",
       "name": "Test of Lore",
       "set": "METW",
-      "Target Item": "Ring"
+      "Special Ability": "Gold Ring: Allow Test"
     },
     {
       "fullCode": "The Arkenstone [H] (TW)",
@@ -5565,7 +5566,7 @@
       "id": "404",
       "name": "Use Palantír",
       "set": "METW",
-      "Target Item": "Palantír"
+      "Special Ability": "Palantír: Allow Use"
     },
     {
       "fullCode": "Vanishment (TW)",
@@ -5647,7 +5648,7 @@
       "id": "414",
       "name": "Wizard's Test",
       "set": "METW",
-      "Target Item": "Ring",
+      "Special Ability": "Gold Ring: Allow Test",
       "Target Species": "Wizard"
     },
     {
@@ -5841,6 +5842,13 @@
       "name": "The Mithril-coat",
       "Role": "Combat",
       "set": "METW"
+    },
+    {
+      "fullCode": "Gandalf [H] (TW)",
+      "id": "40",
+      "name": "Gandalf",
+      "set": "METW",
+      "Special Ability": "Gold Ring: Allow Test"
     }
   ],
   "Filters": [
@@ -6245,6 +6253,12 @@
       "Wilderness",
       "Woodmen-town",
       "Wose Passage-hold"
+    ],
+    [
+      "Special Ability",
+      "Gold Ring: Aid Test",
+      "Gold Ring: Allow Test",
+      "Palantír: Allow Use"
     ],
     [
       "Target Item",

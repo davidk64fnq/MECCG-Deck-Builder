@@ -229,7 +229,7 @@ namespace MECCG_Deck_Builder
 
             // Ensure baseline categories are always present even if unassigned in active memory
             string[] standardCategories = [
-                "Role", "Target Species", "Target Item", "Prerequisite", "Prerequisite For",
+                "Role", "Special Ability", "Target Species", "Target Item", "Prerequisite", "Prerequisite For",
                 "Site Requirement", "Region Requirement", "Home Region", "Faction Bonus",
                 "Combat Bonus", "Environment Stance", "Region Type", "Adjacent Sites"
             ];

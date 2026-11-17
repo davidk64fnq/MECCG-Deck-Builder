@@ -63,7 +63,7 @@
                 <code>Secondary = Avatar</code>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Home Region</code> (blank on Gandalf)<br />
+                <strong>Categories:</strong> <code>Home Region</code> (blank on Gandalf), <code>Special Ability</code> (<code>Gold Ring: Allow Test</code> on Gandalf; <code>Palant&iacute;r: Allow Use</code> on Saruman)<br />
                 <strong>Specialized Attributes:</strong> <code>Home</code> (dynamic predicate <code>Site=Haven</code> on Gandalf)
             </td>
         </tr>
@@ -125,20 +125,8 @@
                 <code>Secondary = Minor Item; Major Item; Greater Item; Gold Ring Item; Special Item</code>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Role</code>, <code>Target Species</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Prerequisite For</code><br />
-                <strong>Specialized Attributes:</strong> <code>Race</code> (overloaded gear types: <code>Weapon</code>, <code>Armor</code>, <code>Shield</code>, <code>Lost Knowledge</code>, <code>Palant&iacute;r</code>, <code>Treasure</code>, <code>Hoard Jewel</code>), <code>Corruption</code> (zero-burden <code>"[Blank]"</code> filtering), <code>Hoard</code>
-            </td>
-        </tr>
-        <tr>
-            <td><a href="#resource-events-playbook">Resource Events</a></td>
-            <td>
-                <code>Primary = Resource</code><br />
-                <code>Secondary = Short-event; Long-event; Permanent-event</code><br />
-                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Spells, quests, combat buffs, travel, &amp; utility)</em></span>
-            </td>
-            <td>
-                <strong>Categories:</strong> <code>Role</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Target Item</code><br />
-                <strong>Specialized Attributes:</strong> <code>Skill</code> (class locks e.g. <code>Sage</code>, <code>Ranger</code>, <code>Warrior</code>, <code>Scout</code>, <code>Diplomat</code>; shield generic draws via <code>"[Blank]"</code>), <code>Specific</code> (character locks e.g. <code>Aragorn II</code> on <em>Return of the King</em>)
+                <strong>Categories:</strong> <code>Role</code>, <code>Special Ability</code> (<code>Gold Ring: Aid Test</code> on <em>Scroll of Isildur</em>), <code>Target Species</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Prerequisite For</code><br />
+                <strong>Specialized Attributes:</strong> <code>Race</code> (overloaded gear types: <code>Weapon</code>, <code>Armor</code>, <code>Shield</code>, <code>Lost Knowledge</code>, <code>Palant&iacute;r</code>, <code>Scroll</code>, <code>Treasure</code>, <code>Hoard Jewel</code>), <code>Corruption</code> (zero-burden <code>"[Blank]"</code> filtering), <code>Hoard</code>
             </td>
         </tr>
         <tr>
@@ -162,6 +150,19 @@
             <td>
                 <strong>Categories:</strong> <code>Adjacent Regions</code>, <code>Region Type</code><br />
                 <strong>Specialized Attributes:</strong> <code>Region</code> (self-identity title)
+            </td>
+        </tr>
+
+        <tr>
+            <td><a href="#resource-events-playbook">Resource Events</a></td>
+            <td>
+                <code>Primary = Resource</code><br />
+                <code>Secondary = Short-event; Long-event; Permanent-event</code><br />
+                <span style="font-size: 8.5pt; color: #4A5568;"><em>(Spells, quests, combat buffs, travel, &amp; utility)</em></span>
+            </td>
+            <td>
+                <strong>Categories:</strong> <code>Role</code>, <code>Special Ability</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Target Item</code><br />
+                <strong>Specialized Attributes:</strong> <code>Skill</code> (class locks e.g. <code>Sage</code>, <code>Ranger</code>, <code>Warrior</code>, <code>Scout</code>, <code>Diplomat</code>; shield generic draws via <code>"[Blank]"</code>), <code>Specific</code> (character locks e.g. <code>Aragorn II</code> on <em>Return of the King</em>)
             </td>
         </tr>
     </table>
@@ -335,11 +336,25 @@
         <li><code>[Blank]</code> &rarr; <em>Gandalf</em> (prints <code>Home Site: Any Haven</code>, handled dynamically via <code>Home: Site=Haven</code>)</li>
     </ul>
 
+    <h4 class="entry-heading-sub">Special Ability</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Character (Avatar)</span>
+    </div>
+    <p>
+        Records innate scenario abilities printed on Avatars so automated ring and seeing-stone modules can detect existing enablers already in the deck without tagging Avatars with <code>Role</code> or <code>Target Item</code>.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Gold Ring: Allow Test</code> &rarr; Innate Gold Ring testing ability on <em>Gandalf</em></li>
+        <li><code>Palant&iacute;r: Allow Use</code> &rarr; Innate Palant&iacute;r alignment/use ability on <em>Saruman</em></li>
+    </ul>
+
     <div class="note">
         <strong>Why Avatar Rules Text is Intentionally OMITTED from Tags:</strong>
         <ul>
             <li><strong>No <code>Role</code> Tags (The Keystone Principle):</strong> Wizards feature powerful abilities (such as <em>Saruman</em> taking spells from discard or <em>Radagast</em> drawing cards in Wilderness). Tagging them with <code>Role: Card Flow</code> or <code>Role: Movement</code> is strictly prohibited because generic utility queries in procedural templates (e.g. <em>"Draft 4 Card Flow events"</em>) would mistakenly draft 14-Mind Wizard cards into event slots.</li>
-            <li><strong>No Item Affinity Tags:</strong> Gandalf's ability to test Gold Rings and Saruman's ability to use Palant&iacute;ri are not tagged under <code>Target Item</code>. Avatars are drafted intentionally by name or race, never as accessory tools for item queries.</li>
+            <li><strong>No <code>Target Item</code> Tags:</strong> Gandalf's ability to test Gold Rings and Saruman's ability to use Palant&iacute;ri are tracked under <code>Special Ability</code> rather than <code>Target Item</code> or <code>Role</code>. Avatars are drafted intentionally by name or race, never as accessory tools for item queries.</li>
             <li><strong>No Starting Pool Eligibility:</strong> Official game rules prohibit Avatars from starting in the starting pool. The procedural generation engine automatically enforces this constraint regardless of query parameters.</li>
         </ul>
     </div>
@@ -1393,6 +1408,19 @@
         <li><code>[Blank]</code> &rarr; Untested Gold Rings (<em>Beautiful Gold Ring</em>, <em>Fair Gold Ring</em>, <em>Precious Gold Ring</em>; left blank so generic role queries do not draft untested rings into event slots)</li>
     </ul>
 
+    <h4 class="entry-heading-sub">Special Ability</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Item)</span>
+    </div>
+    <p>
+        Flags items that grant or modify specialized test mechanics without initiating tests on their own.
+    </p>
+    <strong>Representative Example:</strong>
+    <ul>
+        <li><code>Gold Ring: Aid Test</code> &rarr; Modifies Gold Ring test rolls when another card or character initiates a test (<em>Scroll of Isildur</em>)</li>
+    </ul>
+
     <h4 class="entry-heading-sub">Site Requirement</h4>
     <div class="scope-badge">
         <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
@@ -1570,34 +1598,36 @@
     <p>
         Drafts untested Gold Rings paired with ring test enhancers (<em>Scroll of Isildur</em>) and legal destination testing sites:
     </p>
-    <pre><code>[
-  {
+    <pre><code>
+    [
+    {
     "Name": "Expedition Gold Rings",
     "Section": "Resources",
     "Count": 2,
     "Attributes": {
-      "Primary": "Resource",
-      "Secondary": "Gold Ring Item"
+    "Primary": "Resource",
+    "Secondary": "Gold Ring Item"
     }
-  },
-  {
-    "Name": "Ring Testing Scroll",
+    },
+    {
+    "Name": "Ring Testing Aid Relic",
     "Section": "Resources",
     "Count": 1,
-    "Attributes": {
-      "Name": "Scroll of Isildur"
+    "Categories": {
+    "Special Ability": "Gold Ring: Aid Test"
     }
-  },
-  {
+    },
+    {
     "Name": "Ring Testing Destination Sites",
     "Section": "Sites",
     "Count": 3,
     "Attributes": {
-      "Primary": "Site",
-      "GoldRing": "yes"
+    "Primary": "Site",
+    "GoldRing": "yes"
     }
-  }
-]</code></pre>
+    }
+    ]
+</code></pre>
 
     <h4>Pattern E: Palant&iacute;r Intelligence Engine</h4>
     <p>
@@ -1754,18 +1784,29 @@
         <li><code>Prerequisite For: And&uacute;ril, the Flame of the West</code> &rarr; Assigned to <em>Reforging</em> to shield it until the quest is drafted</li>
     </ul>
 
+    <h4 class="entry-heading-sub">Special Ability</h4>
+    <div class="scope-badge">
+        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
+    </div>
+    <p>
+        Identifies Resource Events that enable Gold Ring testing or Palant&iacute;r activation:
+    </p>
+    <ul>
+        <li><code>Gold Ring: Allow Test</code> &rarr; Gold Ring testing rituals (<em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>)</li>
+        <li><code>Palant&iacute;r: Allow Use</code> &rarr; Seeing-stone alignment and activation rituals (<em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>)</li>
+    </ul>
+
     <h4 class="entry-heading-sub">Target Item</h4>
     <div class="scope-badge">
         <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
         <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
     </div>
     <p>
-        Identifies general item classifications or rules keywords that the event specifically requires, tests, or manipulates:
+        Identifies general item classifications or gear types that the event retrieves or manipulates:
     </p>
     <ul>
-        <li><code>Gold Ring</code> &rarr; Tested by Sage and Wizard rituals (<em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>)</li>
-        <li><code>Palant&iacute;r</code> &rarr; Aligned and activated by Sage seeing stone events (<em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>)</li>
-        <li><code>Armor; Weapon</code> &rarr; Retrieved from discard by <em>Reforging</em></li>
+        <li><code>Armor; Weapon</code> &rarr; Martial gear retrieved from discard by <em>Reforging</em></li>
     </ul>
 
     <h4 class="entry-heading-sub">Target Species</h4>

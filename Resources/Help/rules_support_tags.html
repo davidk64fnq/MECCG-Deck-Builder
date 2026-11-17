@@ -42,6 +42,7 @@
         <a href="#region-type">Region Type</a> &bull;
         <a href="#role">Role</a> &bull;
         <a href="#site-requirement">Site Requirement</a> &bull;
+        <a href="#special-ability">Special Ability</a> &bull;
         <a href="#target-item">Target Item</a> &bull;
         <a href="#target-species">Target Species</a>
     </div>
@@ -157,6 +158,11 @@
             <td><a href="#site-requirement"><code>Site Requirement</code></a></td>
             <td><span class="scope-pill">Character</span> &bull; <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span></td>
             <td>Specific destination sites or hold types required to play, recruit, or target</td>
+        </tr>
+        <tr>
+            <td><a href="#special-ability"><code>Special Ability</code></a></td>
+            <td><span class="scope-pill">Character</span> &bull; <span class="scope-pill">Resource</span></td>
+            <td>Innate or granted testing/activation abilities (Gold Ring tests, Palant&iacute;r use)</td>
         </tr>
         <tr>
             <td><a href="#target-item"><code>Target Item</code></a></td>
@@ -570,28 +576,45 @@
         <a href="#top">&#9650; Top of Page</a>
     </div>
 
+    <h3 id="special-ability" class="entry-heading">Special Ability</h3>
+    <div class="scope-badge">
+        <strong>Card Scope:</strong> <span class="scope-pill">Character</span> &bull; <span class="scope-pill">Resource</span> (Items &amp; Events)
+    </div>
+    <p>
+        Identifies innate or granted rules capabilities&mdash;such as initiating or aiding Gold Ring tests and aligning or using Palant&iacute;ri&mdash;across Characters, Items, and Resource Events without assigning <code>Role</code> tags to Avatars (<em>Gandalf</em>, <em>Saruman</em>) or diluting general utility queries.
+    </p>
+    <strong>Representative Examples:</strong>
+    <ul>
+        <li><code>Gold Ring: Allow Test</code> &rarr; Enables initiating a Gold Ring test (<em>Gandalf</em>, <em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>)</li>
+        <li><code>Gold Ring: Aid Test</code> &rarr; Modifies or aids a Gold Ring test roll without initiating a test on its own (<em>Scroll of Isildur</em>)</li>
+        <li><code>Palant&iacute;r: Allow Use</code> &rarr; Enables aligning or activating a Palant&iacute;r (<em>Saruman</em>, <em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>)</li>
+    </ul>
+    <div class="back-to-top">
+        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
+        <a href="#top">&#9650; Top of Page</a>
+    </div>
+
     <h3 id="target-item" class="entry-heading">Target Item</h3>
     <div class="scope-badge">
         <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> &bull; <span class="scope-pill">Hazard</span>
     </div>
     <p>
-        Identifies general item classifications, gear types, or rules keywords (e.g. <code>Weapon</code>, <code>Armor</code>, <code>Gold Ring</code>, <code>Palant&iacute;r</code>, <code>Lost Knowledge</code>) that an event or hazard requires, enhances, transfers, tests, or targets for theft/corruption.
+        Identifies general item classifications, gear types, or rules keywords (e.g. <code>Weapon</code>, <code>Armor</code>, <code>Ring</code>, <code>Palant&iacute;r</code>) that an event or hazard requires, retrieves, corrupts, or targets.
     </p>
     <div class="note">
-        <strong>The Ring Hierarchy &mdash; <code>Gold Ring</code> vs. <code>Ring</code>:</strong><br />
-        Taxonomy tags maintain a strict functional boundary across ring mechanics:
+        <strong><code>Target Item</code> vs. <code>Special Ability</code> &amp; The Ring Hierarchy:</strong><br />
+        Taxonomy tags maintain a clear boundary between item-targeting effects and character/event testing capabilities:
         <ul>
-            <li><strong><code>Target Item: Gold Ring</code> (The Testing Suite):</strong> Reserved exclusively for cards that interact with or test untested Gold Rings (<em>Ringlore</em>, <em>Scroll of Isildur</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>). This aligns directly with the official site attribute <code>GoldRing: yes</code>.</li>
+            <li><strong><code>Special Ability</code> (Ring Testing &amp; Palant&iacute;r Activation):</strong> Cards that allow or aid Gold Ring tests (<em>Gandalf</em>, <em>Scroll of Isildur</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>, <em>Ringlore</em>) and cards that align or use Palant&iacute;ri (<em>Saruman</em>, <em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>) are tagged under <code>Special Ability</code> rather than <code>Target Item</code>.</li>
             <li><strong><code>Target Item: Ring</code> (Universal Ring Hazards):</strong> Assigned to hazards that target, punish, or corrupt a character bearing <em>any</em> ring (Gold Ring, Magic Ring, Lesser Ring, Dwarven Ring, or The One Ring), such as <em>The Precious</em>, <em>The Ring's Betrayal</em>, and <em>The Will of the Ring</em>.</li>
             <li><strong>Specific One Ring Quests:</strong> Quests specifically mandating the destruction of <em>The One Ring</em> (such as <em>Cracks of Doom</em> or <em>Gollum's Fate</em>) declare <code>Prerequisite: The One Ring</code> rather than a broad category tag.</li>
         </ul>
     </div>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>Gold Ring</code> &rarr; Untested rings and testing rituals (<em>Ringlore</em>, <em>Scroll of Isildur</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Wizard's Test</em>)</li>
         <li><code>Ring</code> &rarr; Universal ring corruption hazards (<em>The Precious</em>, <em>The Ring's Betrayal</em>, <em>The Will of the Ring</em>, <em>The Nazg&ucirc;l are Abroad</em>)</li>
-        <li><code>Palant&iacute;r</code> &rarr; Seeing stone activation and corruption (<em>Align Palant&iacute;r</em>, <em>Use Palant&iacute;r</em>, <em>Bane of the Ithil-stone</em>)</li>
-        <li><code>Armor; Weapon</code> &rarr; Martial gear retrieved by <em>Reforging</em></li>
+        <li><code>Palant&iacute;r</code> &rarr; Seeing stone corruption and interference (<em>Bane of the Ithil-stone</em>)</li>
+        <li><code>Armor; Weapon</code> &rarr; Martial gear retrieved from discard by <em>Reforging</em></li>
     </ul>
     <div class="back-to-top">
         <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
