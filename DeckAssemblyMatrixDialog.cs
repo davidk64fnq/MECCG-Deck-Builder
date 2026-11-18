@@ -108,7 +108,6 @@ namespace MECCG_Deck_Builder
         // --- TAB 2: REGIONS & SITES ---
         private readonly ComboBox _cmbSeedRegion;
         private readonly NumericUpDown _numRegionCount;
-        private readonly NumericUpDown _numMinSiteCount;
         private readonly NumericUpDown _numMaxSiteCount;
         private readonly CheckedListBox _clbRegionTypes;
         private readonly CheckedListBox _clbSiteTypes;
@@ -489,25 +488,10 @@ namespace MECCG_Deck_Builder
             _toolTip.SetToolTip(lblRegCount, regCountTip);
             _toolTip.SetToolTip(_numRegionCount, regCountTip);
 
-            var lblMinSites = new Label { Text = "Min Adventure Sites:", Location = new Point(12, 91), Size = new Size(134, 20) };
-            _numMinSiteCount = new NumericUpDown
-            {
-                Location = new Point(150, 88),
-                Size = new Size(60, 23),
-                Minimum = 0,
-                Maximum = 50,
-                Value = 4
-            };
-            string minSitesTip =
-                "Minimum number of matching adventure sites (non-Haven sites)\n" +
-                "desired inside the region group. Set to 0 for no minimum.";
-            _toolTip.SetToolTip(lblMinSites, minSitesTip);
-            _toolTip.SetToolTip(_numMinSiteCount, minSitesTip);
-
-            var lblMaxSites = new Label { Text = "Max Adventure Sites:", Location = new Point(12, 123), Size = new Size(134, 20) };
+            var lblMaxSites = new Label { Text = "Max Adventure Sites:", Location = new Point(12, 91), Size = new Size(134, 20) };
             _numMaxSiteCount = new NumericUpDown
             {
-                Location = new Point(150, 120),
+                Location = new Point(150, 88),
                 Size = new Size(60, 23),
                 Minimum = 1,
                 Maximum = 50,
@@ -515,29 +499,14 @@ namespace MECCG_Deck_Builder
             };
             string maxSitesTip =
                 "Maximum number of matching adventure sites (non-Haven sites) to draft.\n" +
-                "If more than Max exist across enabled expansions, a random subset up to Max is kept.";
+                "Prefers a connected region group within Max; if all attempts exceed Max, keeps a random subset up to Max.";
             _toolTip.SetToolTip(lblMaxSites, maxSitesTip);
             _toolTip.SetToolTip(_numMaxSiteCount, maxSitesTip);
 
-            _numMinSiteCount.ValueChanged += (s, e) =>
-            {
-                if (_numMinSiteCount.Value > _numMaxSiteCount.Value)
-                {
-                    _numMaxSiteCount.Value = _numMinSiteCount.Value;
-                }
-            };
-            _numMaxSiteCount.ValueChanged += (s, e) =>
-            {
-                if (_numMaxSiteCount.Value < _numMinSiteCount.Value)
-                {
-                    _numMinSiteCount.Value = _numMaxSiteCount.Value;
-                }
-            };
-
             var lblTheaterRulesNote = new Label
             {
-                Location = new Point(12, 154),
-                Size = new Size(390, 74),
+                Location = new Point(12, 126),
+                Size = new Size(390, 86),
                 ForeColor = Color.DimGray,
                 UseMnemonic = false,
                 Text =
@@ -549,7 +518,6 @@ namespace MECCG_Deck_Builder
             grpDraftOpts.Controls.AddRange([
                 lblSeed, _cmbSeedRegion,
                 lblRegCount, _numRegionCount,
-                lblMinSites, _numMinSiteCount,
                 lblMaxSites, _numMaxSiteCount,
                 lblTheaterRulesNote
             ]);
@@ -1960,7 +1928,6 @@ namespace MECCG_Deck_Builder
 
                 SeedRegion = _cmbSeedRegion.SelectedItem?.ToString() ?? "Random",
                 RegionCount = (int)_numRegionCount.Value,
-                MinSiteCount = (int)_numMinSiteCount.Value,
                 MaxSiteCount = (int)_numMaxSiteCount.Value,
                 SelectedRegionTypes = [.. _clbRegionTypes.CheckedItems.Cast<string>()],
                 SelectedSiteTypes = [.. _clbSiteTypes.CheckedItems.Cast<string>()],
@@ -2074,10 +2041,7 @@ namespace MECCG_Deck_Builder
             SetComboSelection(_cmbSeedRegion, config.SeedRegion);
             _numRegionCount.Value = Math.Clamp(config.RegionCount, (int)_numRegionCount.Minimum, (int)_numRegionCount.Maximum);
 
-            int clampedMaxSites = Math.Clamp(config.MaxSiteCount, (int)_numMaxSiteCount.Minimum, (int)_numMaxSiteCount.Maximum);
-            int clampedMinSites = Math.Clamp(config.MinSiteCount, (int)_numMinSiteCount.Minimum, clampedMaxSites);
-            _numMaxSiteCount.Value = clampedMaxSites;
-            _numMinSiteCount.Value = clampedMinSites;
+            _numMaxSiteCount.Value = Math.Clamp(config.MaxSiteCount, (int)_numMaxSiteCount.Minimum, (int)_numMaxSiteCount.Maximum);
 
             SetCheckedItems(_clbRegionTypes, config.SelectedRegionTypes);
             SetCheckedItems(_clbSiteTypes, config.SelectedSiteTypes);
@@ -2773,7 +2737,6 @@ namespace MECCG_Deck_Builder
             var activeSets = _getActiveSets();
             var allCards = _catalog.Cards;
             int targetRegions = (int)_numRegionCount.Value;
-            int minSites = (int)_numMinSiteCount.Value;
             int maxSites = (int)_numMaxSiteCount.Value;
 
             string terrainFilter = string.Join("; ", checkedTerrains);
@@ -2870,11 +2833,16 @@ namespace MECCG_Deck_Builder
                     .Count();
 
                 bool meetsRegions = trialCluster.Count >= targetRegions;
-                bool meetsMinSites = minSites == 0 ? matchingSiteCount > 0 : matchingSiteCount >= minSites;
+                bool hasSites = matchingSiteCount > 0;
+                bool withinMaxSites = hasSites && matchingSiteCount <= maxSites;
 
-                int score = (meetsRegions ? 10000 : trialCluster.Count * 100) +
-                            (meetsMinSites ? 1000 : matchingSiteCount * 50) +
-                            Math.Min(matchingSiteCount, maxSites);
+                int regionScore = meetsRegions ? 100000 : trialCluster.Count * 1000;
+                int sitePresenceScore = hasSites ? 10000 : 0;
+                int maxFitScore = withinMaxSites
+                    ? 5000
+                    : (hasSites ? Math.Max(1, 5000 - (matchingSiteCount - maxSites)) : 0);
+
+                int score = regionScore + sitePresenceScore + maxFitScore;
 
                 if (score > bestScore)
                 {
@@ -2883,7 +2851,7 @@ namespace MECCG_Deck_Builder
                     bestCluster = trialCluster;
                 }
 
-                if (meetsRegions && meetsMinSites)
+                if (meetsRegions && withinMaxSites)
                 {
                     bestSeed = trialSeed;
                     bestCluster = trialCluster;
@@ -2967,11 +2935,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Region Shortfall: Found only {bestCluster.Count} of {targetRegions} connected regions matching checked terrains.");
             }
-            if (minSites > 0 && finalAdvSites < minSites)
-            {
-                warnings.Add($"Site Shortfall: Found only {finalAdvSites} of {minSites} minimum adventure sites matching checked holds.");
-            }
-            else if (finalAdvSites == 0)
+            if (finalAdvSites == 0)
             {
                 warnings.Add("Site Shortfall: 0 adventure sites matched the checked Site Holds inside these regions.");
             }
@@ -4916,16 +4880,24 @@ namespace MECCG_Deck_Builder
                 int neededResAllow = Math.Max(0, reqResAllow - resAllowEffective);
                 int neededSideAllow = Math.Max(0, reqSideAllow - sideAllowEffective);
 
-                var allowCandidates = heroDistinctPool
+                var baseAllowCandidates = heroDistinctPool
                     .Where(c =>
                         HasSpecialAbility(c, "Gold Ring: Allow Test") &&
                         PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: IsStandardTierItem(c), enforceRoleFocus: false))
-                    .OrderBy(_ => Random.Shared.Next())
                     .ToList();
 
-                draftedResAllow = DraftItemsIntoSection(allowCandidates, _deck.Resources, neededResAllow, resCapacity, usedCountsByName);
+                List<Card> OrderAllowCandidatesForSection(int oneRingCount, int otherTestedRingsCount) =>
+                    [.. baseAllowCandidates
+                        .Where(c => !(oneRingCount > 0 && otherTestedRingsCount == 0 && HasSpecialAbility(c, "Gold Ring: Exclude One Ring")))
+                        .OrderBy(c => oneRingCount > 0 && HasSpecialAbility(c, "Gold Ring: Exclude One Ring") ? 1 : 0)
+                        .ThenBy(_ => Random.Shared.Next())];
+
+                var resAllowCandidates = OrderAllowCandidatesForSection(reqResOne, reqResDwarf + reqResMagic + reqResLesser);
+                draftedResAllow = DraftItemsIntoSection(resAllowCandidates, _deck.Resources, neededResAllow, resCapacity, usedCountsByName);
                 resCapacity -= draftedResAllow.Count;
-                draftedSideAllow = DraftItemsIntoSection(allowCandidates, _deck.Sideboard, neededSideAllow, sideCapacity, usedCountsByName);
+
+                var sideAllowCandidates = OrderAllowCandidatesForSection(reqSideOne, reqSideDwarf + reqSideMagic + reqSideLesser);
+                draftedSideAllow = DraftItemsIntoSection(sideAllowCandidates, _deck.Sideboard, neededSideAllow, sideCapacity, usedCountsByName);
                 sideCapacity -= draftedSideAllow.Count;
 
                 // 3. Aid Ring Test (counts already-drafted aid cards such as Scroll of Isildur from Items)
@@ -5486,13 +5458,19 @@ namespace MECCG_Deck_Builder
                     .Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, card.Name));
             }
 
+            string oneRingDiag = null;
+
             bool TryResolveOneRingPackage(
-    List<Card> targetSection,
-    List<Card> branchAdded,
-    Dictionary<string, int> pendingCounts)
+                List<Card> targetSection,
+                List<Card> branchAdded,
+                Dictionary<string, int> pendingCounts)
             {
                 var oneRingCard = heroDistinctPool.FirstOrDefault(IsOneRingCard);
-                if (oneRingCard == null) return false;
+                if (oneRingCard == null)
+                {
+                    oneRingDiag ??= "Cracks of Doom skipped: The One Ring not found in active sets.";
+                    return false;
+                }
 
                 // Already in deck (Resources or Sideboard): 0 extra cards needed
                 if (IsCardAlreadySatisfiedForSection(oneRingCard, targetSection))
@@ -5502,12 +5480,16 @@ namespace MECCG_Deck_Builder
 
                 if (!_chkAutoDraftOneRingPackage.Checked || goldRingSites.Count == 0)
                 {
+                    oneRingDiag ??= !_chkAutoDraftOneRingPackage.Checked
+                        ? "Cracks of Doom skipped: 'Auto-draft One Ring package' is unchecked."
+                        : "Cracks of Doom skipped: 0 GoldRing-playable sites in Sites.";
                     return false;
                 }
 
                 if (!PassesGeneralCardGuards(oneRingCard, enforceQuestSiteFallback: false) ||
                     !CanAddCopyWithPending(oneRingCard, pendingCounts))
                 {
+                    oneRingDiag ??= "Cracks of Doom skipped: The One Ring failed card guards or copy limit.";
                     return false;
                 }
 
@@ -5526,7 +5508,11 @@ namespace MECCG_Deck_Builder
                     .Select(c => (Card: c, Score: ScoreGoldRingForSpecials(c.Text, 1, 0, 0)))
                     .ToList();
 
-                if (eligibleOneRingGolds.Count == 0) return false;
+                if (eligibleOneRingGolds.Count == 0)
+                {
+                    oneRingDiag ??= "Cracks of Doom skipped: 0 eligible Gold Rings found for The One Ring.";
+                    return false;
+                }
 
                 double bestOneRingGoldScore = eligibleOneRingGolds.Max(x => x.Score);
 
@@ -5550,30 +5536,62 @@ namespace MECCG_Deck_Builder
                         .Select(x => x.Card)
                         .FirstOrDefault();
 
-                    if (chosenGold == null) return false;
+                    if (chosenGold == null)
+                    {
+                        oneRingDiag ??= "Cracks of Doom skipped: no Gold Ring copy available.";
+                        return false;
+                    }
 
                     branchAdded.Add(chosenGold);
                     pendingCounts[chosenGold.Name] = pendingCounts.GetValueOrDefault(chosenGold.Name, 0) + 1;
                 }
 
-                // Ensure at least one Allow Ring Test source (including Gandalf if already in scope)
-                int existingAllow = CountEffectiveSpecialAbility(
-                    supportScope.Where(c => HasSpecialAbility(c, "Gold Ring: Allow Test")));
+                // Ensure an Allow Ring Test source that can bring The One Ring into play.
+                var oneRingAllowSources = supportScope
+                    .Where(c =>
+                        HasSpecialAbility(c, "Gold Ring: Allow Test") &&
+                        !HasSpecialAbility(c, "Gold Ring: Exclude One Ring"))
+                    .ToList();
 
-                if (existingAllow == 0)
+                int reusableAllowCount = CountEffectiveSpecialAbility(
+                    oneRingAllowSources.Where(c => !string.Equals(c.Secondary, "Short-event", StringComparison.OrdinalIgnoreCase)));
+
+                if (reusableAllowCount == 0)
                 {
-                    var chosenAllow = heroDistinctPool
-                        .Where(c =>
-                            HasSpecialAbility(c, "Gold Ring: Allow Test") &&
-                            PassesGeneralCardGuards(c, enforceQuestSiteFallback: true) &&
-                            CanAddCopyWithPending(c, pendingCounts))
-                        .OrderBy(_ => Random.Shared.Next())
-                        .FirstOrDefault();
+                    int singleUseUsableAllowCount = oneRingAllowSources
+                        .Count(c => string.Equals(c.Secondary, "Short-event", StringComparison.OrdinalIgnoreCase));
 
-                    if (chosenAllow == null) return false;
+                    int existingTestedSpecialRings = supportScope
+                        .Count(c => IsDwarvenRingCard(c) || IsMagicRingCard(c) || IsLesserRingCard(c));
 
-                    branchAdded.Add(chosenAllow);
-                    pendingCounts[chosenAllow.Name] = pendingCounts.GetValueOrDefault(chosenAllow.Name, 0) + 1;
+                    int excludedSingleUseAllowCount = supportScope.Count(c =>
+                        HasSpecialAbility(c, "Gold Ring: Allow Test") &&
+                        HasSpecialAbility(c, "Gold Ring: Exclude One Ring") &&
+                        string.Equals(c.Secondary, "Short-event", StringComparison.OrdinalIgnoreCase));
+
+                    int uncoveredPriorRings = Math.Max(0, existingTestedSpecialRings - excludedSingleUseAllowCount);
+
+                    if (singleUseUsableAllowCount == 0 || singleUseUsableAllowCount <= uncoveredPriorRings)
+                    {
+                        var chosenAllow = heroDistinctPool
+                            .Where(c =>
+                                HasSpecialAbility(c, "Gold Ring: Allow Test") &&
+                                !HasSpecialAbility(c, "Gold Ring: Exclude One Ring") &&
+                                PassesGeneralCardGuards(c, enforceQuestSiteFallback: true) &&
+                                CanAddCopyWithPending(c, pendingCounts))
+                            .OrderBy(c => usedCountsByName.GetValueOrDefault(c.Name, 0) + pendingCounts.GetValueOrDefault(c.Name, 0))
+                            .ThenBy(_ => Random.Shared.Next())
+                            .FirstOrDefault();
+
+                        if (chosenAllow == null)
+                        {
+                            oneRingDiag ??= "Cracks of Doom skipped: no eligible Allow Ring Test card found.";
+                            return false;
+                        }
+
+                        branchAdded.Add(chosenAllow);
+                        pendingCounts[chosenAllow.Name] = pendingCounts.GetValueOrDefault(chosenAllow.Name, 0) + 1;
+                    }
                 }
 
                 return true;
@@ -5677,6 +5695,11 @@ namespace MECCG_Deck_Builder
                 .OrderBy(x => x.TieBreaker)
                 .ToList();
 
+            if (!questCandidates.Any(q => CardFilterService.EqualsWithDiacriticFallback(q.Card.Name, "Cracks of Doom")))
+            {
+                oneRingDiag ??= "Cracks of Doom not in questCandidates (failed Role / Role Focus / Mount Doom / Guards).";
+            }
+
             void DraftQuestsIntoSection(
                 List<Card> targetSection,
                 int requestedCount,
@@ -5717,7 +5740,14 @@ namespace MECCG_Deck_Builder
                             }
 
                             int slotsNeeded = 1 + extras.Count;
-                            if (slotsNeeded > remainingCapacity) continue;
+                            if (slotsNeeded > remainingCapacity)
+                            {
+                                if (CardFilterService.EqualsWithDiacriticFallback(candidate.Name, "Cracks of Doom"))
+                                {
+                                    oneRingDiag ??= $"Cracks of Doom skipped: needs {slotsNeeded} slots, only {remainingCapacity} remaining.";
+                                }
+                                continue;
+                            }
 
                             bool hasPrereqTag = _filterService.GetCardTagsForCategory(candidate.Id, "Prerequisite").Count > 0;
 
@@ -5781,6 +5811,12 @@ namespace MECCG_Deck_Builder
                 $"Drafted {draftedResQuests.Count} quest(s) into Resources and {draftedSideQuests.Count} into Sideboard:\n" +
                 $"• Resources: {resText}\n" +
                 $"• Sideboard: {sideText}";
+
+            if (!string.IsNullOrEmpty(oneRingDiag) &&
+        !draftedResQuests.Any(q => CardFilterService.EqualsWithDiacriticFallback(q.Name, "Cracks of Doom")))
+            {
+                statusMsg += $"\n• Diagnostic: {oneRingDiag}";
+            }
 
             var warnings = new List<string>();
             if (draftedResQuests.Count < reqRes)
@@ -6423,7 +6459,7 @@ namespace MECCG_Deck_Builder
 
             const int maxPipelineAttempts = 25;
 
-            int bestScore = int.MinValue;
+            int fewestWarnings = int.MaxValue;
             int bestAttempt = 0;
             List<Card> bestPool = null;
             List<Card> bestResources = null;
@@ -6470,12 +6506,9 @@ namespace MECCG_Deck_Builder
                         return;
                     }
 
-                    int totalCards = _deck.Pool.Count + _deck.Resources.Count + _deck.Hazards.Count + _deck.Sideboard.Count + _deck.Sites.Count;
-                    int score = ((stepsToRun.Count - warningTabs.Count) * 10000) + (_deck.Sites.Count * 10) + totalCards;
-
-                    if (score > bestScore)
+                    if (warningTabs.Count <= fewestWarnings)
                     {
-                        bestScore = score;
+                        fewestWarnings = warningTabs.Count;
                         bestAttempt = attempt;
                         bestPool = [.. _deck.Pool];
                         bestResources = [.. _deck.Resources];
@@ -6791,7 +6824,6 @@ namespace MECCG_Deck_Builder
         // Tab 2: Regions & Sites
         public string SeedRegion { get; set; } = "Random";
         public int RegionCount { get; set; } = 4;
-        public int MinSiteCount { get; set; } = 4;
         public int MaxSiteCount { get; set; } = 12;
         public List<string> SelectedRegionTypes { get; set; } = [];
         public List<string> SelectedSiteTypes { get; set; } = [];

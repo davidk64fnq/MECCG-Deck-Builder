@@ -5380,7 +5380,7 @@
       "name": "Ringlore",
       "set": "METW",
       "Site Requirement": "Information!=[Blank]",
-      "Special Ability": "Gold Ring: Allow Test"
+      "Special Ability": "Gold Ring: Allow Test; Gold Ring: Exclude One Ring"
     },
     {
       "fullCode": "River (TW)",
@@ -6248,6 +6248,7 @@
       "Special Ability",
       "Gold Ring: Aid Test",
       "Gold Ring: Allow Test",
+      "Gold Ring: Exclude One Ring",
       "Palantír: Allow Use"
     ],
     [
