@@ -229,7 +229,7 @@ namespace MECCG_Deck_Builder
 
             // Ensure baseline categories are always present even if unassigned in active memory
             string[] standardCategories = [
-                "Role", "Special Ability", "Target Species", "Target Item", "Prerequisite", "Prerequisite For",
+                "Role", "Special Ability", "Target Species", "Target Item", "Prerequisite",
                 "Site Requirement", "Region Requirement", "Home Region", "Faction Bonus",
                 "Combat Bonus", "Environment Stance", "Region Type", "Adjacent Sites"
             ];
@@ -336,7 +336,7 @@ namespace MECCG_Deck_Builder
             {
                 "Items & Gear (All 5 Item Types)" =>
                     (["Secondary", "Race", "Corruption", "MPs", "Specific"],
-                     ["Role", "Target Species", "Prerequisite", "Prerequisite For"]),
+                     ["Role", "Target Species", "Prerequisite"]),
 
                 "Characters (Starting Pool & Recruits)" =>
                     (["Race", "Subrace", "Skill", "Mind", "Direct", "Prowess", "Body", "Corruption", "Home"],
@@ -364,7 +364,7 @@ namespace MECCG_Deck_Builder
 
                 "Resource Events (Short, Long, Permanent)" =>
                     (["Secondary", "Skill", "Specific"],
-                     ["Role", "Environment Stance", "Prerequisite", "Prerequisite For", "Site Requirement", "Region Requirement"]),
+                     ["Role", "Environment Stance", "Prerequisite", "Site Requirement", "Region Requirement"]),
 
                 "Sites & Havens" =>
                     (["Site", "Region", "Haven", "MinorItem", "MajorItem", "GreaterItem", "GoldRing", "Hoard"],

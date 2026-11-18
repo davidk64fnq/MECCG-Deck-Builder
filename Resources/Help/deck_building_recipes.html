@@ -68,7 +68,7 @@
         </tr>
         <tr>
             <td><a href="#recipe-10">10. Universal Quest Engine</a></td>
-            <td><code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code></td>
+            <td><code>Prerequisite</code>, <code>Site Requirement</code></td>
             <td>Drafting complete multi-card storyline packages with zero hardcoding</td>
         </tr>
         <tr>
@@ -482,8 +482,7 @@
     "Fallback": {
       "Name": "Open Resource Support",
       "Categories": {
-        "Role": "Card Flow; Protection",
-        "Prerequisite For": "[Blank]"
+        "Role": "Card Flow; Protection"
       }
     }
   },
@@ -514,11 +513,11 @@
 ]</code></pre>
 
     <div class="tip">
-        <strong>Shielding Generic Resource Draws:</strong><br />
-        To ensure that quest enablers (like <em>Paths of the Dead</em>) are never drawn by generic utility rules into non-quest decks, add <code>"Prerequisite For": "[Blank]"</code> to all open resource rules:
+        <strong>Location Shielding on Generic Draws:</strong><br />
+        Specialized quest enablers (like <em>Paths of the Dead</em> at <em>Dunharrow</em>) already carry a <code>Site Requirement</code> tag, so filtering open utility draws with <code>"Site Requirement": "[Blank]"</code> keeps location-locked cards out of unrelated decks without needing inverse tags:
         <pre><code>"Categories": {
   "Role": "Card Flow; Protection",
-  "Prerequisite For": "[Blank]"
+  "Site Requirement": "[Blank]"
 }</code></pre>
     </div>
 

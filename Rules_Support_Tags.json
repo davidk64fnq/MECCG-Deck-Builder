@@ -3858,7 +3858,7 @@
       "fullCode": "Andúril, the Flame of the West (TW)",
       "id": "243",
       "name": "Andúril, the Flame of the West",
-      "Prerequisite": "Narsil; Reforging",
+      "Prerequisite": "Narsil && Reforging",
       "Role": "Quest; Readiness",
       "set": "METW",
       "Site Requirement": "Information!=[Blank]",
@@ -4016,7 +4016,6 @@
       "fullCode": "Reforging (TW)",
       "id": "363",
       "name": "Reforging",
-      "Prerequisite For": "Andúril, the Flame of the West",
       "Role": "Card Flow; Item",
       "set": "METW",
       "Site Requirement": "Information!=[Blank]",
@@ -4037,7 +4036,7 @@
       "name": "Rescue Prisoners",
       "Role": "Quest",
       "set": "METW",
-      "Site Requirement": "Border-hold; Dark-hold; Free-hold; Shadow-hold"
+      "Site Requirement": "Dark-hold; Shadow-hold"
     },
     {
       "fullCode": "Return of the King (TW)",
@@ -4601,7 +4600,6 @@
       "fullCode": "Paths of the Dead (TW)",
       "id": "352",
       "name": "Paths of the Dead",
-      "Prerequisite For": "Army of the Dead",
       "set": "METW",
       "Site Requirement": "Dunharrow"
     },
@@ -4763,7 +4761,6 @@
       "fullCode": "The One Ring [H] (TW)",
       "id": "396",
       "name": "The One Ring",
-      "Prerequisite For": "Cracks of Doom",
       "Role": "Combat; Influence; Protection",
       "set": "METW"
     },
@@ -4771,15 +4768,14 @@
       "fullCode": "Sapling of the White Tree (TW)",
       "id": "371",
       "name": "Sapling of the White Tree",
-      "Prerequisite For": "The White Tree",
       "Role": "Quest",
-      "set": "METW"
+      "set": "METW",
+      "Site Requirement": "Minas Tirith"
     },
     {
       "fullCode": "Narsil (TW)",
       "id": "339",
       "name": "Narsil",
-      "Prerequisite For": "Andúril, the Flame of the West",
       "Role": "Combat; Influence",
       "set": "METW"
     },
@@ -4796,7 +4792,7 @@
       "name": "Earth of Galadriel's Orchard",
       "Role": "Quest",
       "set": "METW",
-      "Site Requirement": "Bag End; Lórien"
+      "Site Requirement": "Bag End && Lórien"
     },
     {
       "fullCode": "Elf-stone (TW)",
@@ -6102,6 +6098,7 @@
       "Gandalf",
       "Leaflock",
       "Narsil",
+      "Narsil && Reforging",
       "Paths of the Dead",
       "Quickbeam",
       "Reforging",
@@ -6110,14 +6107,6 @@
       "Skinbark",
       "The One Ring",
       "Treebeard"
-    ],
-    [
-      "Prerequisite For",
-      "Andúril, the Flame of the West",
-      "Army of the Dead",
-      "Cracks of Doom",
-      "Gollum",
-      "The White Tree"
     ],
     [
       "Region Requirement",
@@ -6202,6 +6191,7 @@
     [
       "Site Requirement",
       "Bag End",
+      "Bag End && Lórien",
       "Beorn's House",
       "Blue Mountain Dwarf-hold",
       "Border-hold",

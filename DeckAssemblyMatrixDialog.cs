@@ -13,7 +13,11 @@ namespace MECCG_Deck_Builder
     {
         private static readonly string[] HeroHavens = ["Rivendell", "Lórien", "Grey Havens", "Edhellond"];
 
-        // Near top of DeckAssemblyMatrixDialog (line 16):
+        private static readonly HashSet<string> CanonicalHoldTypes = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Haven", "Free-hold", "Border-hold", "Ruins & Lairs", "Shadow-hold", "Dark-hold", "Wizardhaven"
+        };
+
         private const string StarterIdleStatusText =
             "Total Mind limit: <= 20.\n" +
             "Starting characters prioritize: 1) drafted region group (including local Havens), 2) outside Havens, 3) any matching character.";
@@ -40,6 +44,12 @@ namespace MECCG_Deck_Builder
         private const string PalantirIdleStatusText =
             "Palantíri require a GreaterItem- or Palantiri-playable site (or their printed Site Requirement) in the drafted Site deck.\n" +
             "Allow Palantír Use counts are totals (including Saruman counted once if already drafted in Resources/Sideboard).";
+
+        private const string QuestIdleStatusText =
+            "Drafts Role = Quest cards (events and Quest Special Items) playable at drafted Sites/Havens.\n" +
+            "Drafts missing Prerequisite cards (e.g. Men of Lamedon, Narsil && Reforging) into the same section if capacity permits.";
+
+        private const string PureQuestRoleLabel = "Quest (Only)";
 
 #pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
         private static readonly Regex GoldRingOutcomeRegex = new(
@@ -81,7 +91,7 @@ namespace MECCG_Deck_Builder
         private readonly TabControl _tabControl;
         private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
-        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions", "Allies", "Items", "Rings", "Palantíri"];
+        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions", "Allies", "Items", "Rings", "Palantíri", "Quests"];
 
         // --- TAB 1: GENERAL SETTINGS & CONTROLS ---
         private readonly TextBox _txtDeckTitle;
@@ -171,6 +181,13 @@ namespace MECCG_Deck_Builder
         private readonly NumericUpDown _numSideAllowPalantirUse;
         private readonly CheckedListBox _clbPalantirRoles;
         private readonly Label _lblPalantiriStatus;
+
+        // --- TAB 10: QUESTS ---
+        private readonly NumericUpDown _numResourceQuests;
+        private readonly NumericUpDown _numSideboardQuests;
+        private readonly CheckBox _chkAutoDraftOneRingPackage;
+        private readonly CheckedListBox _clbQuestRoles;
+        private readonly Label _lblQuestsStatus;
 
         private readonly ToolTip _toolTip = new()
         {
@@ -326,8 +343,8 @@ namespace MECCG_Deck_Builder
             var lblProfileHint = new Label
             {
                 Text = "Save or load workbench configurations (.workbench.json) to reuse tab criteria.",
-                Location = new Point(415, 163),
-                Size = new Size(385, 24),
+                Location = new Point(415, 157),
+                Size = new Size(385, 34),
                 ForeColor = Color.DimGray
             };
 
@@ -343,14 +360,14 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Deck Assembly Pipeline && Session Snapshots",
                 Location = new Point(16, 222),
-                Size = new Size(810, 146)
+                Size = new Size(810, 158)
             };
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri",
-                Location = new Point(16, 22),
-                Size = new Size(778, 20),
+                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri -> 9. Quests",
+                Location = new Point(16, 20),
+                Size = new Size(778, 34),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
                 ForeColor = Color.FromArgb(26, 54, 93),
                 UseMnemonic = false
@@ -359,20 +376,20 @@ namespace MECCG_Deck_Builder
             _btnRunPipeline = new Button
             {
                 Text = "Run Pipeline",
-                Location = new Point(16, 50),
+                Location = new Point(16, 60),
                 Size = new Size(125, 30),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _btnRunPipeline.Click += (s, e) => RunPipelineDraft();
             _toolTip.SetToolTip(
                 _btnRunPipeline,
-                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Items -> Rings).\n" +
+                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Items -> Rings -> Palantíri -> Quests).\n" +
                 "Automatically retries up to 25 times if random region rolls fail downstream constraints.");
 
             _btnClearDeck = new Button
             {
                 Text = "Clear Deck",
-                Location = new Point(149, 50),
+                Location = new Point(149, 60),
                 Size = new Size(110, 30)
             };
             _btnClearDeck.Click += BtnClearDeck_Click;
@@ -381,7 +398,7 @@ namespace MECCG_Deck_Builder
             _btnSaveSnapshot = new Button
             {
                 Text = "Save Snapshot",
-                Location = new Point(280, 50),
+                Location = new Point(280, 60),
                 Size = new Size(125, 30)
             };
             _btnSaveSnapshot.Click += BtnSaveSnapshot_Click;
@@ -390,7 +407,7 @@ namespace MECCG_Deck_Builder
             _btnRecallSnapshot = new Button
             {
                 Text = "Recall Snapshot",
-                Location = new Point(413, 50),
+                Location = new Point(413, 60),
                 Size = new Size(125, 30),
                 Enabled = false
             };
@@ -399,8 +416,8 @@ namespace MECCG_Deck_Builder
 
             _lblPipelineStatus = new Label
             {
-                Location = new Point(16, 90),
-                Size = new Size(778, 46),
+                Location = new Point(16, 100),
+                Size = new Size(778, 48),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
                 UseMnemonic = false
@@ -415,14 +432,14 @@ namespace MECCG_Deck_Builder
             var grpSummary = new GroupBox
             {
                 Text = "Live Deck Composition Status",
-                Location = new Point(16, 376),
-                Size = new Size(810, 232)
+                Location = new Point(16, 388),
+                Size = new Size(810, 220)
             };
 
             _lblDeckSummary = new Label
             {
                 Location = new Point(20, 22),
-                Size = new Size(770, 200),
+                Size = new Size(770, 188),
                 Font = new Font("Segoe UI", 10.0f),
                 ForeColor = Color.FromArgb(26, 54, 93),
                 UseMnemonic = false
@@ -991,7 +1008,7 @@ namespace MECCG_Deck_Builder
                 ForeColor = Color.DimGray,
                 Font = new Font("Segoe UI", 8.5f),
                 UseMnemonic = false,
-                Text = "Excludes Gold Rings, Ring Special Items, and Palantíri (reserved for dedicated tabs)."
+                Text = "Excludes Gold Rings, Ring Special Items, Palantíri, and Quest Items (reserved for dedicated tabs)."
             };
 
             grpItemCounts.Controls.AddRange([
@@ -1254,8 +1271,114 @@ namespace MECCG_Deck_Builder
 
             tabPalantiri.Controls.AddRange([grpPalantiri, grpPalantirRoles, _lblPalantiriStatus]);
 
+            // ==========================================
+            // TAB 10: QUESTS
+            // ==========================================
+            var tabQuests = new TabPage("Quests");
+
+            var grpQuests = new GroupBox
+            {
+                Text = "Quest Drafting Counts && Options (Resources && Sideboard)",
+                Location = new Point(16, 16),
+                Size = new Size(495, 220)
+            };
+
+            var lblQuestHdrCat = new Label { Text = "Category", Location = new Point(16, 24), Size = new Size(165, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblQuestHdrRes = new Label { Text = "Resources", Location = new Point(190, 24), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblQuestHdrSide = new Label { Text = "Sideboard", Location = new Point(295, 24), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+
+            var lblQuestsCount = new Label { Text = "Quests (Events & Items):", Location = new Point(16, 55), Size = new Size(165, 20), UseMnemonic = false };
+            _numResourceQuests = CreateItemSpinner(190, 52, 0, 15, 1);
+            _numSideboardQuests = CreateItemSpinner(295, 52, 0, 10, 0);
+            _toolTip.SetToolTip(_numResourceQuests, "Number of Role = Quest cards to draft into Resources (default 1).");
+            _toolTip.SetToolTip(_numSideboardQuests, "Number of Role = Quest cards to draft into Sideboard (default 0).");
+
+            _chkAutoDraftOneRingPackage = new CheckBox
+            {
+                Text = "Auto-draft One Ring package if needed (Gold Ring + Ring Test + The One Ring)",
+                Location = new Point(16, 88),
+                Size = new Size(465, 22),
+                Checked = true
+            };
+            _toolTip.SetToolTip(
+                _chkAutoDraftOneRingPackage,
+                "Allows Cracks of Doom / Gollum's Fate to auto-draft The One Ring (plus a valid Gold Ring and Allow Ring Test if missing)\n" +
+                "when Mount Doom and at least one GoldRing-playable site exist in the drafted Site deck.");
+
+            var lblQuestScopeNote = new Label
+            {
+                Location = new Point(16, 118),
+                Size = new Size(465, 90),
+                ForeColor = Color.DimGray,
+                Font = new Font("Segoe UI", 8.5f),
+                UseMnemonic = false,
+                Text =
+                    "• Includes Quest events and Quest Items (Book of Mazarbul, Earth of Galadriel's\n" +
+                    "  Orchard, Red Book of Westmarch, Sapling of the White Tree).\n" +
+                    "• Enforces Skill, Target Species (e.g. Dúnadan for Andúril, Hobbit for Red Book),\n" +
+                    "  Site Requirement, Region Requirement, and Specific.\n" +
+                    "• Prioritizes Quests whose Prerequisite cards are already in the deck."
+            };
+
+            grpQuests.Controls.AddRange([
+                lblQuestHdrCat, lblQuestHdrRes, lblQuestHdrSide,
+                lblQuestsCount, _numResourceQuests, _numSideboardQuests,
+                _chkAutoDraftOneRingPackage,
+                lblQuestScopeNote
+            ]);
+
+            var grpQuestRoles = new GroupBox
+            {
+                Text = "Role Focus (Uncheck to exclude)",
+                Location = new Point(525, 16),
+                Size = new Size(300, 220)
+            };
+
+            _clbQuestRoles = new CheckedListBox
+            {
+                Location = new Point(12, 24),
+                Size = new Size(276, 152),
+                CheckOnClick = true
+            };
+            _clbQuestRoles.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(ValidateWorkbenchReadiness);
+                }
+            };
+            _toolTip.SetToolTip(_clbQuestRoles, "Filters pure Quests (Quest (Only)) vs. hybrid Quests carrying additional Role tags.");
+
+            var btnAllQuestRoles = new Button { Text = "All", Location = new Point(12, 184), Size = new Size(65, 24) };
+            btnAllQuestRoles.Click += (s, e) =>
+            {
+                SetAllChecked(_clbQuestRoles, true);
+                ValidateWorkbenchReadiness();
+            };
+
+            var btnClearQuestRoles = new Button { Text = "Clear", Location = new Point(83, 184), Size = new Size(65, 24) };
+            btnClearQuestRoles.Click += (s, e) =>
+            {
+                SetAllChecked(_clbQuestRoles, false);
+                ValidateWorkbenchReadiness();
+            };
+
+            grpQuestRoles.Controls.AddRange([_clbQuestRoles, btnAllQuestRoles, btnClearQuestRoles]);
+
+            _lblQuestsStatus = new Label
+            {
+                Location = new Point(16, 250),
+                Size = new Size(805, 250),
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false,
+                Text = QuestIdleStatusText
+            };
+
+            tabQuests.Controls.AddRange([grpQuests, grpQuestRoles, _lblQuestsStatus]);
+
             // Tabs ordered to match pipeline execution order
-            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions, tabAllies, tabItems, tabRings, tabPalantiri]);
+            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions, tabAllies, tabItems, tabRings, tabPalantiri, tabQuests]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
             _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
@@ -1264,6 +1387,7 @@ namespace MECCG_Deck_Builder
             _tabInfo["Items"] = new(RunItemsDraft, _lblItemStatus);
             _tabInfo["Rings"] = new(RunRingsDraft, _lblRingsStatus);
             _tabInfo["Palantíri"] = new(RunPalantiriDraft, _lblPalantiriStatus);
+            _tabInfo["Quests"] = new(RunQuestsDraft, _lblQuestsStatus);
 
             Controls.Add(_tabControl);
 
@@ -1275,6 +1399,7 @@ namespace MECCG_Deck_Builder
                     PopulateItemRolesChecklist();
                     PopulateRingRolesChecklist();
                     PopulatePalantirRolesChecklist();
+                    PopulateQuestRolesChecklist();
                     UpdateDeckSummary();
                     ValidateWorkbenchReadiness();
                 }
@@ -1284,6 +1409,7 @@ namespace MECCG_Deck_Builder
             PopulateItemRolesChecklist();
             PopulateRingRolesChecklist();
             PopulatePalantirRolesChecklist();
+            PopulateQuestRolesChecklist();
             UpdateSeedTooltip();
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
@@ -1331,20 +1457,23 @@ namespace MECCG_Deck_Builder
             int sideFactions = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase));
             int resAllies = _deck.Resources.Count(c => string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase));
             int sideAllies = _deck.Sideboard.Count(c => string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase));
-            int poolItems = _deck.Pool.Count(c => IsItemCard(c) && !IsRingPackageCard(c) && !IsPalantirPackageCard(c));
-            int resItems = _deck.Resources.Count(c => IsItemCard(c) && !IsRingPackageCard(c) && !IsPalantirPackageCard(c));
-            int sideItems = _deck.Sideboard.Count(c => IsItemCard(c) && !IsRingPackageCard(c) && !IsPalantirPackageCard(c));
+            int poolItems = _deck.Pool.Count(c => IsItemCard(c) && !IsRingPackageCard(c) && !IsPalantirPackageCard(c) && !IsQuestPackageCard(c));
+            int resItems = _deck.Resources.Count(c => IsItemCard(c) && !IsRingPackageCard(c) && !IsPalantirPackageCard(c) && !IsQuestPackageCard(c));
+            int sideItems = _deck.Sideboard.Count(c => IsItemCard(c) && !IsRingPackageCard(c) && !IsPalantirPackageCard(c) && !IsQuestPackageCard(c));
             int resRingCards = _deck.Resources.Count(IsRingPackageCard);
             int sideRingCards = _deck.Sideboard.Count(IsRingPackageCard);
             int resPalantirCards = _deck.Resources.Count(IsPalantirPackageCard);
             int sidePalantirCards = _deck.Sideboard.Count(IsPalantirPackageCard);
+            int resQuests = _deck.Resources.Count(IsQuestPackageCard);
+            int sideQuests = _deck.Sideboard.Count(IsQuestPackageCard);
 
             if (totalResChars == 0 && totalSideChars == 0 &&
                 resFactions == 0 && sideFactions == 0 &&
                 resAllies == 0 && sideAllies == 0 &&
                 poolItems == 0 && resItems == 0 && sideItems == 0 &&
                 resRingCards == 0 && sideRingCards == 0 &&
-                resPalantirCards == 0 && sidePalantirCards == 0)
+                resPalantirCards == 0 && sidePalantirCards == 0 &&
+                resQuests == 0 && sideQuests == 0)
             {
                 ValidateWorkbenchReadiness();
             }
@@ -1366,6 +1495,7 @@ namespace MECCG_Deck_Builder
             string resItemNote = resItems > 0 ? $", {resItems} item(s)" : "";
             string resRingNote = resRingCards > 0 ? $", {resRingCards} ring card(s)" : "";
             string resPalantirNote = resPalantirCards > 0 ? $", {resPalantirCards} palantír card(s)" : "";
+            string resQuestNote = resQuests > 0 ? $", {resQuests} quest(s)" : "";
 
             var sideParts = new List<string>();
             if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
@@ -1375,12 +1505,13 @@ namespace MECCG_Deck_Builder
             if (sideItems > 0) sideParts.Add($"{sideItems} item(s)");
             if (sideRingCards > 0) sideParts.Add($"{sideRingCards} ring card(s)");
             if (sidePalantirCards > 0) sideParts.Add($"{sidePalantirCards} palantír card(s)");
+            if (sideQuests > 0) sideParts.Add($"{sideQuests} quest(s)");
             string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
 
             _lblDeckSummary.Text =
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
                 $"Pool:             {_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
+                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
                 $"Hazards:          {_deck.Hazards.Count} cards\n" +
                 $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
@@ -1562,6 +1693,63 @@ namespace MECCG_Deck_Builder
             _clbPalantirRoles.EndUpdate();
         }
 
+        private void PopulateQuestRolesChecklist()
+        {
+            var previouslyExcluded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbQuestRoles.Items.Count; i++)
+            {
+                if (!_clbQuestRoles.GetItemChecked(i))
+                {
+                    string role = _clbQuestRoles.Items[i]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        previouslyExcluded.Add(role);
+                    }
+                }
+            }
+
+            var activeSets = _getActiveSets();
+            var roles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var card in _catalog.Cards)
+            {
+                if (activeSets.Count > 0 && !activeSets.Contains(card.Set)) continue;
+                if (!string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase)) continue;
+                if (!IsHeroPlayableAlignment(card.Alignment)) continue;
+                if (!HasRoleTag(card, "Quest")) continue;
+
+                var secondaryRoles = _filterService.GetCardTagsForCategory(card.Id, "Role")
+                    .Where(r => !string.IsNullOrWhiteSpace(r) && !string.Equals(r, "Quest", StringComparison.OrdinalIgnoreCase))
+                    .Select(r => r.Trim())
+                    .ToList();
+
+                if (secondaryRoles.Count == 0)
+                {
+                    roles.Add(PureQuestRoleLabel);
+                }
+                else
+                {
+                    foreach (var sr in secondaryRoles)
+                    {
+                        roles.Add(sr);
+                    }
+                }
+            }
+
+            var sortedRoles = roles
+                .OrderBy(r => string.Equals(r, PureQuestRoleLabel, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .ThenBy(r => r, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            _clbQuestRoles.BeginUpdate();
+            _clbQuestRoles.Items.Clear();
+            foreach (var role in sortedRoles)
+            {
+                _clbQuestRoles.Items.Add(role, !previouslyExcluded.Contains(role));
+            }
+            _clbQuestRoles.EndUpdate();
+        }
+
         #region TAB1_SESSION_ACTIONS
 
         private void BtnClearDeck_Click(object sender, EventArgs e)
@@ -1618,6 +1806,10 @@ namespace MECCG_Deck_Builder
             _lblPalantiriStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblPalantiriStatus.Text = PalantirIdleStatusText;
+
+            _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblQuestsStatus.Text = QuestIdleStatusText;
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -1852,6 +2044,13 @@ namespace MECCG_Deck_Builder
                     .Where(i => !_clbPalantirRoles.GetItemChecked(i))
                     .Select(i => _clbPalantirRoles.Items[i]?.ToString() ?? string.Empty)
                     .Where(s => !string.IsNullOrWhiteSpace(s))],
+                ResourceQuestCount = (int)_numResourceQuests.Value,
+                SideboardQuestCount = (int)_numSideboardQuests.Value,
+                AutoDraftOneRingPackage = _chkAutoDraftOneRingPackage.Checked,
+                ExcludedQuestRoles = [.. Enumerable.Range(0, _clbQuestRoles.Items.Count)
+                    .Where(i => !_clbQuestRoles.GetItemChecked(i))
+                    .Select(i => _clbQuestRoles.Items[i]?.ToString() ?? string.Empty)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))],
             };
         }
 
@@ -1976,6 +2175,18 @@ namespace MECCG_Deck_Builder
             {
                 string roleName = _clbPalantirRoles.Items[i]?.ToString() ?? string.Empty;
                 _clbPalantirRoles.SetItemChecked(i, !excludedPalantirRoles.Contains(roleName));
+            }
+
+            _numResourceQuests.Value = Math.Clamp(config.ResourceQuestCount, (int)_numResourceQuests.Minimum, (int)_numResourceQuests.Maximum);
+            _numSideboardQuests.Value = Math.Clamp(config.SideboardQuestCount, (int)_numSideboardQuests.Minimum, (int)_numSideboardQuests.Maximum);
+            _chkAutoDraftOneRingPackage.Checked = config.AutoDraftOneRingPackage;
+
+            PopulateQuestRolesChecklist();
+            var excludedQuestRoles = new HashSet<string>(config.ExcludedQuestRoles ?? [], StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbQuestRoles.Items.Count; i++)
+            {
+                string roleName = _clbQuestRoles.Items[i]?.ToString() ?? string.Empty;
+                _clbQuestRoles.SetItemChecked(i, !excludedQuestRoles.Contains(roleName));
             }
 
             UpdateDeckSummary();
@@ -2118,7 +2329,7 @@ namespace MECCG_Deck_Builder
         {
             if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null ||
                 _lblFactionStatus == null || _lblAllyStatus == null || _lblItemStatus == null ||
-                _lblRingsStatus == null || _lblPalantiriStatus == null)
+                _lblRingsStatus == null || _lblPalantiriStatus == null || _lblQuestsStatus == null)
             {
                 return;
             }
@@ -2130,6 +2341,7 @@ namespace MECCG_Deck_Builder
             bool hasItemError = false;
             bool hasRingsError = false;
             bool hasPalantirError = false;
+            bool hasQuestsError = false;
 
             int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
             int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
@@ -2154,6 +2366,8 @@ namespace MECCG_Deck_Builder
                                 (int)_numSideLesserRings.Value + (int)_numSideWizardsRing.Value;
             int resPalCards = (int)_numResPalantiri.Value + (int)_numResAllowPalantirUse.Value;
             int sidePalCards = (int)_numSidePalantiri.Value + (int)_numSideAllowPalantirUse.Value;
+            int resQuests = (int)_numResourceQuests.Value;
+            int sideQuests = (int)_numSideboardQuests.Value;
 
             int playDeckLimit = (int)_numPlayDeckSize.Value;
             int sideboardLimit = (int)_numSideboardSize.Value;
@@ -2211,11 +2425,11 @@ namespace MECCG_Deck_Builder
             int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards;
 
             string resOverMsg =
-                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards) exceed Play Deck Size ({playDeckLimit}).\n" +
+                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards + {resQuests} quests) exceed Play Deck Size ({playDeckLimit}).\n" +
                 "Reduce Resources card counts or increase Play Deck Size on General Settings.";
 
             string sideOverMsg =
-                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards) exceed Sideboard Size ({sideboardLimit}).\n" +
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests) exceed Sideboard Size ({sideboardLimit}).\n" +
                 "Reduce Sideboard card counts or increase Sideboard Size on General Settings.";
 
             // --- Tab 5 (Factions) ---
@@ -2422,6 +2636,58 @@ namespace MECCG_Deck_Builder
                 _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
                 _lblPipelineStatus.Text = "Ready to run pipeline.";
+            }
+
+            // --- Tab 10 (Quests) ---
+            int totalRequestedQuests = resQuests + sideQuests;
+            if (totalRequestedQuests > 0 && _clbQuestRoles.Items.Count > 0 && _clbQuestRoles.CheckedItems.Count == 0)
+            {
+                hasQuestsError = true;
+                _lblQuestsStatus.ForeColor = Color.Firebrick;
+                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblQuestsStatus.Text = "⚠ At least one Role must be checked under Role Focus when drafting quests.";
+            }
+            else if (totalConfiguredRes > playDeckLimit && resQuests > 0)
+            {
+                hasQuestsError = true;
+                _lblQuestsStatus.ForeColor = Color.Firebrick;
+                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblQuestsStatus.Text = resOverMsg;
+            }
+            else if (totalConfiguredSide > sideboardLimit && sideQuests > 0)
+            {
+                hasQuestsError = true;
+                _lblQuestsStatus.ForeColor = Color.Firebrick;
+                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblQuestsStatus.Text = sideOverMsg;
+            }
+            else if ((_lblQuestsStatus.ForeColor == Color.Firebrick &&
+                      (_lblQuestsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _lblQuestsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _lblQuestsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+                     (_deck.Resources.All(c => !IsQuestPackageCard(c)) &&
+                      _deck.Sideboard.All(c => !IsQuestPackageCard(c)) &&
+                      !_lblQuestsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_lblQuestsStatus.Text.StartsWith("No quests configured", StringComparison.OrdinalIgnoreCase)))
+            {
+                _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblQuestsStatus.Text = QuestIdleStatusText;
+            }
+
+            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError && !hasAllyError && !hasItemError && !hasRingsError && !hasPalantirError && !hasQuestsError;
+
+            if (hasTheaterError || hasRecruitError || hasFactionError || hasAllyError || hasItemError || hasRingsError || hasPalantirError || hasQuestsError)
+            {
+                var blockedTabs = new List<string>();
+                if (hasTheaterError) blockedTabs.Add("Regions & Sites");
+                if (hasRecruitError) blockedTabs.Add("Wizards & Recruits");
+                if (hasFactionError) blockedTabs.Add("Factions");
+                if (hasAllyError) blockedTabs.Add("Allies");
+                if (hasItemError) blockedTabs.Add("Items");
+                if (hasRingsError) blockedTabs.Add("Rings");
+                if (hasPalantirError) blockedTabs.Add("Palantíri");
+                if (hasQuestsError) blockedTabs.Add("Quests");
             }
         }
 
@@ -4039,16 +4305,7 @@ namespace MECCG_Deck_Builder
             for (int i = 0; i < allSitesInDeck.Count; i++)
             {
                 var site = allSitesInDeck[i];
-                bool matches = siteReqTags.Any(req =>
-                {
-                    string cleanReq = req.Trim();
-                    if (CardFilterService.TryParsePredicate(cleanReq, out _, out _, out _))
-                    {
-                        return CardFilterService.MatchesPredicate(site, cleanReq, _filterService);
-                    }
-                    return CardFilterService.EqualsWithDiacriticFallback(site.Name, cleanReq) ||
-                           string.Equals(site.Name.Replace("-", " "), cleanReq.Replace("-", " "), StringComparison.OrdinalIgnoreCase);
-                });
+                bool matches = siteReqTags.Any(req => SiteMatchesSingleRequirement(site, req.Trim(), _filterService));
 
                 if (matches)
                 {
@@ -4410,6 +4667,9 @@ namespace MECCG_Deck_Builder
             // Exclude Ring Special Items (handled by dedicated Rings tab)
             if (IsSpecialRingItem(card)) return false;
 
+            // Exclude Quest items (handled by dedicated Quests tab)
+            if (HasRoleTag(card, "Quest")) return false;
+
             return true;
         }
 
@@ -4489,20 +4749,15 @@ namespace MECCG_Deck_Builder
                 .Where(s => string.Equals(s.GoldRing, "yes", StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            if (reqResGold + reqSideGold > 0 && goldRingSites.Count == 0)
-            {
-                if (!silent)
-                {
-                    MessageBox.Show(
-                        this,
-                        "Gold Rings were requested, but 0 GoldRing-playable sites exist in the drafted Site deck.\n\n" +
-                        "Widen Seed Region / Region Count or enable Ruins & Lairs / Border-holds on Regions & Sites.",
-                        "Rings (GoldRing Site Required)",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                }
-                return false;
-            }
+            bool hasGoldRingSite = goldRingSites.Count > 0;
+            bool needsGoldRingSite =
+                reqResGold + reqSideGold +
+                reqResAllow + reqSideAllow +
+                reqResAid + reqSideAid +
+                reqResOne + reqSideOne +
+                reqResDwarf + reqSideDwarf +
+                reqResMagic + reqSideMagic +
+                reqResLesser + reqSideLesser > 0;
 
             var allCards = _catalog.Cards;
             var activeSets = _getActiveSets();
@@ -4597,83 +4852,6 @@ namespace MECCG_Deck_Builder
                 .Where(c => c != null)
                 .ToList();
 
-            // 1. Gold Rings (ranked by 2d6 outcome probability for requested One / Dwarven / Magic Rings; variety-first otherwise)
-            var goldCandidates = heroDistinctPool
-                .Where(c =>
-                    string.Equals(c.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase) &&
-                    PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: false, enforceRoleFocus: false))
-                .ToList();
-
-            int wOne = reqResOne + reqSideOne;
-            int wDwarf = reqResDwarf + reqSideDwarf;
-            int wMagic = reqResMagic + reqSideMagic;
-
-            List<Card> draftedResGold;
-            List<Card> draftedSideGold;
-            if (wOne + wDwarf + wMagic > 0)
-            {
-                var rankedGold = goldCandidates
-                    .Select(c => (Card: c, Score: ScoreGoldRingForSpecials(c.Text, wOne, wDwarf, wMagic), Tie: Random.Shared.Next()))
-                    .OrderByDescending(x => x.Score)
-                    .ThenBy(x => x.Tie)
-                    .Select(x => x.Card)
-                    .ToList();
-
-                draftedResGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName);
-                resCapacity -= draftedResGold.Count;
-                draftedSideGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Sideboard, reqSideGold, sideCapacity, usedCountsByName);
-                sideCapacity -= draftedSideGold.Count;
-            }
-            else
-            {
-                var shuffledGold = goldCandidates.OrderBy(_ => Random.Shared.Next()).ToList();
-                draftedResGold = DraftItemsIntoSection(shuffledGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName);
-                resCapacity -= draftedResGold.Count;
-                draftedSideGold = DraftItemsIntoSection(shuffledGold, _deck.Sideboard, reqSideGold, sideCapacity, usedCountsByName);
-                sideCapacity -= draftedSideGold.Count;
-            }
-
-            // 2. Allow Ring Test (counts Unique testers such as Gandalf once per distinct title)
-            var innateResAllow = _deck.Resources.Where(c => HasSpecialAbility(c, "Gold Ring: Allow Test")).ToList();
-            var innateSideAllow = _deck.Sideboard.Where(c => HasSpecialAbility(c, "Gold Ring: Allow Test")).ToList();
-            int resAllowEffective = CountEffectiveSpecialAbility(innateResAllow);
-            int sideAllowEffective = CountEffectiveSpecialAbility(innateSideAllow);
-            int neededResAllow = Math.Max(0, reqResAllow - resAllowEffective);
-            int neededSideAllow = Math.Max(0, reqSideAllow - sideAllowEffective);
-
-            var allowCandidates = heroDistinctPool
-                .Where(c =>
-                    HasSpecialAbility(c, "Gold Ring: Allow Test") &&
-                    PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: IsStandardTierItem(c), enforceRoleFocus: false))
-                .OrderBy(_ => Random.Shared.Next())
-                .ToList();
-
-            var draftedResAllow = DraftItemsIntoSection(allowCandidates, _deck.Resources, neededResAllow, resCapacity, usedCountsByName);
-            resCapacity -= draftedResAllow.Count;
-            var draftedSideAllow = DraftItemsIntoSection(allowCandidates, _deck.Sideboard, neededSideAllow, sideCapacity, usedCountsByName);
-            sideCapacity -= draftedSideAllow.Count;
-
-            // 3. Aid Ring Test (counts already-drafted aid cards such as Scroll of Isildur from Items)
-            var innateResAid = _deck.Resources.Where(c => HasSpecialAbility(c, "Gold Ring: Aid Test")).ToList();
-            var innateSideAid = _deck.Sideboard.Where(c => HasSpecialAbility(c, "Gold Ring: Aid Test")).ToList();
-            int resAidEffective = CountEffectiveSpecialAbility(innateResAid);
-            int sideAidEffective = CountEffectiveSpecialAbility(innateSideAid);
-            int neededResAid = Math.Max(0, reqResAid - resAidEffective);
-            int neededSideAid = Math.Max(0, reqSideAid - sideAidEffective);
-
-            var aidCandidates = heroDistinctPool
-                .Where(c =>
-                    HasSpecialAbility(c, "Gold Ring: Aid Test") &&
-                    PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: IsStandardTierItem(c), enforceRoleFocus: false))
-                .OrderBy(_ => Random.Shared.Next())
-                .ToList();
-
-            var draftedResAid = DraftItemsIntoSection(aidCandidates, _deck.Resources, neededResAid, resCapacity, usedCountsByName);
-            resCapacity -= draftedResAid.Count;
-            var draftedSideAid = DraftItemsIntoSection(aidCandidates, _deck.Sideboard, neededSideAid, sideCapacity, usedCountsByName);
-            sideCapacity -= draftedSideAid.Count;
-
-            // 4. Special Rings
             List<Card> GetSpecialRingCandidates(Func<Card, bool> predicate, bool enforceSpecies, bool enforceRoleFocus) =>
                 [.. heroDistinctPool
                     .Where(c =>
@@ -4682,31 +4860,122 @@ namespace MECCG_Deck_Builder
                         PassesRingCardGuards(c, enforceTargetSpecies: enforceSpecies, checkStandardItemSiteFlags: false, enforceRoleFocus: enforceRoleFocus))
                     .OrderBy(_ => Random.Shared.Next())];
 
-            var oneCandidates = GetSpecialRingCandidates(IsOneRingCard, enforceSpecies: true, enforceRoleFocus: false);
-            var draftedResOne = DraftItemsIntoSection(oneCandidates, _deck.Resources, reqResOne, resCapacity, usedCountsByName);
-            resCapacity -= draftedResOne.Count;
-            var draftedSideOne = DraftItemsIntoSection(oneCandidates, _deck.Sideboard, reqSideOne, sideCapacity, usedCountsByName);
-            sideCapacity -= draftedSideOne.Count;
+            List<Card> draftedResGold = [], draftedSideGold = [];
+            List<Card> draftedResAllow = [], draftedSideAllow = [];
+            List<Card> draftedResAid = [], draftedSideAid = [];
+            List<Card> draftedResOne = [], draftedSideOne = [];
+            List<Card> draftedResDwarf = [], draftedSideDwarf = [];
+            List<Card> draftedResMagic = [], draftedSideMagic = [];
+            List<Card> draftedResLesser = [], draftedSideLesser = [];
+            List<Card> innateResAllow = [], innateSideAllow = [];
+            List<Card> innateResAid = [], innateSideAid = [];
+            int resAllowEffective = 0, sideAllowEffective = 0;
+            int resAidEffective = 0, sideAidEffective = 0;
 
-            // Dwarven Rings: playable by any character (do not enforce Target Species: Dwarf)
-            var dwarfCandidates = GetSpecialRingCandidates(IsDwarvenRingCard, enforceSpecies: false, enforceRoleFocus: true);
-            var draftedResDwarf = DraftItemsIntoSection(dwarfCandidates, _deck.Resources, reqResDwarf, resCapacity, usedCountsByName);
-            resCapacity -= draftedResDwarf.Count;
-            var draftedSideDwarf = DraftItemsIntoSection(dwarfCandidates, _deck.Sideboard, reqSideDwarf, sideCapacity, usedCountsByName);
-            sideCapacity -= draftedSideDwarf.Count;
+            if (hasGoldRingSite)
+            {
+                // 1. Gold Rings (ranked by 2d6 outcome probability for requested One / Dwarven / Magic Rings; variety-first otherwise)
+                var goldCandidates = heroDistinctPool
+                    .Where(c =>
+                        string.Equals(c.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase) &&
+                        PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: false, enforceRoleFocus: false))
+                    .ToList();
 
-            var magicCandidates = GetSpecialRingCandidates(IsMagicRingCard, enforceSpecies: true, enforceRoleFocus: true);
-            var draftedResMagic = DraftItemsIntoSection(magicCandidates, _deck.Resources, reqResMagic, resCapacity, usedCountsByName);
-            resCapacity -= draftedResMagic.Count;
-            var draftedSideMagic = DraftItemsIntoSection(magicCandidates, _deck.Sideboard, reqSideMagic, sideCapacity, usedCountsByName);
-            sideCapacity -= draftedSideMagic.Count;
+                int wOne = reqResOne + reqSideOne;
+                int wDwarf = reqResDwarf + reqSideDwarf;
+                int wMagic = reqResMagic + reqSideMagic;
 
-            var lesserCandidates = GetSpecialRingCandidates(IsLesserRingCard, enforceSpecies: true, enforceRoleFocus: true);
-            var draftedResLesser = DraftItemsIntoSection(lesserCandidates, _deck.Resources, reqResLesser, resCapacity, usedCountsByName);
-            resCapacity -= draftedResLesser.Count;
-            var draftedSideLesser = DraftItemsIntoSection(lesserCandidates, _deck.Sideboard, reqSideLesser, sideCapacity, usedCountsByName);
-            sideCapacity -= draftedSideLesser.Count;
+                if (wOne + wDwarf + wMagic > 0)
+                {
+                    var rankedGold = goldCandidates
+                        .Select(c => (Card: c, Score: ScoreGoldRingForSpecials(c.Text, wOne, wDwarf, wMagic), Tie: Random.Shared.Next()))
+                        .OrderByDescending(x => x.Score)
+                        .ThenBy(x => x.Tie)
+                        .Select(x => x.Card)
+                        .ToList();
 
+                    draftedResGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName);
+                    resCapacity -= draftedResGold.Count;
+                    draftedSideGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Sideboard, reqSideGold, sideCapacity, usedCountsByName);
+                    sideCapacity -= draftedSideGold.Count;
+                }
+                else
+                {
+                    var shuffledGold = goldCandidates.OrderBy(_ => Random.Shared.Next()).ToList();
+                    draftedResGold = DraftItemsIntoSection(shuffledGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName);
+                    resCapacity -= draftedResGold.Count;
+                    draftedSideGold = DraftItemsIntoSection(shuffledGold, _deck.Sideboard, reqSideGold, sideCapacity, usedCountsByName);
+                    sideCapacity -= draftedSideGold.Count;
+                }
+
+                // 2. Allow Ring Test (counts Unique testers such as Gandalf once per distinct title)
+                innateResAllow = _deck.Resources.Where(c => HasSpecialAbility(c, "Gold Ring: Allow Test")).ToList();
+                innateSideAllow = _deck.Sideboard.Where(c => HasSpecialAbility(c, "Gold Ring: Allow Test")).ToList();
+                resAllowEffective = CountEffectiveSpecialAbility(innateResAllow);
+                sideAllowEffective = CountEffectiveSpecialAbility(innateSideAllow);
+                int neededResAllow = Math.Max(0, reqResAllow - resAllowEffective);
+                int neededSideAllow = Math.Max(0, reqSideAllow - sideAllowEffective);
+
+                var allowCandidates = heroDistinctPool
+                    .Where(c =>
+                        HasSpecialAbility(c, "Gold Ring: Allow Test") &&
+                        PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: IsStandardTierItem(c), enforceRoleFocus: false))
+                    .OrderBy(_ => Random.Shared.Next())
+                    .ToList();
+
+                draftedResAllow = DraftItemsIntoSection(allowCandidates, _deck.Resources, neededResAllow, resCapacity, usedCountsByName);
+                resCapacity -= draftedResAllow.Count;
+                draftedSideAllow = DraftItemsIntoSection(allowCandidates, _deck.Sideboard, neededSideAllow, sideCapacity, usedCountsByName);
+                sideCapacity -= draftedSideAllow.Count;
+
+                // 3. Aid Ring Test (counts already-drafted aid cards such as Scroll of Isildur from Items)
+                innateResAid = _deck.Resources.Where(c => HasSpecialAbility(c, "Gold Ring: Aid Test")).ToList();
+                innateSideAid = _deck.Sideboard.Where(c => HasSpecialAbility(c, "Gold Ring: Aid Test")).ToList();
+                resAidEffective = CountEffectiveSpecialAbility(innateResAid);
+                sideAidEffective = CountEffectiveSpecialAbility(innateSideAid);
+                int neededResAid = Math.Max(0, reqResAid - resAidEffective);
+                int neededSideAid = Math.Max(0, reqSideAid - sideAidEffective);
+
+                var aidCandidates = heroDistinctPool
+                    .Where(c =>
+                        HasSpecialAbility(c, "Gold Ring: Aid Test") &&
+                        PassesRingCardGuards(c, enforceTargetSpecies: true, checkStandardItemSiteFlags: IsStandardTierItem(c), enforceRoleFocus: false))
+                    .OrderBy(_ => Random.Shared.Next())
+                    .ToList();
+
+                draftedResAid = DraftItemsIntoSection(aidCandidates, _deck.Resources, neededResAid, resCapacity, usedCountsByName);
+                resCapacity -= draftedResAid.Count;
+                draftedSideAid = DraftItemsIntoSection(aidCandidates, _deck.Sideboard, neededSideAid, sideCapacity, usedCountsByName);
+                sideCapacity -= draftedSideAid.Count;
+
+                // 4a. Gold-Ring-Tested Special Rings
+                var oneCandidates = GetSpecialRingCandidates(IsOneRingCard, enforceSpecies: true, enforceRoleFocus: false);
+                draftedResOne = DraftItemsIntoSection(oneCandidates, _deck.Resources, reqResOne, resCapacity, usedCountsByName);
+                resCapacity -= draftedResOne.Count;
+                draftedSideOne = DraftItemsIntoSection(oneCandidates, _deck.Sideboard, reqSideOne, sideCapacity, usedCountsByName);
+                sideCapacity -= draftedSideOne.Count;
+
+                // Dwarven Rings: playable by any character (do not enforce Target Species: Dwarf)
+                var dwarfCandidates = GetSpecialRingCandidates(IsDwarvenRingCard, enforceSpecies: false, enforceRoleFocus: true);
+                draftedResDwarf = DraftItemsIntoSection(dwarfCandidates, _deck.Resources, reqResDwarf, resCapacity, usedCountsByName);
+                resCapacity -= draftedResDwarf.Count;
+                draftedSideDwarf = DraftItemsIntoSection(dwarfCandidates, _deck.Sideboard, reqSideDwarf, sideCapacity, usedCountsByName);
+                sideCapacity -= draftedSideDwarf.Count;
+
+                var magicCandidates = GetSpecialRingCandidates(IsMagicRingCard, enforceSpecies: true, enforceRoleFocus: true);
+                draftedResMagic = DraftItemsIntoSection(magicCandidates, _deck.Resources, reqResMagic, resCapacity, usedCountsByName);
+                resCapacity -= draftedResMagic.Count;
+                draftedSideMagic = DraftItemsIntoSection(magicCandidates, _deck.Sideboard, reqSideMagic, sideCapacity, usedCountsByName);
+                sideCapacity -= draftedSideMagic.Count;
+
+                var lesserCandidates = GetSpecialRingCandidates(IsLesserRingCard, enforceSpecies: true, enforceRoleFocus: true);
+                draftedResLesser = DraftItemsIntoSection(lesserCandidates, _deck.Resources, reqResLesser, resCapacity, usedCountsByName);
+                resCapacity -= draftedResLesser.Count;
+                draftedSideLesser = DraftItemsIntoSection(lesserCandidates, _deck.Sideboard, reqSideLesser, sideCapacity, usedCountsByName);
+                sideCapacity -= draftedSideLesser.Count;
+            }
+
+            // 4b. Wizard's Ring (playable directly at a Haven without a GoldRing site)
             var wizardRingCandidates = GetSpecialRingCandidates(IsWizardsRingCard, enforceSpecies: true, enforceRoleFocus: true);
             var draftedResWizard = DraftItemsIntoSection(wizardRingCandidates, _deck.Resources, reqResWizard, resCapacity, usedCountsByName);
             resCapacity -= draftedResWizard.Count;
@@ -4760,22 +5029,31 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            CheckShortfall("Resources Gold Rings", draftedResGold.Count, reqResGold);
-            CheckShortfall("Sideboard Gold Rings", draftedSideGold.Count, reqSideGold);
-            CheckShortfall("Resources Allow Ring Test", resAllowEffective + draftedResAllow.Count, reqResAllow);
-            CheckShortfall("Sideboard Allow Ring Test", sideAllowEffective + draftedSideAllow.Count, reqSideAllow);
-            CheckShortfall("Resources Aid Ring Test", resAidEffective + draftedResAid.Count, reqResAid);
-            CheckShortfall("Sideboard Aid Ring Test", sideAidEffective + draftedSideAid.Count, reqSideAid);
-            CheckShortfall("Resources The One Ring", draftedResOne.Count, reqResOne);
-            CheckShortfall("Sideboard The One Ring", draftedSideOne.Count, reqSideOne);
-            CheckShortfall("Resources Dwarven Rings", draftedResDwarf.Count, reqResDwarf);
-            CheckShortfall("Sideboard Dwarven Rings", draftedSideDwarf.Count, reqSideDwarf);
-            CheckShortfall("Resources Magic Rings", draftedResMagic.Count, reqResMagic);
-            CheckShortfall("Sideboard Magic Rings", draftedSideMagic.Count, reqSideMagic);
-            CheckShortfall("Resources Lesser Rings", draftedResLesser.Count, reqResLesser);
-            CheckShortfall("Sideboard Lesser Rings", draftedSideLesser.Count, reqSideLesser);
-            CheckShortfall("Resources Wizard's Ring", draftedResWizard.Count, reqResWizard, !allDraftedChars.Any(c => string.Equals(c.Race, "Wizard", StringComparison.OrdinalIgnoreCase)) ? "requires a Wizard in the deck" : null);
-            CheckShortfall("Sideboard Wizard's Ring", draftedSideWizard.Count, reqSideWizard, !allDraftedChars.Any(c => string.Equals(c.Race, "Wizard", StringComparison.OrdinalIgnoreCase)) ? "requires a Wizard in the deck" : null);
+            if (!hasGoldRingSite && needsGoldRingSite)
+            {
+                warnings.Add("0 GoldRing-playable sites exist in the drafted Site deck; skipped Gold Rings, Ring Tests & tested Special Rings (widen Seed Region / Region Count or enable Ruins & Lairs).");
+            }
+            else
+            {
+                CheckShortfall("Resources Gold Rings", draftedResGold.Count, reqResGold);
+                CheckShortfall("Sideboard Gold Rings", draftedSideGold.Count, reqSideGold);
+                CheckShortfall("Resources Allow Ring Test", resAllowEffective + draftedResAllow.Count, reqResAllow);
+                CheckShortfall("Sideboard Allow Ring Test", sideAllowEffective + draftedSideAllow.Count, reqSideAllow);
+                CheckShortfall("Resources Aid Ring Test", resAidEffective + draftedResAid.Count, reqResAid);
+                CheckShortfall("Sideboard Aid Ring Test", sideAidEffective + draftedSideAid.Count, reqSideAid);
+                CheckShortfall("Resources The One Ring", draftedResOne.Count, reqResOne);
+                CheckShortfall("Sideboard The One Ring", draftedSideOne.Count, reqSideOne);
+                CheckShortfall("Resources Dwarven Rings", draftedResDwarf.Count, reqResDwarf);
+                CheckShortfall("Sideboard Dwarven Rings", draftedSideDwarf.Count, reqSideDwarf);
+                CheckShortfall("Resources Magic Rings", draftedResMagic.Count, reqResMagic);
+                CheckShortfall("Sideboard Magic Rings", draftedSideMagic.Count, reqSideMagic);
+                CheckShortfall("Resources Lesser Rings", draftedResLesser.Count, reqResLesser);
+                CheckShortfall("Sideboard Lesser Rings", draftedSideLesser.Count, reqSideLesser);
+            }
+
+            bool hasWizard = allDraftedChars.Any(c => string.Equals(c.Race, "Wizard", StringComparison.OrdinalIgnoreCase));
+            CheckShortfall("Resources Wizard's Ring", draftedResWizard.Count, reqResWizard, !hasWizard ? "requires a Wizard in the deck" : null);
+            CheckShortfall("Sideboard Wizard's Ring", draftedSideWizard.Count, reqSideWizard, !hasWizard ? "requires a Wizard in the deck" : null);
 
             if (warnings.Count > 0)
             {
@@ -5056,10 +5334,513 @@ namespace MECCG_Deck_Builder
             return true;
         }
 
+        private bool RunQuestsDraft(bool silent = false)
+        {
+            int reqRes = (int)_numResourceQuests.Value;
+            int reqSide = (int)_numSideboardQuests.Value;
+
+            if (reqRes == 0 && reqSide == 0)
+            {
+                _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblQuestsStatus.Text = "No quests configured (0 drafted).";
+                return true;
+            }
+
+            var checkedQuestRoles = new HashSet<string>(_clbQuestRoles.CheckedItems.Cast<string>(), StringComparer.OrdinalIgnoreCase);
+            if (_clbQuestRoles.Items.Count > 0 && checkedQuestRoles.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Please select at least one Role under Role Focus on the Quests tab.", "Quests", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+
+            var allSitesInDeck = _deck.Sites
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (allSitesInDeck.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        this,
+                        "Quests requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Quests",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var goldRingSites = allSitesInDeck
+                .Where(s => string.Equals(s.GoldRing, "yes", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var draftedRegionNames = new HashSet<string>(
+                _deck.Sites
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()),
+                StringComparer.OrdinalIgnoreCase);
+
+            var draftedRegionTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in _deck.Sites.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+            {
+                foreach (var rt in DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService))
+                {
+                    if (!string.IsNullOrWhiteSpace(rt))
+                    {
+                        draftedRegionTypes.Add(rt.Trim());
+                    }
+                }
+            }
+
+            var allDraftedChars = _deck.Pool
+                .Concat(_deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .Concat(_deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            var allDeckNonSiteCards = _deck.Pool
+                .Concat(_deck.Resources)
+                .Concat(_deck.Sideboard)
+                .ToList();
+
+            var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in allDeckNonSiteCards)
+            {
+                usedCountsByName[c.Name] = usedCountsByName.GetValueOrDefault(c.Name, 0) + 1;
+            }
+
+            int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
+            int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
+
+            var heroDistinctPool = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    string.Equals(c.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+                    IsHeroPlayableAlignment(c.Alignment))
+                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(PickHeroPreferredFromGroup)
+                .Where(c => c != null)
+                .ToList();
+
+            bool PassesGeneralCardGuards(Card card, bool enforceQuestSiteFallback)
+            {
+                if (!IsHeroPlayableAlignment(card.Alignment)) return false;
+
+                if (!MatchesItemRegionRequirement(card, draftedRegionNames, draftedRegionTypes)) return false;
+
+                var siteReqs = _filterService.GetCardTagsForCategory(card.Id, "Site Requirement");
+                if (siteReqs.Count > 0)
+                {
+                    if (!siteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService)))
+                    {
+                        return false;
+                    }
+                }
+                else if (enforceQuestSiteFallback && IsStandardTierItem(card) && !MatchesItemSitePlayability(card, allSitesInDeck))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(card.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, card.Specific)))
+                {
+                    return false;
+                }
+
+                if (!MatchesSkillOrRaceRequirements(card, allDraftedChars)) return false;
+
+                if (!MatchesItemTargetSpecies(card, allDraftedChars)) return false;
+
+                return true;
+            }
+
+            bool CanAddCopyWithPending(Card card, Dictionary<string, int> pendingCounts)
+            {
+                int current = usedCountsByName.GetValueOrDefault(card.Name, 0) + pendingCounts.GetValueOrDefault(card.Name, 0);
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                return current < max;
+            }
+
+            bool IsCardAlreadySatisfiedForSection(Card card, List<Card> targetSection)
+            {
+                if (card == null) return false;
+                if (string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase))
+                {
+                    return _deck.Pool.Concat(_deck.Resources).Concat(_deck.Sideboard)
+                        .Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, card.Name));
+                }
+
+                if (targetSection == _deck.Resources)
+                {
+                    return _deck.Resources.Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, card.Name));
+                }
+
+                return _deck.Resources.Concat(_deck.Sideboard)
+                    .Any(c => CardFilterService.EqualsWithDiacriticFallback(c.Name, card.Name));
+            }
+
+            bool TryResolveOneRingPackage(
+    List<Card> targetSection,
+    List<Card> branchAdded,
+    Dictionary<string, int> pendingCounts)
+            {
+                var oneRingCard = heroDistinctPool.FirstOrDefault(IsOneRingCard);
+                if (oneRingCard == null) return false;
+
+                // Already in deck (Resources or Sideboard): 0 extra cards needed
+                if (IsCardAlreadySatisfiedForSection(oneRingCard, targetSection))
+                {
+                    return true;
+                }
+
+                if (!_chkAutoDraftOneRingPackage.Checked || goldRingSites.Count == 0)
+                {
+                    return false;
+                }
+
+                if (!PassesGeneralCardGuards(oneRingCard, enforceQuestSiteFallback: false) ||
+                    !CanAddCopyWithPending(oneRingCard, pendingCounts))
+                {
+                    return false;
+                }
+
+                branchAdded.Add(oneRingCard);
+                pendingCounts[oneRingCard.Name] = pendingCounts.GetValueOrDefault(oneRingCard.Name, 0) + 1;
+
+                var supportScope = targetSection == _deck.Resources
+                    ? _deck.Resources
+                    : _deck.Resources.Concat(_deck.Sideboard);
+
+                var eligibleOneRingGolds = heroDistinctPool
+                    .Where(c =>
+                        string.Equals(c.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase) &&
+                        ScoreGoldRingForSpecials(c.Text, 1, 0, 0) > 0 &&
+                        PassesGeneralCardGuards(c, enforceQuestSiteFallback: false))
+                    .Select(c => (Card: c, Score: ScoreGoldRingForSpecials(c.Text, 1, 0, 0)))
+                    .ToList();
+
+                if (eligibleOneRingGolds.Count == 0) return false;
+
+                double bestOneRingGoldScore = eligibleOneRingGolds.Max(x => x.Score);
+
+                // Ensure at least one Gold Ring with the best available One Ring odds (e.g. Precious Gold Ring)
+                bool hasOptimalGoldRing = supportScope.Any(c =>
+                    string.Equals(c.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase) &&
+                    ScoreGoldRingForSpecials(c.Text, 1, 0, 0) >= bestOneRingGoldScore);
+
+                if (!hasOptimalGoldRing)
+                {
+                    var chosenGold = eligibleOneRingGolds
+                        .Where(x => x.Score >= bestOneRingGoldScore && CanAddCopyWithPending(x.Card, pendingCounts))
+                        .OrderBy(_ => Random.Shared.Next())
+                        .Select(x => x.Card)
+                        .FirstOrDefault();
+
+                    chosenGold ??= eligibleOneRingGolds
+                        .Where(x => CanAddCopyWithPending(x.Card, pendingCounts))
+                        .OrderByDescending(x => x.Score)
+                        .ThenBy(_ => Random.Shared.Next())
+                        .Select(x => x.Card)
+                        .FirstOrDefault();
+
+                    if (chosenGold == null) return false;
+
+                    branchAdded.Add(chosenGold);
+                    pendingCounts[chosenGold.Name] = pendingCounts.GetValueOrDefault(chosenGold.Name, 0) + 1;
+                }
+
+                // Ensure at least one Allow Ring Test source (including Gandalf if already in scope)
+                int existingAllow = CountEffectiveSpecialAbility(
+                    supportScope.Where(c => HasSpecialAbility(c, "Gold Ring: Allow Test")));
+
+                if (existingAllow == 0)
+                {
+                    var chosenAllow = heroDistinctPool
+                        .Where(c =>
+                            HasSpecialAbility(c, "Gold Ring: Allow Test") &&
+                            PassesGeneralCardGuards(c, enforceQuestSiteFallback: true) &&
+                            CanAddCopyWithPending(c, pendingCounts))
+                        .OrderBy(_ => Random.Shared.Next())
+                        .FirstOrDefault();
+
+                    if (chosenAllow == null) return false;
+
+                    branchAdded.Add(chosenAllow);
+                    pendingCounts[chosenAllow.Name] = pendingCounts.GetValueOrDefault(chosenAllow.Name, 0) + 1;
+                }
+
+                return true;
+            }
+
+            bool TryResolveQuestPrereqBranch(
+                Card card,
+                List<Card> targetSection,
+                List<Card> resolvedExtras,
+                Dictionary<string, int> pendingCounts,
+                HashSet<string> visitedNames)
+            {
+                if (card == null || !visitedNames.Add(card.Name)) return true;
+
+                var prereqTags = _filterService.GetCardTagsForCategory(card.Id, "Prerequisite");
+                if (prereqTags.Count == 0) return true;
+
+                var candidateBranches = new List<(List<Card> Extras, Dictionary<string, int> Counts)>();
+
+                foreach (var orBranch in prereqTags)
+                {
+                    var andTerms = orBranch.Split("&&", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if (andTerms.Length == 0) continue;
+
+                    var branchExtras = new List<Card>();
+                    var branchCounts = new Dictionary<string, int>(pendingCounts, StringComparer.OrdinalIgnoreCase);
+                    var branchVisited = new HashSet<string>(visitedNames, StringComparer.OrdinalIgnoreCase);
+                    bool branchOk = true;
+
+                    foreach (var prereqName in andTerms)
+                    {
+                        if (CardFilterService.EqualsWithDiacriticFallback(prereqName, "The One Ring"))
+                        {
+                            if (!TryResolveOneRingPackage(targetSection, branchExtras, branchCounts))
+                            {
+                                branchOk = false;
+                                break;
+                            }
+                            continue;
+                        }
+
+                        var prereqCard = heroDistinctPool.FirstOrDefault(c =>
+                            CardFilterService.EqualsWithDiacriticFallback(c.Name, prereqName));
+
+                        if (prereqCard == null)
+                        {
+                            branchOk = false;
+                            break;
+                        }
+
+                        if (!IsCardAlreadySatisfiedForSection(prereqCard, targetSection) &&
+                            branchCounts.GetValueOrDefault(prereqCard.Name, 0) == 0)
+                        {
+                            if (!PassesGeneralCardGuards(prereqCard, enforceQuestSiteFallback: true) ||
+                                !CanAddCopyWithPending(prereqCard, branchCounts))
+                            {
+                                branchOk = false;
+                                break;
+                            }
+
+                            branchExtras.Add(prereqCard);
+                            branchCounts[prereqCard.Name] = branchCounts.GetValueOrDefault(prereqCard.Name, 0) + 1;
+                        }
+
+                        if (!TryResolveQuestPrereqBranch(prereqCard, targetSection, branchExtras, branchCounts, branchVisited))
+                        {
+                            branchOk = false;
+                            break;
+                        }
+                    }
+
+                    if (branchOk)
+                    {
+                        candidateBranches.Add((branchExtras, branchCounts));
+                    }
+                }
+
+                if (candidateBranches.Count == 0) return false;
+
+                // Prefer branch requiring the fewest new cards (e.g. already-satisfied branch first)
+                var (Extras, Counts) = candidateBranches
+                    .OrderBy(b => b.Extras.Count)
+                    .ThenBy(_ => Random.Shared.Next())
+                    .First();
+
+                resolvedExtras.AddRange(Extras);
+                foreach (var kvp in Counts)
+                {
+                    pendingCounts[kvp.Key] = kvp.Value;
+                }
+
+                return true;
+            }
+
+            var questCandidates = heroDistinctPool
+                .Where(c =>
+                    HasRoleTag(c, "Quest") &&
+                    MatchesQuestRoleFocus(c, checkedQuestRoles) &&
+                    PassesGeneralCardGuards(c, enforceQuestSiteFallback: true))
+                .Select(c => (Card: c, TieBreaker: Random.Shared.Next()))
+                .OrderBy(x => x.TieBreaker)
+                .ToList();
+
+            void DraftQuestsIntoSection(
+                List<Card> targetSection,
+                int requestedCount,
+                ref int remainingCapacity,
+                List<Card> draftedQuestsOut,
+                List<Card> draftedExtrasOut)
+            {
+                if (requestedCount <= 0 || remainingCapacity <= 0) return;
+
+                for (int copyTier = 0; copyTier < 3 && draftedQuestsOut.Count < requestedCount && remainingCapacity > 0; copyTier++)
+                {
+                    while (draftedQuestsOut.Count < requestedCount && remainingCapacity > 0)
+                    {
+                        (Card Quest, List<Card> Extras)? bestPick = null;
+                        int bestTier = int.MaxValue;
+                        int bestTie = int.MaxValue;
+
+                        foreach (var (candidate, tieBreaker) in questCandidates)
+                        {
+                            int curCount = usedCountsByName.GetValueOrDefault(candidate.Name, 0);
+                            int max = string.Equals(candidate.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                            if (curCount != copyTier || curCount >= max) continue;
+
+                            var extras = new List<Card>();
+                            var pending = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+                            {
+                                [candidate.Name] = 1
+                            };
+
+                            if (!TryResolveQuestPrereqBranch(
+                                candidate,
+                                targetSection,
+                                extras,
+                                pending,
+                                new HashSet<string>(StringComparer.OrdinalIgnoreCase)))
+                            {
+                                continue;
+                            }
+
+                            int slotsNeeded = 1 + extras.Count;
+                            if (slotsNeeded > remainingCapacity) continue;
+
+                            bool hasPrereqTag = _filterService.GetCardTagsForCategory(candidate.Id, "Prerequisite").Count > 0;
+
+                            // Tier 1: Quest has a Prerequisite that is ALREADY satisfied in the deck
+                            // Tier 2: Standalone quests (no Prerequisite) and self-contained prerequisite quests compete equally
+                            int tier = (hasPrereqTag && extras.Count == 0) ? 1 : 2;
+
+                            if (tier < bestTier || (tier == bestTier && tieBreaker < bestTie))
+                            {
+                                bestTier = tier;
+                                bestTie = tieBreaker;
+                                bestPick = (candidate, extras);
+                            }
+                        }
+
+                        if (!bestPick.HasValue) break;
+
+                        var (chosenQuest, chosenExtras) = bestPick.Value;
+
+                        targetSection.Add(chosenQuest);
+                        usedCountsByName[chosenQuest.Name] = usedCountsByName.GetValueOrDefault(chosenQuest.Name, 0) + 1;
+                        draftedQuestsOut.Add(chosenQuest);
+
+                        foreach (var extra in chosenExtras)
+                        {
+                            targetSection.Add(extra);
+                            usedCountsByName[extra.Name] = usedCountsByName.GetValueOrDefault(extra.Name, 0) + 1;
+                            draftedExtrasOut.Add(extra);
+                        }
+
+                        remainingCapacity -= 1 + chosenExtras.Count;
+                    }
+                }
+            }
+
+            var draftedResQuests = new List<Card>();
+            var draftedResExtras = new List<Card>();
+            DraftQuestsIntoSection(_deck.Resources, reqRes, ref resCapacity, draftedResQuests, draftedResExtras);
+
+            var draftedSideQuests = new List<Card>();
+            var draftedSideExtras = new List<Card>();
+            DraftQuestsIntoSection(_deck.Sideboard, reqSide, ref sideCapacity, draftedSideQuests, draftedSideExtras);
+
+            _deck.SortSections();
+            if (!silent)
+            {
+                NotifyDeckChanged(draftedResQuests.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
+            }
+
+            string resText = draftedResQuests.Count > 0
+                ? FormatCardCountList(draftedResQuests) +
+                  (draftedResExtras.Count > 0 ? $" (+ prereq/ring: {FormatCardCountList(draftedResExtras)})" : "")
+                : "(None)";
+
+            string sideText = draftedSideQuests.Count > 0
+                ? FormatCardCountList(draftedSideQuests) +
+                  (draftedSideExtras.Count > 0 ? $" (+ prereq/ring: {FormatCardCountList(draftedSideExtras)})" : "")
+                : "(None)";
+
+            string statusMsg =
+                $"Drafted {draftedResQuests.Count} quest(s) into Resources and {draftedSideQuests.Count} into Sideboard:\n" +
+                $"• Resources: {resText}\n" +
+                $"• Sideboard: {sideText}";
+
+            var warnings = new List<string>();
+            if (draftedResQuests.Count < reqRes)
+            {
+                warnings.Add($"Resources Quest Shortfall: Drafted only {draftedResQuests.Count} of {reqRes} eligible quest(s).");
+            }
+            if (draftedSideQuests.Count < reqSide)
+            {
+                warnings.Add($"Sideboard Quest Shortfall: Drafted only {draftedSideQuests.Count} of {reqSide} eligible quest(s).");
+            }
+
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblQuestsStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblQuestsStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
+            _lblQuestsStatus.Text = statusMsg;
+            return true;
+        }
+
         private bool HasSpecialAbility(Card card, string abilityTag) =>
             card != null &&
             _filterService.GetCardTagsForCategory(card.Id, "Special Ability")
                 .Any(t => CardFilterService.EqualsWithDiacriticFallback(t, abilityTag));
+
+        private bool HasRoleTag(Card card, string roleTag) =>
+            card != null &&
+            _filterService.GetCardTagsForCategory(card.Id, "Role")
+                .Any(t => CardFilterService.EqualsWithDiacriticFallback(t, roleTag));
+
+        private bool IsQuestPackageCard(Card card) =>
+            card != null &&
+            string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+            IsHeroPlayableAlignment(card.Alignment) &&
+            HasRoleTag(card, "Quest");
+
+        private bool MatchesQuestRoleFocus(Card quest, HashSet<string> checkedRoles)
+        {
+            var secondaryRoles = _filterService.GetCardTagsForCategory(quest.Id, "Role")
+                .Where(r => !string.IsNullOrWhiteSpace(r) && !string.Equals(r, "Quest", StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.Trim())
+                .ToList();
+
+            if (secondaryRoles.Count == 0)
+            {
+                return checkedRoles.Contains(PureQuestRoleLabel);
+            }
+
+            return secondaryRoles.Any(r => checkedRoles.Contains(r));
+        }
 
         private static int CountEffectiveSpecialAbility(IEnumerable<Card> cards)
         {
@@ -5172,7 +5953,7 @@ namespace MECCG_Deck_Builder
                 else if (ringType.Contains("magic") || ringType.Contains("spirit")) magicWays = Math.Max(magicWays, ways);
             }
 
-            return (wOne * oneWays) + (wDwarf * dwarfWays) + (wMagic * magicWays);
+            return (wOne * 5.0 * oneWays) + (wDwarf * 2.0 * dwarfWays) + (wMagic * magicWays);
         }
 
         private static int SumTwoDiceWays(string numbersText)
@@ -5246,24 +6027,32 @@ namespace MECCG_Deck_Builder
                    IsWizardsRingCard(card);
         }
 
+        private static bool IsSpecialItemCard(Card c) =>
+            c != null && string.Equals(c.Secondary, "Special Item", StringComparison.OrdinalIgnoreCase);
+
         private static bool IsOneRingCard(Card c) =>
-            HasRaceToken(c, "The One Ring") ||
-            HasRaceToken(c, "One Ring") ||
-            CardFilterService.EqualsWithDiacriticFallback(c.Name, "The One Ring");
+            IsSpecialItemCard(c) &&
+            (HasRaceToken(c, "The One Ring") ||
+             HasRaceToken(c, "One Ring") ||
+             CardFilterService.EqualsWithDiacriticFallback(c.Name, "The One Ring"));
 
         private static bool IsDwarvenRingCard(Card c) =>
-            HasRaceToken(c, "Dwarven Ring") ||
-            c.Name.StartsWith("Dwarven Ring", StringComparison.OrdinalIgnoreCase);
+            IsSpecialItemCard(c) &&
+            (HasRaceToken(c, "Dwarven Ring") ||
+             c.Name.StartsWith("Dwarven Ring", StringComparison.OrdinalIgnoreCase));
 
         private static bool IsMagicRingCard(Card c) =>
-            HasRaceToken(c, "Magic Ring") ||
-            c.Name.StartsWith("Magic Ring", StringComparison.OrdinalIgnoreCase);
+            IsSpecialItemCard(c) &&
+            (HasRaceToken(c, "Magic Ring") ||
+             c.Name.StartsWith("Magic Ring", StringComparison.OrdinalIgnoreCase));
 
         private static bool IsLesserRingCard(Card c) =>
-            HasRaceToken(c, "Lesser Ring") ||
-            CardFilterService.EqualsWithDiacriticFallback(c.Name, "Lesser Ring");
+            IsSpecialItemCard(c) &&
+            (HasRaceToken(c, "Lesser Ring") ||
+             CardFilterService.EqualsWithDiacriticFallback(c.Name, "Lesser Ring"));
 
         private bool IsWizardsRingCard(Card c) =>
+            IsSpecialItemCard(c) &&
             HasRaceToken(c, "Ring") &&
             (CardFilterService.MatchesCardnumCriterion(c, "Skill", "Wizard") ||
              _filterService.GetCardTagsForCategory(c.Id, "Target Species")
@@ -5557,19 +6346,36 @@ namespace MECCG_Deck_Builder
             return false;
         }
 
+        private static bool SiteMatchesSingleRequirement(Card site, string cleanReq, CardFilterService filterService)
+        {
+            if (site == null || string.IsNullOrWhiteSpace(cleanReq)) return false;
+
+            if (CardFilterService.TryParsePredicate(cleanReq, out _, out _, out _))
+            {
+                return CardFilterService.MatchesPredicate(site, cleanReq, filterService);
+            }
+
+            if (CanonicalHoldTypes.Contains(CardFilterService.NormalizeSiteType(cleanReq)))
+            {
+                return CardFilterService.MatchesSiteType(site.Site, cleanReq);
+            }
+
+            return CardFilterService.EqualsWithDiacriticFallback(site.Name, cleanReq) ||
+                   string.Equals(site.Name.Replace("-", " "), cleanReq.Replace("-", " "), StringComparison.OrdinalIgnoreCase);
+        }
+
         private static bool MatchesAnySiteRequirement(List<Card> sites, string requirement, CardFilterService filterService)
         {
             if (sites == null || sites.Count == 0 || string.IsNullOrWhiteSpace(requirement)) return false;
 
             string cleanReq = requirement.Trim();
-            if (CardFilterService.TryParsePredicate(cleanReq, out _, out _, out _))
+            if (cleanReq.Contains("&&"))
             {
-                return sites.Any(s => CardFilterService.MatchesPredicate(s, cleanReq, filterService));
+                var andTerms = cleanReq.Split("&&", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                return andTerms.Length > 0 && andTerms.All(term => MatchesAnySiteRequirement(sites, term, filterService));
             }
 
-            return sites.Any(s =>
-                CardFilterService.EqualsWithDiacriticFallback(s.Name, cleanReq) ||
-                string.Equals(s.Name.Replace("-", " "), cleanReq.Replace("-", " "), StringComparison.OrdinalIgnoreCase));
+            return sites.Any(s => SiteMatchesSingleRequirement(s, cleanReq, filterService));
         }
 
         private static bool IsHeroPlayableAlignment(string alignment)
@@ -5715,6 +6521,9 @@ namespace MECCG_Deck_Builder
             }
 
             ResetAttemptState();
+            _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+            _lblPipelineStatus.Text = "Running diagnostic pass...";
             NotifyDeckChanged(null);
 
             var finalCompleted = new List<string>();
@@ -6045,5 +6854,11 @@ namespace MECCG_Deck_Builder
         public int ResourceAllowPalantirUseCount { get; set; } = 1;
         public int SideboardAllowPalantirUseCount { get; set; } = 0;
         public List<string> ExcludedPalantirRoles { get; set; } = [];
+
+        // Tab 10: Quests
+        public int ResourceQuestCount { get; set; } = 1;
+        public int SideboardQuestCount { get; set; } = 0;
+        public bool AutoDraftOneRingPackage { get; set; } = true;
+        public List<string> ExcludedQuestRoles { get; set; } = [];
     }
 }

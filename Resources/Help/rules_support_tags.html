@@ -37,7 +37,6 @@
         <a href="#faction-bonus">Faction Bonus</a> &bull;
         <a href="#home-region">Home Region</a> &bull;
         <a href="#prerequisite">Prerequisite</a> &bull;
-        <a href="#prerequisite-for">Prerequisite For</a> &bull;
         <a href="#region-requirement">Region Requirement</a> &bull;
         <a href="#region-type">Region Type</a> &bull;
         <a href="#role">Role</a> &bull;
@@ -133,11 +132,6 @@
             <td><a href="#prerequisite"><code>Prerequisite</code></a></td>
             <td><span class="scope-pill">Resource</span> (Quests)</td>
             <td>Partner enabler cards or relics required to complete a quest</td>
-        </tr>
-        <tr>
-            <td><a href="#prerequisite-for"><code>Prerequisite For</code></a></td>
-            <td><span class="scope-pill">Resource</span> (Enablers)</td>
-            <td>Locks enablers out of generic draws until their quest is drafted</td>
         </tr>
         <tr>
             <td><a href="#region-requirement"><code>Region Requirement</code></a></td>
@@ -356,33 +350,11 @@
     <strong>Representative Examples:</strong>
     <ul>
         <li><code>Paths of the Dead</code> &rarr; Enabler required on <em>Army of the Dead</em></li>
-        <li><code>Narsil; Reforging</code> &rarr; Relic and event required on <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>Narsil &amp;&amp; Reforging</code> &rarr; Relic and event required together on <em>And&uacute;ril, the Flame of the West</em></li>
         <li><code>The One Ring</code> &rarr; Artifact required to complete <em>Cracks of Doom</em> and <em>Gollum's Fate</em></li>
         <li><code>Sapling of the White Tree</code> &rarr; Relic required to blossom <em>The White Tree</em></li>
         <li><code>Men of Lamedon</code> &rarr; Faction required on <em>Stone of Erech</em></li>
         <li><code>Ents of Fangorn; Leaflock; Quickbeam; Skinbark; Treebeard</code> &rarr; Active ally/faction required on <em>Ent-draughts</em></li>
-    </ul>
-    <div class="back-to-top">
-        <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;
-        <a href="#top">&#9650; Top of Page</a>
-    </div>
-
-    <h3 id="prerequisite-for" class="entry-heading">Prerequisite For</h3>
-    <div class="scope-badge">
-        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> (Enabler Events &amp; Quest Relics)
-    </div>
-    <p>
-        The inverse companion to <code>Prerequisite</code>. Identifies which quest or storyline card this card enables.
-    </p>
-    <div class="note">
-        <strong>The Enabler Shield Pattern:</strong> When drafting generic utility cards, querying <code>"Prerequisite For": "[Blank]"</code> guarantees that niche enablers (like <em>Paths of the Dead</em> or <em>Reforging</em>) are never drafted as dead cards into decks that lack their parent quest.
-    </div>
-    <strong>Representative Examples:</strong>
-    <ul>
-        <li><code>Army of the Dead</code> &rarr; Assigned to <em>Paths of the Dead</em></li>
-        <li><code>And&uacute;ril, the Flame of the West</code> &rarr; Assigned to <em>Narsil</em> and <em>Reforging</em></li>
-        <li><code>The White Tree</code> &rarr; Assigned to <em>Sapling of the White Tree</em></li>
-        <li><code>Cracks of Doom</code> &rarr; Assigned to <em>The One Ring</em></li>
     </ul>
     <div class="back-to-top">
         <a href="#taxonomy-table">&#9650; Back to Matrix</a> &bull;

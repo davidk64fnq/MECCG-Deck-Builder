@@ -125,7 +125,7 @@
                 <code>Secondary = Minor Item; Major Item; Greater Item; Gold Ring Item; Special Item</code>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Role</code>, <code>Special Ability</code> (<code>Gold Ring: Aid Test</code> on <em>Scroll of Isildur</em>), <code>Target Species</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Prerequisite For</code><br />
+                <strong>Categories:</strong> <code>Role</code>, <code>Special Ability</code>, <code>Target Species</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code><br />
                 <strong>Specialized Attributes:</strong> <code>Race</code> (overloaded gear types: <code>Weapon</code>, <code>Armor</code>, <code>Shield</code>, <code>Lost Knowledge</code>, <code>Palant&iacute;r</code>, <code>Scroll</code>, <code>Treasure</code>, <code>Hoard Jewel</code>), <code>Corruption</code> (zero-burden <code>"[Blank]"</code> filtering), <code>Hoard</code>
             </td>
         </tr>
@@ -161,7 +161,7 @@
                 <span style="font-size: 8.5pt; color: #4A5568;"><em>(Spells, quests, combat buffs, travel, &amp; utility)</em></span>
             </td>
             <td>
-                <strong>Categories:</strong> <code>Role</code>, <code>Special Ability</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Prerequisite For</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Target Item</code><br />
+                <strong>Categories:</strong> <code>Role</code>, <code>Special Ability</code>, <code>Environment Stance</code>, <code>Prerequisite</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Target Item</code><br />
                 <strong>Specialized Attributes:</strong> <code>Skill</code> (class locks e.g. <code>Sage</code>, <code>Ranger</code>, <code>Warrior</code>, <code>Scout</code>, <code>Diplomat</code>; shield generic draws via <code>"[Blank]"</code>), <code>Specific</code> (character locks e.g. <code>Aragorn II</code> on <em>Return of the King</em>)
             </td>
         </tr>
@@ -1431,7 +1431,7 @@
     </p>
     <strong>Representative Examples:</strong>
     <ul>
-        <li><code>L&oacute;rien; Bag End</code> &rarr; <em>Earth of Galadriel's Orchard</em> (played at L&oacute;rien, delivered/stored at Bag End for 2 MPs)</li>
+        <li><code>Bag End &amp;&amp; L&oacute;rien</code> &rarr; <em>Earth of Galadriel's Orchard</em> (played at L&oacute;rien, delivered/stored at Bag End for 2 MPs)</li>
         <li><code>Moria</code> &rarr; Mandatory entry site for <em>Book of Mazarbul</em></li>
         <li><code>Wellinghall</code> &rarr; Mandatory entry site for <em>Ent-draughts</em></li>
         <li><code>Bag End</code> &rarr; Mandatory entry site for <em>Red Book of Westmarch</em></li>
@@ -1452,21 +1452,6 @@
     <strong>Representative Example:</strong>
     <ul>
         <li><code>Wilderness</code> &rarr; Terrain strike-cancellation boundary on <em>Elven Cloak</em></li>
-    </ul>
-
-    <h4 class="entry-heading-sub">Prerequisite For</h4>
-    <div class="scope-badge">
-        <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
-        <strong>Card Scope:</strong> <span class="scope-pill">Resource (Item)</span>
-    </div>
-    <p>
-        Identifies the exact quest or storyline card that requires this relic. Allows generic equipment queries to shield themselves using <code>"Prerequisite For": "[Blank]"</code> so niche storyline relics are not drafted into decks lacking their parent quest.
-    </p>
-    <strong>Representative Examples:</strong>
-    <ul>
-        <li><code>And&uacute;ril, the Flame of the West</code> &rarr; Enabled by <em>Narsil</em></li>
-        <li><code>The White Tree</code> &rarr; Enabled by <em>Sapling of the White Tree</em></li>
-        <li><code>Cracks of Doom</code> &rarr; Destroyed by the quest on <em>The One Ring</em></li>
     </ul>
 
     <h4 class="entry-heading-sub">Prerequisite</h4>
@@ -1507,7 +1492,6 @@
         <strong>What is Intentionally OMITTED on Items:</strong>
         <ul>
             <li><strong>No Redundant <code>Site Requirement</code> on Standard Items:</strong> Standard Minor, Major, Greater, Ring, and Hoard items leave <code>Site Requirement</code> <strong><code>[Blank]</code></strong>. They are drafted to legal adventure sites dynamically using Cardnum's discrete item attributes (e.g. <code>"MajorItem": "yes"</code> or <code>"Hoard": "yes"</code>). Manually listing hold types on items would break automated site discovery.</li>
-            <li><strong>No Soft Perks as Hard Dependencies (<em>Red Arrow</em>):</strong> Although <em>Red Arrow</em> provides direct influence bonuses to recruit <em>Riders of Rohan</em>, the Riders do not require the arrow to be mustered. Tagging Red Arrow with <code>Prerequisite For: Riders of Rohan</code> would falsely lock a valuable 2-MP Major Item out of generic company decks.</li>
             <li><strong>No Situational Perks as Primary Roles (<em>Athelas</em>):</strong> While Aragorn can remove corruption with <em>Athelas</em>, its baseline mechanic is wound recovery by any D&uacute;nadan. Tagging it with <code>Role: Corruption</code> would cause generic corruption-defense rules to draft it into non-Aragorn companies where it cannot remove corruption.</li>
         </ul>
     </div>
@@ -1531,8 +1515,7 @@
     "Specific": "[Blank]"
   },
   "Categories": {
-    "Role": "Combat",
-    "Prerequisite For": "[Blank]"
+    "Role": "Combat"
   }
 }</code></pre>
 
@@ -1558,9 +1541,6 @@
       "Primary": "Resource",
       "Race": "Weapon",
       "Specific": "[Blank]"
-    },
-    "Categories": {
-      "Prerequisite For": "[Blank]"
     }
   }
 }</code></pre>
@@ -1767,7 +1747,7 @@
         <li><code>Coastal Sea</code> &rarr; Maritime travel protection for <em>Fair Sailing</em> and <em>Great Ship</em></li>
     </ul>
 
-    <h4 class="entry-heading-sub">Prerequisite &amp; Prerequisite For</h4>
+    <h4 class="entry-heading-sub">Prerequisite</h4>
     <div class="scope-badge">
         <strong>Classification:</strong> <span class="scope-pill">Custom Category</span> &bull;
         <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
@@ -1776,12 +1756,10 @@
         Connects multi-card storyline objectives and enabler events without title hardcoding:
     </p>
     <ul>
-        <li><code>Prerequisite: Narsil; Reforging</code> &rarr; Relic and event required by <em>And&uacute;ril, the Flame of the West</em></li>
+        <li><code>Prerequisite: Narsil &amp;&amp; Reforging</code> &rarr; Relic and event required by <em>And&uacute;ril, the Flame of the West</em></li>
         <li><code>Prerequisite: The One Ring</code> &rarr; Artifact required to complete <em>Cracks of Doom</em> and <em>Gollum's Fate</em></li>
         <li><code>Prerequisite: Sapling of the White Tree</code> &rarr; Stored relic required to blossom <em>The White Tree</em></li>
         <li><code>Prerequisite: Men of Lamedon</code> &rarr; Recruited faction required to awaken <em>Stone of Erech</em></li>
-        <li><code>Prerequisite For: Army of the Dead</code> &rarr; Assigned to <em>Paths of the Dead</em> to shield it from non-quest decks</li>
-        <li><code>Prerequisite For: And&uacute;ril, the Flame of the West</code> &rarr; Assigned to <em>Reforging</em> to shield it until the quest is drafted</li>
     </ul>
 
     <h4 class="entry-heading-sub">Special Ability</h4>
@@ -1855,8 +1833,7 @@
     "Specific": "[Blank]"
   },
   "Categories": {
-    "Role": "Protection; Card Flow; Movement",
-    "Prerequisite For": "[Blank]"
+    "Role": "Protection; Card Flow; Movement"
   }
 }</code></pre>
 
