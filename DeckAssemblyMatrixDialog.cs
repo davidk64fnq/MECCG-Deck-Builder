@@ -53,6 +53,10 @@ namespace MECCG_Deck_Builder
             "Fills remaining Play Deck (Resources) capacity up to Play Deck Size, plus requested Sideboard events.\n" +
             "Drafts Environment cards (Gates of Morning, Twilight) first, then distributes remaining slots proportionately across checked Role Focus tags.";
 
+        private const string CreaturesIdleStatusText =
+            "Drafts Nazgûl, Nazgûl Support events, Standard Creatures (1.0), and non-Nazgûl Dual-Mode Half-Creatures (0.5).\n" +
+            "Uses proportionate Species / Race buckets with variety-first sampling; all Unique creatures remain eligible.";
+
         private const string PureQuestRoleLabel = "Quest (Only)";
 
 #pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
@@ -98,7 +102,8 @@ namespace MECCG_Deck_Builder
         private readonly string[] _pipelineOrder =
         [
             "Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions",
-            "Allies", "Items", "Rings", "Palantíri", "Quests", "Resource Events"
+            "Allies", "Items", "Rings", "Palantíri", "Quests", "Resource Events",
+            "Creatures"
         ];
 
         // --- TAB 1: GENERAL SETTINGS & CONTROLS ---
@@ -112,6 +117,7 @@ namespace MECCG_Deck_Builder
         private readonly Label _lblPipelineStatus;
         private readonly Label _lblDeckSummary;
         private readonly NumericUpDown _numDecksBeforeCouncil;
+        private readonly CheckBox _chkTailorHazardsToCurrentDeck;
 
         // --- TAB 2: REGIONS & SITES ---
         private readonly ComboBox _cmbSeedRegion;
@@ -205,6 +211,24 @@ namespace MECCG_Deck_Builder
         private readonly CheckedListBox _clbResourceEventRoles;
         private readonly Label _lblResourceEventsStatus;
 
+        // --- TAB 12: CREATURES ---
+        private readonly NumericUpDown _numHazNazgul;
+        private readonly NumericUpDown _numSideNazgul;
+        private readonly NumericUpDown _numHazNazgulSupport;
+        private readonly NumericUpDown _numSideNazgulSupport;
+        private readonly NumericUpDown _numHazStandardCreatures;
+        private readonly NumericUpDown _numSideStandardCreatures;
+        private readonly NumericUpDown _numHazDualCreatures;
+        private readonly NumericUpDown _numSideDualCreatures;
+        private readonly Label _lblCreatureEquivReadout;
+        private readonly CheckedListBox _clbCreatureSpecies;
+        private readonly CheckedListBox _clbCreatureRegionTypes;
+        private readonly CheckedListBox _clbCreatureSiteTypes;
+        private readonly Button _btnAllCreatureKeying;
+        private readonly Button _btnClearCreatureKeying;
+        private readonly Label _lblCreatureKeyingNote;
+        private readonly Label _lblCreaturesStatus;
+
         private readonly ToolTip _toolTip = new()
         {
             AutoPopDelay = 12000,
@@ -248,7 +272,7 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Target Deck Sizing && Workbench Profiles",
                 Location = new Point(16, 12),
-                Size = new Size(810, 202)
+                Size = new Size(810, 224)
             };
 
             var lblTitle = new Label { Text = "Deck Title:", Location = new Point(16, 24), Size = new Size(135, 20) };
@@ -264,10 +288,10 @@ namespace MECCG_Deck_Builder
                 NotifyDeckChanged();
             };
 
-            var lblPlaySize = new Label { Text = "Play Deck Size:", Location = new Point(16, 58), Size = new Size(135, 20) };
+            var lblPlaySize = new Label { Text = "Play Deck Size:", Location = new Point(16, 56), Size = new Size(135, 20) };
             _numPlayDeckSize = new NumericUpDown
             {
-                Location = new Point(155, 55),
+                Location = new Point(155, 53),
                 Size = new Size(60, 23),
                 Minimum = 20,
                 Maximum = 60,
@@ -276,21 +300,22 @@ namespace MECCG_Deck_Builder
             _numPlayDeckSize.ValueChanged += (s, e) =>
             {
                 UpdateDeckSummary();
+                UpdateCreatureEquivalentsReadout();
                 ValidateWorkbenchReadiness();
             };
 
             var lblPlaySizeHint = new Label
             {
                 Text = "cards in Resources and equal cards in Hazards (Official tournament standard is 30/30).",
-                Location = new Point(225, 58),
+                Location = new Point(225, 56),
                 Size = new Size(560, 20),
                 ForeColor = Color.DimGray
             };
 
-            var lblSideSize = new Label { Text = "Sideboard Size:", Location = new Point(16, 92), Size = new Size(135, 20) };
+            var lblSideSize = new Label { Text = "Sideboard Size:", Location = new Point(16, 88), Size = new Size(135, 20) };
             _numSideboardSize = new NumericUpDown
             {
-                Location = new Point(155, 89),
+                Location = new Point(155, 85),
                 Size = new Size(60, 23),
                 Minimum = 0,
                 Maximum = 30,
@@ -305,15 +330,15 @@ namespace MECCG_Deck_Builder
             var lblSideSizeHint = new Label
             {
                 Text = "cards in reserve (Official tournament standard is up to 20 or 25).",
-                Location = new Point(225, 92),
+                Location = new Point(225, 88),
                 Size = new Size(560, 20),
                 ForeColor = Color.DimGray
             };
 
-            var lblDecksBeforeCouncil = new Label { Text = "Decks Before Council:", Location = new Point(16, 126), Size = new Size(135, 20) };
+            var lblDecksBeforeCouncil = new Label { Text = "Decks Before Council:", Location = new Point(16, 120), Size = new Size(135, 20) };
             _numDecksBeforeCouncil = new NumericUpDown
             {
-                Location = new Point(155, 123),
+                Location = new Point(155, 117),
                 Size = new Size(60, 23),
                 Minimum = 1,
                 Maximum = 4,
@@ -327,15 +352,33 @@ namespace MECCG_Deck_Builder
             var lblDecksHint = new Label
             {
                 Text = "deck cycle(s) planned (1: distinct sites for Factions/Allies; 2+: sites refresh on exhaust).",
-                Location = new Point(225, 126),
+                Location = new Point(225, 120),
                 Size = new Size(575, 20),
                 ForeColor = Color.DimGray
+            };
+
+            var lblHazardTargeting = new Label { Text = "Hazard Targeting:", Location = new Point(16, 152), Size = new Size(135, 20) };
+            _chkTailorHazardsToCurrentDeck = new CheckBox
+            {
+                Text = "Tailor Hazards to current deck (Sites, Regions && Resources)",
+                Location = new Point(155, 150),
+                Size = new Size(440, 22),
+                Checked = false
+            };
+            _toolTip.SetToolTip(
+                _chkTailorHazardsToCurrentDeck,
+                "Unchecked: Target an unknown opponent using manual Hazard tab filters.\n" +
+                "Checked: Target the Sites, Regions, and Resources of this deck (for paired/swapped two-deck play).");
+            _chkTailorHazardsToCurrentDeck.CheckedChanged += (s, e) =>
+            {
+                UpdateCreatureKeyingEnabledState();
+                ValidateWorkbenchReadiness();
             };
 
             var lblProfiles = new Label
             {
                 Text = "Profile Settings:",
-                Location = new Point(16, 163),
+                Location = new Point(16, 189),
                 Size = new Size(135, 20),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
@@ -343,7 +386,7 @@ namespace MECCG_Deck_Builder
             var btnSaveSettings = new Button
             {
                 Text = "Save Settings...",
-                Location = new Point(155, 160),
+                Location = new Point(155, 186),
                 Size = new Size(120, 26)
             };
             btnSaveSettings.Click += (s, e) => SaveSettingsToFile();
@@ -351,7 +394,7 @@ namespace MECCG_Deck_Builder
             var btnLoadSettings = new Button
             {
                 Text = "Load Settings...",
-                Location = new Point(283, 160),
+                Location = new Point(283, 186),
                 Size = new Size(120, 26)
             };
             btnLoadSettings.Click += (s, e) => LoadSettingsFromFile();
@@ -359,7 +402,7 @@ namespace MECCG_Deck_Builder
             var lblProfileHint = new Label
             {
                 Text = "Save or load workbench configurations (.workbench.json) to reuse tab criteria.",
-                Location = new Point(415, 157),
+                Location = new Point(415, 183),
                 Size = new Size(385, 34),
                 ForeColor = Color.DimGray
             };
@@ -369,19 +412,20 @@ namespace MECCG_Deck_Builder
                 lblPlaySize, _numPlayDeckSize, lblPlaySizeHint,
                 lblSideSize, _numSideboardSize, lblSideSizeHint,
                 lblDecksBeforeCouncil, _numDecksBeforeCouncil, lblDecksHint,
+                lblHazardTargeting, _chkTailorHazardsToCurrentDeck,
                 lblProfiles, btnSaveSettings, btnLoadSettings, lblProfileHint
             ]);
 
             var grpPipeline = new GroupBox
             {
                 Text = "Deck Assembly Pipeline && Session Snapshots",
-                Location = new Point(16, 222),
-                Size = new Size(810, 158)
+                Location = new Point(16, 244),
+                Size = new Size(810, 152)
             };
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri -> 9. Quests -> 10. Resource Events",
+                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri -> 9. Quests -> 10. Resource Events -> 11. Creatures",
                 Location = new Point(16, 20),
                 Size = new Size(778, 34),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
@@ -392,20 +436,20 @@ namespace MECCG_Deck_Builder
             _btnRunPipeline = new Button
             {
                 Text = "Run Pipeline",
-                Location = new Point(16, 60),
+                Location = new Point(16, 58),
                 Size = new Size(125, 30),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _btnRunPipeline.Click += (s, e) => RunPipelineDraft();
             _toolTip.SetToolTip(
                 _btnRunPipeline,
-                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Items -> Rings -> Palantíri -> Quests).\n" +
+                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Items -> Rings -> Palantíri -> Quests -> Resource Events -> Creatures).\n" +
                 "Automatically retries up to 25 times if random region rolls fail downstream constraints.");
 
             _btnClearDeck = new Button
             {
                 Text = "Clear Deck",
-                Location = new Point(149, 60),
+                Location = new Point(149, 58),
                 Size = new Size(110, 30)
             };
             _btnClearDeck.Click += BtnClearDeck_Click;
@@ -414,7 +458,7 @@ namespace MECCG_Deck_Builder
             _btnSaveSnapshot = new Button
             {
                 Text = "Save Snapshot",
-                Location = new Point(280, 60),
+                Location = new Point(280, 58),
                 Size = new Size(125, 30)
             };
             _btnSaveSnapshot.Click += BtnSaveSnapshot_Click;
@@ -423,7 +467,7 @@ namespace MECCG_Deck_Builder
             _btnRecallSnapshot = new Button
             {
                 Text = "Recall Snapshot",
-                Location = new Point(413, 60),
+                Location = new Point(413, 58),
                 Size = new Size(125, 30),
                 Enabled = false
             };
@@ -432,7 +476,7 @@ namespace MECCG_Deck_Builder
 
             _lblPipelineStatus = new Label
             {
-                Location = new Point(16, 100),
+                Location = new Point(16, 96),
                 Size = new Size(778, 48),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
@@ -448,14 +492,14 @@ namespace MECCG_Deck_Builder
             var grpSummary = new GroupBox
             {
                 Text = "Live Deck Composition Status",
-                Location = new Point(16, 388),
-                Size = new Size(810, 256)
+                Location = new Point(16, 404),
+                Size = new Size(810, 244)
             };
 
             _lblDeckSummary = new Label
             {
                 Location = new Point(20, 22),
-                Size = new Size(770, 224),
+                Size = new Size(770, 214),
                 Font = new Font("Segoe UI", 10.0f),
                 ForeColor = Color.FromArgb(26, 54, 93),
                 UseMnemonic = false
@@ -1504,10 +1548,219 @@ namespace MECCG_Deck_Builder
 
             tabResourceEvents.Controls.AddRange([grpEnv, grpAutoFill, grpResEventRoles, _lblResourceEventsStatus]);
 
+            // ==========================================
+            // TAB 12: CREATURES
+            // ==========================================
+            var tabCreatures = new TabPage("Creatures");
+
+            var grpNazgul = new GroupBox
+            {
+                Text = "Nazgûl Package (Hazards && Sideboard)",
+                Location = new Point(16, 14),
+                Size = new Size(475, 116)
+            };
+
+            var lblNazHdrCat = new Label { Text = "Card Group", Location = new Point(16, 22), Size = new Size(165, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblNazHdrHaz = new Label { Text = "Hazards", Location = new Point(190, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblNazHdrSide = new Label { Text = "Sideboard", Location = new Point(282, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+
+            NumericUpDown CreateCreatureSpinner(int x, int y, int min, int max, int defVal)
+            {
+                var nud = CreateItemSpinner(x, y, min, max, defVal);
+                nud.ValueChanged += (s, e) => UpdateCreatureEquivalentsReadout();
+                return nud;
+            }
+
+            var lblNazgul = new Label { Text = "Nazgûl (0.5 equiv):", Location = new Point(16, 49), Size = new Size(165, 20) };
+            _numHazNazgul = CreateCreatureSpinner(190, 46, 0, 9, 0);
+            _numSideNazgul = CreateCreatureSpinner(282, 46, 0, 9, 0);
+            var lblNazNote = new Label { Text = "Unique (<= 9 total)", Location = new Point(358, 49), Size = new Size(110, 20), ForeColor = Color.DimGray };
+            _toolTip.SetToolTip(_numHazNazgul, "Unique Nazgûl (Race = Nazgûl; 0.5 creature equivalent each). Combined Hazards + Sideboard <= 9.");
+            _toolTip.SetToolTip(_numSideNazgul, "Unique Nazgûl in Sideboard (combined Hazards + Sideboard <= 9).");
+
+            var lblNazSup = new Label { Text = "Nazgûl Support:", Location = new Point(16, 81), Size = new Size(165, 20) };
+            _numHazNazgulSupport = CreateCreatureSpinner(190, 78, 0, 15, 0);
+            _numSideNazgulSupport = CreateCreatureSpinner(282, 78, 0, 10, 0);
+            var lblNazSupNote = new Label { Text = "Target: Nazgûl", Location = new Point(358, 81), Size = new Size(110, 20), ForeColor = Color.DimGray };
+            _toolTip.SetToolTip(_numHazNazgulSupport, "Hazard support events tagged Target Species = Nazgûl.");
+            _toolTip.SetToolTip(_numSideNazgulSupport, "Sideboard Nazgûl support events tagged Target Species = Nazgûl.");
+
+            grpNazgul.Controls.AddRange([
+                lblNazHdrCat, lblNazHdrHaz, lblNazHdrSide,
+                lblNazgul, _numHazNazgul, _numSideNazgul, lblNazNote,
+                lblNazSup, _numHazNazgulSupport, _numSideNazgulSupport, lblNazSupNote
+            ]);
+
+            var grpCreatures = new GroupBox
+            {
+                Text = "Standard && Dual-Mode Creatures",
+                Location = new Point(16, 138),
+                Size = new Size(475, 168)
+            };
+
+            var lblCrHdrCat = new Label { Text = "Creature Tier", Location = new Point(16, 22), Size = new Size(165, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblCrHdrHaz = new Label { Text = "Hazards", Location = new Point(190, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblCrHdrSide = new Label { Text = "Sideboard", Location = new Point(282, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+
+            var lblStdCr = new Label { Text = "Standard Creatures (1.0):", Location = new Point(16, 49), Size = new Size(165, 20) };
+            _numHazStandardCreatures = CreateCreatureSpinner(190, 46, 0, 30, 12);
+            _numSideStandardCreatures = CreateCreatureSpinner(282, 46, 0, 15, 2);
+            var lblStdNote = new Label { Text = "Secondary = Creature", Location = new Point(358, 49), Size = new Size(112, 20), ForeColor = Color.DimGray };
+
+            var lblDualCr = new Label { Text = "Dual-Mode Half (0.5):", Location = new Point(16, 81), Size = new Size(165, 20) };
+            _numHazDualCreatures = CreateCreatureSpinner(190, 78, 0, 12, 0);
+            _numSideDualCreatures = CreateCreatureSpinner(282, 78, 0, 10, 0);
+            var lblDualNote = new Label { Text = "Non-Nazgûl duals", Location = new Point(358, 81), Size = new Size(112, 20), ForeColor = Color.DimGray };
+            _toolTip.SetToolTip(_numHazDualCreatures, "Non-Nazgûl dual-mode creatures (e.g. Shelob, Mouth of Sauron; 0.5 creature equivalent each).");
+
+            _lblCreatureEquivReadout = new Label
+            {
+                Location = new Point(16, 114),
+                Size = new Size(445, 44),
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+                ForeColor = Color.FromArgb(26, 54, 93),
+                UseMnemonic = false
+            };
+
+            grpCreatures.Controls.AddRange([
+                lblCrHdrCat, lblCrHdrHaz, lblCrHdrSide,
+                lblStdCr, _numHazStandardCreatures, _numSideStandardCreatures, lblStdNote,
+                lblDualCr, _numHazDualCreatures, _numSideDualCreatures, lblDualNote,
+                _lblCreatureEquivReadout
+            ]);
+
+            var grpCreatureSpecies = new GroupBox
+            {
+                Text = "Species / Race Focus (Uncheck to exclude)",
+                Location = new Point(505, 14),
+                Size = new Size(321, 200)
+            };
+
+            _clbCreatureSpecies = new CheckedListBox
+            {
+                Location = new Point(12, 22),
+                Size = new Size(297, 136),
+                CheckOnClick = true
+            };
+            _clbCreatureSpecies.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(ValidateWorkbenchReadiness);
+                }
+            };
+            _toolTip.SetToolTip(_clbCreatureSpecies, "Drafts Standard & Dual-Mode creatures proportionately across checked species (variety-first).");
+
+            var btnAllCrSpecies = new Button { Text = "All", Location = new Point(12, 166), Size = new Size(65, 24) };
+            btnAllCrSpecies.Click += (s, e) =>
+            {
+                SetAllChecked(_clbCreatureSpecies, true);
+                ValidateWorkbenchReadiness();
+            };
+
+            var btnClearCrSpecies = new Button { Text = "Clear", Location = new Point(83, 166), Size = new Size(65, 24) };
+            btnClearCrSpecies.Click += (s, e) =>
+            {
+                SetAllChecked(_clbCreatureSpecies, false);
+                ValidateWorkbenchReadiness();
+            };
+
+            grpCreatureSpecies.Controls.AddRange([_clbCreatureSpecies, btnAllCrSpecies, btnClearCrSpecies]);
+
+            var grpCreatureKeying = new GroupBox
+            {
+                Text = "Keying Filters (Unknown Opponent Only)",
+                Location = new Point(505, 222),
+                Size = new Size(321, 226)
+            };
+
+            var lblCrRegTypes = new Label { Text = "Region Terrains:", Location = new Point(12, 22), Size = new Size(144, 16) };
+            _clbCreatureRegionTypes = new CheckedListBox
+            {
+                Location = new Point(12, 40),
+                Size = new Size(144, 142),
+                CheckOnClick = true
+            };
+            _clbCreatureRegionTypes.Items.AddRange(["Wilderness", "Border-land", "Free-domain", "Shadow-land", "Dark-domain", "Coastal Sea"]);
+            SetAllChecked(_clbCreatureRegionTypes, true);
+            _clbCreatureRegionTypes.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(ValidateWorkbenchReadiness);
+                }
+            };
+
+            var lblCrSiteTypes = new Label { Text = "Site Holds:", Location = new Point(165, 22), Size = new Size(144, 16) };
+            _clbCreatureSiteTypes = new CheckedListBox
+            {
+                Location = new Point(165, 40),
+                Size = new Size(144, 142),
+                CheckOnClick = true
+            };
+            _clbCreatureSiteTypes.Items.AddRange(["Free-hold", "Border-hold", "Ruins & Lairs", "Shadow-hold", "Dark-hold"]);
+            SetAllChecked(_clbCreatureSiteTypes, true);
+            _clbCreatureSiteTypes.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(ValidateWorkbenchReadiness);
+                }
+            };
+
+            _btnAllCreatureKeying = new Button { Text = "All", Location = new Point(12, 190), Size = new Size(65, 24) };
+            _btnAllCreatureKeying.Click += (s, e) =>
+            {
+                SetAllChecked(_clbCreatureRegionTypes, true);
+                SetAllChecked(_clbCreatureSiteTypes, true);
+                ValidateWorkbenchReadiness();
+            };
+
+            _btnClearCreatureKeying = new Button { Text = "Clear", Location = new Point(83, 190), Size = new Size(65, 24) };
+            _btnClearCreatureKeying.Click += (s, e) =>
+            {
+                SetAllChecked(_clbCreatureRegionTypes, false);
+                SetAllChecked(_clbCreatureSiteTypes, false);
+                ValidateWorkbenchReadiness();
+            };
+
+            grpCreatureKeying.Controls.AddRange([
+                lblCrRegTypes, _clbCreatureRegionTypes,
+                lblCrSiteTypes, _clbCreatureSiteTypes,
+                _btnAllCreatureKeying, _btnClearCreatureKeying
+            ]);
+
+            _lblCreatureKeyingNote = new Label
+            {
+                Location = new Point(505, 456),
+                Size = new Size(321, 60),
+                ForeColor = Color.DimGray,
+                Font = new Font("Segoe UI", 8.5f),
+                UseMnemonic = false
+            };
+
+            _lblCreaturesStatus = new Label
+            {
+                Location = new Point(16, 318),
+                Size = new Size(475, 290),
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false,
+                Text = CreaturesIdleStatusText
+            };
+
+            tabCreatures.Controls.AddRange([
+                grpNazgul, grpCreatures,
+                grpCreatureSpecies, grpCreatureKeying, _lblCreatureKeyingNote,
+                _lblCreaturesStatus
+            ]);
+
+            // Tabs ordered to match pipeline execution order
             // Tabs ordered to match pipeline execution order
             _tabControl.TabPages.AddRange([
                 tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions,
-                tabAllies, tabItems, tabRings, tabPalantiri, tabQuests, tabResourceEvents
+                tabAllies, tabItems, tabRings, tabPalantiri, tabQuests, tabResourceEvents,
+                tabCreatures
             ]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
@@ -1519,6 +1772,7 @@ namespace MECCG_Deck_Builder
             _tabInfo["Palantíri"] = new(RunPalantiriDraft, _lblPalantiriStatus);
             _tabInfo["Quests"] = new(RunQuestsDraft, _lblQuestsStatus);
             _tabInfo["Resource Events"] = new(RunResourceEventsDraft, _lblResourceEventsStatus);
+            _tabInfo["Creatures"] = new(RunCreaturesDraft, _lblCreaturesStatus);
 
             Controls.Add(_tabControl);
 
@@ -1532,6 +1786,9 @@ namespace MECCG_Deck_Builder
                     PopulatePalantirRolesChecklist();
                     PopulateQuestRolesChecklist();
                     PopulateResourceEventRolesChecklist();
+                    PopulateCreatureSpeciesChecklist();
+                    UpdateCreatureKeyingEnabledState();
+                    UpdateCreatureEquivalentsReadout();
                     UpdateDeckSummary();
                     ValidateWorkbenchReadiness();
                 }
@@ -1542,6 +1799,10 @@ namespace MECCG_Deck_Builder
             PopulateRingRolesChecklist();
             PopulatePalantirRolesChecklist();
             PopulateQuestRolesChecklist();
+            PopulateResourceEventRolesChecklist();
+            PopulateCreatureSpeciesChecklist();
+            UpdateCreatureKeyingEnabledState();
+            UpdateCreatureEquivalentsReadout();
             UpdateSeedTooltip();
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
@@ -1600,6 +1861,15 @@ namespace MECCG_Deck_Builder
             int sideQuests = _deck.Sideboard.Count(IsQuestPackageCard);
             int resEvents = _deck.Resources.Count(IsGeneralResourceEvent);
             int sideEvents = _deck.Sideboard.Count(IsGeneralResourceEvent);
+            int hazNazgul = _deck.Hazards.Count(IsNazgulCard);
+            int sideNazgul = _deck.Sideboard.Count(IsNazgulCard);
+            int hazNazgulSupport = _deck.Hazards.Count(IsNazgulSupportCard);
+            int sideNazgulSupport = _deck.Sideboard.Count(IsNazgulSupportCard);
+            int hazStandardCreatures = _deck.Hazards.Count(IsStandardCreatureCard);
+            int sideStandardCreatures = _deck.Sideboard.Count(IsStandardCreatureCard);
+            int hazDualCreatures = _deck.Hazards.Count(IsDualModeNonNazgulCreature);
+            int sideDualCreatures = _deck.Sideboard.Count(IsDualModeNonNazgulCreature);
+            int hazCreatureEquiv = hazStandardCreatures + ((hazNazgul + hazDualCreatures) / 2);
 
             if (totalResChars == 0 && totalSideChars == 0 &&
                 resFactions == 0 && sideFactions == 0 &&
@@ -1608,7 +1878,11 @@ namespace MECCG_Deck_Builder
                 resRingCards == 0 && sideRingCards == 0 &&
                 resPalantirCards == 0 && sidePalantirCards == 0 &&
                 resQuests == 0 && sideQuests == 0 &&
-                resEvents == 0 && sideEvents == 0)
+                resEvents == 0 && sideEvents == 0 &&
+                hazNazgul == 0 && sideNazgul == 0 &&
+                hazNazgulSupport == 0 && sideNazgulSupport == 0 &&
+                hazStandardCreatures == 0 && sideStandardCreatures == 0 &&
+                hazDualCreatures == 0 && sideDualCreatures == 0)
             {
                 ValidateWorkbenchReadiness();
             }
@@ -1633,6 +1907,13 @@ namespace MECCG_Deck_Builder
             string resQuestNote = resQuests > 0 ? $", {resQuests} quest(s)" : "";
             string resEventNote = resEvents > 0 ? $", {resEvents} event(s)" : "";
 
+            var hazParts = new List<string>();
+            if (hazStandardCreatures > 0) hazParts.Add($"{hazStandardCreatures} creature(s)");
+            if (hazDualCreatures > 0) hazParts.Add($"{hazDualCreatures} dual(s)");
+            if (hazNazgul > 0) hazParts.Add($"{hazNazgul} Nazgûl");
+            if (hazNazgulSupport > 0) hazParts.Add($"{hazNazgulSupport} Nazgûl support");
+            string hazDetailNote = hazParts.Count > 0 ? $" ({string.Join(", ", hazParts)}; Equiv: {hazCreatureEquiv}/12 min)" : "";
+
             var sideParts = new List<string>();
             if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
             if (avatarsInSideboard > 0) sideParts.Add($"{avatarsInSideboard} Avatar");
@@ -1643,6 +1924,10 @@ namespace MECCG_Deck_Builder
             if (sidePalantirCards > 0) sideParts.Add($"{sidePalantirCards} palantír card(s)");
             if (sideQuests > 0) sideParts.Add($"{sideQuests} quest(s)");
             if (sideEvents > 0) sideParts.Add($"{sideEvents} event(s)");
+            if (sideStandardCreatures > 0) sideParts.Add($"{sideStandardCreatures} creature(s)");
+            if (sideDualCreatures > 0) sideParts.Add($"{sideDualCreatures} dual(s)");
+            if (sideNazgul > 0) sideParts.Add($"{sideNazgul} Nazgûl");
+            if (sideNazgulSupport > 0) sideParts.Add($"{sideNazgulSupport} Nazgûl support");
             string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
 
             static bool IsNonHazard(Card c) => !string.Equals(c.Primary, "Hazard", StringComparison.OrdinalIgnoreCase);
@@ -1677,7 +1962,7 @@ namespace MECCG_Deck_Builder
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
                 $"Pool:             {_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]\n" +
                 $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote}{resEventNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
-                $"Hazards:          {_deck.Hazards.Count} cards\n" +
+                $"Hazards:          {_deck.Hazards.Count} cards{hazDetailNote}\n" +
                 $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
                 $"Play Deck Status: {_deck.Resources.Count} Resources / {_deck.Hazards.Count} Hazards (Target: {_numPlayDeckSize.Value}/{_numPlayDeckSize.Value})\n" +
@@ -1980,6 +2265,90 @@ namespace MECCG_Deck_Builder
             _clbResourceEventRoles.EndUpdate();
         }
 
+        private void PopulateCreatureSpeciesChecklist()
+        {
+            var previouslyExcluded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbCreatureSpecies.Items.Count; i++)
+            {
+                if (!_clbCreatureSpecies.GetItemChecked(i))
+                {
+                    string sp = _clbCreatureSpecies.Items[i]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(sp))
+                    {
+                        previouslyExcluded.Add(sp);
+                    }
+                }
+            }
+
+            var activeSets = _getActiveSets();
+            var species = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var card in _catalog.Cards)
+            {
+                if (activeSets.Count > 0 && !activeSets.Contains(card.Set)) continue;
+                if (!IsHeroPlayableAlignment(card.Alignment)) continue;
+                if (!IsStandardCreatureCard(card) && !IsDualModeNonNazgulCreature(card)) continue;
+
+                if (string.IsNullOrWhiteSpace(card.Race)) continue;
+                foreach (var part in card.Race.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    if (!string.IsNullOrWhiteSpace(part))
+                    {
+                        species.Add(part.Trim());
+                    }
+                }
+            }
+
+            var sortedSpecies = species.OrderBy(s => s, StringComparer.OrdinalIgnoreCase).ToList();
+
+            _clbCreatureSpecies.BeginUpdate();
+            _clbCreatureSpecies.Items.Clear();
+            foreach (var sp in sortedSpecies)
+            {
+                _clbCreatureSpecies.Items.Add(sp, !previouslyExcluded.Contains(sp));
+            }
+            _clbCreatureSpecies.EndUpdate();
+        }
+
+        private void UpdateCreatureKeyingEnabledState()
+        {
+            if (_clbCreatureRegionTypes == null || _clbCreatureSiteTypes == null || _lblCreatureKeyingNote == null)
+            {
+                return;
+            }
+
+            bool tailorToDeck = _chkTailorHazardsToCurrentDeck.Checked;
+            _clbCreatureRegionTypes.Enabled = !tailorToDeck;
+            _clbCreatureSiteTypes.Enabled = !tailorToDeck;
+            _btnAllCreatureKeying.Enabled = !tailorToDeck;
+            _btnClearCreatureKeying.Enabled = !tailorToDeck;
+
+            _lblCreatureKeyingNote.Text = tailorToDeck
+                ? "Keying Filters disabled: 'Tailor Hazards to current deck' is enabled on General Settings, so Creatures automatically key to drafted Sites && Regions."
+                : "Unknown Opponent mode: Creatures pass if any Region Requirement terrain or Site Requirement hold is checked above.";
+        }
+
+        private void UpdateCreatureEquivalentsReadout()
+        {
+            if (_lblCreatureEquivReadout == null || _numPlayDeckSize == null) return;
+
+            int hazStd = (int)_numHazStandardCreatures.Value;
+            int hazDual = (int)_numHazDualCreatures.Value;
+            int hazNaz = (int)_numHazNazgul.Value;
+            int hazSup = (int)_numHazNazgulSupport.Value;
+
+            int equiv = hazStd + ((hazNaz + hazDual) / 2);
+            int totalHazCards = hazStd + hazDual + hazNaz + hazSup;
+            int playSize = (int)_numPlayDeckSize.Value;
+            int remainingForEvents = Math.Max(0, playSize - totalHazCards);
+
+            string minWarning = equiv < 12 ? "  [Below 12 min!]" : "  [Min: 12]";
+            _lblCreatureEquivReadout.ForeColor = equiv < 12 ? Color.FromArgb(180, 83, 9) : Color.FromArgb(26, 54, 93);
+            _lblCreatureEquivReadout.Text =
+                $"Creature Equivalents in Hazards: {equiv}  ({hazStd} Std + ({hazDual} Dual + {hazNaz} Nazgûl)/2){minWarning}\n" +
+                $"Hazard Play Deck: {totalHazCards} / {playSize} used ({remainingForEvents} remaining for Hazard Events)";
+        }
+
         #region TAB1_SESSION_ACTIONS
 
         private void BtnClearDeck_Click(object sender, EventArgs e)
@@ -2041,14 +2410,13 @@ namespace MECCG_Deck_Builder
             _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblQuestsStatus.Text = QuestIdleStatusText;
 
-            _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblQuestsStatus.Text = QuestIdleStatusText;
-
-            // ADD THESE 3 LINES:
             _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblResourceEventsStatus.Text = ResourceEventsIdleStatusText;
+
+            _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblCreaturesStatus.Text = CreaturesIdleStatusText;
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
 
@@ -2292,7 +2660,6 @@ namespace MECCG_Deck_Builder
                     .Select(i => _clbQuestRoles.Items[i]?.ToString() ?? string.Empty)
                     .Where(s => !string.IsNullOrWhiteSpace(s))],
 
-                // ADD THESE LINES:
                 ResourceGatesOfMorningCount = (int)_numResGatesOfMorning.Value,
                 SideboardGatesOfMorningCount = (int)_numSideGatesOfMorning.Value,
                 ResourceTwilightCount = (int)_numResTwilight.Value,
@@ -2301,7 +2668,23 @@ namespace MECCG_Deck_Builder
                 ExcludedResourceEventRoles = [.. Enumerable.Range(0, _clbResourceEventRoles.Items.Count)
                     .Where(i => !_clbResourceEventRoles.GetItemChecked(i))
                     .Select(i => _clbResourceEventRoles.Items[i]?.ToString() ?? string.Empty)
-                    .Where(s => !string.IsNullOrWhiteSpace(s))]
+                    .Where(s => !string.IsNullOrWhiteSpace(s))],
+
+                TailorHazardsToCurrentDeck = _chkTailorHazardsToCurrentDeck.Checked,
+                HazardNazgulCount = (int)_numHazNazgul.Value,
+                SideboardNazgulCount = (int)_numSideNazgul.Value,
+                HazardNazgulSupportCount = (int)_numHazNazgulSupport.Value,
+                SideboardNazgulSupportCount = (int)_numSideNazgulSupport.Value,
+                HazardStandardCreatureCount = (int)_numHazStandardCreatures.Value,
+                SideboardStandardCreatureCount = (int)_numSideStandardCreatures.Value,
+                HazardDualCreatureCount = (int)_numHazDualCreatures.Value,
+                SideboardDualCreatureCount = (int)_numSideDualCreatures.Value,
+                ExcludedCreatureSpecies = [.. Enumerable.Range(0, _clbCreatureSpecies.Items.Count)
+                    .Where(i => !_clbCreatureSpecies.GetItemChecked(i))
+                    .Select(i => _clbCreatureSpecies.Items[i]?.ToString() ?? string.Empty)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))],
+                SelectedCreatureRegionTypes = [.. _clbCreatureRegionTypes.CheckedItems.Cast<string>()],
+                SelectedCreatureSiteTypes = [.. _clbCreatureSiteTypes.CheckedItems.Cast<string>()]
             };
         }
 
@@ -2451,6 +2834,45 @@ namespace MECCG_Deck_Builder
                 _clbResourceEventRoles.SetItemChecked(i, !excludedEventRoles.Contains(roleName));
             }
 
+            _chkTailorHazardsToCurrentDeck.Checked = config.TailorHazardsToCurrentDeck;
+            _numHazNazgul.Value = Math.Clamp(config.HazardNazgulCount, (int)_numHazNazgul.Minimum, (int)_numHazNazgul.Maximum);
+            _numSideNazgul.Value = Math.Clamp(config.SideboardNazgulCount, (int)_numSideNazgul.Minimum, (int)_numSideNazgul.Maximum);
+            _numHazNazgulSupport.Value = Math.Clamp(config.HazardNazgulSupportCount, (int)_numHazNazgulSupport.Minimum, (int)_numHazNazgulSupport.Maximum);
+            _numSideNazgulSupport.Value = Math.Clamp(config.SideboardNazgulSupportCount, (int)_numSideNazgulSupport.Minimum, (int)_numSideNazgulSupport.Maximum);
+            _numHazStandardCreatures.Value = Math.Clamp(config.HazardStandardCreatureCount, (int)_numHazStandardCreatures.Minimum, (int)_numHazStandardCreatures.Maximum);
+            _numSideStandardCreatures.Value = Math.Clamp(config.SideboardStandardCreatureCount, (int)_numSideStandardCreatures.Minimum, (int)_numSideStandardCreatures.Maximum);
+            _numHazDualCreatures.Value = Math.Clamp(config.HazardDualCreatureCount, (int)_numHazDualCreatures.Minimum, (int)_numHazDualCreatures.Maximum);
+            _numSideDualCreatures.Value = Math.Clamp(config.SideboardDualCreatureCount, (int)_numSideDualCreatures.Minimum, (int)_numSideDualCreatures.Maximum);
+
+            PopulateCreatureSpeciesChecklist();
+            var excludedSpecies = new HashSet<string>(config.ExcludedCreatureSpecies ?? [], StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbCreatureSpecies.Items.Count; i++)
+            {
+                string speciesName = _clbCreatureSpecies.Items[i]?.ToString() ?? string.Empty;
+                _clbCreatureSpecies.SetItemChecked(i, !excludedSpecies.Contains(speciesName));
+            }
+
+            if (config.SelectedCreatureRegionTypes != null)
+            {
+                SetCheckedItems(_clbCreatureRegionTypes, config.SelectedCreatureRegionTypes);
+            }
+            else
+            {
+                SetAllChecked(_clbCreatureRegionTypes, true);
+            }
+
+            if (config.SelectedCreatureSiteTypes != null)
+            {
+                SetCheckedItems(_clbCreatureSiteTypes, config.SelectedCreatureSiteTypes);
+            }
+            else
+            {
+                SetAllChecked(_clbCreatureSiteTypes, true);
+            }
+
+            UpdateCreatureKeyingEnabledState();
+            UpdateCreatureEquivalentsReadout();
+
             UpdateDeckSummary();
             ValidateWorkbenchReadiness();
         }
@@ -2592,7 +3014,7 @@ namespace MECCG_Deck_Builder
             if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null ||
                 _lblFactionStatus == null || _lblAllyStatus == null || _lblItemStatus == null ||
                 _lblRingsStatus == null || _lblPalantiriStatus == null || _lblQuestsStatus == null ||
-                _lblResourceEventsStatus == null)
+                _lblResourceEventsStatus == null || _lblCreaturesStatus == null)
             {
                 return;
             }
@@ -2606,6 +3028,7 @@ namespace MECCG_Deck_Builder
             bool hasPalantirError = false;
             bool hasQuestsError = false;
             bool hasResourceEventsError = false;
+            bool hasCreaturesError = false;
 
             int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
             int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
@@ -2635,6 +3058,17 @@ namespace MECCG_Deck_Builder
             int resEnvEvents = (int)_numResGatesOfMorning.Value + (int)_numResTwilight.Value;
             int sideEnvEvents = (int)_numSideGatesOfMorning.Value + (int)_numSideTwilight.Value;
             int sideAutoEvents = (int)_numSideboardResourceEvents.Value;
+            int hazNazgul = (int)_numHazNazgul.Value;
+            int sideNazgul = (int)_numSideNazgul.Value;
+            int hazNazSup = (int)_numHazNazgulSupport.Value;
+            int sideNazSup = (int)_numSideNazgulSupport.Value;
+            int hazStdCr = (int)_numHazStandardCreatures.Value;
+            int sideStdCr = (int)_numSideStandardCreatures.Value;
+            int hazDualCr = (int)_numHazDualCreatures.Value;
+            int sideDualCr = (int)_numSideDualCreatures.Value;
+
+            int hazCreaturesTotal = hazNazgul + hazNazSup + hazStdCr + hazDualCr;
+            int sideCreatures = sideNazgul + sideNazSup + sideStdCr + sideDualCr;
 
             int playDeckLimit = (int)_numPlayDeckSize.Value;
             int sideboardLimit = (int)_numSideboardSize.Value;
@@ -2689,14 +3123,14 @@ namespace MECCG_Deck_Builder
 
             // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5-11) ---
             int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies + resItems + resRingCards + resPalCards + resQuests + resEnvEvents;
-            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards + sideQuests + sideEnvEvents + sideAutoEvents;
+            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards + sideQuests + sideEnvEvents + sideAutoEvents + sideCreatures;
 
             string resOverMsg =
                 $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards + {resQuests} quests + {resEnvEvents} env) exceed Play Deck Size ({playDeckLimit}).\n" +
                 "Reduce Resources card counts or increase Play Deck Size on General Settings.";
 
             string sideOverMsg =
-                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents} events) exceed Sideboard Size ({sideboardLimit}).\n" +
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents} events + {sideCreatures} creature/Nazgûl) exceed Sideboard Size ({sideboardLimit}).\n" +
                 "Reduce Sideboard card counts or increase Sideboard Size on General Settings.";
 
             // --- Tab 5 (Factions) ---
@@ -2972,11 +3406,70 @@ namespace MECCG_Deck_Builder
                 _lblResourceEventsStatus.Text = ResourceEventsIdleStatusText;
             }
 
+            // --- Tab 12 (Creatures) ---
+            int totalNonNazgulRequested = hazStdCr + sideStdCr + hazDualCr + sideDualCr;
+            bool tailorToDeck = _chkTailorHazardsToCurrentDeck.Checked;
+
+            if (hazNazgul + sideNazgul > 9)
+            {
+                hasCreaturesError = true;
+                _lblCreaturesStatus.ForeColor = Color.Firebrick;
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblCreaturesStatus.Text = "⚠ Nazgûl are Unique: combined Hazards + Sideboard count cannot exceed 9.";
+            }
+            else if (totalNonNazgulRequested > 0 && _clbCreatureSpecies.Items.Count > 0 && _clbCreatureSpecies.CheckedItems.Count == 0)
+            {
+                hasCreaturesError = true;
+                _lblCreaturesStatus.ForeColor = Color.Firebrick;
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblCreaturesStatus.Text = "⚠ At least one Species / Race must be checked when drafting Standard or Dual-Mode creatures.";
+            }
+            else if (!tailorToDeck && totalNonNazgulRequested > 0 &&
+                     _clbCreatureRegionTypes.CheckedItems.Count == 0 &&
+                     _clbCreatureSiteTypes.CheckedItems.Count == 0)
+            {
+                hasCreaturesError = true;
+                _lblCreaturesStatus.ForeColor = Color.Firebrick;
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblCreaturesStatus.Text = "⚠ At least one Region Terrain or Site Hold must be checked under Keying Filters (or enable Tailor Hazards to current deck).";
+            }
+            else if (hazCreaturesTotal > playDeckLimit)
+            {
+                hasCreaturesError = true;
+                _lblCreaturesStatus.ForeColor = Color.Firebrick;
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblCreaturesStatus.Text =
+                    $"⚠ Configured Hazards cards ({hazCreaturesTotal}: {hazStdCr} Standard + {hazDualCr} Dual + {hazNazgul} Nazgûl + {hazNazSup} Support) exceed Play Deck Size ({playDeckLimit}).\n" +
+                    "Reduce creature/Nazgûl counts or increase Play Deck Size on General Settings.";
+            }
+            else if (totalConfiguredSide > sideboardLimit && sideCreatures > 0)
+            {
+                hasCreaturesError = true;
+                _lblCreaturesStatus.ForeColor = Color.Firebrick;
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblCreaturesStatus.Text = sideOverMsg;
+            }
+            else if ((_lblCreaturesStatus.ForeColor == Color.Firebrick &&
+                      (_lblCreaturesStatus.Text.StartsWith("⚠ Nazgûl are Unique", StringComparison.Ordinal) ||
+                       _lblCreaturesStatus.Text.StartsWith("⚠ At least one Species", StringComparison.Ordinal) ||
+                       _lblCreaturesStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal) ||
+                       _lblCreaturesStatus.Text.StartsWith("⚠ Configured Hazards", StringComparison.Ordinal) ||
+                       _lblCreaturesStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+                     (_deck.Hazards.All(c => !IsCreaturesTabCard(c)) &&
+                      _deck.Sideboard.All(c => !IsCreaturesTabCard(c)) &&
+                      !_lblCreaturesStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_lblCreaturesStatus.Text.StartsWith("No creatures or Nazgûl configured", StringComparison.OrdinalIgnoreCase)))
+            {
+                _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblCreaturesStatus.Text = CreaturesIdleStatusText;
+            }
+
             // --- Unified Pipeline Readiness ---
             bool anyError =
                 hasTheaterError || hasRecruitError || hasFactionError || hasAllyError ||
                 hasItemError || hasRingsError || hasPalantirError || hasQuestsError ||
-                hasResourceEventsError;
+                hasResourceEventsError || hasCreaturesError;
 
             _btnRunPipeline.Enabled = !anyError;
 
@@ -2992,6 +3485,7 @@ namespace MECCG_Deck_Builder
                 if (hasPalantirError) blockedTabs.Add("Palantíri");
                 if (hasQuestsError) blockedTabs.Add("Quests");
                 if (hasResourceEventsError) blockedTabs.Add("Resource Events");
+                if (hasCreaturesError) blockedTabs.Add("Creatures");
 
                 _lblPipelineStatus.ForeColor = Color.Firebrick;
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
@@ -7170,6 +7664,519 @@ namespace MECCG_Deck_Builder
             return (drafted, summary);
         }
 
+        private bool RunCreaturesDraft(bool silent = false)
+        {
+            int reqHazNazgul = (int)_numHazNazgul.Value;
+            int reqSideNazgul = (int)_numSideNazgul.Value;
+            int reqHazNazSup = (int)_numHazNazgulSupport.Value;
+            int reqSideNazSup = (int)_numSideNazgulSupport.Value;
+            int reqHazStd = (int)_numHazStandardCreatures.Value;
+            int reqSideStd = (int)_numSideStandardCreatures.Value;
+            int reqHazDual = (int)_numHazDualCreatures.Value;
+            int reqSideDual = (int)_numSideDualCreatures.Value;
+
+            int totalRequested =
+                reqHazNazgul + reqSideNazgul +
+                reqHazNazSup + reqSideNazSup +
+                reqHazStd + reqSideStd +
+                reqHazDual + reqSideDual;
+
+            if (totalRequested == 0)
+            {
+                _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblCreaturesStatus.Text = "No creatures or Nazgûl configured (0 drafted).";
+                return true;
+            }
+
+            if (reqHazNazgul + reqSideNazgul > 9)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Nazgûl are Unique: combined Hazards + Sideboard count cannot exceed 9.", "Creatures", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            bool tailorToDeck = _chkTailorHazardsToCurrentDeck.Checked;
+            int totalNonNazgulRequested = reqHazStd + reqSideStd + reqHazDual + reqSideDual;
+
+            var checkedSpecies = new HashSet<string>(_clbCreatureSpecies.CheckedItems.Cast<string>(), StringComparer.OrdinalIgnoreCase);
+            if (totalNonNazgulRequested > 0 && _clbCreatureSpecies.Items.Count > 0 && checkedSpecies.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Please select at least one Species / Race under Species / Race Focus on the Creatures tab.", "Creatures", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var checkedRegTypes = new HashSet<string>(_clbCreatureRegionTypes.CheckedItems.Cast<string>(), StringComparer.OrdinalIgnoreCase);
+            var checkedSiteTypes = new HashSet<string>(_clbCreatureSiteTypes.CheckedItems.Cast<string>(), StringComparer.OrdinalIgnoreCase);
+
+            if (!tailorToDeck && totalNonNazgulRequested > 0 && checkedRegTypes.Count == 0 && checkedSiteTypes.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Please select at least one Region Terrain or Site Hold under Keying Filters.", "Creatures", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+
+            var draftedRegions = new HashSet<string>(
+                _deck.Sites
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()),
+                StringComparer.OrdinalIgnoreCase);
+
+            var draftedSites = _deck.Sites
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (tailorToDeck && draftedRegions.Count == 0 && draftedSites.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        this,
+                        "'Tailor Hazards to current deck' requires Regions/Sites in the Site deck (run Regions & Sites first).",
+                        "Creatures",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var draftedRegionTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in _deck.Sites.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+            {
+                foreach (var rt in DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService))
+                {
+                    if (!string.IsNullOrWhiteSpace(rt))
+                    {
+                        draftedRegionTypes.Add(rt.Trim());
+                    }
+                }
+            }
+
+            // Build catalog lookup maps for Unknown Opponent mode (named Region -> terrains; named Site -> hold type)
+            var catalogRegionTypesByName = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in allCards.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name)))
+            {
+                string rName = regCard.Name.Trim();
+                if (!catalogRegionTypesByName.TryGetValue(rName, out var set))
+                {
+                    set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    catalogRegionTypesByName[rName] = set;
+                }
+                foreach (var rt in DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService))
+                {
+                    if (!string.IsNullOrWhiteSpace(rt)) set.Add(rt.Trim());
+                }
+            }
+
+            var catalogSiteHoldByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var siteCard in allCards.Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Site)))
+            {
+                catalogSiteHoldByName.TryAdd(siteCard.Name.Trim(), siteCard.Site.Trim());
+            }
+
+            bool IsKeyableToTargetDeck(Card card)
+            {
+                var regReqs = _filterService.GetCardTagsForCategory(card.Id, "Region Requirement");
+                foreach (var req in regReqs)
+                {
+                    string clean = req.Trim();
+                    if (draftedRegions.Any(dr => CardFilterService.EqualsWithDiacriticFallback(dr, clean)) ||
+                        draftedRegionTypes.Any(rt => CardFilterService.EqualsWithDiacriticFallback(rt, clean)))
+                    {
+                        return true;
+                    }
+                }
+
+                var siteReqs = _filterService.GetCardTagsForCategory(card.Id, "Site Requirement");
+                foreach (var req in siteReqs)
+                {
+                    if (MatchesAnySiteRequirement(draftedSites, req, _filterService))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            bool PassesUnknownOpponentKeying(Card card)
+            {
+                var regReqs = _filterService.GetCardTagsForCategory(card.Id, "Region Requirement");
+                var siteReqs = _filterService.GetCardTagsForCategory(card.Id, "Site Requirement");
+
+                if (regReqs.Count == 0 && siteReqs.Count == 0)
+                {
+                    return true;
+                }
+
+                foreach (var req in regReqs)
+                {
+                    string clean = req.Trim();
+                    if (checkedRegTypes.Any(rt => CardFilterService.EqualsWithDiacriticFallback(rt, clean)))
+                    {
+                        return true;
+                    }
+
+                    if (catalogRegionTypesByName.TryGetValue(clean, out var mappedTerrains) &&
+                        mappedTerrains.Any(mt => checkedRegTypes.Any(rt => CardFilterService.EqualsWithDiacriticFallback(rt, mt))))
+                    {
+                        return true;
+                    }
+                }
+
+                foreach (var req in siteReqs)
+                {
+                    string clean = req.Trim();
+                    string norm = CardFilterService.NormalizeSiteType(clean);
+                    if (CanonicalHoldTypes.Contains(norm) &&
+                        checkedSiteTypes.Any(st => CardFilterService.MatchesSiteType(clean, st)))
+                    {
+                        return true;
+                    }
+
+                    if (catalogSiteHoldByName.TryGetValue(clean, out string holdType) &&
+                        checkedSiteTypes.Any(st => CardFilterService.MatchesSiteType(holdType, st)))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in _deck.Pool.Concat(_deck.Resources).Concat(_deck.Hazards).Concat(_deck.Sideboard))
+            {
+                usedCountsByName[c.Name] = usedCountsByName.GetValueOrDefault(c.Name, 0) + 1;
+            }
+
+            int hazCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Hazards.Count);
+            int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
+
+            var heroDistinctHazards = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    string.Equals(c.Primary, "Hazard", StringComparison.OrdinalIgnoreCase) &&
+                    IsHeroPlayableAlignment(c.Alignment))
+                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(PickHeroPreferredFromGroup)
+                .Where(c => c != null)
+                .ToList();
+
+            // 1. Nazgûl (in Target Current Deck mode, prioritize creature-keyable Nazgûl first, then permanent-event Nazgûl)
+            var nazgulCandidates = heroDistinctHazards
+                .Where(IsNazgulCard)
+                .OrderBy(c => tailorToDeck && !IsKeyableToTargetDeck(c) ? 1 : 0)
+                .ThenBy(_ => Random.Shared.Next())
+                .ToList();
+
+            var draftedHazNazgul = DraftItemsIntoSection(nazgulCandidates, _deck.Hazards, reqHazNazgul, hazCapacity, usedCountsByName);
+            hazCapacity -= draftedHazNazgul.Count;
+            var draftedSideNazgul = DraftItemsIntoSection(nazgulCandidates, _deck.Sideboard, reqSideNazgul, sideCapacity, usedCountsByName);
+            sideCapacity -= draftedSideNazgul.Count;
+
+            // 2. Nazgûl Support
+            var nazSupCandidates = heroDistinctHazards
+                .Where(IsNazgulSupportCard)
+                .OrderBy(_ => Random.Shared.Next())
+                .ToList();
+
+            var draftedHazNazSup = DraftItemsIntoSection(nazSupCandidates, _deck.Hazards, reqHazNazSup, hazCapacity, usedCountsByName);
+            hazCapacity -= draftedHazNazSup.Count;
+            var draftedSideNazSup = DraftItemsIntoSection(nazSupCandidates, _deck.Sideboard, reqSideNazSup, sideCapacity, usedCountsByName);
+            sideCapacity -= draftedSideNazSup.Count;
+
+            // 3. Standard Creatures (1.0) & Dual-Mode Half-Creatures (0.5)
+            bool PassesCreatureFilters(Card c)
+            {
+                if (string.IsNullOrWhiteSpace(c.Race)) return false;
+                var races = c.Race.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (!races.Any(r => checkedSpecies.Contains(r))) return false;
+
+                return tailorToDeck ? IsKeyableToTargetDeck(c) : PassesUnknownOpponentKeying(c);
+            }
+
+            var standardPool = heroDistinctHazards
+                .Where(c => IsStandardCreatureCard(c) && PassesCreatureFilters(c))
+                .ToList();
+
+            var dualPool = heroDistinctHazards
+                .Where(c => IsDualModeNonNazgulCreature(c) && PassesCreatureFilters(c))
+                .ToList();
+
+            var (draftedHazStd, hazStdSummary) = DraftCreaturesProportionately(
+                standardPool, checkedSpecies, _deck.Hazards, Math.Min(reqHazStd, hazCapacity), usedCountsByName);
+            hazCapacity -= draftedHazStd.Count;
+
+            var (draftedSideStd, _) = DraftCreaturesProportionately(
+                standardPool, checkedSpecies, _deck.Sideboard, Math.Min(reqSideStd, sideCapacity), usedCountsByName);
+            sideCapacity -= draftedSideStd.Count;
+
+            var (draftedHazDual, hazDualSummary) = DraftCreaturesProportionately(
+                dualPool, checkedSpecies, _deck.Hazards, Math.Min(reqHazDual, hazCapacity), usedCountsByName);
+
+            var (draftedSideDual, _) = DraftCreaturesProportionately(
+                dualPool, checkedSpecies, _deck.Sideboard, Math.Min(reqSideDual, sideCapacity), usedCountsByName);
+
+            _deck.SortSections();
+            if (!silent)
+            {
+                NotifyDeckChanged(DeckSectionType.Hazards);
+            }
+
+            // 4. Status & Shortfall Reporting
+            var hazAll = draftedHazStd.Concat(draftedHazDual).Concat(draftedHazNazgul).Concat(draftedHazNazSup).ToList();
+            var sideAll = draftedSideStd.Concat(draftedSideDual).Concat(draftedSideNazgul).Concat(draftedSideNazSup).ToList();
+
+            int hazEquiv = draftedHazStd.Count + ((draftedHazNazgul.Count + draftedHazDual.Count) / 2);
+
+            string hazText = hazAll.Count > 0 ? FormatCardCountList(hazAll) : "(None)";
+            string sideText = sideAll.Count > 0 ? FormatCardCountList(sideAll) : "(None)";
+
+            string statusMsg =
+                $"Drafted {hazAll.Count} card(s) into Hazards (Creature Equiv: {hazEquiv}/12 min) and {sideAll.Count} into Sideboard:\n" +
+                $"• Hazards: {hazText}\n" +
+                $"• Sideboard: {sideText}";
+
+            if (!string.IsNullOrWhiteSpace(hazStdSummary))
+            {
+                statusMsg += $"\n• Standard Species Mix: {hazStdSummary}";
+            }
+            if (!string.IsNullOrWhiteSpace(hazDualSummary))
+            {
+                statusMsg += $"\n• Dual-Mode Species Mix: {hazDualSummary}";
+            }
+
+            var warnings = new List<string>();
+            if (draftedHazNazgul.Count < reqHazNazgul) warnings.Add($"Hazards Nazgûl Shortfall: Drafted {draftedHazNazgul.Count} of {reqHazNazgul}.");
+            if (draftedSideNazgul.Count < reqSideNazgul) warnings.Add($"Sideboard Nazgûl Shortfall: Drafted {draftedSideNazgul.Count} of {reqSideNazgul}.");
+            if (draftedHazNazSup.Count < reqHazNazSup) warnings.Add($"Hazards Nazgûl Support Shortfall: Drafted {draftedHazNazSup.Count} of {reqHazNazSup}.");
+            if (draftedSideNazSup.Count < reqSideNazSup) warnings.Add($"Sideboard Nazgûl Support Shortfall: Drafted {draftedSideNazSup.Count} of {reqSideNazSup}.");
+            if (draftedHazStd.Count < reqHazStd) warnings.Add($"Hazards Standard Creatures Shortfall: Drafted {draftedHazStd.Count} of {reqHazStd}.");
+            if (draftedSideStd.Count < reqSideStd) warnings.Add($"Sideboard Standard Creatures Shortfall: Drafted {draftedSideStd.Count} of {reqSideStd}.");
+            if (draftedHazDual.Count < reqHazDual) warnings.Add($"Hazards Dual-Mode Creatures Shortfall: Drafted {draftedHazDual.Count} of {reqHazDual}.");
+            if (draftedSideDual.Count < reqSideDual) warnings.Add($"Sideboard Dual-Mode Creatures Shortfall: Drafted {draftedSideDual.Count} of {reqSideDual}.");
+
+            if (draftedHazNazSup.Count + draftedSideNazSup.Count > 0 &&
+                draftedHazNazgul.Count + draftedSideNazgul.Count == 0)
+            {
+                warnings.Add("Nazgûl Support card(s) drafted with 0 Nazgûl in Hazards/Sideboard.");
+            }
+
+            if (hazEquiv < 12 && (reqHazStd + reqHazNazgul + reqHazDual) > 0)
+            {
+                warnings.Add($"Hazards has {hazEquiv} creature equivalents (tournament minimum is 12).");
+            }
+
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblCreaturesStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
+            _lblCreaturesStatus.Text = statusMsg;
+            return true;
+        }
+
+        private static (List<Card> Drafted, string SpeciesSummary) DraftCreaturesProportionately(
+            List<Card> eligiblePool,
+            HashSet<string> checkedSpecies,
+            List<Card> targetSection,
+            int slotsToFill,
+            Dictionary<string, int> usedCountsByName)
+        {
+            var drafted = new List<Card>();
+            if (slotsToFill <= 0 || eligiblePool.Count == 0 || checkedSpecies.Count == 0)
+            {
+                return (drafted, string.Empty);
+            }
+
+            bool CanAddCopy(Card card)
+            {
+                int current = usedCountsByName.GetValueOrDefault(card.Name, 0);
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                return current < max;
+            }
+
+            var buckets = new List<(string Species, List<Card> Cards, int Quota)>();
+            foreach (var sp in checkedSpecies.OrderBy(s => s, StringComparer.OrdinalIgnoreCase))
+            {
+                var cardsInSpecies = eligiblePool
+                    .Where(c => HasRaceToken(c, sp) && CanAddCopy(c))
+                    .ToList();
+
+                if (cardsInSpecies.Count > 0)
+                {
+                    buckets.Add((sp, cardsInSpecies, 0));
+                }
+            }
+
+            if (buckets.Count == 0)
+            {
+                return (drafted, string.Empty);
+            }
+
+            if (slotsToFill < buckets.Count)
+            {
+                var remainingIndices = Enumerable.Range(0, buckets.Count).ToList();
+                for (int pick = 0; pick < slotsToFill && remainingIndices.Count > 0; pick++)
+                {
+                    int totalW = remainingIndices.Sum(idx => buckets[idx].Cards.Count);
+                    int roll = Random.Shared.Next(totalW);
+                    int cum = 0;
+                    int chosenListPos = 0;
+                    for (int i = 0; i < remainingIndices.Count; i++)
+                    {
+                        cum += buckets[remainingIndices[i]].Cards.Count;
+                        if (roll < cum)
+                        {
+                            chosenListPos = i;
+                            break;
+                        }
+                    }
+
+                    int bIdx = remainingIndices[chosenListPos];
+                    buckets[bIdx] = (buckets[bIdx].Species, buckets[bIdx].Cards, 1);
+                    remainingIndices.RemoveAt(chosenListPos);
+                }
+            }
+            else
+            {
+                int totalWeight = buckets.Sum(b => b.Cards.Count);
+                int remaining = slotsToFill - buckets.Count;
+
+                var extras = new double[buckets.Count];
+                for (int i = 0; i < buckets.Count; i++)
+                {
+                    double ideal = (double)slotsToFill * buckets[i].Cards.Count / totalWeight;
+                    extras[i] = Math.Max(0.0, ideal - 1.0);
+                }
+
+                double sumExtra = extras.Sum();
+                var intQuotas = new int[buckets.Count];
+                var remainders = new (int Index, double Rem, int Tie)[buckets.Count];
+                int assignedExtra = 0;
+
+                for (int i = 0; i < buckets.Count; i++)
+                {
+                    double scaled = sumExtra > 0 ? (extras[i] * remaining / sumExtra) : ((double)remaining / buckets.Count);
+                    int floored = (int)Math.Floor(scaled);
+                    intQuotas[i] = 1 + floored;
+                    assignedExtra += floored;
+                    remainders[i] = (i, scaled - floored, Random.Shared.Next());
+                }
+
+                int leftover = remaining - assignedExtra;
+                foreach (var item in remainders.OrderByDescending(r => r.Rem).ThenBy(r => r.Tie).Take(leftover))
+                {
+                    intQuotas[item.Index]++;
+                }
+
+                for (int i = 0; i < buckets.Count; i++)
+                {
+                    buckets[i] = (buckets[i].Species, buckets[i].Cards, intQuotas[i]);
+                }
+            }
+
+            var countsPerSpecies = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (Species, Cards, Quota) in buckets.Where(b => b.Quota > 0).OrderBy(b => b.Cards.Count).ThenBy(_ => Random.Shared.Next()))
+            {
+                int addedInBucket = 0;
+                while (addedInBucket < Quota && drafted.Count < slotsToFill)
+                {
+                    var available = Cards.Where(CanAddCopy).ToList();
+                    if (available.Count == 0) break;
+
+                    int minCopyCount = available.Min(c => usedCountsByName.GetValueOrDefault(c.Name, 0));
+                    var tierCandidates = available
+                        .Where(c => usedCountsByName.GetValueOrDefault(c.Name, 0) == minCopyCount)
+                        .ToList();
+
+                    var chosen = tierCandidates[Random.Shared.Next(tierCandidates.Count)];
+                    targetSection.Add(chosen);
+                    usedCountsByName[chosen.Name] = usedCountsByName.GetValueOrDefault(chosen.Name, 0) + 1;
+                    drafted.Add(chosen);
+                    addedInBucket++;
+                    countsPerSpecies[Species] = countsPerSpecies.GetValueOrDefault(Species, 0) + 1;
+                }
+            }
+
+            while (drafted.Count < slotsToFill)
+            {
+                var available = eligiblePool.Where(CanAddCopy).ToList();
+                if (available.Count == 0) break;
+
+                int minCopyCount = available.Min(c => usedCountsByName.GetValueOrDefault(c.Name, 0));
+                var tierCandidates = available
+                    .Where(c => usedCountsByName.GetValueOrDefault(c.Name, 0) == minCopyCount)
+                    .ToList();
+
+                var chosen = tierCandidates[Random.Shared.Next(tierCandidates.Count)];
+                targetSection.Add(chosen);
+                usedCountsByName[chosen.Name] = usedCountsByName.GetValueOrDefault(chosen.Name, 0) + 1;
+                drafted.Add(chosen);
+            }
+
+            string summary = string.Join(", ", countsPerSpecies
+                .OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+
+            return (drafted, summary);
+        }
+
+        private static bool IsNazgulCard(Card card) =>
+            card != null &&
+            string.Equals(card.Primary, "Hazard", StringComparison.OrdinalIgnoreCase) &&
+            HasRaceToken(card, "Nazgûl");
+
+        private bool IsNazgulSupportCard(Card card) =>
+            card != null &&
+            string.Equals(card.Primary, "Hazard", StringComparison.OrdinalIgnoreCase) &&
+            !HasRaceToken(card, "Nazgûl") &&
+            card.Secondary != null &&
+            card.Secondary.Contains("event", StringComparison.OrdinalIgnoreCase) &&
+            _filterService.GetCardTagsForCategory(card.Id, "Target Species")
+                .Any(t => CardFilterService.EqualsWithDiacriticFallback(t, "Nazgûl"));
+
+        private static bool IsStandardCreatureCard(Card card) =>
+            card != null &&
+            string.Equals(card.Primary, "Hazard", StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(card.Secondary, "Creature", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsDualModeNonNazgulCreature(Card card) =>
+            card != null &&
+            string.Equals(card.Primary, "Hazard", StringComparison.OrdinalIgnoreCase) &&
+            !HasRaceToken(card, "Nazgûl") &&
+            card.Secondary != null &&
+            card.Secondary.Contains("Creature", StringComparison.OrdinalIgnoreCase) &&
+            card.Secondary.Contains("event", StringComparison.OrdinalIgnoreCase);
+
+        private bool IsCreaturesTabCard(Card card) =>
+            IsNazgulCard(card) ||
+            IsNazgulSupportCard(card) ||
+            IsStandardCreatureCard(card) ||
+            IsDualModeNonNazgulCreature(card);
+
         private void RunPipelineDraft()
         {
             var stepsToRun = new List<(int StepNumber, string TabName, RunnableTabInfo Info)>();
@@ -7600,6 +8607,7 @@ namespace MECCG_Deck_Builder
         public int PlayDeckSize { get; set; } = 30;
         public int SideboardSize { get; set; } = 20;
         public int DecksBeforeCouncil { get; set; } = 1;
+        public bool TailorHazardsToCurrentDeck { get; set; }
 
         // Tab 2: Regions & Sites
         public string SeedRegion { get; set; } = "Random";
@@ -7680,5 +8688,18 @@ namespace MECCG_Deck_Builder
         public int SideboardTwilightCount { get; set; } = 0;
         public int SideboardResourceEventCount { get; set; } = 4;
         public List<string> ExcludedResourceEventRoles { get; set; } = [];
+
+        // Tab 12: Creatures
+        public int HazardNazgulCount { get; set; } = 0;
+        public int SideboardNazgulCount { get; set; } = 0;
+        public int HazardNazgulSupportCount { get; set; } = 0;
+        public int SideboardNazgulSupportCount { get; set; } = 0;
+        public int HazardStandardCreatureCount { get; set; } = 12;
+        public int SideboardStandardCreatureCount { get; set; } = 2;
+        public int HazardDualCreatureCount { get; set; } = 0;
+        public int SideboardDualCreatureCount { get; set; } = 0;
+        public List<string> ExcludedCreatureSpecies { get; set; } = [];
+        public List<string> SelectedCreatureRegionTypes { get; set; }
+        public List<string> SelectedCreatureSiteTypes { get; set; }
     }
 }
