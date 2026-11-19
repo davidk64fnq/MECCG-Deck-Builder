@@ -4268,8 +4268,7 @@
       "id": "259",
       "name": "Dark Quarrels",
       "Role": "Protection",
-      "set": "METW",
-      "Target Species": "Man; Orc; Troll"
+      "set": "METW"
     },
     {
       "fullCode": "Dodge (TW)",
@@ -4844,8 +4843,7 @@
       "id": "355",
       "name": "Praise to Elbereth",
       "Role": "Combat; Protection",
-      "set": "METW",
-      "Target Species": "Nazgûl"
+      "set": "METW"
     },
     {
       "fullCode": "Southrons (TW)",
@@ -5462,8 +5460,7 @@
       "id": "390",
       "name": "The Cock Crows",
       "Role": "Card Flow",
-      "set": "METW",
-      "Target Species": "Troll"
+      "set": "METW"
     },
     {
       "Environment Stance": "Gates of Morning",
@@ -5637,7 +5634,7 @@
       "name": "Wizard's River-horses",
       "Role": "Card Flow; Protection",
       "set": "METW",
-      "Target Species": "Nazgûl; Wizard"
+      "Target Species": "Wizard"
     },
     {
       "fullCode": "Wizard's Test (TW)",

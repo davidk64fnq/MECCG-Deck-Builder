@@ -166,7 +166,7 @@
         <tr>
             <td><a href="#target-species"><code>Target Species</code></a></td>
             <td><span class="scope-pill">Hazard</span> &bull; <span class="scope-pill">Resource</span></td>
-            <td>Biological species or creature races targeted, aided, or excluded</td>
+            <td>Company/bearer species required by Resources, or biological species targeted or buffed by Hazards</td>
         </tr>
     </table>
 
@@ -596,10 +596,10 @@
 
     <h3 id="target-species" class="entry-heading">Target Species</h3>
     <div class="scope-badge">
-        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> (Weapons, Items, Allies, Events) &bull; <span class="scope-pill">Hazard</span>
+        <strong>Card Scope:</strong> <span class="scope-pill">Resource</span> (Weapons, Items, Events) &bull; <span class="scope-pill">Hazard</span>
     </div>
     <p>
-        Identifies specific biological species or creature races (e.g. <code>Elf</code>, <code>D&uacute;nadan</code>, <code>Wizard</code>, <code>Nazg&ucirc;l</code>, <code>Orc</code>) that an event, weapon, item, ally, or hazard explicitly targets, modifies, or aids. Supports exact species names as well as dynamic exclusion predicates.
+        On <strong>Resource</strong> cards, identifies the biological species a character in your company must belong to in order to bear, cast, or receive the effect. On <strong>Hazard</strong> cards, identifies biological minion species buffed by the hazard or opposing character species targeted or excluded. Supports exact species names as well as dynamic exclusion predicates.
     </p>
     <div class="note">
         <strong>Named Characters vs. Species:</strong> Do <strong>not</strong> use this category for specific named individuals (such as <em>Aragorn II</em> or <em>Gandalf</em>). Named character requirements are official database properties tracked directly under the <code>Specific</code> attribute (e.g. <code>Specific: Aragorn II</code> on <em>Return of the King</em>, or <code>Specific: Gandalf</code> on <em>Narya</em>).
@@ -611,10 +611,6 @@
         <li><code>Elf</code> &rarr; Species prowess buff on <em>The Evenstar</em></li>
         <li><code>D&uacute;nadan; Man</code> &rarr; Daytime combat prowess buff on <em>Sun</em></li>
         <li><code>D&uacute;nadan</code> &rarr; Bearer untapping stamina on <em>And&uacute;ril, the Flame of the West</em></li>
-        <li><code>Man; Orc; Troll</code> &rarr; Attack cancellation on <em>Dark Quarrels</em></li>
-        <li><code>Troll</code> &rarr; Attack cancellation on <em>The Cock Crows</em></li>
-        <li><code>Nazg&ucirc;l</code> &rarr; Event/attack cancellation on <em>Praise to Elbereth</em> and <em>Wizard's River-horses</em></li>
-        <li><code>Race!=Nazg&ucirc;l</code> &rarr; Printed exclusion on <em>The Old Thrush</em> (cannot target Nazg&ucirc;l attacks)</li>
         <li><code>Orc; Troll</code> &rarr; Minion swarm attack buffs (<em>Minions Stir</em>, <em>Wake of War</em>, <em>Fury of the Iron Crown</em>)</li>
         <li><code>Undead</code> &rarr; Attack escalation for spirits and wights (<em>Plague of Wights</em>)</li>
         <li><code>Race!=Hobbit &amp;&amp; Race!=Wizard</code> &rarr; Printed character exclusions on corruption hazards (<em>Despair of the Heart</em>, <em>Lure of Nature</em>, <em>Lure of Power</em>, <em>Greed</em>)</li>

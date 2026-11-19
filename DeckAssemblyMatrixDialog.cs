@@ -49,6 +49,10 @@ namespace MECCG_Deck_Builder
             "Drafts Role = Quest cards (events and Quest Special Items) playable at drafted Sites/Havens.\n" +
             "Drafts missing Prerequisite cards (e.g. Men of Lamedon, Narsil && Reforging) into the same section if capacity permits.";
 
+        private const string ResourceEventsIdleStatusText =
+            "Fills remaining Play Deck (Resources) capacity up to Play Deck Size, plus requested Sideboard events.\n" +
+            "Drafts Environment cards (Gates of Morning, Twilight) first, then distributes remaining slots proportionately across checked Role Focus tags.";
+
         private const string PureQuestRoleLabel = "Quest (Only)";
 
 #pragma warning disable SYSLIB1045 // Use 'GeneratedRegexAttribute'
@@ -91,7 +95,11 @@ namespace MECCG_Deck_Builder
         private readonly TabControl _tabControl;
         private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
-        private readonly string[] _pipelineOrder = ["Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions", "Allies", "Items", "Rings", "Palantíri", "Quests"];
+        private readonly string[] _pipelineOrder =
+        [
+            "Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions",
+            "Allies", "Items", "Rings", "Palantíri", "Quests", "Resource Events"
+        ];
 
         // --- TAB 1: GENERAL SETTINGS & CONTROLS ---
         private readonly TextBox _txtDeckTitle;
@@ -188,6 +196,15 @@ namespace MECCG_Deck_Builder
         private readonly CheckedListBox _clbQuestRoles;
         private readonly Label _lblQuestsStatus;
 
+        // --- TAB 11: RESOURCE EVENTS ---
+        private readonly NumericUpDown _numResGatesOfMorning;
+        private readonly NumericUpDown _numSideGatesOfMorning;
+        private readonly NumericUpDown _numResTwilight;
+        private readonly NumericUpDown _numSideTwilight;
+        private readonly NumericUpDown _numSideboardResourceEvents;
+        private readonly CheckedListBox _clbResourceEventRoles;
+        private readonly Label _lblResourceEventsStatus;
+
         private readonly ToolTip _toolTip = new()
         {
             AutoPopDelay = 12000,
@@ -210,7 +227,7 @@ namespace MECCG_Deck_Builder
             _notifyDeckCallback = notifyDeckChanged ?? (_ => { });
 
             Text = "Modular Deck Assembly Workbench";
-            ClientSize = new Size(860, 650);
+            ClientSize = new Size(860, 690);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -309,7 +326,7 @@ namespace MECCG_Deck_Builder
 
             var lblDecksHint = new Label
             {
-                Text = "deck cycle(s) planned (1 = strict non-overlapping sites for Factions/Allies; >= 2 = sites refresh on exhaust).",
+                Text = "deck cycle(s) planned (1: distinct sites for Factions/Allies; 2+: sites refresh on exhaust).",
                 Location = new Point(225, 126),
                 Size = new Size(575, 20),
                 ForeColor = Color.DimGray
@@ -364,7 +381,7 @@ namespace MECCG_Deck_Builder
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri -> 9. Quests",
+                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri -> 9. Quests -> 10. Resource Events",
                 Location = new Point(16, 20),
                 Size = new Size(778, 34),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
@@ -432,13 +449,13 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Live Deck Composition Status",
                 Location = new Point(16, 388),
-                Size = new Size(810, 220)
+                Size = new Size(810, 256)
             };
 
             _lblDeckSummary = new Label
             {
                 Location = new Point(20, 22),
-                Size = new Size(770, 188),
+                Size = new Size(770, 224),
                 Font = new Font("Segoe UI", 10.0f),
                 ForeColor = Color.FromArgb(26, 54, 93),
                 UseMnemonic = false
@@ -480,7 +497,7 @@ namespace MECCG_Deck_Builder
                 Size = new Size(60, 23),
                 Minimum = 4,
                 Maximum = 12,
-                Value = 4
+                Value = 5
             };
             string regCountTip =
                 "Target number of connected (border-to-border) regions to draft.\n" +
@@ -590,6 +607,11 @@ namespace MECCG_Deck_Builder
             var tabStarter = new TabPage("Starting Company");
             BuildCharacterGrid(tabStarter, _starterRows, 5, 42, 28, null);
 
+            foreach (var row in _starterRows)
+            {
+                row.TxtMind.Text = ">=1";
+            }
+
             _lblStarterStatus = new Label
             {
                 Location = new Point(16, 198),
@@ -622,7 +644,7 @@ namespace MECCG_Deck_Builder
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbWizard1.Items.AddRange(["(None)", "Random", "Alatar", "Gandalf", "Pallando", "Radagast", "Saruman"]);
-            _cmbWizard1.SelectedIndex = 0;
+            _cmbWizard1.SelectedIndex = 1; // Random
 
             var lblWiz1Cop = new Label { Text = "Copies:", Location = new Point(275, 25), Size = new Size(50, 18) };
             _cmbWizard1Copies = new ComboBox
@@ -633,7 +655,7 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
             _cmbWizard1Copies.Items.AddRange(["1", "2", "3"]);
-            _cmbWizard1Copies.SelectedIndex = 0;
+            _cmbWizard1Copies.SelectedIndex = 1; // 2 copies
 
             var lblWiz2 = new Label { Text = "Secondary Wizard:", Location = new Point(12, 53), Size = new Size(105, 18) };
             _cmbWizard2 = new ComboBox
@@ -644,7 +666,7 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
             _cmbWizard2.Items.AddRange(["(None)", "Random", "Alatar", "Gandalf", "Pallando", "Radagast", "Saruman"]);
-            _cmbWizard2.SelectedIndex = 0;
+            _cmbWizard2.SelectedIndex = 1; // Random
 
             var lblWiz2Cop = new Label { Text = "Copies:", Location = new Point(275, 53), Size = new Size(50, 18) };
             _cmbWizard2Copies = new ComboBox
@@ -655,7 +677,7 @@ namespace MECCG_Deck_Builder
                 Enabled = false
             };
             _cmbWizard2Copies.Items.AddRange(["1", "2"]);
-            _cmbWizard2Copies.SelectedIndex = 0;
+            _cmbWizard2Copies.SelectedIndex = 0; // 1 copy
 
             var lblWiz2Dest = new Label { Text = "Destination:", Location = new Point(395, 53), Size = new Size(75, 18) };
             _cmbWizard2Dest = new ComboBox
@@ -673,6 +695,7 @@ namespace MECCG_Deck_Builder
             _cmbWizard2.SelectedIndexChanged += WizardSelection_Changed;
             _cmbWizard2Copies.SelectedIndexChanged += WizardSelection_Changed;
             _cmbWizard2Dest.SelectedIndexChanged += WizardSelection_Changed;
+            WizardSelection_Changed(null, null);
 
             grpWizards.Controls.AddRange([
                 lblWiz1, _cmbWizard1, lblWiz1Cop, _cmbWizard1Copies,
@@ -768,7 +791,7 @@ namespace MECCG_Deck_Builder
                 Size = new Size(60, 23),
                 Minimum = 0,
                 Maximum = 10,
-                Value = 1
+                Value = 0
             };
             string sideFactionsTip =
                 "Number of backup factions to draft into the Sideboard.\n" +
@@ -869,7 +892,7 @@ namespace MECCG_Deck_Builder
                 Size = new Size(60, 23),
                 Minimum = 0,
                 Maximum = 10,
-                Value = 1
+                Value = 0
             };
             string sideAlliesTip =
                 "Number of backup allies to draft into the Sideboard.\n" +
@@ -949,9 +972,9 @@ namespace MECCG_Deck_Builder
             }
 
             var lblMinor = new Label { Text = "Minor Items:", Location = new Point(16, 53), Size = new Size(130, 20) };
-            _numPoolMinorItems = CreateItemSpinner(156, 50, 0, 2, 1);
+            _numPoolMinorItems = CreateItemSpinner(156, 50, 0, 2, 2);
             _numResourceMinorItems = CreateItemSpinner(260, 50, 0, 15, 1);
-            _numSideboardMinorItems = CreateItemSpinner(365, 50, 0, 10, 1);
+            _numSideboardMinorItems = CreateItemSpinner(365, 50, 0, 10, 0);
             _toolTip.SetToolTip(_numPoolMinorItems, "Starting Minor Items in Pool (0-2; counts toward 3-copy limit, does not consume Play Deck Size).");
 
             var lblMajor = new Label { Text = "Major Items:", Location = new Point(16, 87), Size = new Size(130, 20) };
@@ -1083,12 +1106,12 @@ namespace MECCG_Deck_Builder
                 return (nudRes, nudSide);
             }
 
-            (_numResGoldRings, _numSideGoldRings) = AddRingRow(0, "Gold Rings:", 9, 2, 9, 0, "Auto-selected from Gold Ring roll tables to match requested Special Rings.");
-            (_numResAllowRingTest, _numSideAllowRingTest) = AddRingRow(1, "Allow Ring Test:", 9, 1, 6, 0, "Total desired (counts Gandalf once if already drafted in Resources/Sideboard).");
+            (_numResGoldRings, _numSideGoldRings) = AddRingRow(0, "Gold Rings:", 9, 0, 9, 0, "Auto-selected from Gold Ring roll tables to match requested Special Rings.");
+            (_numResAllowRingTest, _numSideAllowRingTest) = AddRingRow(1, "Allow Ring Test:", 9, 0, 6, 0, "Total desired (counts Gandalf once if already drafted in Resources/Sideboard).");
             (_numResAidRingTest, _numSideAidRingTest) = AddRingRow(2, "Aid Ring Test:", 6, 0, 6, 0, "Total desired (includes Scroll of Isildur if already drafted in Items).");
             (_numResOneRing, _numSideOneRing) = AddRingRow(3, "The One Ring:", 1, 0, 1, 0, "Unique (combined Resources + Sideboard <= 1).");
             (_numResDwarvenRings, _numSideDwarvenRings) = AddRingRow(4, "Dwarven Rings:", 7, 0, 7, 0, "Unique; playable by any character (extra perks for Dwarves).");
-            (_numResMagicRings, _numSideMagicRings) = AddRingRow(5, "Magic Rings:", 10, 1, 10, 0, "Unique; playable with a Gold Ring when test indicates Magic Ring.");
+            (_numResMagicRings, _numSideMagicRings) = AddRingRow(5, "Magic Rings:", 10, 0, 10, 0, "Unique; playable with a Gold Ring when test indicates Magic Ring.");
             (_numResLesserRings, _numSideLesserRings) = AddRingRow(6, "Lesser Rings:", 6, 0, 6, 0, "Non-unique (up to 3 copies); playable with any Gold Ring test result.");
             (_numResWizardsRing, _numSideWizardsRing) = AddRingRow(7, "Wizard's Ring:", 3, 0, 3, 0, "Wizard only, playable at a Haven (requires a Wizard in the deck).");
 
@@ -1159,12 +1182,12 @@ namespace MECCG_Deck_Builder
             var lblPalHdrSide = new Label { Text = "Sideboard", Location = new Point(295, 24), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
 
             var lblPalantiriItems = new Label { Text = "Palantíri (Items):", Location = new Point(16, 55), Size = new Size(165, 20) };
-            _numResPalantiri = CreateItemSpinner(190, 52, 0, 7, 1);
+            _numResPalantiri = CreateItemSpinner(190, 52, 0, 7, 0);
             _numSidePalantiri = CreateItemSpinner(295, 52, 0, 7, 0);
             _toolTip.SetToolTip(_numResPalantiri, "Unique Palantír items playable at GreaterItem/Palantiri sites or their printed Site Requirement.");
 
             var lblAllowPalantirUse = new Label { Text = "Allow Palantír Use:", Location = new Point(16, 91), Size = new Size(165, 20) };
-            _numResAllowPalantirUse = CreateItemSpinner(190, 88, 0, 6, 1);
+            _numResAllowPalantirUse = CreateItemSpinner(190, 88, 0, 6, 0);
             _numSideAllowPalantirUse = CreateItemSpinner(295, 88, 0, 6, 0);
             _toolTip.SetToolTip(_numResAllowPalantirUse, "Total desired (counts Saruman once if already drafted, plus Align/Use Palantír events).");
 
@@ -1256,7 +1279,7 @@ namespace MECCG_Deck_Builder
             var lblQuestHdrSide = new Label { Text = "Sideboard", Location = new Point(295, 24), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
 
             var lblQuestsCount = new Label { Text = "Quests (Events & Items):", Location = new Point(16, 55), Size = new Size(165, 20), UseMnemonic = false };
-            _numResourceQuests = CreateItemSpinner(190, 52, 0, 15, 1);
+            _numResourceQuests = CreateItemSpinner(190, 52, 0, 15, 0);
             _numSideboardQuests = CreateItemSpinner(295, 52, 0, 10, 0);
             _toolTip.SetToolTip(_numResourceQuests, "Number of Role = Quest cards to draft into Resources (default 1).");
             _toolTip.SetToolTip(_numSideboardQuests, "Number of Role = Quest cards to draft into Sideboard (default 0).");
@@ -1345,8 +1368,147 @@ namespace MECCG_Deck_Builder
 
             tabQuests.Controls.AddRange([grpQuests, grpQuestRoles, _lblQuestsStatus]);
 
+            // ==========================================
+            // TAB 11: RESOURCE EVENTS
+            // ==========================================
+            var tabResourceEvents = new TabPage("Resource Events");
+
+            var grpEnv = new GroupBox
+            {
+                Text = "Environment (Resources && Sideboard)",
+                Location = new Point(16, 16),
+                Size = new Size(495, 148)
+            };
+
+            var lblEnvHdrCard = new Label { Text = "Card", Location = new Point(16, 22), Size = new Size(165, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblEnvHdrRes = new Label { Text = "Resources", Location = new Point(190, 22), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblEnvHdrSide = new Label { Text = "Sideboard", Location = new Point(295, 22), Size = new Size(85, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+
+            var lblGom = new Label { Text = "Gates of Morning:", Location = new Point(16, 51), Size = new Size(165, 20) };
+            _numResGatesOfMorning = CreateItemSpinner(190, 48, 0, 3, 0);
+            _numSideGatesOfMorning = CreateItemSpinner(295, 48, 0, 3, 0);
+            _toolTip.SetToolTip(_numResGatesOfMorning, "Permanent-event (up to 3 total across Resources + Sideboard).");
+            _toolTip.SetToolTip(_numSideGatesOfMorning, "Permanent-event (up to 3 total across Resources + Sideboard).");
+
+            var lblTwi = new Label { Text = "Twilight:", Location = new Point(16, 83), Size = new Size(165, 20) };
+            _numResTwilight = CreateItemSpinner(190, 80, 0, 3, 0);
+            _numSideTwilight = CreateItemSpinner(295, 80, 0, 3, 0);
+            _toolTip.SetToolTip(_numResTwilight, "Dual-purpose Resource/Hazard Short-event (shares 3-copy limit across Resources, Hazards & Sideboard).");
+            _toolTip.SetToolTip(_numSideTwilight, "Dual-purpose Resource/Hazard Short-event (shares 3-copy limit across Resources, Hazards & Sideboard).");
+
+            var lblEnvNote = new Label
+            {
+                Location = new Point(16, 112),
+                Size = new Size(465, 30),
+                ForeColor = Color.DimGray,
+                Font = new Font("Segoe UI", 8.5f),
+                UseMnemonic = false,
+                Text = "Twilight counts as Resource or Hazard and shares its 3-copy limit across Resources, Hazards & Sideboard."
+            };
+
+            grpEnv.Controls.AddRange([
+                lblEnvHdrCard, lblEnvHdrRes, lblEnvHdrSide,
+    lblGom, _numResGatesOfMorning, _numSideGatesOfMorning,
+    lblTwi, _numResTwilight, _numSideTwilight,
+    lblEnvNote
+            ]);
+
+            var grpAutoFill = new GroupBox
+            {
+                Text = "Resource Events Auto-Fill && Sideboard",
+                Location = new Point(16, 174),
+                Size = new Size(495, 134)
+            };
+
+            var lblAutoPlayDeck = new Label
+            {
+                Location = new Point(16, 24),
+                Size = new Size(465, 20),
+                UseMnemonic = false,
+                Text = "Play Deck (Resources):   Auto-fills all remaining slots up to Play Deck Size."
+            };
+
+            var lblSideAuto = new Label
+            {
+                Text = "Additional Events in Sideboard:",
+                Location = new Point(16, 54),
+                Size = new Size(205, 20)
+            };
+            _numSideboardResourceEvents = CreateItemSpinner(228, 51, 0, 20, 4);
+            _toolTip.SetToolTip(
+                _numSideboardResourceEvents,
+                "Number of general Resource Events to draft into Sideboard (beyond Sideboard Gates of Morning / Twilight).");
+
+            var lblAutoNote = new Label
+            {
+                Location = new Point(16, 82),
+                Size = new Size(465, 44),
+                ForeColor = Color.DimGray,
+                Font = new Font("Segoe UI", 8.5f),
+                UseMnemonic = false,
+                Text =
+                    "• Distributes slots proportionately by eligible cards per checked Role (min 1 each if slots permit).\n" +
+                    "• Excludes Gates of Morning, Twilight, Quests, Ring Tests & Palantír Use events.\n" +
+                    "• Enforces Skill, Target Species, Specific, Site/Region Requirements & existing Prerequisites."
+            };
+
+            grpAutoFill.Controls.AddRange([lblAutoPlayDeck, lblSideAuto, _numSideboardResourceEvents, lblAutoNote]);
+
+            var grpResEventRoles = new GroupBox
+            {
+                Text = "Role Focus (Uncheck to exclude)",
+                Location = new Point(525, 16),
+                Size = new Size(300, 292)
+            };
+
+            _clbResourceEventRoles = new CheckedListBox
+            {
+                Location = new Point(12, 24),
+                Size = new Size(276, 224),
+                CheckOnClick = true
+            };
+            _clbResourceEventRoles.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(ValidateWorkbenchReadiness);
+                }
+            };
+            _toolTip.SetToolTip(_clbResourceEventRoles, "Auto-filled Resource Events must carry at least one checked Role tag.");
+
+            var btnAllEventRoles = new Button { Text = "All", Location = new Point(12, 256), Size = new Size(65, 24) };
+            btnAllEventRoles.Click += (s, e) =>
+            {
+                SetAllChecked(_clbResourceEventRoles, true);
+                ValidateWorkbenchReadiness();
+            };
+
+            var btnClearEventRoles = new Button { Text = "Clear", Location = new Point(83, 256), Size = new Size(65, 24) };
+            btnClearEventRoles.Click += (s, e) =>
+            {
+                SetAllChecked(_clbResourceEventRoles, false);
+                ValidateWorkbenchReadiness();
+            };
+
+            grpResEventRoles.Controls.AddRange([_clbResourceEventRoles, btnAllEventRoles, btnClearEventRoles]);
+
+            _lblResourceEventsStatus = new Label
+            {
+                Location = new Point(16, 320),
+                Size = new Size(805, 290),
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
+                UseMnemonic = false,
+                Text = ResourceEventsIdleStatusText
+            };
+
+            tabResourceEvents.Controls.AddRange([grpEnv, grpAutoFill, grpResEventRoles, _lblResourceEventsStatus]);
+
             // Tabs ordered to match pipeline execution order
-            _tabControl.TabPages.AddRange([tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions, tabAllies, tabItems, tabRings, tabPalantiri, tabQuests]);
+            _tabControl.TabPages.AddRange([
+                tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions,
+                tabAllies, tabItems, tabRings, tabPalantiri, tabQuests, tabResourceEvents
+            ]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
             _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
@@ -1356,6 +1518,7 @@ namespace MECCG_Deck_Builder
             _tabInfo["Rings"] = new(RunRingsDraft, _lblRingsStatus);
             _tabInfo["Palantíri"] = new(RunPalantiriDraft, _lblPalantiriStatus);
             _tabInfo["Quests"] = new(RunQuestsDraft, _lblQuestsStatus);
+            _tabInfo["Resource Events"] = new(RunResourceEventsDraft, _lblResourceEventsStatus);
 
             Controls.Add(_tabControl);
 
@@ -1368,6 +1531,7 @@ namespace MECCG_Deck_Builder
                     PopulateRingRolesChecklist();
                     PopulatePalantirRolesChecklist();
                     PopulateQuestRolesChecklist();
+                    PopulateResourceEventRolesChecklist();
                     UpdateDeckSummary();
                     ValidateWorkbenchReadiness();
                 }
@@ -1434,6 +1598,8 @@ namespace MECCG_Deck_Builder
             int sidePalantirCards = _deck.Sideboard.Count(IsPalantirPackageCard);
             int resQuests = _deck.Resources.Count(IsQuestPackageCard);
             int sideQuests = _deck.Sideboard.Count(IsQuestPackageCard);
+            int resEvents = _deck.Resources.Count(IsGeneralResourceEvent);
+            int sideEvents = _deck.Sideboard.Count(IsGeneralResourceEvent);
 
             if (totalResChars == 0 && totalSideChars == 0 &&
                 resFactions == 0 && sideFactions == 0 &&
@@ -1441,7 +1607,8 @@ namespace MECCG_Deck_Builder
                 poolItems == 0 && resItems == 0 && sideItems == 0 &&
                 resRingCards == 0 && sideRingCards == 0 &&
                 resPalantirCards == 0 && sidePalantirCards == 0 &&
-                resQuests == 0 && sideQuests == 0)
+                resQuests == 0 && sideQuests == 0 &&
+                resEvents == 0 && sideEvents == 0)
             {
                 ValidateWorkbenchReadiness();
             }
@@ -1464,6 +1631,7 @@ namespace MECCG_Deck_Builder
             string resRingNote = resRingCards > 0 ? $", {resRingCards} ring card(s)" : "";
             string resPalantirNote = resPalantirCards > 0 ? $", {resPalantirCards} palantír card(s)" : "";
             string resQuestNote = resQuests > 0 ? $", {resQuests} quest(s)" : "";
+            string resEventNote = resEvents > 0 ? $", {resEvents} event(s)" : "";
 
             var sideParts = new List<string>();
             if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
@@ -1474,17 +1642,47 @@ namespace MECCG_Deck_Builder
             if (sideRingCards > 0) sideParts.Add($"{sideRingCards} ring card(s)");
             if (sidePalantirCards > 0) sideParts.Add($"{sidePalantirCards} palantír card(s)");
             if (sideQuests > 0) sideParts.Add($"{sideQuests} quest(s)");
+            if (sideEvents > 0) sideParts.Add($"{sideEvents} event(s)");
             string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
+
+            static bool IsNonHazard(Card c) => !string.Equals(c.Primary, "Hazard", StringComparison.OrdinalIgnoreCase);
+
+            static (int Base, int Cond) SumSectionMPs(IEnumerable<Card> cards)
+            {
+                int b = 0, c = 0;
+                foreach (var card in cards.Where(IsNonHazard))
+                {
+                    var (cb, cc) = ParseCardMPs(card.MPs);
+                    b += cb;
+                    c += cc;
+                }
+                return (b, c);
+            }
+
+            var (poolBase, poolCond) = SumSectionMPs(_deck.Pool);
+            var (resBase, resCond) = SumSectionMPs(_deck.Resources);
+            var (sideBase, sideCond) = SumSectionMPs(_deck.Sideboard);
+            var (siteBase, siteCond) = SumSectionMPs(_deck.Sites);
+
+            int totalBase = poolBase + resBase + sideBase + siteBase;
+            int totalCond = poolCond + resCond + sideCond + siteCond;
+
+            string totalMpText = totalCond != totalBase ? $"{totalBase}({totalCond})" : $"{totalBase}";
+            string poolMpText = poolCond != poolBase ? $"{poolBase}({poolCond})" : $"{poolBase}";
+            string resMpText = $"{resBase}({resCond})";
+            string sideMpText = sideCond != sideBase ? $"{sideBase}({sideCond})" : $"{sideBase}";
+            string siteMpText = siteCond != siteBase ? $"{siteBase}({siteCond})" : $"{siteBase}";
 
             _lblDeckSummary.Text =
                 $"Deck Title:       \"{_deck.Title}\"\n\n" +
                 $"Pool:             {_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
+                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote}{resEventNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
                 $"Hazards:          {_deck.Hazards.Count} cards\n" +
                 $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
                 $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
                 $"Play Deck Status: {_deck.Resources.Count} Resources / {_deck.Hazards.Count} Hazards (Target: {_numPlayDeckSize.Value}/{_numPlayDeckSize.Value})\n" +
-                $"Sideboard Status: {_deck.Sideboard.Count} / {_numSideboardSize.Value}";
+                $"Sideboard Status: {_deck.Sideboard.Count} / {_numSideboardSize.Value}\n" +
+                $"MP Total:         {totalMpText} MPs (Pool: {poolMpText}, Resources: {resMpText}, Sideboard: {sideMpText}{(siteBase != 0 || siteCond != 0 ? $", Sites: {siteMpText}" : "")})";
         }
 
         private void UpdateSeedTooltip()
@@ -1718,6 +1916,70 @@ namespace MECCG_Deck_Builder
             _clbQuestRoles.EndUpdate();
         }
 
+        private bool IsEligibleBaseResourceEvent(Card card)
+        {
+            if (card == null) return false;
+            if (!string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase)) return false;
+            if (!IsHeroPlayableAlignment(card.Alignment)) return false;
+            if (card.Secondary == null || !card.Secondary.Contains("event", StringComparison.OrdinalIgnoreCase)) return false;
+
+            // Environment & earlier dedicated tabs handle these explicitly
+            if (CardFilterService.EqualsWithDiacriticFallback(card.Name, "Gates of Morning") ||
+                CardFilterService.EqualsWithDiacriticFallback(card.Name, "Twilight"))
+            {
+                return false;
+            }
+
+            if (HasRoleTag(card, "Quest")) return false;
+            if (HasSpecialAbility(card, "Gold Ring: Allow Test")) return false;
+            if (HasSpecialAbility(card, "Palantír: Allow Use")) return false;
+
+            return true;
+        }
+
+        private void PopulateResourceEventRolesChecklist()
+        {
+            var previouslyExcluded = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbResourceEventRoles.Items.Count; i++)
+            {
+                if (!_clbResourceEventRoles.GetItemChecked(i))
+                {
+                    string role = _clbResourceEventRoles.Items[i]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        previouslyExcluded.Add(role);
+                    }
+                }
+            }
+
+            var activeSets = _getActiveSets();
+            var roles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var card in _catalog.Cards)
+            {
+                if (activeSets.Count > 0 && !activeSets.Contains(card.Set)) continue;
+                if (!IsEligibleBaseResourceEvent(card)) continue;
+
+                foreach (var role in _filterService.GetCardTagsForCategory(card.Id, "Role"))
+                {
+                    if (!string.IsNullOrWhiteSpace(role))
+                    {
+                        roles.Add(role.Trim());
+                    }
+                }
+            }
+
+            var sortedRoles = roles.OrderBy(r => r, StringComparer.OrdinalIgnoreCase).ToList();
+
+            _clbResourceEventRoles.BeginUpdate();
+            _clbResourceEventRoles.Items.Clear();
+            foreach (var role in sortedRoles)
+            {
+                _clbResourceEventRoles.Items.Add(role, !previouslyExcluded.Contains(role));
+            }
+            _clbResourceEventRoles.EndUpdate();
+        }
+
         #region TAB1_SESSION_ACTIONS
 
         private void BtnClearDeck_Click(object sender, EventArgs e)
@@ -1778,6 +2040,17 @@ namespace MECCG_Deck_Builder
             _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblQuestsStatus.Text = QuestIdleStatusText;
+
+            _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblQuestsStatus.Text = QuestIdleStatusText;
+
+            // ADD THESE 3 LINES:
+            _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            _lblResourceEventsStatus.Text = ResourceEventsIdleStatusText;
+
+            _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -2018,6 +2291,17 @@ namespace MECCG_Deck_Builder
                     .Where(i => !_clbQuestRoles.GetItemChecked(i))
                     .Select(i => _clbQuestRoles.Items[i]?.ToString() ?? string.Empty)
                     .Where(s => !string.IsNullOrWhiteSpace(s))],
+
+                // ADD THESE LINES:
+                ResourceGatesOfMorningCount = (int)_numResGatesOfMorning.Value,
+                SideboardGatesOfMorningCount = (int)_numSideGatesOfMorning.Value,
+                ResourceTwilightCount = (int)_numResTwilight.Value,
+                SideboardTwilightCount = (int)_numSideTwilight.Value,
+                SideboardResourceEventCount = (int)_numSideboardResourceEvents.Value,
+                ExcludedResourceEventRoles = [.. Enumerable.Range(0, _clbResourceEventRoles.Items.Count)
+                    .Where(i => !_clbResourceEventRoles.GetItemChecked(i))
+                    .Select(i => _clbResourceEventRoles.Items[i]?.ToString() ?? string.Empty)
+                    .Where(s => !string.IsNullOrWhiteSpace(s))]
             };
         }
 
@@ -2151,6 +2435,20 @@ namespace MECCG_Deck_Builder
             {
                 string roleName = _clbQuestRoles.Items[i]?.ToString() ?? string.Empty;
                 _clbQuestRoles.SetItemChecked(i, !excludedQuestRoles.Contains(roleName));
+            }
+
+            _numResGatesOfMorning.Value = Math.Clamp(config.ResourceGatesOfMorningCount, (int)_numResGatesOfMorning.Minimum, (int)_numResGatesOfMorning.Maximum);
+            _numSideGatesOfMorning.Value = Math.Clamp(config.SideboardGatesOfMorningCount, (int)_numSideGatesOfMorning.Minimum, (int)_numSideGatesOfMorning.Maximum);
+            _numResTwilight.Value = Math.Clamp(config.ResourceTwilightCount, (int)_numResTwilight.Minimum, (int)_numResTwilight.Maximum);
+            _numSideTwilight.Value = Math.Clamp(config.SideboardTwilightCount, (int)_numSideTwilight.Minimum, (int)_numSideTwilight.Maximum);
+            _numSideboardResourceEvents.Value = Math.Clamp(config.SideboardResourceEventCount, (int)_numSideboardResourceEvents.Minimum, (int)_numSideboardResourceEvents.Maximum);
+
+            PopulateResourceEventRolesChecklist();
+            var excludedEventRoles = new HashSet<string>(config.ExcludedResourceEventRoles ?? [], StringComparer.OrdinalIgnoreCase);
+            for (int i = 0; i < _clbResourceEventRoles.Items.Count; i++)
+            {
+                string roleName = _clbResourceEventRoles.Items[i]?.ToString() ?? string.Empty;
+                _clbResourceEventRoles.SetItemChecked(i, !excludedEventRoles.Contains(roleName));
             }
 
             UpdateDeckSummary();
@@ -2293,7 +2591,8 @@ namespace MECCG_Deck_Builder
         {
             if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null ||
                 _lblFactionStatus == null || _lblAllyStatus == null || _lblItemStatus == null ||
-                _lblRingsStatus == null || _lblPalantiriStatus == null || _lblQuestsStatus == null)
+                _lblRingsStatus == null || _lblPalantiriStatus == null || _lblQuestsStatus == null ||
+                _lblResourceEventsStatus == null)
             {
                 return;
             }
@@ -2306,6 +2605,7 @@ namespace MECCG_Deck_Builder
             bool hasRingsError = false;
             bool hasPalantirError = false;
             bool hasQuestsError = false;
+            bool hasResourceEventsError = false;
 
             int wizInRes = GetSelectedWizard1Count() + (IsWizard2InSideboard() ? 0 : GetSelectedWizard2Count());
             int wizInSide = IsWizard2InSideboard() ? GetSelectedWizard2Count() : 0;
@@ -2332,6 +2632,9 @@ namespace MECCG_Deck_Builder
             int sidePalCards = (int)_numSidePalantiri.Value + (int)_numSideAllowPalantirUse.Value;
             int resQuests = (int)_numResourceQuests.Value;
             int sideQuests = (int)_numSideboardQuests.Value;
+            int resEnvEvents = (int)_numResGatesOfMorning.Value + (int)_numResTwilight.Value;
+            int sideEnvEvents = (int)_numSideGatesOfMorning.Value + (int)_numSideTwilight.Value;
+            int sideAutoEvents = (int)_numSideboardResourceEvents.Value;
 
             int playDeckLimit = (int)_numPlayDeckSize.Value;
             int sideboardLimit = (int)_numSideboardSize.Value;
@@ -2384,16 +2687,16 @@ namespace MECCG_Deck_Builder
                     "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.";
             }
 
-            // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5, 6, 7, 8, 9) ---
-            int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies + resItems + resRingCards + resPalCards;
-            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards;
+            // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5-11) ---
+            int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies + resItems + resRingCards + resPalCards + resQuests + resEnvEvents;
+            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards + sideQuests + sideEnvEvents + sideAutoEvents;
 
             string resOverMsg =
-                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards + {resQuests} quests) exceed Play Deck Size ({playDeckLimit}).\n" +
+                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards + {resQuests} quests + {resEnvEvents} env) exceed Play Deck Size ({playDeckLimit}).\n" +
                 "Reduce Resources card counts or increase Play Deck Size on General Settings.";
 
             string sideOverMsg =
-                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests) exceed Sideboard Size ({sideboardLimit}).\n" +
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents} events) exceed Sideboard Size ({sideboardLimit}).\n" +
                 "Reduce Sideboard card counts or increase Sideboard Size on General Settings.";
 
             // --- Tab 5 (Factions) ---
@@ -2479,9 +2782,9 @@ namespace MECCG_Deck_Builder
                       (_lblItemStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
                        _lblItemStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
                        _lblItemStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
-                     (_deck.Pool.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c)) &&
-                      _deck.Resources.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c)) &&
-                      _deck.Sideboard.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c)) &&
+                     (_deck.Pool.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c) || IsQuestPackageCard(c)) &&
+                      _deck.Resources.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c) || IsQuestPackageCard(c)) &&
+                      _deck.Sideboard.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c) || IsQuestPackageCard(c)) &&
                       !_lblItemStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
                       !_lblItemStatus.Text.StartsWith("No items configured", StringComparison.OrdinalIgnoreCase)))
             {
@@ -2577,31 +2880,6 @@ namespace MECCG_Deck_Builder
                 _lblPalantiriStatus.Text = PalantirIdleStatusText;
             }
 
-            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError && !hasAllyError && !hasItemError && !hasRingsError && !hasPalantirError;
-
-            if (hasTheaterError || hasRecruitError || hasFactionError || hasAllyError || hasItemError || hasRingsError || hasPalantirError)
-            {
-                var blockedTabs = new List<string>();
-                if (hasTheaterError) blockedTabs.Add("Regions & Sites");
-                if (hasRecruitError) blockedTabs.Add("Wizards & Recruits");
-                if (hasFactionError) blockedTabs.Add("Factions");
-                if (hasAllyError) blockedTabs.Add("Allies");
-                if (hasItemError) blockedTabs.Add("Items");
-                if (hasRingsError) blockedTabs.Add("Rings");
-                if (hasPalantirError) blockedTabs.Add("Palantíri");
-
-                _lblPipelineStatus.ForeColor = Color.Firebrick;
-                _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblPipelineStatus.Text = $"⚠ Run Pipeline disabled: resolve validation error(s) on {string.Join(", ", blockedTabs)}.";
-            }
-            else if (_lblPipelineStatus.ForeColor == Color.Firebrick &&
-                     _lblPipelineStatus.Text.StartsWith("⚠ Run Pipeline disabled:", StringComparison.Ordinal))
-            {
-                _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
-                _lblPipelineStatus.Text = "Ready to run pipeline.";
-            }
-
             // --- Tab 10 (Quests) ---
             int totalRequestedQuests = resQuests + sideQuests;
             if (totalRequestedQuests > 0 && _clbQuestRoles.Items.Count > 0 && _clbQuestRoles.CheckedItems.Count == 0)
@@ -2639,9 +2917,70 @@ namespace MECCG_Deck_Builder
                 _lblQuestsStatus.Text = QuestIdleStatusText;
             }
 
-            _btnRunPipeline.Enabled = !hasTheaterError && !hasRecruitError && !hasFactionError && !hasAllyError && !hasItemError && !hasRingsError && !hasPalantirError && !hasQuestsError;
+            // --- Tab 11 (Resource Events) ---
+            int gomTotal = (int)_numResGatesOfMorning.Value + (int)_numSideGatesOfMorning.Value;
+            int twiTotal = (int)_numResTwilight.Value + (int)_numSideTwilight.Value;
+            bool needsAutoEvents = totalConfiguredRes < playDeckLimit || sideAutoEvents > 0;
 
-            if (hasTheaterError || hasRecruitError || hasFactionError || hasAllyError || hasItemError || hasRingsError || hasPalantirError || hasQuestsError)
+            if (gomTotal > 3)
+            {
+                hasResourceEventsError = true;
+                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblResourceEventsStatus.Text = "⚠ Gates of Morning is non-unique: combined Resources + Sideboard count cannot exceed 3.";
+            }
+            else if (twiTotal > 3)
+            {
+                hasResourceEventsError = true;
+                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblResourceEventsStatus.Text = "⚠ Twilight is non-unique: combined Resources + Sideboard count cannot exceed 3.";
+            }
+            else if (needsAutoEvents && _clbResourceEventRoles.Items.Count > 0 && _clbResourceEventRoles.CheckedItems.Count == 0)
+            {
+                hasResourceEventsError = true;
+                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblResourceEventsStatus.Text = "⚠ At least one Role must be checked under Role Focus to auto-fill Resource Events.";
+            }
+            else if (totalConfiguredRes > playDeckLimit && resEnvEvents > 0)
+            {
+                hasResourceEventsError = true;
+                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblResourceEventsStatus.Text = resOverMsg;
+            }
+            else if (totalConfiguredSide > sideboardLimit && (sideEnvEvents + sideAutoEvents) > 0)
+            {
+                hasResourceEventsError = true;
+                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
+                _lblResourceEventsStatus.Text = sideOverMsg;
+            }
+            else if ((_lblResourceEventsStatus.ForeColor == Color.Firebrick &&
+                      (_lblResourceEventsStatus.Text.StartsWith("⚠ Gates of Morning", StringComparison.Ordinal) ||
+                       _lblResourceEventsStatus.Text.StartsWith("⚠ Twilight", StringComparison.Ordinal) ||
+                       _lblResourceEventsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _lblResourceEventsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _lblResourceEventsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+                     (_deck.Resources.All(c => !IsGeneralResourceEvent(c)) &&
+                      _deck.Sideboard.All(c => !IsGeneralResourceEvent(c)) &&
+                      !_lblResourceEventsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase)))
+            {
+                _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+                _lblResourceEventsStatus.Text = ResourceEventsIdleStatusText;
+            }
+
+            // --- Unified Pipeline Readiness ---
+            bool anyError =
+                hasTheaterError || hasRecruitError || hasFactionError || hasAllyError ||
+                hasItemError || hasRingsError || hasPalantirError || hasQuestsError ||
+                hasResourceEventsError;
+
+            _btnRunPipeline.Enabled = !anyError;
+
+            if (anyError)
             {
                 var blockedTabs = new List<string>();
                 if (hasTheaterError) blockedTabs.Add("Regions & Sites");
@@ -2652,6 +2991,18 @@ namespace MECCG_Deck_Builder
                 if (hasRingsError) blockedTabs.Add("Rings");
                 if (hasPalantirError) blockedTabs.Add("Palantíri");
                 if (hasQuestsError) blockedTabs.Add("Quests");
+                if (hasResourceEventsError) blockedTabs.Add("Resource Events");
+
+                _lblPipelineStatus.ForeColor = Color.Firebrick;
+                _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+                _lblPipelineStatus.Text = $"⚠ Run Pipeline disabled: resolve validation error(s) on {string.Join(", ", blockedTabs)}.";
+            }
+            else if (_lblPipelineStatus.ForeColor == Color.Firebrick &&
+                     _lblPipelineStatus.Text.StartsWith("⚠ Run Pipeline disabled:", StringComparison.Ordinal))
+            {
+                _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+                _lblPipelineStatus.Text = "Ready to run pipeline.";
             }
         }
 
@@ -5863,6 +6214,19 @@ namespace MECCG_Deck_Builder
             IsHeroPlayableAlignment(card.Alignment) &&
             HasRoleTag(card, "Quest");
 
+        private static bool IsResourceEventPackageCard(Card card) =>
+            card != null &&
+            ((string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+              card.Secondary != null &&
+              card.Secondary.Contains("event", StringComparison.OrdinalIgnoreCase)) ||
+             CardFilterService.EqualsWithDiacriticFallback(card.Name, "Twilight"));
+
+        private bool IsGeneralResourceEvent(Card card) =>
+            IsResourceEventPackageCard(card) &&
+            !IsRingPackageCard(card) &&
+            !IsPalantirPackageCard(card) &&
+            !IsQuestPackageCard(card);
+
         private bool MatchesQuestRoleFocus(Card quest, HashSet<string> checkedRoles)
         {
             var secondaryRoles = _filterService.GetCardTagsForCategory(quest.Id, "Role")
@@ -6422,6 +6786,390 @@ namespace MECCG_Deck_Builder
                    string.Equals(alignment, "Dual", StringComparison.OrdinalIgnoreCase);
         }
 
+        private bool RunResourceEventsDraft(bool silent = false)
+        {
+            int reqResGom = (int)_numResGatesOfMorning.Value;
+            int reqSideGom = (int)_numSideGatesOfMorning.Value;
+            int reqResTwi = (int)_numResTwilight.Value;
+            int reqSideTwi = (int)_numSideTwilight.Value;
+            int reqSideAuto = (int)_numSideboardResourceEvents.Value;
+
+            if (reqResGom + reqSideGom > 3)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Gates of Morning is non-unique: combined Resources + Sideboard count cannot exceed 3.", "Resource Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            if (reqResTwi + reqSideTwi > 3)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Twilight is non-unique: combined Resources + Sideboard count cannot exceed 3.", "Resource Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
+            int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
+
+            int resAutoTarget = Math.Max(0, resCapacity - reqResGom - reqResTwi);
+            int sideAutoTarget = Math.Min(reqSideAuto, Math.Max(0, sideCapacity - reqSideGom - reqSideTwi));
+
+            var checkedRoles = new HashSet<string>(_clbResourceEventRoles.CheckedItems.Cast<string>(), StringComparer.OrdinalIgnoreCase);
+            if ((resAutoTarget > 0 || reqSideAuto > 0) && _clbResourceEventRoles.Items.Count > 0 && checkedRoles.Count == 0)
+            {
+                if (!silent)
+                {
+                    MessageBox.Show(this, "Please select at least one Role under Role Focus on the Resource Events tab.", "Resource Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+
+            var allSitesInDeck = _deck.Sites
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            var draftedRegionNames = new HashSet<string>(
+                _deck.Sites
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
+                    .Select(c => c.Name.Trim()),
+                StringComparer.OrdinalIgnoreCase);
+
+            var draftedRegionTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in _deck.Sites.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+            {
+                foreach (var rt in DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService))
+                {
+                    if (!string.IsNullOrWhiteSpace(rt))
+                    {
+                        draftedRegionTypes.Add(rt.Trim());
+                    }
+                }
+            }
+
+            var allDraftedChars = _deck.Pool
+                .Concat(_deck.Resources.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .Concat(_deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            var allDeckNonSiteCards = _deck.Pool
+                .Concat(_deck.Resources)
+                .Concat(_deck.Hazards)
+                .Concat(_deck.Sideboard)
+                .ToList();
+
+            var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var c in allDeckNonSiteCards)
+            {
+                usedCountsByName[c.Name] = usedCountsByName.GetValueOrDefault(c.Name, 0) + 1;
+            }
+
+            // 1. Draft Environment cards first (Gates of Morning, Twilight)
+            Card gomCard = FindHeroPreferredCard(allCards, activeSets, "Resource", "Gates of Morning");
+            Card twilightCard = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    CardFilterService.EqualsWithDiacriticFallback(c.Name, "Twilight"))
+                .OrderBy(c => string.Equals(c.Alignment, "Neutral", StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .FirstOrDefault();
+
+            List<Card> DraftFixedCopies(Card card, List<Card> targetSection, int requested, ref int cap)
+            {
+                var added = new List<Card>();
+                if (card == null || requested <= 0 || cap <= 0) return added;
+
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                int cur = usedCountsByName.GetValueOrDefault(card.Name, 0);
+
+                while (added.Count < requested && cap > 0 && cur < max)
+                {
+                    targetSection.Add(card);
+                    cur++;
+                    usedCountsByName[card.Name] = cur;
+                    added.Add(card);
+                    cap--;
+                }
+                return added;
+            }
+
+            var draftedResGom = DraftFixedCopies(gomCard, _deck.Resources, reqResGom, ref resCapacity);
+            var draftedResTwi = DraftFixedCopies(twilightCard, _deck.Resources, reqResTwi, ref resCapacity);
+            var draftedSideGom = DraftFixedCopies(gomCard, _deck.Sideboard, reqSideGom, ref sideCapacity);
+            var draftedSideTwi = DraftFixedCopies(twilightCard, _deck.Sideboard, reqSideTwi, ref sideCapacity);
+
+            // 2. Build eligible general Resource Events pool
+            var eligiblePool = allCards
+                .Where(c =>
+                    (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                    IsEligibleBaseResourceEvent(c))
+                .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .Select(PickHeroPreferredFromGroup)
+                .Where(c => c != null && PassesResourceEventGuards(c))
+                .ToList();
+
+            bool PassesResourceEventGuards(Card evt)
+            {
+                var roleTags = _filterService.GetCardTagsForCategory(evt.Id, "Role");
+                if (roleTags.Count == 0 || !roleTags.Any(r => checkedRoles.Contains(r)))
+                {
+                    return false;
+                }
+
+                if (!MatchesItemRegionRequirement(evt, draftedRegionNames, draftedRegionTypes))
+                {
+                    return false;
+                }
+
+                var siteReqs = _filterService.GetCardTagsForCategory(evt.Id, "Site Requirement");
+                if (siteReqs.Count > 0 && !siteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService)))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(evt.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, evt.Specific)))
+                {
+                    return false;
+                }
+
+                if (!SatisfiesExistingPrerequisites(evt, _deck.Pool.Concat(_deck.Resources).Concat(_deck.Sideboard).ToList()))
+                {
+                    return false;
+                }
+
+                if (!MatchesSkillOrRaceRequirements(evt, allDraftedChars))
+                {
+                    return false;
+                }
+
+                if (!MatchesItemTargetSpecies(evt, allDraftedChars))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            // 3. Auto-fill remaining Resources to Play Deck Size, then requested Sideboard count
+            var (draftedResAuto, resRoleSummary) = DraftEventsProportionately(
+                eligiblePool, checkedRoles, _deck.Resources, resCapacity, usedCountsByName);
+
+            int sideFillCount = Math.Min(reqSideAuto, sideCapacity);
+            var (draftedSideAuto, _) = DraftEventsProportionately(
+                eligiblePool, checkedRoles, _deck.Sideboard, sideFillCount, usedCountsByName);
+
+            _deck.SortSections();
+            if (!silent)
+            {
+                NotifyDeckChanged(DeckSectionType.Resources);
+            }
+
+            // 4. Status & Shortfall Reporting
+            var resAll = draftedResGom.Concat(draftedResTwi).Concat(draftedResAuto).ToList();
+            var sideAll = draftedSideGom.Concat(draftedSideTwi).Concat(draftedSideAuto).ToList();
+
+            string resText = resAll.Count > 0 ? FormatCardCountList(resAll) : "(None)";
+            string sideText = sideAll.Count > 0 ? FormatCardCountList(sideAll) : "(None)";
+
+            string statusMsg =
+                $"Drafted {resAll.Count} event(s) into Resources and {sideAll.Count} into Sideboard:\n" +
+                $"• Resources: {resText}\n" +
+                $"• Sideboard: {sideText}";
+
+            if (!string.IsNullOrWhiteSpace(resRoleSummary))
+            {
+                statusMsg += $"\n• Resources Role Allocation: {resRoleSummary}";
+            }
+
+            var warnings = new List<string>();
+            if (draftedResGom.Count < reqResGom) warnings.Add($"Resources Gates of Morning Shortfall: Drafted {draftedResGom.Count} of {reqResGom}.");
+            if (draftedSideGom.Count < reqSideGom) warnings.Add($"Sideboard Gates of Morning Shortfall: Drafted {draftedSideGom.Count} of {reqSideGom}.");
+            if (draftedResTwi.Count < reqResTwi) warnings.Add($"Resources Twilight Shortfall: Drafted {draftedResTwi.Count} of {reqResTwi}.");
+            if (draftedSideTwi.Count < reqSideTwi) warnings.Add($"Sideboard Twilight Shortfall: Drafted {draftedSideTwi.Count} of {reqSideTwi}.");
+            if (draftedResAuto.Count < resAutoTarget)
+            {
+                warnings.Add($"Play Deck Capacity Shortfall: Needed {resAutoTarget} auto-fill event(s), only {draftedResAuto.Count} eligible copy/copies available.");
+            }
+            if (draftedSideAuto.Count < reqSideAuto)
+            {
+                warnings.Add($"Sideboard Events Shortfall: Drafted {draftedSideAuto.Count} of {reqSideAuto} requested.");
+            }
+
+            if (warnings.Count > 0)
+            {
+                foreach (var w in warnings)
+                {
+                    statusMsg += $"\n⚠ {w}";
+                }
+                _lblResourceEventsStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            }
+            else
+            {
+                _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            }
+
+            _lblResourceEventsStatus.Text = statusMsg;
+            return true;
+        }
+
+        private (List<Card> Drafted, string RoleSummary) DraftEventsProportionately(
+            List<Card> eligiblePool,
+            HashSet<string> checkedRoles,
+            List<Card> targetSection,
+            int slotsToFill,
+            Dictionary<string, int> usedCountsByName)
+        {
+            var drafted = new List<Card>();
+            if (slotsToFill <= 0 || eligiblePool.Count == 0 || checkedRoles.Count == 0)
+            {
+                return (drafted, string.Empty);
+            }
+
+            bool CanAddCopy(Card card)
+            {
+                int current = usedCountsByName.GetValueOrDefault(card.Name, 0);
+                int max = string.Equals(card.Unique, "Unique", StringComparison.OrdinalIgnoreCase) ? 1 : 3;
+                return current < max;
+            }
+
+            var buckets = new List<(string Role, List<Card> Cards, int Quota)>();
+            foreach (var role in checkedRoles.OrderBy(r => r, StringComparer.OrdinalIgnoreCase))
+            {
+                var cardsInRole = eligiblePool
+                    .Where(c => HasRoleTag(c, role) && CanAddCopy(c))
+                    .ToList();
+
+                if (cardsInRole.Count > 0)
+                {
+                    buckets.Add((role, cardsInRole, 0));
+                }
+            }
+
+            if (buckets.Count == 0)
+            {
+                return (drafted, string.Empty);
+            }
+
+            // Allocate quotas: min 1 per eligible role if slots permit; otherwise weighted random subset
+            if (slotsToFill < buckets.Count)
+            {
+                var remainingIndices = Enumerable.Range(0, buckets.Count).ToList();
+                for (int pick = 0; pick < slotsToFill && remainingIndices.Count > 0; pick++)
+                {
+                    int totalW = remainingIndices.Sum(idx => buckets[idx].Cards.Count);
+                    int roll = Random.Shared.Next(totalW);
+                    int cum = 0;
+                    int chosenListPos = 0;
+                    for (int i = 0; i < remainingIndices.Count; i++)
+                    {
+                        cum += buckets[remainingIndices[i]].Cards.Count;
+                        if (roll < cum)
+                        {
+                            chosenListPos = i;
+                            break;
+                        }
+                    }
+
+                    int bIdx = remainingIndices[chosenListPos];
+                    buckets[bIdx] = (buckets[bIdx].Role, buckets[bIdx].Cards, 1);
+                    remainingIndices.RemoveAt(chosenListPos);
+                }
+            }
+            else
+            {
+                int totalWeight = buckets.Sum(b => b.Cards.Count);
+                int remaining = slotsToFill - buckets.Count;
+
+                var extras = new double[buckets.Count];
+                for (int i = 0; i < buckets.Count; i++)
+                {
+                    double ideal = (double)slotsToFill * buckets[i].Cards.Count / totalWeight;
+                    extras[i] = Math.Max(0.0, ideal - 1.0);
+                }
+
+                double sumExtra = extras.Sum();
+                var intQuotas = new int[buckets.Count];
+                var remainders = new (int Index, double Rem, int Tie)[buckets.Count];
+                int assignedExtra = 0;
+
+                for (int i = 0; i < buckets.Count; i++)
+                {
+                    double scaled = sumExtra > 0 ? (extras[i] * remaining / sumExtra) : ((double)remaining / buckets.Count);
+                    int floored = (int)Math.Floor(scaled);
+                    intQuotas[i] = 1 + floored;
+                    assignedExtra += floored;
+                    remainders[i] = (i, scaled - floored, Random.Shared.Next());
+                }
+
+                int leftover = remaining - assignedExtra;
+                foreach (var item in remainders.OrderByDescending(r => r.Rem).ThenBy(r => r.Tie).Take(leftover))
+                {
+                    intQuotas[item.Index]++;
+                }
+
+                for (int i = 0; i < buckets.Count; i++)
+                {
+                    buckets[i] = (buckets[i].Role, buckets[i].Cards, intQuotas[i]);
+                }
+            }
+
+            var countsPerRole = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            // Pick narrowest buckets first so specialized roles claim a card before broad multi-role pools
+            foreach (var (Role, Cards, Quota) in buckets.Where(b => b.Quota > 0).OrderBy(b => b.Cards.Count).ThenBy(_ => Random.Shared.Next()))
+            {
+                int addedInBucket = 0;
+                while (addedInBucket < Quota && drafted.Count < slotsToFill)
+                {
+                    var available = Cards.Where(CanAddCopy).ToList();
+                    if (available.Count == 0) break;
+
+                    int minCopyCount = available.Min(c => usedCountsByName.GetValueOrDefault(c.Name, 0));
+                    var tierCandidates = available
+                        .Where(c => usedCountsByName.GetValueOrDefault(c.Name, 0) == minCopyCount)
+                        .ToList();
+
+                    var chosen = tierCandidates[Random.Shared.Next(tierCandidates.Count)];
+                    targetSection.Add(chosen);
+                    usedCountsByName[chosen.Name] = usedCountsByName.GetValueOrDefault(chosen.Name, 0) + 1;
+                    drafted.Add(chosen);
+                    addedInBucket++;
+                    countsPerRole[Role] = countsPerRole.GetValueOrDefault(Role, 0) + 1;
+                }
+            }
+
+            // Fallback top-up if any narrow bucket hit copy-limit exhaustion
+            while (drafted.Count < slotsToFill)
+            {
+                var available = eligiblePool.Where(CanAddCopy).ToList();
+                if (available.Count == 0) break;
+
+                int minCopyCount = available.Min(c => usedCountsByName.GetValueOrDefault(c.Name, 0));
+                var tierCandidates = available
+                    .Where(c => usedCountsByName.GetValueOrDefault(c.Name, 0) == minCopyCount)
+                    .ToList();
+
+                var chosen = tierCandidates[Random.Shared.Next(tierCandidates.Count)];
+                targetSection.Add(chosen);
+                usedCountsByName[chosen.Name] = usedCountsByName.GetValueOrDefault(chosen.Name, 0) + 1;
+                drafted.Add(chosen);
+            }
+
+            string summary = string.Join(", ", countsPerRole
+                .OrderBy(kvp => kvp.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+
+            return (drafted, summary);
+        }
+
         private void RunPipelineDraft()
         {
             var stepsToRun = new List<(int StepNumber, string TabName, RunnableTabInfo Info)>();
@@ -6779,6 +7527,38 @@ namespace MECCG_Deck_Builder
             return int.TryParse(clean, out int val) ? val : 0;
         }
 
+        private static (int Base, int Conditional) ParseCardMPs(string mpsStr)
+        {
+            if (string.IsNullOrWhiteSpace(mpsStr)) return (0, 0);
+
+            string trimmed = mpsStr.Trim();
+            if (string.Equals(trimmed, "None", StringComparison.OrdinalIgnoreCase)) return (0, 0);
+
+            int openParen = trimmed.IndexOf('(');
+            int closeParen = openParen >= 0 ? trimmed.IndexOf(')', openParen + 1) : -1;
+
+            // Purely parenthesized e.g. "(2)" -> 0 base, 2 conditional
+            if (openParen == 0 && closeParen > 0)
+            {
+                string inner = trimmed[1..closeParen].Trim();
+                return int.TryParse(inner, out int condOnly) ? (0, condOnly) : (0, 0);
+            }
+
+            // Base + conditional e.g. "4(6)" -> 4 base, 6 conditional
+            if (openParen > 0 && closeParen > openParen)
+            {
+                string basePart = trimmed[..openParen].Trim();
+                string condPart = trimmed[(openParen + 1)..closeParen].Trim();
+
+                int baseVal = int.TryParse(basePart, out int b) ? b : 0;
+                int condVal = int.TryParse(condPart, out int c) ? c : baseVal;
+                return (baseVal, condVal);
+            }
+
+            // Plain integer e.g. "3", "-2" -> (3, 3)
+            return int.TryParse(trimmed, out int plain) ? (plain, plain) : (0, 0);
+        }
+
         #endregion
     }
 
@@ -6823,7 +7603,7 @@ namespace MECCG_Deck_Builder
 
         // Tab 2: Regions & Sites
         public string SeedRegion { get; set; } = "Random";
-        public int RegionCount { get; set; } = 4;
+        public int RegionCount { get; set; } = 5;
         public int MaxSiteCount { get; set; } = 12;
         public List<string> SelectedRegionTypes { get; set; } = [];
         public List<string> SelectedSiteTypes { get; set; } = [];
@@ -6832,9 +7612,9 @@ namespace MECCG_Deck_Builder
         public List<CharacterRowSettings> StarterRows { get; set; } = [];
 
         // Tab 4: Wizards & Recruits
-        public string PrimaryWizard { get; set; } = "(None)";
-        public int PrimaryWizardCopies { get; set; } = 1;
-        public string SecondaryWizard { get; set; } = "(None)";
+        public string PrimaryWizard { get; set; } = "Random";
+        public int PrimaryWizardCopies { get; set; } = 2;
+        public string SecondaryWizard { get; set; } = "Random";
         public int SecondaryWizardCopies { get; set; } = 1;
         public string SecondaryWizardDestination { get; set; } = "Sideboard";
 
@@ -6843,16 +7623,16 @@ namespace MECCG_Deck_Builder
 
         // Tab 5: Factions
         public int ResourceFactionCount { get; set; } = 1;
-        public int SideboardFactionCount { get; set; } = 1;
+        public int SideboardFactionCount { get; set; } = 0;
 
         // Tab 6: Allies
         public int ResourceAllyCount { get; set; } = 1;
-        public int SideboardAllyCount { get; set; } = 1;
+        public int SideboardAllyCount { get; set; } = 0;
 
         // Tab 7: Items
-        public int PoolMinorItemCount { get; set; } = 1;
+        public int PoolMinorItemCount { get; set; } = 2;
         public int ResourceMinorItemCount { get; set; } = 1;
-        public int SideboardMinorItemCount { get; set; } = 1;
+        public int SideboardMinorItemCount { get; set; } = 0;
         public int ResourceMajorItemCount { get; set; } = 1;
         public int SideboardMajorItemCount { get; set; } = 1;
         public int ResourceGreaterItemCount { get; set; } = 1;
@@ -6862,9 +7642,9 @@ namespace MECCG_Deck_Builder
         public List<string> ExcludedItemRoles { get; set; } = [];
 
         // Tab 8: Rings
-        public int ResourceGoldRingCount { get; set; } = 2;
+        public int ResourceGoldRingCount { get; set; } = 0;
         public int SideboardGoldRingCount { get; set; } = 0;
-        public int ResourceAllowRingTestCount { get; set; } = 1;
+        public int ResourceAllowRingTestCount { get; set; } = 0;
         public int SideboardAllowRingTestCount { get; set; } = 0;
         public int ResourceAidRingTestCount { get; set; } = 0;
         public int SideboardAidRingTestCount { get; set; } = 0;
@@ -6872,7 +7652,7 @@ namespace MECCG_Deck_Builder
         public int SideboardOneRingCount { get; set; } = 0;
         public int ResourceDwarvenRingCount { get; set; } = 0;
         public int SideboardDwarvenRingCount { get; set; } = 0;
-        public int ResourceMagicRingCount { get; set; } = 1;
+        public int ResourceMagicRingCount { get; set; } = 0;
         public int SideboardMagicRingCount { get; set; } = 0;
         public int ResourceLesserRingCount { get; set; } = 0;
         public int SideboardLesserRingCount { get; set; } = 0;
@@ -6881,16 +7661,24 @@ namespace MECCG_Deck_Builder
         public List<string> ExcludedRingRoles { get; set; } = [];
 
         // Tab 9: Palantiri
-        public int ResourcePalantirCount { get; set; } = 1;
+        public int ResourcePalantirCount { get; set; } = 0;
         public int SideboardPalantirCount { get; set; } = 0;
-        public int ResourceAllowPalantirUseCount { get; set; } = 1;
+        public int ResourceAllowPalantirUseCount { get; set; } = 0;
         public int SideboardAllowPalantirUseCount { get; set; } = 0;
         public List<string> ExcludedPalantirRoles { get; set; } = [];
 
         // Tab 10: Quests
-        public int ResourceQuestCount { get; set; } = 1;
+        public int ResourceQuestCount { get; set; } = 0;
         public int SideboardQuestCount { get; set; } = 0;
         public bool AutoDraftOneRingPackage { get; set; } = true;
         public List<string> ExcludedQuestRoles { get; set; } = [];
+
+        // Tab 11: Resource Events
+        public int ResourceGatesOfMorningCount { get; set; } = 0;
+        public int SideboardGatesOfMorningCount { get; set; } = 0;
+        public int ResourceTwilightCount { get; set; } = 0;
+        public int SideboardTwilightCount { get; set; } = 0;
+        public int SideboardResourceEventCount { get; set; } = 4;
+        public List<string> ExcludedResourceEventRoles { get; set; } = [];
     }
 }

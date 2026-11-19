@@ -1794,7 +1794,7 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Resource (Event)</span>
     </div>
     <p>
-        Identifies biological species or creature races that the event specifically buffs, protects, cancels, or targets in combat:
+        Identifies the Hero company species required to cast, bear, or benefit from the event (enemy attacker species cancelled by protection events such as <em>Dark Quarrels</em>, <em>The Cock Crows</em>, and <em>Praise to Elbereth</em> are omitted so Resource drafting treats <code>Target Species</code> strictly as a company eligibility guard):
     </p>
     <ul>
         <li><code>Wizard</code> &rarr; Mandatory caster race for Istari spells (<em>Kindling of the Spirit</em>, <em>Sacrifice of Form</em>, <em>True F&aacute;na</em>, <em>Vanishment</em>, <em>Wizard's Fire</em>, <em>Wizard's Flame</em>, <em>Wizard's Laughter</em>, <em>Wizard's River-horses</em>, <em>Wizard's Voice</em>)</li>
@@ -1802,10 +1802,6 @@
         <li><code>Elf</code> &rarr; Species prowess buff on <em>The Evenstar</em></li>
         <li><code>D&uacute;nadan; Man</code> &rarr; Daytime combat prowess buff on <em>Sun</em></li>
         <li><code>D&uacute;nadan</code> &rarr; Bearer untapping stamina on <em>And&uacute;ril, the Flame of the West</em></li>
-        <li><code>Man; Orc; Troll</code> &rarr; Attack cancellation on <em>Dark Quarrels</em></li>
-        <li><code>Troll</code> &rarr; Attack cancellation on <em>The Cock Crows</em></li>
-        <li><code>Nazg&ucirc;l</code> &rarr; Event/attack cancellation on <em>Praise to Elbereth</em> and <em>Wizard's River-horses</em></li>
-        <li><code>Race!=Nazg&ucirc;l</code> &rarr; Printed exclusion on <em>The Old Thrush</em> (cannot target Nazg&ucirc;l attacks)</li>
     </ul>
 
     <div class="note">
