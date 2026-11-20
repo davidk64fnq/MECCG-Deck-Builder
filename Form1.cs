@@ -1045,7 +1045,15 @@ namespace MECCG_Deck_Builder
 
             if (listBox.SelectedIndex < 0)
             {
-                if (listBox == ListBoxMaster)
+                bool anyListHasSelection =
+                    ListBoxMaster.SelectedIndex >= 0 ||
+                    ListBoxPool.SelectedIndex >= 0 ||
+                    ListBoxResources.SelectedIndex >= 0 ||
+                    ListBoxHazards.SelectedIndex >= 0 ||
+                    ListBoxSideboard.SelectedIndex >= 0 ||
+                    ListBoxSites.SelectedIndex >= 0;
+
+                if (!anyListHasSelection)
                 {
                     _imageLoadCts?.Cancel();
                     PictureBoxCardImage.Image = null;

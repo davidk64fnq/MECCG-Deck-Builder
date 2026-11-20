@@ -54,6 +54,10 @@
 			<param name="Local" value="export_formats.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Modular Workbench Tab &amp; Rules Reference">
+			<param name="Local" value="workbench_reference.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Modular Workbench: Drafting Specific Cards">
 			<param name="Local" value="workbench_examples.html">
     </OBJECT>

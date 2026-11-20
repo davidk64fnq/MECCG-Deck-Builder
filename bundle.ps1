@@ -1,4 +1,4 @@
-$extensions = @("*.cs", "*.md", "*.html", "*.css")
+$extensions = @("*.cs", "*.md", "*.html", "*.css", "*.hhp", "*.hhc", "*.hhk")
 $outputFile = "meccg-context.xml"
 
 # Find all matching files, excluding typical visual studio / git build folders

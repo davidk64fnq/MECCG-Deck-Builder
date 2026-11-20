@@ -366,11 +366,12 @@ namespace MECCG_Deck_Builder
             _toolTip.SetToolTip(
                 _numDecksBeforeCouncil,
                 "Planned deck cycles before calling the Free Council.\n" +
-                "At 1, Allies avoid sharing a site with Resources Factions; at >= 2, tapped sites refresh on exhaust.");
+                "Each non-Haven site can be tapped once per deck cycle (1-4) across Resources Factions, Allies, Items, Gold Rings, Palantíri, and Quest Items.\n" +
+                "Havens never tap and have unlimited capacity.");
 
             var lblDecksHint = new Label
             {
-                Text = "deck cycle(s) planned (1: distinct sites for Factions/Allies; 2+: sites refresh on exhaust).",
+                Text = "deck cycle(s) planned (non-Haven sites allow 1 Resources tap per cycle; Havens never tap).",
                 Location = new Point(225, 120),
                 Size = new Size(575, 20),
                 ForeColor = Color.DimGray
@@ -867,7 +868,8 @@ namespace MECCG_Deck_Builder
                 Text = "backup factions in Sideboard (unique titles are never duplicated across Resources & Sideboard).",
                 Location = new Point(304, 65),
                 Size = new Size(495, 32),
-                ForeColor = Color.DimGray
+                ForeColor = Color.DimGray,
+                UseMnemonic = false
             };
 
             _numResourceFactions.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
@@ -968,7 +970,8 @@ namespace MECCG_Deck_Builder
                 Text = "backup allies in Sideboard (unique titles are never duplicated across Resources & Sideboard).",
                 Location = new Point(304, 65),
                 Size = new Size(495, 32),
-                ForeColor = Color.DimGray
+                ForeColor = Color.DimGray,
+                UseMnemonic = false
             };
 
             _numResourceAllies.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
@@ -2699,6 +2702,8 @@ namespace MECCG_Deck_Builder
             _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
             _lblStarterStatus.Text = StarterIdleStatusText;
+            _lblRecruitStatus.Text = string.Empty;
+            _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
 
             _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
@@ -3480,7 +3485,9 @@ namespace MECCG_Deck_Builder
                     $"⚠ Sideboard characters ({totalSideboardChars}: {reserveCount} Sideboard row(s){(wizInSide > 0 ? $" + {wizInSide} Wizard" : "")}) exceed the Sideboard Size limit ({sideboardLimit}) set in General Settings.\n" +
                     "Increase Sideboard Size, change Secondary Wizard destination, or clear a Sideboard row.";
             }
-            else
+            else if (_lblRecruitStatus.ForeColor == Color.Firebrick ||
+                     string.IsNullOrWhiteSpace(_lblRecruitStatus.Text) ||
+                     _lblRecruitStatus.Text.StartsWith("Configured:", StringComparison.Ordinal))
             {
                 _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
                 _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -3500,7 +3507,7 @@ namespace MECCG_Deck_Builder
                 "Reduce Resources card counts or increase Play Deck Size on General Settings.";
 
             string sideOverMsg =
-                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents + hazEventsSide} + {sideCreatures} creature/Nazgûl) exceed Sideboard Size ({sideboardLimit}).\n" +
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents + hazEventsSide} events + {sideCreatures} creature/Nazgûl) exceed Sideboard Size ({sideboardLimit}).\n" +
                 "Reduce Sideboard card counts or increase Sideboard Size on General Settings.";
 
             // --- Tab 5 (Factions) ---
@@ -4877,7 +4884,6 @@ namespace MECCG_Deck_Builder
                 return true;
             }
 
-            // 2. Gather Sites and drafted character groups
             var draftedRegions = new HashSet<string>(
                 _deck.Sites
                     .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
@@ -4919,7 +4925,6 @@ namespace MECCG_Deck_Builder
             var sideChars = _deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)).ToList();
             var allDraftedChars = poolChars.Concat(resChars).Concat(sideChars).ToList();
 
-            // 3. Build eligible faction candidates (grouped by Name, preferring Hero alignment)
             var factionGroups = allCards
                 .Where(c =>
                     (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
@@ -4941,14 +4946,12 @@ namespace MECCG_Deck_Builder
 
             foreach (var faction in factionGroups)
             {
-                // 3a. Named character "Specific" check
                 if (!string.IsNullOrWhiteSpace(faction.Specific) &&
                     !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, faction.Specific)))
                 {
                     continue;
                 }
 
-                // 3b. Site Requirement check (must match at least one Site/Haven in _deck.Sites)
                 var siteReqTags = _filterService.GetCardTagsForCategory(faction.Id, "Site Requirement");
                 if (siteReqTags.Count == 0) continue;
 
@@ -4957,7 +4960,6 @@ namespace MECCG_Deck_Builder
 
                 if (!playableLocal && !playableOutside) continue;
 
-                // 3c. Resolve complete Prerequisite chain (and verify prerequisites' own Site Requirements & Specific)
                 var resolvedPrereqs = new List<Card>();
                 if (!TryResolvePrerequisiteChain(
                     faction,
@@ -4971,11 +4973,6 @@ namespace MECCG_Deck_Builder
                     continue;
                 }
 
-                // 3d. Evaluate priority tier:
-                // 1 = Character Faction Bonus or Specific Character Match (Pool > Resources > Sideboard)
-                // 2 = Character Race Match (Pool > Resources > Sideboard)
-                // 3 = Local Site vs Outside Haven
-                // 4 = Remaining Eligible Factions
                 int localRank = playableLocal ? 0 : 1;
 
                 int bonusSourceRank = GetBestFactionBonusSourceRank(faction, poolChars, resChars, sideChars);
@@ -5015,7 +5012,6 @@ namespace MECCG_Deck_Builder
                 .ThenBy(x => x.TieBreaker)
                 .ToList();
 
-            // 4. Draft into Resources first, then Sideboard
             var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (var c in _deck.Resources.Concat(_deck.Sideboard))
             {
@@ -5025,19 +5021,43 @@ namespace MECCG_Deck_Builder
             int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
             int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
 
+            var siteTracker = new DeckCycleSiteTracker(this, (int)_numDecksBeforeCouncil.Value, _deck.Resources, allSitesInDeck);
+
             var draftedResFactions = new List<Card>();
             var draftedResPrereqs = new List<Card>();
+            var factionOverlaps = new List<string>();
             int resCardsAdded = 0;
 
+            // Pass 1: Respect per-cycle site capacity
             DraftFactionsIntoSection(
                 orderedCandidates,
                 _deck.Resources,
                 reqRes,
                 resCapacity,
                 usedCountsByName,
+                siteTracker,
+                requireAvailableCapacity: true,
+                factionOverlaps,
                 draftedResFactions,
                 draftedResPrereqs,
                 ref resCardsAdded);
+
+            // Pass 2: Fallback if requested count still unmet
+            if (draftedResFactions.Count < reqRes)
+            {
+                DraftFactionsIntoSection(
+                    orderedCandidates,
+                    _deck.Resources,
+                    reqRes,
+                    resCapacity,
+                    usedCountsByName,
+                    siteTracker,
+                    requireAvailableCapacity: false,
+                    factionOverlaps,
+                    draftedResFactions,
+                    draftedResPrereqs,
+                    ref resCardsAdded);
+            }
 
             var draftedSideFactions = new List<Card>();
             var draftedSidePrereqs = new List<Card>();
@@ -5049,6 +5069,9 @@ namespace MECCG_Deck_Builder
                 reqSide,
                 sideCapacity,
                 usedCountsByName,
+                siteTracker: null,
+                requireAvailableCapacity: false,
+                overlapsOut: null,
                 draftedSideFactions,
                 draftedSidePrereqs,
                 ref sideCardsAdded);
@@ -5059,7 +5082,6 @@ namespace MECCG_Deck_Builder
                 NotifyDeckChanged(draftedResFactions.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
             }
 
-            // 5. Build Status Message
             string resText = draftedResFactions.Count > 0
                 ? string.Join(", ", draftedResFactions.Select(f => f.Name)) +
                   (draftedResPrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedResPrereqs.Select(p => p.Name))})" : "")
@@ -5084,6 +5106,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Faction Shortfall: Drafted only {draftedSideFactions.Count} of {reqSide} playable faction(s).");
             }
+            warnings.AddRange(factionOverlaps);
 
             if (warnings.Count > 0)
             {
@@ -5110,6 +5133,9 @@ namespace MECCG_Deck_Builder
             int requestedFactions,
             int sectionCapacity,
             Dictionary<string, int> usedCountsByName,
+            DeckCycleSiteTracker siteTracker,
+            bool requireAvailableCapacity,
+            List<string> overlapsOut,
             List<Card> draftedFactionsOut,
             List<Card> draftedPrereqsOut,
             ref int totalCardsAdded)
@@ -5123,7 +5149,6 @@ namespace MECCG_Deck_Builder
                 return current < max;
             }
 
-            // First pass prioritizes distinct titles; subsequent passes only allow non-unique duplicates if needed
             for (int copyTier = 0; copyTier < 3 && draftedFactionsOut.Count < requestedFactions; copyTier++)
             {
                 foreach (var (Faction, Prerequisites, PrimaryTier, SourceRank, LocalRank, TieBreaker) in orderedCandidates)
@@ -5155,6 +5180,12 @@ namespace MECCG_Deck_Builder
                     int neededSlots = 1 + neededPrereqs.Count;
                     if (totalCardsAdded + neededSlots > sectionCapacity) continue;
 
+                    Card[] cardsToAdd = [faction, .. neededPrereqs];
+                    if (requireAvailableCapacity && siteTracker != null && !siteTracker.CanAddWithinCapacity(cardsToAdd))
+                    {
+                        continue;
+                    }
+
                     targetSection.Add(faction);
                     usedCountsByName[faction.Name] = curCount + 1;
                     draftedFactionsOut.Add(faction);
@@ -5166,6 +5197,7 @@ namespace MECCG_Deck_Builder
                         draftedPrereqsOut.Add(prereq);
                     }
 
+                    siteTracker?.Commit(cardsToAdd, overlapsOut);
                     totalCardsAdded += neededSlots;
                 }
             }
@@ -5187,7 +5219,6 @@ namespace MECCG_Deck_Builder
                 return true;
             }
 
-            // 2. Gather Sites and drafted characters
             var draftedRegions = new HashSet<string>(
                 _deck.Sites
                     .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(c.Name))
@@ -5229,7 +5260,6 @@ namespace MECCG_Deck_Builder
                 .Concat(_deck.Sideboard.Where(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase)))
                 .ToList();
 
-            // 3. Build eligible ally candidates (grouped by Name, preferring Hero alignment)
             var allyGroups = allCards
                 .Where(c =>
                     (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
@@ -5249,14 +5279,12 @@ namespace MECCG_Deck_Builder
 
             foreach (var ally in allyGroups)
             {
-                // 3a. Named character "Specific" check
                 if (!string.IsNullOrWhiteSpace(ally.Specific) &&
                     !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, ally.Specific)))
                 {
                     continue;
                 }
 
-                // 3b. Site Requirement check (must match at least one Site/Haven in _deck.Sites)
                 var siteReqTags = _filterService.GetCardTagsForCategory(ally.Id, "Site Requirement");
                 if (siteReqTags.Count == 0) continue;
 
@@ -5265,7 +5293,6 @@ namespace MECCG_Deck_Builder
 
                 if (!playableLocal && !playableOutside) continue;
 
-                // 3c. Resolve complete Prerequisite chain (future-safe for later expansions)
                 var resolvedPrereqs = new List<Card>();
                 if (!TryResolvePrerequisiteChain(
                     ally,
@@ -5279,7 +5306,6 @@ namespace MECCG_Deck_Builder
                     continue;
                 }
 
-                // 3d. Prioritize local region-group sites/Havens before outside Havens
                 int localRank = playableLocal ? 0 : 1;
                 scoredCandidates.Add((ally, resolvedPrereqs, localRank, Random.Shared.Next()));
             }
@@ -5289,7 +5315,6 @@ namespace MECCG_Deck_Builder
                 .ThenBy(x => x.TieBreaker)
                 .ToList();
 
-            // 4. Draft into Resources first (preferring distinct sites from Resources Factions), then Sideboard
             var usedCountsByName = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (var c in _deck.Resources.Concat(_deck.Sideboard))
             {
@@ -5299,40 +5324,26 @@ namespace MECCG_Deck_Builder
             int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
             int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
 
-            var resourceFactions = _deck.Resources
-                .Where(c => string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            var siteOccupyingCards = new List<Card>(resourceFactions);
-            int currentSiteMatches = MaxSiteAssignments(siteOccupyingCards, allSitesInDeck);
+            var siteTracker = new DeckCycleSiteTracker(this, (int)_numDecksBeforeCouncil.Value, _deck.Resources, allSitesInDeck);
 
             var draftedResAllies = new List<Card>();
             var draftedResPrereqs = new List<Card>();
-            var overlappingResAllies = new List<Card>();
+            var allyOverlaps = new List<string>();
             int resCardsAdded = 0;
 
-            bool enforceDistinctSite = (int)_numDecksBeforeCouncil.Value == 1;
+            DraftAlliesIntoSection(
+                orderedCandidates,
+                _deck.Resources,
+                reqRes,
+                resCapacity,
+                usedCountsByName,
+                siteTracker,
+                requireAvailableCapacity: true,
+                allyOverlaps,
+                draftedResAllies,
+                draftedResPrereqs,
+                ref resCardsAdded);
 
-            if (enforceDistinctSite)
-            {
-                // Pass 1: Disjoint sites only (so Resource Allies and Factions don't share the same sole site in 1-deck games)
-                DraftAlliesIntoSection(
-                    orderedCandidates,
-                    _deck.Resources,
-                    reqRes,
-                    resCapacity,
-                    usedCountsByName,
-                    allSitesInDeck,
-                    siteOccupyingCards,
-                    ref currentSiteMatches,
-                    requireDistinctSite: true,
-                    draftedResAllies,
-                    draftedResPrereqs,
-                    overlappingOut: null,
-                    ref resCardsAdded);
-            }
-
-            // Pass 2 (or sole pass when Decks Before Council >= 2): fill remaining requested Resources Allies
             if (draftedResAllies.Count < reqRes)
             {
                 DraftAlliesIntoSection(
@@ -5341,21 +5352,17 @@ namespace MECCG_Deck_Builder
                     reqRes,
                     resCapacity,
                     usedCountsByName,
-                    allSitesInDeck,
-                    enforceDistinctSite ? siteOccupyingCards : null,
-                    ref currentSiteMatches,
-                    requireDistinctSite: false,
+                    siteTracker,
+                    requireAvailableCapacity: false,
+                    allyOverlaps,
                     draftedResAllies,
                     draftedResPrereqs,
-                    overlappingOut: enforceDistinctSite ? overlappingResAllies : null,
                     ref resCardsAdded);
             }
 
-            // Sideboard backup allies (no disjoint-site restriction)
             var draftedSideAllies = new List<Card>();
             var draftedSidePrereqs = new List<Card>();
             int sideCardsAdded = 0;
-            int unusedSiteMatches = 0;
 
             DraftAlliesIntoSection(
                 orderedCandidates,
@@ -5363,13 +5370,11 @@ namespace MECCG_Deck_Builder
                 reqSide,
                 sideCapacity,
                 usedCountsByName,
-                allSitesInDeck,
-                siteOccupyingCards: null,
-                ref unusedSiteMatches,
-                requireDistinctSite: false,
+                siteTracker: null,
+                requireAvailableCapacity: false,
+                overlapsOut: null,
                 draftedSideAllies,
                 draftedSidePrereqs,
-                overlappingOut: null,
                 ref sideCardsAdded);
 
             _deck.SortSections();
@@ -5378,7 +5383,6 @@ namespace MECCG_Deck_Builder
                 NotifyDeckChanged(draftedResAllies.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
             }
 
-            // 5. Build Status Message
             string resText = draftedResAllies.Count > 0
                 ? string.Join(", ", draftedResAllies.Select(a => a.Name)) +
                   (draftedResPrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedResPrereqs.Select(p => p.Name))})" : "")
@@ -5403,26 +5407,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Ally Shortfall: Drafted only {draftedSideAllies.Count} of {reqSide} playable ally/allies.");
             }
-
-            foreach (var overlapAlly in overlappingResAllies)
-            {
-                var allySiteNames = GetPlayableSiteIndices(overlapAlly, allSitesInDeck)
-                    .Select(idx => allSitesInDeck[idx].Name)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                var conflictingFactions = resourceFactions
-                    .Where(f => GetPlayableSiteIndices(f, allSitesInDeck).Any(idx => allySiteNames.Contains(allSitesInDeck[idx].Name)))
-                    .Select(f => f.Name)
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList();
-
-                string siteList = string.Join(", ", allySiteNames);
-                string factionList = conflictingFactions.Count > 0
-                    ? $" with Resource Faction(s): {string.Join(", ", conflictingFactions)}"
-                    : string.Empty;
-
-                warnings.Add($"Site overlap in Resources: {overlapAlly.Name} ({siteList}) shares its playable site(s){factionList}.");
-            }
+            warnings.AddRange(allyOverlaps);
 
             if (warnings.Count > 0)
             {
@@ -5443,19 +5428,17 @@ namespace MECCG_Deck_Builder
             return true;
         }
 
-        private void DraftAlliesIntoSection(
+        private static void DraftAlliesIntoSection(
             List<(Card Ally, List<Card> Prerequisites, int LocalRank, int TieBreaker)> orderedCandidates,
             List<Card> targetSection,
             int requestedAllies,
             int sectionCapacity,
             Dictionary<string, int> usedCountsByName,
-            List<Card> allSitesInDeck,
-            List<Card> siteOccupyingCards,
-            ref int currentSiteMatches,
-            bool requireDistinctSite,
+            DeckCycleSiteTracker siteTracker,
+            bool requireAvailableCapacity,
+            List<string> overlapsOut,
             List<Card> draftedAlliesOut,
             List<Card> draftedPrereqsOut,
-            List<Card> overlappingOut,
             ref int totalCardsAdded)
         {
             if (requestedAllies <= 0 || sectionCapacity <= 0) return;
@@ -5497,34 +5480,15 @@ namespace MECCG_Deck_Builder
                     int neededSlots = 1 + neededPrereqs.Count;
                     if (totalCardsAdded + neededSlots > sectionCapacity) continue;
 
-                    int newSiteMatches = currentSiteMatches;
-                    bool isDistinctSite = true;
-
-                    if (siteOccupyingCards != null)
+                    Card[] cardsToAdd = [Ally, .. neededPrereqs];
+                    if (requireAvailableCapacity && siteTracker != null && !siteTracker.CanAddWithinCapacity(cardsToAdd))
                     {
-                        var testCards = new List<Card>(siteOccupyingCards) { Ally };
-                        newSiteMatches = MaxSiteAssignments(testCards, allSitesInDeck);
-                        isDistinctSite = newSiteMatches > currentSiteMatches;
-
-                        if (requireDistinctSite && !isDistinctSite)
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     targetSection.Add(Ally);
                     usedCountsByName[Ally.Name] = curCount + 1;
                     draftedAlliesOut.Add(Ally);
-
-                    if (siteOccupyingCards != null)
-                    {
-                        siteOccupyingCards.Add(Ally);
-                        currentSiteMatches = newSiteMatches;
-                        if (!isDistinctSite)
-                        {
-                            overlappingOut?.Add(Ally);
-                        }
-                    }
 
                     foreach (var prereq in neededPrereqs)
                     {
@@ -5533,25 +5497,196 @@ namespace MECCG_Deck_Builder
                         draftedPrereqsOut.Add(prereq);
                     }
 
+                    siteTracker?.Commit(cardsToAdd, overlapsOut);
                     totalCardsAdded += neededSlots;
                 }
             }
         }
 
-        private List<int> GetPlayableSiteIndices(Card card, List<Card> allSitesInDeck)
+        private sealed class DeckCycleSiteTracker
+        {
+            private readonly DeckAssemblyMatrixDialog _owner;
+            private readonly int _capacityPerSite;
+            private readonly List<Card> _allSitesInDeck;
+            private readonly List<Card> _nonHavenSites;
+            private readonly List<Card> _occupyingCards = [];
+            private int _matchedCount;
+
+            public DeckCycleSiteTracker(
+                DeckAssemblyMatrixDialog owner,
+                int cyclesBeforeCouncil,
+                IEnumerable<Card> existingResourceCards,
+                List<Card> allSitesInDeck)
+            {
+                _owner = owner;
+                _capacityPerSite = Math.Max(1, cyclesBeforeCouncil);
+                _allSitesInDeck = allSitesInDeck ?? [];
+                _nonHavenSites = [.. _allSitesInDeck.Where(s => !string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase))];
+
+                if (existingResourceCards == null) return;
+
+                foreach (var card in existingResourceCards)
+                {
+                    if (_owner.NeedsDistinctNonHavenSite(card, _allSitesInDeck))
+                    {
+                        _occupyingCards.Add(card);
+                    }
+                }
+
+                _matchedCount = _owner.MaxNonHavenSiteAssignments(_occupyingCards, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
+            }
+
+            public bool CanAddWithinCapacity(IEnumerable<Card> newCards)
+            {
+                var tappers = newCards.Where(c => _owner.NeedsDistinctNonHavenSite(c, _allSitesInDeck)).ToList();
+                if (tappers.Count == 0) return true;
+
+                var testList = new List<Card>(_occupyingCards.Count + tappers.Count);
+                testList.AddRange(_occupyingCards);
+                testList.AddRange(tappers);
+
+                int newMatched = _owner.MaxNonHavenSiteAssignments(testList, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
+                return newMatched >= _matchedCount + tappers.Count;
+            }
+
+            public void Commit(IEnumerable<Card> addedCards, List<string> overlapsOut = null)
+            {
+                var tappers = addedCards.Where(c => _owner.NeedsDistinctNonHavenSite(c, _allSitesInDeck)).ToList();
+                if (tappers.Count == 0) return;
+
+                var testList = new List<Card>(_occupyingCards.Count + tappers.Count);
+                testList.AddRange(_occupyingCards);
+                testList.AddRange(tappers);
+
+                int newMatched = _owner.MaxNonHavenSiteAssignments(testList, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
+
+                if (newMatched < _matchedCount + tappers.Count && overlapsOut != null)
+                {
+                    foreach (var tapper in tappers)
+                    {
+                        overlapsOut.Add(BuildOverlapMessage(tapper));
+                    }
+                }
+
+                _occupyingCards.AddRange(tappers);
+                _matchedCount = newMatched;
+            }
+
+            private string BuildOverlapMessage(Card tapper)
+            {
+                var tapIndices = _owner.GetNonHavenTapSiteIndices(tapper, _allSitesInDeck, _nonHavenSites);
+                if (tapIndices.Count == 0)
+                {
+                    return $"Site capacity exceeded in Resources: {tapper.Name} has no matching non-Haven site in Sites.";
+                }
+
+                var tapIndexSet = tapIndices.ToHashSet();
+                var tapSiteNames = tapIndices.Select(i => _nonHavenSites[i].Name).ToList();
+                string siteSummary = tapSiteNames.Count <= 3
+                    ? string.Join(", ", tapSiteNames)
+                    : $"{string.Join(", ", tapSiteNames.Take(3))}, ... ({tapSiteNames.Count} sites)";
+
+                var conflictingCards = _occupyingCards
+                    .Where(other => _owner.GetNonHavenTapSiteIndices(other, _allSitesInDeck, _nonHavenSites).Any(idx => tapIndexSet.Contains(idx)))
+                    .ToList();
+
+                string conflictNote = conflictingCards.Count > 0
+                    ? $" (shared with {FormatCardCountList(conflictingCards)})"
+                    : string.Empty;
+
+                return $"Site capacity exceeded in Resources: {tapper.Name} ({siteSummary}) exceeds the {_capacityPerSite}-deck capacity of its playable site(s){conflictNote}.";
+            }
+        }
+
+        private bool IsSiteTappingResourceCard(Card card)
+        {
+            if (card == null) return false;
+            if (!string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase)) return false;
+
+            if (string.Equals(card.Secondary, "Faction", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(card.Secondary, "Ally", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(card.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return IsItemCard(card) && !IsSpecialRingItem(card);
+        }
+
+        private bool NeedsDistinctNonHavenSite(Card card, List<Card> allSitesInDeck)
+        {
+            if (!IsSiteTappingResourceCard(card) || allSitesInDeck == null || allSitesInDeck.Count == 0)
+            {
+                return false;
+            }
+
+            return !HasFreeHavenOption(card, allSitesInDeck);
+        }
+
+        private bool HasFreeHavenOption(Card card, List<Card> allSitesInDeck)
+        {
+            var havensInDeck = allSitesInDeck
+                .Where(s => string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (havensInDeck.Count == 0) return false;
+
+            var siteReqs = _filterService.GetCardTagsForCategory(card.Id, "Site Requirement");
+            if (siteReqs.Count > 0)
+            {
+                return siteReqs.Any(req => MatchesAnySiteRequirement(havensInDeck, req, _filterService));
+            }
+
+            return havensInDeck.Any(h => MatchesCardFlagPlayabilityAtSite(card, h));
+        }
+
+        private List<int> GetNonHavenTapSiteIndices(Card card, List<Card> allSitesInDeck, List<Card> nonHavenSites)
         {
             var indices = new List<int>();
-            if (card == null || allSitesInDeck == null || allSitesInDeck.Count == 0) return indices;
+            if (card == null || nonHavenSites == null || nonHavenSites.Count == 0) return indices;
 
             var siteReqTags = _filterService.GetCardTagsForCategory(card.Id, "Site Requirement");
-            if (siteReqTags.Count == 0) return indices;
-
-            for (int i = 0; i < allSitesInDeck.Count; i++)
+            if (siteReqTags.Count > 0)
             {
-                var site = allSitesInDeck[i];
-                bool matches = siteReqTags.Any(req => SiteMatchesSingleRequirement(site, req.Trim(), _filterService));
+                var matchedIndices = new HashSet<int>();
+                foreach (var rawReq in siteReqTags)
+                {
+                    string cleanReq = rawReq.Trim();
+                    if (cleanReq.Contains("&&"))
+                    {
+                        if (!MatchesAnySiteRequirement(allSitesInDeck, cleanReq, _filterService)) continue;
 
-                if (matches)
+                        var terms = cleanReq.Split("&&", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        foreach (var term in terms)
+                        {
+                            for (int i = 0; i < nonHavenSites.Count; i++)
+                            {
+                                if (SiteMatchesSingleRequirement(nonHavenSites[i], term, _filterService))
+                                {
+                                    matchedIndices.Add(i);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < nonHavenSites.Count; i++)
+                        {
+                            if (SiteMatchesSingleRequirement(nonHavenSites[i], cleanReq, _filterService))
+                            {
+                                matchedIndices.Add(i);
+                            }
+                        }
+                    }
+                }
+
+                indices.AddRange(matchedIndices.OrderBy(i => i));
+                return indices;
+            }
+
+            for (int i = 0; i < nonHavenSites.Count; i++)
+            {
+                if (MatchesCardFlagPlayabilityAtSite(card, nonHavenSites[i]))
                 {
                     indices.Add(i);
                 }
@@ -5560,9 +5695,53 @@ namespace MECCG_Deck_Builder
             return indices;
         }
 
-        private int MaxSiteAssignments(List<Card> cards, List<Card> allSitesInDeck)
+        private static bool MatchesCardFlagPlayabilityAtSite(Card card, Card site)
         {
-            if (cards == null || cards.Count == 0 || allSitesInDeck == null || allSitesInDeck.Count == 0)
+            if (card == null || site == null) return false;
+
+            bool needsHoard = string.Equals(card.Hoard, "yes", StringComparison.OrdinalIgnoreCase);
+            if (needsHoard && !string.Equals(site.Hoard, "yes", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (string.Equals(card.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Equals(site.GoldRing, "yes", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (IsPalantirItem(card))
+            {
+                return string.Equals(site.GreaterItem, "yes", StringComparison.OrdinalIgnoreCase) ||
+                       string.Equals(site.Palantiri, "yes", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (string.Equals(card.Secondary, "Minor Item", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Equals(site.MinorItem, "yes", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (string.Equals(card.Secondary, "Major Item", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Equals(site.MajorItem, "yes", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (string.Equals(card.Secondary, "Greater Item", StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Equals(site.GreaterItem, "yes", StringComparison.OrdinalIgnoreCase) ||
+                       (HasRaceToken(card, "Scroll") && string.Equals(site.Scroll, "yes", StringComparison.OrdinalIgnoreCase));
+            }
+
+            return false;
+        }
+
+        private int MaxNonHavenSiteAssignments(
+            List<Card> cards,
+            List<Card> allSitesInDeck,
+            List<Card> nonHavenSites,
+            int capacityPerSite)
+        {
+            if (cards == null || cards.Count == 0 || nonHavenSites == null || nonHavenSites.Count == 0 || capacityPerSite <= 0)
             {
                 return 0;
             }
@@ -5570,17 +5749,20 @@ namespace MECCG_Deck_Builder
             var adj = new List<int>[cards.Count];
             for (int i = 0; i < cards.Count; i++)
             {
-                adj[i] = GetPlayableSiteIndices(cards[i], allSitesInDeck);
+                adj[i] = GetNonHavenTapSiteIndices(cards[i], allSitesInDeck, nonHavenSites);
             }
 
-            int[] siteOwner = new int[allSitesInDeck.Count];
-            Array.Fill(siteOwner, -1);
+            var siteOccupants = new List<int>[nonHavenSites.Count];
+            for (int i = 0; i < nonHavenSites.Count; i++)
+            {
+                siteOccupants[i] = [];
+            }
 
             int matched = 0;
             for (int u = 0; u < cards.Count; u++)
             {
-                bool[] visited = new bool[allSitesInDeck.Count];
-                if (TryMatchSite(u, adj, siteOwner, visited))
+                bool[] visited = new bool[nonHavenSites.Count];
+                if (TryMatchSite(u, adj, siteOccupants, capacityPerSite, visited))
                 {
                     matched++;
                 }
@@ -5589,17 +5771,32 @@ namespace MECCG_Deck_Builder
             return matched;
         }
 
-        private static bool TryMatchSite(int u, List<int>[] adj, int[] siteOwner, bool[] visited)
+        private static bool TryMatchSite(
+            int u,
+            List<int>[] adj,
+            List<int>[] siteOccupants,
+            int capacityPerSite,
+            bool[] visited)
         {
             foreach (int siteIdx in adj[u])
             {
                 if (visited[siteIdx]) continue;
                 visited[siteIdx] = true;
 
-                if (siteOwner[siteIdx] < 0 || TryMatchSite(siteOwner[siteIdx], adj, siteOwner, visited))
+                if (siteOccupants[siteIdx].Count < capacityPerSite)
                 {
-                    siteOwner[siteIdx] = u;
+                    siteOccupants[siteIdx].Add(u);
                     return true;
+                }
+
+                for (int k = 0; k < siteOccupants[siteIdx].Count; k++)
+                {
+                    int existingCardIdx = siteOccupants[siteIdx][k];
+                    if (TryMatchSite(existingCardIdx, adj, siteOccupants, capacityPerSite, visited))
+                    {
+                        siteOccupants[siteIdx][k] = u;
+                        return true;
+                    }
                 }
             }
 
@@ -5697,33 +5894,28 @@ namespace MECCG_Deck_Builder
 
             bool PassesNonSiteGuards(Card item)
             {
-                // Role Focus (strict)
                 var roleTags = _filterService.GetCardTagsForCategory(item.Id, "Role");
                 if (roleTags.Count == 0 || !roleTags.Any(r => checkedRoles.Contains(r)))
                 {
                     return false;
                 }
 
-                // Region Requirement (hard guard)
                 if (!MatchesItemRegionRequirement(item, draftedRegionNames, draftedRegionTypes))
                 {
                     return false;
                 }
 
-                // Specific character requirement
                 if (!string.IsNullOrWhiteSpace(item.Specific) &&
                     !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, item.Specific)))
                 {
                     return false;
                 }
 
-                // Prerequisite (must already exist in Pool / Resources / Sideboard; ; = OR, && = AND)
                 if (!SatisfiesExistingPrerequisites(item, allDeckNonSiteCards))
                 {
                     return false;
                 }
 
-                // Target Species (hard guard for Hero character races; Creature races ignored)
                 if (!MatchesItemTargetSpecies(item, allDraftedChars))
                 {
                     return false;
@@ -5749,36 +5941,61 @@ namespace MECCG_Deck_Builder
             int resCapacity = Math.Max(0, (int)_numPlayDeckSize.Value - _deck.Resources.Count);
             int sideCapacity = Math.Max(0, (int)_numSideboardSize.Value - _deck.Sideboard.Count);
 
-            // Execution order:
-            // 1. Pool Minor Items (skipped site check; max 1 per starting character, up to 2)
-            // 2. Special Items (Resources -> Sideboard)
-            // 3. Greater Items (Resources -> Sideboard)
-            // 4. Major Items (Resources -> Sideboard)
-            // 5. Minor Items (Resources -> Sideboard)
+            var siteTracker = new DeckCycleSiteTracker(this, (int)_numDecksBeforeCouncil.Value, _deck.Resources, allSitesInDeck);
+            var itemOverlaps = new List<string>();
+
+            // 1. Pool Minor Items (placed at Rivendell before Turn 1; no site tap)
             int effectivePoolCap = Math.Min(reqPoolMinor, poolChars.Count);
             var poolMinorCandidates = GetTierCandidates("Minor Item", checkSites: false);
             var draftedPoolMinor = DraftItemsIntoSection(poolMinorCandidates, _deck.Pool, effectivePoolCap, effectivePoolCap, usedCountsByName);
 
             var specialCandidates = GetTierCandidates("Special Item", checkSites: true);
-            var draftedResSpecial = DraftItemsIntoSection(specialCandidates, _deck.Resources, reqResSpecial, resCapacity, usedCountsByName);
+            var greaterCandidates = GetTierCandidates("Greater Item", checkSites: true);
+            var majorCandidates = GetTierCandidates("Major Item", checkSites: true);
+            var minorCandidates = GetTierCandidates("Minor Item", checkSites: true);
+
+            // 2. Resources Items Pass 1 (within per-cycle site capacity across Special -> Greater -> Major -> Minor)
+            var draftedResSpecial = DraftItemsIntoSection(specialCandidates, _deck.Resources, reqResSpecial, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, itemOverlaps);
             resCapacity -= draftedResSpecial.Count;
+            var draftedResGreater = DraftItemsIntoSection(greaterCandidates, _deck.Resources, reqResGreater, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, itemOverlaps);
+            resCapacity -= draftedResGreater.Count;
+            var draftedResMajor = DraftItemsIntoSection(majorCandidates, _deck.Resources, reqResMajor, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, itemOverlaps);
+            resCapacity -= draftedResMajor.Count;
+            var draftedResMinor = DraftItemsIntoSection(minorCandidates, _deck.Resources, reqResMinor, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, itemOverlaps);
+            resCapacity -= draftedResMinor.Count;
+
+            // 3. Resources Items Pass 2 (fallback if any tier is short)
+            if (draftedResSpecial.Count < reqResSpecial && resCapacity > 0)
+            {
+                var extra = DraftItemsIntoSection(specialCandidates, _deck.Resources, reqResSpecial - draftedResSpecial.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, itemOverlaps);
+                draftedResSpecial.AddRange(extra);
+                resCapacity -= extra.Count;
+            }
+            if (draftedResGreater.Count < reqResGreater && resCapacity > 0)
+            {
+                var extra = DraftItemsIntoSection(greaterCandidates, _deck.Resources, reqResGreater - draftedResGreater.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, itemOverlaps);
+                draftedResGreater.AddRange(extra);
+                resCapacity -= extra.Count;
+            }
+            if (draftedResMajor.Count < reqResMajor && resCapacity > 0)
+            {
+                var extra = DraftItemsIntoSection(majorCandidates, _deck.Resources, reqResMajor - draftedResMajor.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, itemOverlaps);
+                draftedResMajor.AddRange(extra);
+                resCapacity -= extra.Count;
+            }
+            if (draftedResMinor.Count < reqResMinor && resCapacity > 0)
+            {
+                var extra = DraftItemsIntoSection(minorCandidates, _deck.Resources, reqResMinor - draftedResMinor.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, itemOverlaps);
+                draftedResMinor.AddRange(extra);
+            }
+
+            // 4. Sideboard Items
             var draftedSideSpecial = DraftItemsIntoSection(specialCandidates, _deck.Sideboard, reqSideSpecial, sideCapacity, usedCountsByName);
             sideCapacity -= draftedSideSpecial.Count;
-
-            var greaterCandidates = GetTierCandidates("Greater Item", checkSites: true);
-            var draftedResGreater = DraftItemsIntoSection(greaterCandidates, _deck.Resources, reqResGreater, resCapacity, usedCountsByName);
-            resCapacity -= draftedResGreater.Count;
             var draftedSideGreater = DraftItemsIntoSection(greaterCandidates, _deck.Sideboard, reqSideGreater, sideCapacity, usedCountsByName);
             sideCapacity -= draftedSideGreater.Count;
-
-            var majorCandidates = GetTierCandidates("Major Item", checkSites: true);
-            var draftedResMajor = DraftItemsIntoSection(majorCandidates, _deck.Resources, reqResMajor, resCapacity, usedCountsByName);
-            resCapacity -= draftedResMajor.Count;
             var draftedSideMajor = DraftItemsIntoSection(majorCandidates, _deck.Sideboard, reqSideMajor, sideCapacity, usedCountsByName);
             sideCapacity -= draftedSideMajor.Count;
-
-            var minorCandidates = GetTierCandidates("Minor Item", checkSites: true);
-            var draftedResMinor = DraftItemsIntoSection(minorCandidates, _deck.Resources, reqResMinor, resCapacity, usedCountsByName);
             var draftedSideMinor = DraftItemsIntoSection(minorCandidates, _deck.Sideboard, reqSideMinor, sideCapacity, usedCountsByName);
 
             _deck.SortSections();
@@ -5826,6 +6043,7 @@ namespace MECCG_Deck_Builder
             CheckShortfall("Sideboard Greater Item", draftedSideGreater.Count, reqSideGreater);
             CheckShortfall("Resources Special Item", draftedResSpecial.Count, reqResSpecial);
             CheckShortfall("Sideboard Special Item", draftedSideSpecial.Count, reqSideSpecial);
+            warnings.AddRange(itemOverlaps);
 
             if (warnings.Count > 0)
             {
@@ -5851,7 +6069,10 @@ namespace MECCG_Deck_Builder
             List<Card> targetSection,
             int requestedCount,
             int sectionCapacity,
-            Dictionary<string, int> usedCountsByName)
+            Dictionary<string, int> usedCountsByName,
+            DeckCycleSiteTracker siteTracker = null,
+            bool requireAvailableCapacity = false,
+            List<string> overlapsOut = null)
         {
             var drafted = new List<Card>();
             if (requestedCount <= 0 || sectionCapacity <= 0 || candidates.Count == 0)
@@ -5876,9 +6097,15 @@ namespace MECCG_Deck_Builder
                     int curCount = usedCountsByName.GetValueOrDefault(item.Name, 0);
                     if (curCount != copyTier || !CanAddCopy(item)) continue;
 
+                    if (requireAvailableCapacity && siteTracker != null && !siteTracker.CanAddWithinCapacity([item]))
+                    {
+                        continue;
+                    }
+
                     targetSection.Add(item);
                     usedCountsByName[item.Name] = curCount + 1;
                     drafted.Add(item);
+                    siteTracker?.Commit([item], overlapsOut);
                 }
             }
 
@@ -6115,6 +6342,8 @@ namespace MECCG_Deck_Builder
             List<Card> innateResAid = [], innateSideAid = [];
             int resAllowEffective = 0, sideAllowEffective = 0;
             int resAidEffective = 0, sideAidEffective = 0;
+            var siteTracker = new DeckCycleSiteTracker(this, (int)_numDecksBeforeCouncil.Value, _deck.Resources, allSitesInDeck);
+            var ringOverlaps = new List<string>();
 
             if (hasGoldRingSite)
             {
@@ -6138,16 +6367,30 @@ namespace MECCG_Deck_Builder
                         .Select(x => x.Card)
                         .ToList();
 
-                    draftedResGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName);
+                    draftedResGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, ringOverlaps);
                     resCapacity -= draftedResGold.Count;
+                    if (draftedResGold.Count < reqResGold && resCapacity > 0)
+                    {
+                        var extraGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Resources, reqResGold - draftedResGold.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, ringOverlaps);
+                        draftedResGold.AddRange(extraGold);
+                        resCapacity -= extraGold.Count;
+                    }
+
                     draftedSideGold = DraftCardsRankedPlaysetFirst(rankedGold, _deck.Sideboard, reqSideGold, sideCapacity, usedCountsByName);
                     sideCapacity -= draftedSideGold.Count;
                 }
                 else
                 {
                     var shuffledGold = goldCandidates.OrderBy(_ => Random.Shared.Next()).ToList();
-                    draftedResGold = DraftItemsIntoSection(shuffledGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName);
+                    draftedResGold = DraftItemsIntoSection(shuffledGold, _deck.Resources, reqResGold, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, ringOverlaps);
                     resCapacity -= draftedResGold.Count;
+                    if (draftedResGold.Count < reqResGold && resCapacity > 0)
+                    {
+                        var extraGold = DraftItemsIntoSection(shuffledGold, _deck.Resources, reqResGold - draftedResGold.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, ringOverlaps);
+                        draftedResGold.AddRange(extraGold);
+                        resCapacity -= extraGold.Count;
+                    }
+
                     draftedSideGold = DraftItemsIntoSection(shuffledGold, _deck.Sideboard, reqSideGold, sideCapacity, usedCountsByName);
                     sideCapacity -= draftedSideGold.Count;
                 }
@@ -6470,7 +6713,7 @@ namespace MECCG_Deck_Builder
                 .Where(c => c != null)
                 .ToList();
 
-            // 1. Draft Palantíri Items (Resources -> Sideboard)
+            // 1. Draft Palantíri Items (Resources Pass 1 within site capacity -> Pass 2 fallback -> Sideboard)
             var palantirCandidates = heroDistinctPool
                 .Where(c =>
                     IsPalantirItem(c) &&
@@ -6478,8 +6721,18 @@ namespace MECCG_Deck_Builder
                 .OrderBy(_ => Random.Shared.Next())
                 .ToList();
 
-            var draftedResPal = DraftItemsIntoSection(palantirCandidates, _deck.Resources, reqResPal, resCapacity, usedCountsByName);
+            var siteTracker = new DeckCycleSiteTracker(this, (int)_numDecksBeforeCouncil.Value, _deck.Resources, allSitesInDeck);
+            var palantirOverlaps = new List<string>();
+
+            var draftedResPal = DraftItemsIntoSection(palantirCandidates, _deck.Resources, reqResPal, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true, palantirOverlaps);
             resCapacity -= draftedResPal.Count;
+            if (draftedResPal.Count < reqResPal && resCapacity > 0)
+            {
+                var extraPal = DraftItemsIntoSection(palantirCandidates, _deck.Resources, reqResPal - draftedResPal.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false, palantirOverlaps);
+                draftedResPal.AddRange(extraPal);
+                resCapacity -= extraPal.Count;
+            }
+
             var draftedSidePal = DraftItemsIntoSection(palantirCandidates, _deck.Sideboard, reqSidePal, sideCapacity, usedCountsByName);
             sideCapacity -= draftedSidePal.Count;
 
@@ -6566,6 +6819,7 @@ namespace MECCG_Deck_Builder
                 string extra = !hasSage ? " (requires a Sage or Saruman)" : string.Empty;
                 warnings.Add($"Sideboard Allow Palantír Use Shortfall: Only {sideAllowEffective + draftedSideAllow.Count} of {reqSideAllow} met{extra}.");
             }
+            warnings.AddRange(palantirOverlaps);
 
             if (warnings.Count > 0)
             {
@@ -6752,7 +7006,6 @@ namespace MECCG_Deck_Builder
                     return false;
                 }
 
-                // Already in deck (Resources or Sideboard): 0 extra cards needed
                 if (IsCardAlreadySatisfiedForSection(oneRingCard, targetSection))
                 {
                     return true;
@@ -6796,7 +7049,6 @@ namespace MECCG_Deck_Builder
 
                 double bestOneRingGoldScore = eligibleOneRingGolds.Max(x => x.Score);
 
-                // Ensure at least one Gold Ring with the best available One Ring odds (e.g. Precious Gold Ring)
                 bool hasOptimalGoldRing = supportScope.Any(c =>
                     string.Equals(c.Secondary, "Gold Ring Item", StringComparison.OrdinalIgnoreCase) &&
                     ScoreGoldRingForSpecials(c.Text, 1, 0, 0) >= bestOneRingGoldScore);
@@ -6826,7 +7078,6 @@ namespace MECCG_Deck_Builder
                     pendingCounts[chosenGold.Name] = pendingCounts.GetValueOrDefault(chosenGold.Name, 0) + 1;
                 }
 
-                // Ensure an Allow Ring Test source that can bring The One Ring into play.
                 var oneRingAllowSources = supportScope
                     .Where(c =>
                         HasSpecialAbility(c, "Gold Ring: Allow Test") &&
@@ -6951,7 +7202,6 @@ namespace MECCG_Deck_Builder
 
                 if (candidateBranches.Count == 0) return false;
 
-                // Prefer branch requiring the fewest new cards (e.g. already-satisfied branch first)
                 var (Extras, Counts) = candidateBranches
                     .OrderBy(b => b.Extras.Count)
                     .ThenBy(_ => Random.Shared.Next())
@@ -6985,7 +7235,10 @@ namespace MECCG_Deck_Builder
                 int requestedCount,
                 ref int remainingCapacity,
                 List<Card> draftedQuestsOut,
-                List<Card> draftedExtrasOut)
+                List<Card> draftedExtrasOut,
+                DeckCycleSiteTracker siteTracker = null,
+                bool requireAvailableCapacity = false,
+                List<string> overlapsOut = null)
             {
                 if (requestedCount <= 0 || remainingCapacity <= 0) return;
 
@@ -7029,10 +7282,17 @@ namespace MECCG_Deck_Builder
                                 continue;
                             }
 
-                            bool hasPrereqTag = _filterService.GetCardTagsForCategory(candidate.Id, "Prerequisite").Count > 0;
+                            if (requireAvailableCapacity && siteTracker != null &&
+                                !siteTracker.CanAddWithinCapacity([candidate, .. extras]))
+                            {
+                                if (CardFilterService.EqualsWithDiacriticFallback(candidate.Name, "Cracks of Doom"))
+                                {
+                                    oneRingDiag ??= "Cracks of Doom skipped in Pass 1: Gold Ring exceeds non-Haven site capacity for the planned deck cycle(s).";
+                                }
+                                continue;
+                            }
 
-                            // Tier 1: Quest has a Prerequisite that is ALREADY satisfied in the deck
-                            // Tier 2: Standalone quests (no Prerequisite) and self-contained prerequisite quests compete equally
+                            bool hasPrereqTag = _filterService.GetCardTagsForCategory(candidate.Id, "Prerequisite").Count > 0;
                             int tier = (hasPrereqTag && extras.Count == 0) ? 1 : 2;
 
                             if (tier < bestTier || (tier == bestTier && tieBreaker < bestTie))
@@ -7058,14 +7318,22 @@ namespace MECCG_Deck_Builder
                             draftedExtrasOut.Add(extra);
                         }
 
+                        siteTracker?.Commit([chosenQuest, .. chosenExtras], overlapsOut);
                         remainingCapacity -= 1 + chosenExtras.Count;
                     }
                 }
             }
 
+            var siteTracker = new DeckCycleSiteTracker(this, (int)_numDecksBeforeCouncil.Value, _deck.Resources, allSitesInDeck);
+            var questOverlaps = new List<string>();
+
             var draftedResQuests = new List<Card>();
             var draftedResExtras = new List<Card>();
-            DraftQuestsIntoSection(_deck.Resources, reqRes, ref resCapacity, draftedResQuests, draftedResExtras);
+            DraftQuestsIntoSection(_deck.Resources, reqRes, ref resCapacity, draftedResQuests, draftedResExtras, siteTracker, requireAvailableCapacity: true, questOverlaps);
+            if (draftedResQuests.Count < reqRes && resCapacity > 0)
+            {
+                DraftQuestsIntoSection(_deck.Resources, reqRes, ref resCapacity, draftedResQuests, draftedResExtras, siteTracker, requireAvailableCapacity: false, questOverlaps);
+            }
 
             var draftedSideQuests = new List<Card>();
             var draftedSideExtras = new List<Card>();
@@ -7093,7 +7361,7 @@ namespace MECCG_Deck_Builder
                 $"• Sideboard: {sideText}";
 
             if (!string.IsNullOrEmpty(oneRingDiag) &&
-        !draftedResQuests.Any(q => CardFilterService.EqualsWithDiacriticFallback(q.Name, "Cracks of Doom")))
+                !draftedResQuests.Any(q => CardFilterService.EqualsWithDiacriticFallback(q.Name, "Cracks of Doom")))
             {
                 statusMsg += $"\n• Diagnostic: {oneRingDiag}";
             }
@@ -7107,6 +7375,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Quest Shortfall: Drafted only {draftedSideQuests.Count} of {reqSide} eligible quest(s).");
             }
+            warnings.AddRange(questOverlaps);
 
             if (warnings.Count > 0)
             {
@@ -7236,7 +7505,10 @@ namespace MECCG_Deck_Builder
             List<Card> targetSection,
             int requestedCount,
             int sectionCapacity,
-            Dictionary<string, int> usedCountsByName)
+            Dictionary<string, int> usedCountsByName,
+            DeckCycleSiteTracker siteTracker = null,
+            bool requireAvailableCapacity = false,
+            List<string> overlapsOut = null)
         {
             var drafted = new List<Card>();
             if (requestedCount <= 0 || sectionCapacity <= 0 || rankedCandidates.Count == 0)
@@ -7253,10 +7525,16 @@ namespace MECCG_Deck_Builder
 
                 while (current < max && drafted.Count < requestedCount && drafted.Count < sectionCapacity)
                 {
+                    if (requireAvailableCapacity && siteTracker != null && !siteTracker.CanAddWithinCapacity([card]))
+                    {
+                        break;
+                    }
+
                     targetSection.Add(card);
                     current++;
                     usedCountsByName[card.Name] = current;
                     drafted.Add(card);
+                    siteTracker?.Commit([card], overlapsOut);
                 }
             }
 
