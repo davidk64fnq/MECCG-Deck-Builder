@@ -3868,10 +3868,9 @@
       "fullCode": "Balrog of Moria (TW)",
       "id": "83",
       "name": "Balrog of Moria",
-      "Region Requirement": "Hollin; Redhorn Gate; Wold & Foothills",
-      "Role": "Automatic Attack; Site",
+      "Role": "Automatic Attack",
       "set": "METW",
-      "Site Requirement": "Lórien; Moria"
+      "Site Requirement": "Moria"
     },
     {
       "fullCode": "Bane of the Ithil-stone (TW)",
@@ -4653,7 +4652,7 @@
       "fullCode": "\"Bert\" - Bûrat (TW)",
       "id": "86",
       "name": "\"Bert\" - Bûrat",
-      "Region Requirement": "Shadow-land; Wilderness",
+      "Region Requirement": "Wilderness",
       "set": "METW",
       "Site Requirement": "Shadow-hold"
     },

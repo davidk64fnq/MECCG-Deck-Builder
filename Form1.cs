@@ -1205,12 +1205,27 @@ namespace MECCG_Deck_Builder
             }
             ListBoxMaster.EndUpdate();
 
+            bool deckListSelected =
+                ListBoxPool.SelectedIndex >= 0 ||
+                ListBoxResources.SelectedIndex >= 0 ||
+                ListBoxHazards.SelectedIndex >= 0 ||
+                ListBoxSideboard.SelectedIndex >= 0 ||
+                ListBoxSites.SelectedIndex >= 0;
+
             if (_masterCards.Count == 0)
             {
-                _imageLoadCts?.Cancel();
-                PictureBoxCardImage.Image = null;
-                _inspectedCard = null;
-                UpdateTaxonomyView(null);
+                if (!deckListSelected || _inspectedCard == null)
+                {
+                    _imageLoadCts?.Cancel();
+                    PictureBoxCardImage.Image = null;
+                    _inspectedCard = null;
+                    UpdateTaxonomyView(null);
+                }
+                else
+                {
+                    UpdateTaxonomyView(_inspectedCard);
+                    PopulateAssignTagsForCategory();
+                }
                 return;
             }
 
@@ -1225,6 +1240,10 @@ namespace MECCG_Deck_Builder
             {
                 ListBoxMaster.SelectedIndex = foundIndex;
                 _inspectedCard = _masterCards[foundIndex];
+            }
+            else if (deckListSelected && _inspectedCard != null)
+            {
+                // Preserve active deck-tab selection and inspected card instead of jumping to Master[0]
             }
             else
             {
