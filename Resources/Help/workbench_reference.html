@@ -16,7 +16,7 @@
 
     <h1>Modular Workbench Tab &amp; Rules Reference</h1>
     <p>
-        The <strong>Modular Deck Assembly Workbench</strong> (<strong>Deck &gt; Assemble from Components...</strong> [<kbd>Ctrl+M</kbd>]) builds cohesive, tournament-legal Hero decks using a fixed 12-step pipeline across 13 tabs. Rather than drafting cards in isolation, each tab inspects what earlier steps placed into the deck&mdash;ensuring legal site paths, satisfied prerequisites, and zero dead cards.
+        The <strong>Modular Deck Assembly Workbench</strong> (<strong>Deck &gt; Assemble from Components...</strong> [<kbd>Ctrl+M</kbd>]) builds cohesive, tournament-legal Hero decks using a fixed 12-step pipeline across 13 tabs. Rather than drafting cards in isolation, each tab inspects what earlier steps placed into the five deck sections&mdash;Pool (main window <strong>Pool</strong> tab), Resources (<strong>Res</strong> tab), Hazards (<strong>Haz</strong> tab), Sideboard (<strong>Side</strong> tab), and Sites (<strong>Site</strong> tab)&mdash;ensuring legal site paths, satisfied prerequisites, and zero dead cards.
     </p>
     <p>
         Use this reference to see exactly which official database attributes, custom taxonomy categories, eligibility guards, and priority tiers each tab uses&mdash;and to understand why specific cards were (or were not) drafted.
@@ -64,104 +64,104 @@
                 <span class="scope-pill">Sites</span>
             </td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code>, <code>Secondary</code>, <code>Race</code>, <code>MPs</code><br />
-                <strong>Controls:</strong> Sizing limits, <strong>Decks Before Council</strong>, <strong>Tailor Hazards to current deck</strong> toggle, 25-attempt retry &amp; MP summary
+                <span class="lead-in">Attributes:</span> <code>Primary</code>, <code>Secondary</code>, <code>Race</code>, <code>MPs</code><br />
+                <span class="lead-in">Controls:</span> Sizing limits, <strong>Decks Before Council</strong>, <strong>Tailor Hazards to current deck</strong> toggle, 25-attempt retry &amp; MP summary
             </td>
         </tr>
         <tr>
             <td><a href="#tab-regions-sites">2. Regions &amp; Sites</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 1)</em></span></td>
             <td><span class="scope-pill">Sites</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code>, <code>Region</code>, <code>Alignment</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Adjacent Regions</code>, <code>Region Type</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code>, <code>Region</code>, <code>Alignment</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Adjacent Regions</code>, <code>Region Type</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-starting-company">3. Starting Company</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 2)</em></span></td>
             <td><span class="scope-pill">Pool</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Character</code>), <code>Secondary</code>/<code>Race</code> (non-Avatar), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Home Region</code> <em>(ignores <code>Site Requirement</code>)</em>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Character</code>), <code>Secondary</code>/<code>Race</code> (non-Avatar), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Home Region</code> <em>(ignores <code>Site Requirement</code>)</em>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-wizards-recruits">4. Wizards &amp; Recruits</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 3)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Character</code>), <code>Secondary</code> (<code>Avatar</code>), <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Unique</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Home Region</code>, <code>Site Requirement</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Character</code>), <code>Secondary</code> (<code>Avatar</code>), <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Unique</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Home Region</code>, <code>Site Requirement</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-factions">5. Factions</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 4)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>Faction</code>), <code>Alignment</code>, <code>Race</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Site Requirement</code>, <code>Prerequisite</code>, <code>Faction Bonus</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>Faction</code>), <code>Alignment</code>, <code>Race</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Site Requirement</code>, <code>Prerequisite</code>, <code>Faction Bonus</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-allies">6. Allies</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 5)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>Ally</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Site Requirement</code>, <code>Prerequisite</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>Ally</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Site Requirement</code>, <code>Prerequisite</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-items">7. Items</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 6)</em></span></td>
             <td><span class="scope-pill">Pool</span> (Minor) &bull; <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>*Item</code>), <code>Alignment</code>, <code>Race</code> (<code>Scroll</code>), <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>Scroll</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code><br />
-                <strong>Categories:</strong> <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>*Item</code>), <code>Alignment</code>, <code>Race</code> (<code>Scroll</code>), <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>Scroll</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code><br />
+                <span class="lead-in">Categories:</span> <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-rings">8. Rings</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 7)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code>, <code>Alignment</code>, <code>Text</code> (2d6 table), <code>Race</code>, <code>Skill</code>, <code>GoldRing</code>, <code>Specific</code>, <code>Unique</code><br />
-                <strong>Categories:</strong> <code>Special Ability</code>, <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code>, <code>Alignment</code>, <code>Text</code> (2d6 table), <code>Race</code>, <code>Skill</code>, <code>GoldRing</code>, <code>Specific</code>, <code>Unique</code><br />
+                <span class="lead-in">Categories:</span> <code>Special Ability</code>, <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-palantiri">9. Palant&iacute;ri</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 8)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Race</code> (<code>Palant&iacute;r</code>), <code>Alignment</code>, <code>Skill</code> (<code>Sage</code>), <code>GreaterItem</code>, <code>Palantiri</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code><br />
-                <strong>Categories:</strong> <code>Special Ability</code>, <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Race</code> (<code>Palant&iacute;r</code>), <code>Alignment</code>, <code>Skill</code> (<code>Sage</code>), <code>GreaterItem</code>, <code>Palantiri</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code><br />
+                <span class="lead-in">Categories:</span> <code>Special Ability</code>, <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-quests">10. Quests</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 9)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code>, <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>GoldRing</code>, item flags<br />
-                <strong>Categories:</strong> <code>Role</code> (<code>Quest</code>), <code>Prerequisite</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Special Ability</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code>, <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>GoldRing</code>, item flags<br />
+                <span class="lead-in">Categories:</span> <code>Role</code> (<code>Quest</code>), <code>Prerequisite</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Target Species</code>, <code>Special Ability</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-resource-events">11. Resource Events</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 10)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>*event*</code>), <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>*event*</code>), <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Role</code>, <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-creatures">12. Creatures</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 11)</em></span></td>
             <td><span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Hazard</code>), <code>Secondary</code> (<code>Creature</code>, <code>Creature/*event*</code>), <code>Alignment</code>, <code>Race</code>, <code>Unique</code><br />
-                <strong>Categories:</strong> <code>Target Species</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Region Type</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Hazard</code>), <code>Secondary</code> (<code>Creature</code>, <code>Creature/*event*</code>), <code>Alignment</code>, <code>Race</code>, <code>Unique</code><br />
+                <span class="lead-in">Categories:</span> <code>Target Species</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Region Type</code>
             </td>
         </tr>
         <tr>
             <td><a href="#tab-hazard-events">13. Hazard Events</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 12)</em></span></td>
             <td><span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
-                <strong>Attributes:</strong> <code>Primary</code> (<code>Hazard</code>), <code>Secondary</code> (<code>*event*</code>, <code>Long-event</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
-                <strong>Categories:</strong> <code>Role</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Item</code>, <code>Target Species</code>, <code>Prerequisite</code>, <code>Automatic Attack</code>
+                <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Hazard</code>), <code>Secondary</code> (<code>*event*</code>, <code>Long-event</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
+                <span class="lead-in">Categories:</span> <code>Role</code>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Item</code>, <code>Target Species</code>, <code>Prerequisite</code>, <code>Automatic Attack</code>
             </td>
         </tr>
     </table>
@@ -179,31 +179,31 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary</code>, <code>Secondary</code>, <code>Race</code>, and <code>MPs</code> (for the live composition breakdown and Marshalling Point readout).</li>
-        <li><strong>Custom Categories:</strong> None directly; monitors status labels and checklist selections across all drafting tabs.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary</code>, <code>Secondary</code>, <code>Race</code>, and <code>MPs</code> (for the live composition breakdown and Marshalling Point readout).</li>
+        <li><span class="lead-in">Custom Categories:</span> None directly; monitors status labels and checklist selections across all drafting tabs.</li>
     </ul>
     <h4>Coded Rules &amp; Pipeline Logic</h4>
     <ul>
         <li>
-            <strong>Hard Pre-Run Validation:</strong> <strong>Run Pipeline</strong> is disabled whenever a configuration violates hard tournament or budget limits:
+            <span class="lead-in">Hard Pre-Run Validation:</span> <strong>Run Pipeline</strong> is disabled whenever a configuration violates hard tournament or budget limits:
             <ul>
-                <li><strong>Play Deck Size</strong> (<code>20</code>&ndash;<code>60</code>, default <code>30</code>): Total configured <strong>Resources</strong> cards (characters + factions + allies + items + rings + palant&iacute;ri + quests + environment events) or configured <strong>Hazards</strong> cards cannot exceed <strong>Play Deck Size</strong>.</li>
-                <li><strong>Sideboard Size</strong> (<code>0</code>&ndash;<code>30</code>, default <code>20</code>): Total configured <strong>Sideboard</strong> cards across all tabs cannot exceed <strong>Sideboard Size</strong>.</li>
-                <li><strong>Character &amp; Copy Caps:</strong> Play Deck characters &le; <code>10</code>; <em>The One Ring</em> &le; <code>1</code>; <em>Nazg&ucirc;l</em> &le; <code>9</code>; <em>Gates of Morning</em> &le; <code>3</code>; <em>Doors of Night</em> &le; <code>3</code>; <em>Twilight</em> &le; <code>3</code> combined across <strong>Resources</strong> + <strong>Hazards</strong> + <strong>Sideboard</strong>.</li>
-                <li><strong>Checklist Guards:</strong> Required checklists (such as <strong>Region Terrains</strong> and <strong>Site Holds</strong> on <strong>Regions &amp; Sites</strong>, or <strong>Role Focus</strong>, <strong>Special Ring Role Focus</strong>, <strong>Species / Race Focus</strong>, and <strong>Keying Filters</strong> on active drafting tabs) cannot be left completely unchecked when cards governed by them are requested.</li>
+                <li><strong>Play Deck Size</strong> (20&ndash;60, default 30): Total configured Resources cards (characters + factions + allies + items + rings + palant&iacute;ri + quests + environment events) or configured Hazards cards cannot exceed <strong>Play Deck Size</strong>.</li>
+                <li><strong>Sideboard Size</strong> (0&ndash;30, default 20): Total configured Sideboard cards across all tabs cannot exceed <strong>Sideboard Size</strong>.</li>
+                <li><span class="lead-in">Character &amp; Copy Caps:</span> Play Deck non-Avatar characters &le; 10; Avatars &le; 3 (up to 2 distinct Wizards across Resources + Sideboard); <em>The One Ring</em> &le; 1; <em>Nazg&ucirc;l</em> &le; 9; <em>Gates of Morning</em> &le; 3; <em>Doors of Night</em> &le; 3; <em>Twilight</em> &le; 3 combined across Resources + Hazards + Sideboard.</li>
+                <li><span class="lead-in">Checklist Guards:</span> Required checklists (such as <strong>Region Terrains</strong> and <strong>Site Holds</strong> on the <strong>Regions &amp; Sites</strong> tab, or <strong>Role Focus</strong>, <strong>Special Ring Role Focus</strong>, <strong>Species / Race Focus</strong>, and <strong>Keying Filters</strong> on active drafting tabs) cannot be left completely unchecked when cards governed by them are requested.</li>
             </ul>
         </li>
-        <li><strong>Decks Before Council</strong> (<code>1</code>&ndash;<code>4</code>, default <code>1</code>): Sets the per-site tap capacity across Steps 4&ndash;9 (<strong>Factions</strong>, <strong>Allies</strong>, <strong>Items</strong>, <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, and <strong>Quests</strong>). Each non-Haven site in <strong>Sites</strong> supports up to <code>N</code> site-tapping cards in <strong>Resources</strong> (1 per planned deck cycle, since tapped sites untap on deck exhaust), while Havens never tap and have unlimited capacity.</li>
-        <li><strong>Tailor Hazards to current deck</strong> (default unchecked): Switches Steps 11&ndash;12 (<strong>Creatures</strong> and <strong>Hazard Events</strong>) between <em>Unknown Opponent</em> mode (manual keying filters) and <em>Target Current Deck</em> mode (keying against your drafted <strong>Sites</strong>, <strong>Pool</strong>, and <strong>Resources</strong>).</li>
+        <li><strong>Decks Before Council</strong> (1&ndash;4, default 1): Sets the per-site tap capacity across Steps 4&ndash;9 (<strong>Factions</strong>, <strong>Allies</strong>, <strong>Items</strong>, <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, and <strong>Quests</strong> tabs). Each non-Haven site in Sites supports up to <em>N</em> site-tapping cards in Resources (1 per planned deck cycle, since tapped sites untap on deck exhaust), while Havens never tap and have unlimited capacity.</li>
+        <li><strong>Tailor Hazards to current deck</strong> (default unchecked): Switches Steps 11&ndash;12 (<strong>Creatures</strong> and <strong>Hazard Events</strong> tabs) between <em>Unknown Opponent</em> mode (manual keying filters) and <em>Target Current Deck</em> mode (keying against your drafted Sites, Pool, and Resources).</li>
         <li>
-            <strong>25-Attempt Retry Loop:</strong> Clicking <strong>Run Pipeline</strong> clears all five deck sections and executes Steps 1&ndash;12 in sequence up to 25 times:
+            <span class="lead-in">25-Attempt Retry Loop:</span> Clicking <strong>Run Pipeline</strong> clears all five deck sections and executes Steps 1&ndash;12 in sequence up to 25 times:
             <ul>
-                <li>Stops immediately if Step 1 fails on attempt 1, or as soon as all 12 steps complete with zero <code>&#9888;</code> warnings.</li>
-                <li>If every attempt produces at least one <code>&#9888;</code> warning, keeps the latest run with the <strong>fewest warning tabs</strong> (without biasing toward larger site counts or multi-card packages).</li>
+                <li>Stops immediately if Step 1 fails on attempt 1, or as soon as all 12 steps complete with zero &#9888; warnings.</li>
+                <li>If every attempt produces at least one &#9888; warning, keeps the latest run with the <em>fewest warning tabs</em> (without biasing toward larger site counts or multi-card packages).</li>
                 <li>If all 25 attempts hit a hard lock, runs one diagnostic pass displaying the blocking error message.</li>
             </ul>
         </li>
-        <li><strong>Live MP Summary:</strong> Sums non-Hazard MPs across <strong>Pool</strong>, <strong>Resources</strong>, <strong>Sideboard</strong>, and <strong>Sites</strong>. Parenthesized values like <code>(2)</code> or <code>4(6)</code> are tracked as <code>Base(Conditional)</code> totals (with <strong>Resources</strong> always displaying <code>Base(Conditional)</code>).</li>
+        <li><span class="lead-in">Live MP Summary:</span> Sums non-Hazard MPs across Pool, Resources, Sideboard, and Sites. Parenthesized values like <code>(2)</code> or <code>4(6)</code> are tracked as <em>Base(Conditional)</em> totals (with Resources always displaying <em>Base(Conditional)</em>).</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -224,20 +224,20 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code> (<code>Haven</code> vs. adventure hold types), <code>Region</code>, <code>Alignment</code>, <code>Name</code>, <code>Set</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Adjacent Regions</code> (builds Middle-earth's bidirectional border graph), <code>Region Type</code> (read from Region cards and propagated to Site cards).</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code> (<code>Haven</code> vs. adventure hold types), <code>Region</code>, <code>Alignment</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Adjacent Regions</code> (builds Middle-earth's bidirectional border graph), <code>Region Type</code> (read from Region cards and propagated to Site cards).</li>
     </ul>
     <h4>Coded Rules &amp; Selection Logic</h4>
     <ul>
-        <li><strong>Automatic Hero Havens:</strong> Always drafts <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, and <em>Edhellond</em>, preferring <code>Hero</code> &rarr; <code>Neutral</code> printings.</li>
-        <li><strong>Terrain Filtering &amp; Seed Fallback:</strong> Only regions whose <code>Region Type</code> matches a checked item in <strong>Region Terrains</strong> are eligible. If a named <strong>Seed Region</strong> is excluded by checked terrains, BFS finds the shortest border path to the nearest allowed region and starts there with a <code>&#9888;</code> notice.</li>
-        <li><strong>Cluster Search (50 trials for <code>Random</code> / 25 for named seed):</strong> Expands a contiguous border-to-border region cluster up to <strong>Region Count</strong> (<code>4</code>&ndash;<code>12</code>, default <code>5</code>). Scores clusters highest when they hit <strong>Region Count</strong> and contain at least <code>1</code> and at most <strong>Max Adventure Sites</strong> (<code>1</code>&ndash;<code>50</code>, default <code>12</code>) matching adventure sites.</li>
-        <li><strong>Adventure Site Filtering &amp; Cap:</strong> Drafts non-Haven sites inside the chosen cluster whose <code>Site</code> hold is checked in <strong>Site Holds</strong> and whose <code>Region Type</code> is checked in <strong>Region Terrains</strong>. If more than <strong>Max Adventure Sites</strong> match, a random subset up to the cap is kept. Duplicate titles in <strong>Sites</strong> are never added.</li>
+        <li><span class="lead-in">Automatic Hero Havens:</span> Always drafts <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, and <em>Edhellond</em>, preferring <code>Hero</code> &rarr; <code>Neutral</code> printings.</li>
+        <li><span class="lead-in">Terrain Filtering &amp; Seed Fallback:</span> Only regions whose <code>Region Type</code> matches a checked item in <strong>Region Terrains</strong> are eligible. If a named <strong>Seed Region</strong> is excluded by checked terrains, BFS finds the shortest border path to the nearest allowed region and starts there with a &#9888; notice.</li>
+        <li><span class="lead-in">Cluster Search</span> (50 trials for <strong>Random</strong> / 25 for a named seed): Expands a contiguous border-to-border region cluster up to <strong>Region Count</strong> (4&ndash;12, default 5). Scores clusters highest when they hit <strong>Region Count</strong> and contain at least 1 and at most <strong>Max Adventure Sites</strong> (1&ndash;50, default 12) matching adventure sites.</li>
+        <li><span class="lead-in">Adventure Site Filtering &amp; Cap:</span> Drafts non-Haven sites inside the chosen cluster whose <code>Site</code> hold is checked in <strong>Site Holds</strong> and whose <code>Region Type</code> is checked in <strong>Region Terrains</strong>. If more than <strong>Max Adventure Sites</strong> match, a random subset up to the cap is kept. Duplicate titles in Sites are never added.</li>
     </ul>
     <h4>Warnings &amp; Edge Cases</h4>
     <ul>
-        <li><code>&#9888;</code> <em>Seed adjusted:</em> Triggered if the named seed was excluded by <strong>Region Terrains</strong>.</li>
-        <li><code>&#9888;</code> <em>Region / Site Shortfall:</em> Triggered if fewer than <strong>Region Count</strong> connected regions match checked terrains, or <code>0</code> adventure sites match checked holds inside the cluster.</li>
+        <li>&#9888; <span class="lead-in">Seed adjusted:</span> Triggered if the named seed was excluded by <strong>Region Terrains</strong>.</li>
+        <li>&#9888; <span class="lead-in">Region / Site Shortfall:</span> Triggered if fewer than <strong>Region Count</strong> connected regions match checked terrains, or 0 adventure sites match checked holds inside the cluster.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -258,22 +258,22 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Character"</code>, <code>Secondary</code> / <code>Race</code> (excludes Avatars: <code>Avatar</code>, <code>Wizard</code>, <code>Ringwraith</code>), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Name</code>, <code>Set</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Home Region</code>.</li>
-        <li><strong>Intentionally Ignored:</strong> Character <code>Site Requirement</code> tags are ignored here because starting characters deploy at <em>Rivendell</em> regardless of home-site recruitment restrictions (allowing Hobbits to start in <strong>Pool</strong> without <em>Bag End</em> in <strong>Sites</strong>).</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Character"</code>, <code>Secondary</code> / <code>Race</code> (excludes Avatars: <code>Avatar</code>, <code>Wizard</code>, <code>Ringwraith</code>), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Home Region</code>.</li>
+        <li><span class="lead-in">Intentionally Ignored:</span> Character <code>Site Requirement</code> tags are ignored here because starting characters deploy at <em>Rivendell</em> regardless of home-site recruitment restrictions (allowing Hobbits to start in Pool without <em>Bag End</em> in Sites).</li>
     </ul>
     <h4>Coded Rules &amp; Priority Tiers</h4>
     <ul>
-        <li><strong>Minimum Mind Feasibility Check:</strong> Before searching, sums the lowest <code>Mind</code> candidate for each active row; if the minimum sum exceeds <code>20</code>, the step stops immediately.</li>
+        <li><span class="lead-in">Minimum Mind Feasibility Check:</span> Before searching, sums the lowest <code>Mind</code> candidate for each active row; if the minimum sum exceeds 20, the step stops immediately.</li>
         <li>
-            <strong>3-Tier Geographic Priority:</strong>
+            <span class="lead-in">3-Tier Geographic Priority:</span>
             <ol>
-                <li><strong>Tier 1 (Local Region Group):</strong> Characters whose <code>Home Region</code>, home site's <code>Region</code>, or <code>Home</code> site/predicate matches the drafted regions in <strong>Sites</strong> or a Haven located inside those drafted regions.</li>
-                <li><strong>Tier 2 (Outside Havens):</strong> Characters homed at Havens outside the drafted region cluster.</li>
-                <li><strong>Tier 3 (Out-of-Region):</strong> Any remaining matching non-Avatar character.</li>
+                <li><span class="lead-in">Tier 1 (Local Region Group):</span> Characters whose <code>Home Region</code>, home site's <code>Region</code>, or <code>Home</code> site/predicate matches the drafted regions in Sites or a Haven located inside those drafted regions.</li>
+                <li><span class="lead-in">Tier 2 (Outside Havens):</span> Characters homed at Havens outside the drafted region cluster.</li>
+                <li><span class="lead-in">Tier 3 (Out-of-Region):</span> Any remaining matching non-Avatar character.</li>
             </ol>
         </li>
-        <li><strong>100-Attempt Permutation Search:</strong> Shuffles row assignment order across up to 100 attempts to find a distinct-character combination totaling &le; <code>20</code> Mind with the highest Tier 1 / Tier 2 score, never duplicating titles across <strong>Pool</strong>, <strong>Resources</strong>, or <strong>Sideboard</strong>.</li>
+        <li><span class="lead-in">100-Attempt Permutation Search:</span> Shuffles row assignment order across up to 100 attempts to find a distinct-character combination totaling &le; 20 Mind with the highest Tier 1 / Tier 2 score, never duplicating titles across Pool, Resources, or Sideboard.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -294,26 +294,26 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Character"</code>, <code>Secondary == "Avatar"</code>, <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Home Region</code>, <code>Site Requirement</code> (strictly enforced for non-Avatar recruits).</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Character"</code>, <code>Secondary == "Avatar"</code>, <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Home Region</code>, <code>Site Requirement</code> (strictly enforced for non-Avatar recruits).</li>
     </ul>
     <h4>Coded Rules &amp; Priority Tiers</h4>
     <ul>
-        <li><strong>Tournament Avatar Allowance:</strong> Supports <code>1</code>&ndash;<code>3</code> copies of <strong>Primary Wizard</strong> in <strong>Resources</strong>. When Primary &lt; <code>3</code>, a distinct <strong>Secondary Wizard</strong> (<code>1</code>&ndash;<code>2</code> copies, capped so total Wizards &le; <code>3</code>) can be routed to <strong>Sideboard</strong> (default: <code>Random 2</code> + <code>Random 1</code>) or <strong>Resources</strong>.</li>
-        <li><strong>Recruit <code>Site Requirement</code> Guard:</strong> Unlike <strong>Starting Company</strong>, every recruit and Sideboard character must have its <code>Site Requirement</code> (if any) satisfied in <strong>Sites</strong>. For example, Hobbits (<code>Site Requirement: Bag End</code>) and <em>Fram Framson</em> (<code>Site Requirement: Framsburg</code>) only draft here if those sites are in the drafted Site deck.</li>
+        <li><span class="lead-in">Tournament Avatar Allowance:</span> Supports 1&ndash;3 copies of <strong>Primary Wizard</strong> in Resources. When Primary &lt; 3, a distinct <strong>Secondary Wizard</strong> (1&ndash;2 copies, capped so total Wizards &le; 3) can be routed to Sideboard (default: <strong>Random</strong> 2 + <strong>Random</strong> 1) or Resources.</li>
+        <li><span class="lead-in">Recruit <code>Site Requirement</code> Guard:</span> Unlike the <strong>Starting Company</strong> tab, every recruit and Sideboard character must have its <code>Site Requirement</code> (if any) satisfied in Sites. For example, Hobbits (<code>Site Requirement: Bag End</code>) and <em>Fram Framson</em> (<code>Site Requirement: Framsburg</code>) only draft here if those sites are in the drafted Site deck.</li>
         <li>
-            <strong>3-Tier Geographic Priority (25 attempts, tightest-row-first on attempt 0):</strong>
+            <span class="lead-in">3-Tier Geographic Priority</span> (25 attempts, tightest-row-first on attempt 0):
             <ol>
-                <li><strong>Tier 1:</strong> Characters homed at drafted local adventure sites or Havens inside the drafted region group.</li>
-                <li><strong>Tier 2:</strong> Characters homed at Havens outside the drafted region group.</li>
-                <li><strong>Tier 3:</strong> Remaining Haven-playable characters (or those whose <code>Site Requirement</code> is met in <strong>Sites</strong>).</li>
+                <li><span class="lead-in">Tier 1:</span> Characters homed at drafted local adventure sites or Havens inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 2:</span> Characters homed at Havens outside the drafted region group.</li>
+                <li><span class="lead-in">Tier 3:</span> Remaining Haven-playable characters (or those whose <code>Site Requirement</code> is met in Sites).</li>
             </ol>
         </li>
-        <li><strong>Uniqueness &amp; Exclusion:</strong> Never drafts a character title already in <strong>Pool</strong>, and enforces <code>Unique = 1</code> across non-Avatar recruits.</li>
+        <li><span class="lead-in">Uniqueness &amp; Exclusion:</span> Never drafts a character title already in Pool, and enforces <code>Unique</code> = 1 across non-Avatar recruits.</li>
     </ul>
     <h4>Warnings</h4>
     <ul>
-        <li><code>&#9888;</code> Emits a non-blocking notice if <em>Saruman</em> is drafted without <em>Isengard</em> in <strong>Sites</strong>, or <em>Radagast</em> without <em>Rhosgobel</em> (both still deploy normally at any Haven).</li>
+        <li>&#9888; Emits a non-blocking notice if <em>Saruman</em> is drafted without <em>Isengard</em> in Sites, or <em>Radagast</em> without <em>Rhosgobel</em> (both still deploy normally at any Haven).</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -334,23 +334,23 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Secondary == "Faction"</code>, <code>Alignment</code> (<code>Hero</code>, <code>Neutral</code>, <code>Dual</code>, or blank), <code>Race</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Site Requirement</code> (required), <code>Prerequisite</code> (<code>;</code> = OR branches, <code>&amp;&amp;</code> = AND terms), and <code>Faction Bonus</code> (read from drafted characters).</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Secondary == "Faction"</code>, <code>Alignment</code> (<code>Hero</code>, <code>Neutral</code>, <code>Dual</code>, or blank), <code>Race</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Site Requirement</code> (required), <code>Prerequisite</code> (<code>;</code> = OR branches, <code>&amp;&amp;</code> = AND terms), and <code>Faction Bonus</code> (read from drafted characters).</li>
     </ul>
     <h4>Coded Rules &amp; 4-Tier Ranking</h4>
     <ul>
-        <li><strong>Hard Eligibility Guards:</strong> Candidate must be Hero-playable, have a <code>Site Requirement</code> matched in <strong>Sites</strong>, satisfy <code>Specific</code> (if set) against drafted characters (<strong>Pool</strong> + <strong>Resources</strong> + <strong>Sideboard</strong>), and pass recursive prerequisite verification (each prerequisite in the chosen <code>Prerequisite</code> branch must also satisfy its own <code>Site Requirement</code> and <code>Specific</code>).</li>
+        <li><span class="lead-in">Hard Eligibility Guards:</span> Candidate must be Hero-playable, have a <code>Site Requirement</code> matched in Sites, satisfy <code>Specific</code> (if set) against drafted characters (Pool + Resources + Sideboard), and pass recursive prerequisite verification (each prerequisite in the chosen <code>Prerequisite</code> branch must also satisfy its own <code>Site Requirement</code> and <code>Specific</code>).</li>
         <li>
-            <strong>4-Tier Priority Order:</strong>
+            <span class="lead-in">4-Tier Priority Order:</span>
             <ol>
-                <li><strong>Tier 1:</strong> Matches a drafted character's <code>Faction Bonus</code> tag (ignoring wildcards <code>*</code> and <code>All</code>) <strong>OR</strong> matches a drafted character via <code>Specific</code> (such as <em>Army of the Dead</em> with <em>Aragorn II</em>), tie-broken by <strong>Pool</strong> &gt; <strong>Resources</strong> &gt; <strong>Sideboard</strong>.</li>
-                <li><strong>Tier 2:</strong> Matches a drafted character's <code>Race</code> (<strong>Pool</strong> &gt; <strong>Resources</strong> &gt; <strong>Sideboard</strong>).</li>
-                <li><strong>Tier 3:</strong> Playable at a local adventure site or local Haven inside the drafted region group.</li>
-                <li><strong>Tier 4:</strong> Remaining eligible factions (such as those at outside Havens).</li>
+                <li><span class="lead-in">Tier 1:</span> Matches a drafted character's <code>Faction Bonus</code> tag (ignoring wildcards <code>*</code> and <code>All</code>) <em>or</em> matches a drafted character via <code>Specific</code> (such as <em>Army of the Dead</em> with <em>Aragorn II</em>), tie-broken by Pool &gt; Resources &gt; Sideboard.</li>
+                <li><span class="lead-in">Tier 2:</span> Matches a drafted character's <code>Race</code> (Pool &gt; Resources &gt; Sideboard).</li>
+                <li><span class="lead-in">Tier 3:</span> Playable at a local adventure site or local Haven inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 4:</span> Remaining eligible factions (such as those at outside Havens).</li>
             </ol>
         </li>
-        <li><strong>Auto-Drafting &amp; Copy Limits:</strong> Drafts <strong>Resources</strong> before <strong>Sideboard</strong> (variety-first, enforcing <code>Unique = 1</code> / non-unique = <code>3</code> combined). Missing <code>Prerequisite</code> cards (e.g. <em>Paths of the Dead</em>) are automatically added to the same section if capacity allows.</li>
-        <li><strong>Per-Cycle Site-Capacity Matching:</strong> Pass 1 enforces <strong>Decks Before Council</strong> tap capacity across non-Haven sites in <strong>Sites</strong> (<code>1</code> <strong>Resources</strong> play per cycle; Havens unlimited), factoring in any site-tapping <code>Prerequisite</code> cards. If no within-capacity faction exists, Pass 2 falls back and logs a <code>&#9888;</code> warning.</li>
+        <li><span class="lead-in">Auto-Drafting &amp; Copy Limits:</span> Drafts Resources before Sideboard (variety-first, enforcing <code>Unique</code> = 1 / non-unique = 3 combined). Missing <code>Prerequisite</code> cards (e.g., <em>Paths of the Dead</em>) are automatically added to the same section if capacity allows.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 enforces <strong>Decks Before Council</strong> tap capacity across non-Haven sites in Sites (1 Resources play per cycle; Havens unlimited), factoring in any site-tapping <code>Prerequisite</code> cards. If no within-capacity faction exists, Pass 2 falls back and logs a &#9888; warning.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -367,24 +367,24 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Resource (Ally)</span>
     </div>
     <p>
-        Drafts Hero-playable allies playable at drafted Sites or Havens, prioritizing local territory and preventing 1-deck site bottlenecks with <strong>Resources</strong> Factions.
+        Drafts Hero-playable allies playable at drafted Sites or Havens, prioritizing local territory and preventing 1-deck site bottlenecks with Resources Factions.
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Secondary == "Ally"</code>, <code>Alignment</code> (<code>Hero</code>, <code>Neutral</code>, <code>Dual</code>), <code>Specific</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Site Requirement</code> (required), <code>Prerequisite</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Secondary == "Ally"</code>, <code>Alignment</code> (<code>Hero</code>, <code>Neutral</code>, <code>Dual</code>), <code>Specific</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Site Requirement</code> (required), <code>Prerequisite</code>.</li>
     </ul>
     <h4>Coded Rules &amp; Priority Tiers</h4>
     <ul>
-        <li><strong>Hard Eligibility Guards:</strong> Must be Hero-playable, satisfy <code>Specific</code> against drafted characters, have a <code>Site Requirement</code> matched in <strong>Sites</strong>, and pass recursive <code>Prerequisite</code> chain checks (auto-drafting missing prerequisites into the same section).</li>
+        <li><span class="lead-in">Hard Eligibility Guards:</span> Must be Hero-playable, satisfy <code>Specific</code> against drafted characters, have a <code>Site Requirement</code> matched in Sites, and pass recursive <code>Prerequisite</code> chain checks (auto-drafting missing prerequisites into the same section).</li>
         <li>
-            <strong>2-Tier Geographic Priority:</strong>
+            <span class="lead-in">2-Tier Geographic Priority:</span>
             <ol>
-                <li><strong>Tier 1:</strong> Playable at local adventure sites or local Havens inside the drafted region group.</li>
-                <li><strong>Tier 2:</strong> Playable at Havens outside the drafted region group.</li>
+                <li><span class="lead-in">Tier 1:</span> Playable at local adventure sites or local Havens inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 2:</span> Playable at Havens outside the drafted region group.</li>
             </ol>
         </li>
-        <li><strong>Per-Cycle Site-Capacity Matching:</strong> Pass 1 uses capacitated bipartite matching across all site-tapping cards already in <strong>Resources</strong> (allowing up to <strong>Decks Before Council</strong> cards per non-Haven site in <strong>Sites</strong>, and unlimited plays at Havens). If no within-capacity ally exists, Pass 2 falls back to an over-capacity ally and logs a <code>&#9888;</code> warning naming the site(s) and conflicting card(s).</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 uses capacitated bipartite matching across all site-tapping cards already in Resources (allowing up to <strong>Decks Before Council</strong> cards per non-Haven site in Sites, and unlimited plays at Havens). If no within-capacity ally exists, Pass 2 falls back to an over-capacity ally and logs a &#9888; warning naming the site(s) and conflicting card(s).</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -405,28 +405,28 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Secondary</code> (<code>Minor Item</code>, <code>Major Item</code>, <code>Greater Item</code>, <code>Special Item</code>), <code>Alignment</code>, <code>Race</code> (detects <code>Scroll</code> for site playability; excludes <code>Palant&iacute;r</code>), <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>Scroll</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Secondary</code> (<code>Minor Item</code>, <code>Major Item</code>, <code>Greater Item</code>, <code>Special Item</code>), <code>Alignment</code>, <code>Race</code> (detects <code>Scroll</code> for site playability; excludes <code>Palant&iacute;r</code>), <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>Scroll</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
     </ul>
     <h4>Exclusions &amp; Cross-Tab Interactions</h4>
     <ul>
-        <li><strong>Reserved Item Exclusions:</strong> Excludes <code>Gold Ring Item</code> cards, Ring <code>Special Item</code> cards (<em>The One Ring</em>, Dwarven, Magic, Lesser, <em>Wizard's Ring</em>), <code>Palant&iacute;r</code> items, and any item tagged <code>Role: Quest</code> (such as <em>Book of Mazarbul</em> or <em>Sapling of the White Tree</em>), leaving them to the <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, and <strong>Quests</strong> tabs.</li>
-        <li><em>Scroll of Isildur</em><strong>:</strong> Drafts as a <code>Greater Item</code> on this tab (playable at <code>GreaterItem = yes</code> or <code>Scroll = yes</code> sites such as <em>Tolfalas</em>) and is automatically counted toward <strong>Aid Ring Test</strong> on the <strong>Rings</strong> tab.</li>
+        <li><span class="lead-in">Reserved Item Exclusions:</span> Excludes <code>Gold Ring Item</code> cards, Ring <code>Special Item</code> cards (<em>The One Ring</em>, Dwarven, Magic, Lesser, <em>Wizard's Ring</em>), <code>Palant&iacute;r</code> items, and any item tagged <code>Role: Quest</code> (such as <em>Book of Mazarbul</em> or <em>Sapling of the White Tree</em>), leaving them to the <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, and <strong>Quests</strong> tabs.</li>
+        <li><span class="lead-in"><em>Scroll of Isildur</em>:</span> Drafts as a <code>Greater Item</code> on this tab (playable at <code>GreaterItem = yes</code> or <code>Scroll = yes</code> sites such as <em>Tolfalas</em>) and is automatically counted toward <strong>Aid Ring Test</strong> on the <strong>Rings</strong> tab.</li>
     </ul>
     <h4>Coded Rules &amp; Hard Guards</h4>
     <ul>
-        <li><strong>Draft Order:</strong> <strong>Pool</strong> Minor Items (<code>0</code>&ndash;<code>2</code>, capped by <strong>Pool</strong> character count; skips site check because starting items deploy with the starting company) &rarr; <code>Special</code> &rarr; <code>Greater</code> &rarr; <code>Major</code> &rarr; <code>Minor</code> (<strong>Resources</strong> before <strong>Sideboard</strong>), variety-first.</li>
+        <li><span class="lead-in">Draft Order:</span> Pool Minor Items (0&ndash;2, capped by Pool character count; skips site check because starting items deploy with the starting company) &rarr; <code>Special Item</code> &rarr; <code>Greater Item</code> &rarr; <code>Major Item</code> &rarr; <code>Minor Item</code> (Resources before Sideboard), variety-first.</li>
         <li>
-            <strong>Eligibility Guards:</strong>
+            <span class="lead-in">Eligibility Guards:</span>
             <ul>
                 <li>Must carry at least one checked <code>Role</code> tag under <strong>Role Focus</strong>.</li>
                 <li><code>Region Requirement</code> (if tagged) must match a drafted Region name or <code>Region Type</code>.</li>
-                <li><code>Site Requirement</code> (if tagged) must match <strong>Sites</strong>; otherwise standard-tier items require a site with the matching <code>MinorItem</code> / <code>MajorItem</code> / <code>GreaterItem</code> / <code>Scroll</code> flag (and <code>Hoard = yes</code> on the same site when the item has <code>Hoard = yes</code>).</li>
-                <li><code>Specific</code> (if set) must match a drafted character; <code>Prerequisite</code> (if tagged) must <strong>already</strong> exist in <strong>Pool</strong> + <strong>Resources</strong> + <strong>Sideboard</strong> (this tab does not auto-draft missing prerequisites).</li>
+                <li><code>Site Requirement</code> (if tagged) must match Sites; otherwise standard-tier items require a site with the matching <code>MinorItem</code> / <code>MajorItem</code> / <code>GreaterItem</code> / <code>Scroll</code> flag (and <code>Hoard = yes</code> on the same site when the item has <code>Hoard = yes</code>).</li>
+                <li><code>Specific</code> (if set) must match a drafted character; <code>Prerequisite</code> (if tagged) must <em>already</em> exist in Pool + Resources + Sideboard (this tab does not auto-draft missing prerequisites).</li>
                 <li><code>Target Species</code> is enforced only for Hero character races (<code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>). Creature-targeted tags (such as <code>Orc</code> on <em>Glamdring</em> or <code>Animal; Spider; Undead; Wolf</code> on <em>Star-glass</em>) are ignored here.</li>
             </ul>
         </li>
-        <li><strong>Per-Cycle Site-Capacity Matching:</strong> For <strong>Resources</strong> items, Pass 1 runs across all four tiers (<code>Special</code> &rarr; <code>Greater</code> &rarr; <code>Major</code> &rarr; <code>Minor</code>) within remaining <strong>Decks Before Council</strong> non-Haven site capacity before Pass 2 fills any shortfall with a <code>&#9888;</code> warning. <strong>Pool</strong> starting Minor Items (deployed at <em>Rivendell</em> before Turn 1) and <strong>Sideboard</strong> items are unrestricted.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> For Resources items, Pass 1 runs across all four tiers (<code>Special Item</code> &rarr; <code>Greater Item</code> &rarr; <code>Major Item</code> &rarr; <code>Minor Item</code>) within remaining <strong>Decks Before Council</strong> non-Haven site capacity before Pass 2 fills any shortfall with a &#9888; warning. Pool starting Minor Items (deployed at <em>Rivendell</em> before Turn 1) and Sideboard items are unrestricted.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -447,16 +447,16 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Secondary</code> (<code>Gold Ring Item</code>, <code>Special Item</code>, <code>*event*</code>, or standard item tier), <code>Alignment</code>, <code>Text</code> (2d6 roll-table parsing), <code>Race</code>, <code>Skill</code>, <code>GoldRing</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Special Ability</code> (<code>Gold Ring: Allow Test</code>, <code>Gold Ring: Aid Test</code>, <code>Gold Ring: Exclude One Ring</code>), <code>Role</code> (filtered by <strong>Special Ring Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Secondary</code> (<code>Gold Ring Item</code>, <code>Special Item</code>, <code>*event*</code>, or standard item tier), <code>Alignment</code>, <code>Text</code> (2d6 roll-table parsing), <code>Race</code>, <code>Skill</code>, <code>GoldRing</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Special Ability</code> (<code>Gold Ring: Allow Test</code>, <code>Gold Ring: Aid Test</code>, <code>Gold Ring: Exclude One Ring</code>), <code>Role</code> (filtered by <strong>Special Ring Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
     </ul>
     <h4>Coded Rules &amp; Cross-Tab Interactions</h4>
     <ul>
-        <li><strong><code>GoldRing = yes</code> Site Gate:</strong> Gold Rings, Ring Tests, <em>The One Ring</em>, Dwarven Rings, Magic Rings, and Lesser Rings require at least one <code>GoldRing = yes</code> site in <strong>Sites</strong>. If none exists, those slots are skipped with a <code>&#9888;</code> warning. (<em>Wizard's Ring</em> only requires a Haven via <code>Site Requirement</code> plus a <code>Wizard</code> in the deck.)</li>
-        <li><strong>2d6 Roll-Table Scoring:</strong> When any Special Ring (One, Dwarven, or Magic) is requested, Gold Rings are scored by parsing their printed 2d6 outcomes in <code>Text</code> (<code>5 &times; One Ring ways + 2 &times; Dwarven Ring ways + 1 &times; Magic/Spirit Ring ways</code>) and drafted playset-first. Otherwise, Gold Rings draft variety-first.</li>
-        <li><strong>Total Test Counting &amp; <em>Ringlore</em> Exclusion:</strong> <strong>Allow Ring Test</strong> and <strong>Aid Ring Test</strong> spinners represent <strong>totals</strong>. Cards already drafted in earlier tabs (such as <em>Gandalf</em> for <code>Gold Ring: Allow Test</code>, counted at most once per unique title per section, or <em>Scroll of Isildur</em> from <strong>Items</strong> for <code>Gold Ring: Aid Test</code>) are counted first before drafting additional test events. If <em>The One Ring</em> is requested without other tested Special Rings in that section, testers tagged <code>Gold Ring: Exclude One Ring</code> (<em>Ringlore</em>) are excluded; otherwise they are ranked behind unrestricted testers.</li>
-        <li><strong>Special Ring Guards:</strong> <em>The One Ring</em> is capped at &le; <code>1</code> combined (<strong>Resources</strong> + <strong>Sideboard</strong>). Dwarven Rings do <strong>not</strong> enforce <code>Target Species: Dwarf</code> (any character can bear them). Non-One Special Rings must pass checked tags in <strong>Special Ring Role Focus</strong>. All cards check <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code>, and <code>Skill</code>/<code>Race</code> locks.</li>
-        <li><strong>Per-Cycle Site-Capacity Matching:</strong> <strong>Resources</strong> Gold Rings run Pass 1 within remaining <strong>Decks Before Council</strong> capacity across non-Haven <code>GoldRing = yes</code> sites before Pass 2 fills any shortfall with a <code>&#9888;</code> warning. Special Rings (which replace Gold Rings on test, or play at a Haven for <em>Wizard's Ring</em>) and Ring Test events do not consume site tap slots.</li>
+        <li><span class="lead-in"><code>GoldRing = yes</code> Site Gate:</span> Gold Rings, Ring Tests, <em>The One Ring</em>, Dwarven Rings, Magic Rings, and Lesser Rings require at least one <code>GoldRing = yes</code> site in Sites. If none exists, those slots are skipped with a &#9888; warning. (<em>Wizard's Ring</em> only requires a Haven via <code>Site Requirement</code> plus a <code>Wizard</code> in the deck.)</li>
+        <li><span class="lead-in">2d6 Roll-Table Scoring:</span> When any Special Ring (One, Dwarven, or Magic) is requested, Gold Rings are scored by parsing their printed 2d6 outcomes in <code>Text</code> (<code>5 &times; One Ring ways + 2 &times; Dwarven Ring ways + 1 &times; Magic/Spirit Ring ways</code>) and drafted playset-first. Otherwise, Gold Rings draft variety-first.</li>
+        <li><span class="lead-in">Total Test Counting &amp; <em>Ringlore</em> Exclusion:</span> The <strong>Allow Ring Test</strong> and <strong>Aid Ring Test</strong> spinners represent <em>totals</em>. Cards already drafted in earlier tabs (such as <em>Gandalf</em> for <code>Gold Ring: Allow Test</code>, counted at most once per unique title per section, or <em>Scroll of Isildur</em> from the <strong>Items</strong> tab for <code>Gold Ring: Aid Test</code>) are counted first before drafting additional test events. If <em>The One Ring</em> is requested without other tested Special Rings in that section, testers tagged <code>Gold Ring: Exclude One Ring</code> (<em>Ringlore</em>) are excluded; otherwise they are ranked behind unrestricted testers.</li>
+        <li><span class="lead-in">Special Ring Guards:</span> <em>The One Ring</em> is capped at &le; 1 combined (Resources + Sideboard). Dwarven Rings do <em>not</em> enforce <code>Target Species: Dwarf</code> (any character can bear them). Non-One Special Rings must pass checked tags in <strong>Special Ring Role Focus</strong>. All cards check <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code>, and <code>Skill</code>/<code>Race</code> locks.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Resources Gold Rings run Pass 1 within remaining <strong>Decks Before Council</strong> capacity across non-Haven <code>GoldRing = yes</code> sites before Pass 2 fills any shortfall with a &#9888; warning. Special Rings (which replace Gold Rings on test, or play at a Haven for <em>Wizard's Ring</em>) and Ring Test events do not consume site tap slots.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -477,15 +477,15 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Race == "Palant&iacute;r"</code>, <code>Alignment</code>, <code>Skill</code> (<code>Sage</code>), <code>GreaterItem</code>, <code>Palantiri</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Special Ability</code> (<code>Palant&iacute;r: Allow Use</code>), <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Race == "Palant&iacute;r"</code>, <code>Alignment</code>, <code>Skill</code> (<code>Sage</code>), <code>GreaterItem</code>, <code>Palantiri</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Special Ability</code> (<code>Palant&iacute;r: Allow Use</code>), <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
     </ul>
     <h4>Coded Rules &amp; Guards</h4>
     <ul>
-        <li><strong>Palant&iacute;r Item Playability:</strong> A Palant&iacute;r is eligible if its <code>Site Requirement</code> (e.g., <em>Isengard</em>, <em>Minas Tirith</em>, <em>The White Towers</em>) matches <strong>Sites</strong>, or&mdash;when no <code>Site Requirement</code> is tagged&mdash;if <strong>Sites</strong> contains a location with <code>GreaterItem = yes</code> or <code>Palantiri = yes</code> (such as <em>Lossadan Cairn</em>, respecting <code>Hoard</code>).</li>
-        <li><strong>Item Guards:</strong> Enforces checked <strong>Role Focus</strong> tags, <code>Region Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code>, <code>Skill</code>, and <code>Target Species</code> (<em>Palant&iacute;r of Elostirion</em> requires an <code>Elf</code> or <code>Wizard</code> in the deck).</li>
-        <li><strong>Total Allow Palant&iacute;r Use Counting:</strong> Counts existing <code>Special Ability: Palant&iacute;r: Allow Use</code> cards in <strong>Resources</strong> / <strong>Sideboard</strong> (such as <em>Saruman</em>, counted once per unique title) before drafting <em>Align Palant&iacute;r</em> or <em>Use Palant&iacute;r</em> (which require a <code>Sage</code>).</li>
-        <li><strong>Per-Cycle Site-Capacity Matching:</strong> <strong>Resources</strong> Palant&iacute;r items run Pass 1 within remaining <strong>Decks Before Council</strong> non-Haven site capacity (avoiding collisions with earlier Factions, Allies, or Items on sites like <em>Minas Tirith</em> or <em>Isengard</em>) before Pass 2 falls back with a <code>&#9888;</code> warning.</li>
+        <li><span class="lead-in">Palant&iacute;r Item Playability:</span> A Palant&iacute;r is eligible if its <code>Site Requirement</code> (e.g., <em>Isengard</em>, <em>Minas Tirith</em>, <em>The White Towers</em>) matches Sites, or&mdash;when no <code>Site Requirement</code> is tagged&mdash;if Sites contains a location with <code>GreaterItem = yes</code> or <code>Palantiri = yes</code> (such as <em>Lossadan Cairn</em>, respecting <code>Hoard</code>).</li>
+        <li><span class="lead-in">Item Guards:</span> Enforces checked <strong>Role Focus</strong> tags, <code>Region Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code>, <code>Skill</code>, and <code>Target Species</code> (<em>Palant&iacute;r of Elostirion</em> requires an <code>Elf</code> or <code>Wizard</code> in the deck).</li>
+        <li><span class="lead-in">Total Allow Palant&iacute;r Use Counting:</span> Counts existing <code>Special Ability: Palant&iacute;r: Allow Use</code> cards in Resources / Sideboard (such as <em>Saruman</em>, counted once per unique title) before drafting <em>Align Palant&iacute;r</em> or <em>Use Palant&iacute;r</em> (which require a <code>Sage</code>).</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Resources Palant&iacute;r items run Pass 1 within remaining <strong>Decks Before Council</strong> non-Haven site capacity (avoiding collisions with earlier Factions, Allies, or Items on sites like <em>Minas Tirith</em> or <em>Isengard</em>) before Pass 2 falls back with a &#9888; warning.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -506,22 +506,22 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Secondary</code>, <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>GoldRing</code>, discrete item flags (for Quest items without explicit <code>Site Requirement</code>), <code>Name</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Role</code> (<code>Quest</code> plus secondary roles / <code>Quest (Only)</code>), <code>Prerequisite</code> (<code>;</code> = OR, <code>&amp;&amp;</code> = AND), <code>Site Requirement</code> (supports <code>&amp;&amp;</code> multi-site clauses such as <code>Bag End &amp;&amp; L&oacute;rien</code>), <code>Region Requirement</code>, <code>Target Species</code>, <code>Special Ability</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Secondary</code>, <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>GoldRing</code>, discrete item flags (for Quest items without explicit <code>Site Requirement</code>), <code>Name</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Role</code> (<code>Quest</code> plus secondary roles), <code>Prerequisite</code> (<code>;</code> = OR, <code>&amp;&amp;</code> = AND), <code>Site Requirement</code> (supports <code>&amp;&amp;</code> multi-site clauses such as <code>Bag End &amp;&amp; L&oacute;rien</code>), <code>Region Requirement</code>, <code>Target Species</code>, <code>Special Ability</code>.</li>
     </ul>
     <h4>Coded Rules &amp; Priority Tiers</h4>
     <ul>
-        <li><strong>Role Focus (<code>Quest (Only)</code> vs. Hybrid Quests):</strong> Pure Quests carrying only <code>Role: Quest</code> match <code>Quest (Only)</code>; Quests carrying additional <code>Role</code> tags match if any of those secondary roles is checked.</li>
-        <li><strong>Eligibility Guards:</strong> Enforces <code>Region Requirement</code>, <code>Site Requirement</code> (all terms in <code>&amp;&amp;</code> clauses must exist in <strong>Sites</strong>), <code>Specific</code>, <code>Skill</code>/<code>Race</code>, and <code>Target Species</code> (e.g., <code>D&uacute;nadan</code> on <em>And&uacute;ril, the Flame of the West</em>, <code>Hobbit</code> on <em>Red Book of Westmarch</em>).</li>
+        <li><span class="lead-in">Role Focus</span> (<strong>Quest (Only)</strong> vs. Hybrid Quests): Pure Quests carrying only <code>Role: Quest</code> match <strong>Quest (Only)</strong>; Quests carrying additional <code>Role</code> tags match if any of those secondary roles is checked.</li>
+        <li><span class="lead-in">Eligibility Guards:</span> Enforces <code>Region Requirement</code>, <code>Site Requirement</code> (all terms in <code>&amp;&amp;</code> clauses must exist in Sites), <code>Specific</code>, <code>Skill</code>/<code>Race</code>, and <code>Target Species</code> (e.g., <code>D&uacute;nadan</code> on <em>And&uacute;ril, the Flame of the West</em>, <code>Hobbit</code> on <em>Red Book of Westmarch</em>).</li>
         <li>
-            <strong>2-Tier Prerequisite Resolution:</strong> Evaluates <code>Prerequisite</code> branches recursively, selecting the branch needing the fewest new cards:
+            <span class="lead-in">2-Tier Prerequisite Resolution:</span> Evaluates <code>Prerequisite</code> branches recursively, selecting the branch needing the fewest new cards:
             <ol>
-                <li><strong>Tier 1 (Already Satisfied):</strong> Quests whose <code>Prerequisite</code> is already in the deck (<code>0</code> extra cards needed).</li>
-                <li><strong>Tier 2 (Standalone / Self-Contained):</strong> Quests with no <code>Prerequisite</code>, or Quests whose missing prerequisite cards pass all guards and fit in remaining section capacity (auto-drafted into the same section).</li>
+                <li><span class="lead-in">Tier 1 (Already Satisfied):</span> Quests whose <code>Prerequisite</code> is already in the deck (0 extra cards needed).</li>
+                <li><span class="lead-in">Tier 2 (Standalone / Self-Contained):</span> Quests with no <code>Prerequisite</code>, or Quests whose missing prerequisite cards pass all guards and fit in remaining section capacity (auto-drafted into the same section).</li>
             </ol>
         </li>
-        <li><strong>Optional One Ring Package (Auto-draft One Ring package):</strong> When checked and a Quest requires <em>The One Ring</em> (<em>Cracks of Doom</em>, <em>Gollum's Fate</em>) that is not yet in the deck, checks for a <code>GoldRing = yes</code> site in <strong>Sites</strong> and automatically bundles <em>The One Ring</em>, an optimal Gold Ring (if missing), and an unrestricted <code>Gold Ring: Allow Test</code> card (excluding <code>Gold Ring: Exclude One Ring</code>, and accounting for prior Special Rings consuming single-use <code>Short-event</code> testers).</li>
-        <li><strong>Per-Cycle Site-Capacity Matching:</strong> Pass 1 checks Quest Items and any site-tapping <code>Prerequisite</code> cards (such as factions or an auto-drafted Gold Ring) against remaining <strong>Decks Before Council</strong> non-Haven site capacity in <strong>Resources</strong>; if capacity is exhausted, Pass 2 falls back and logs a <code>&#9888;</code> warning.</li>
+        <li><span class="lead-in">Optional One Ring Package</span> (<strong>Auto-draft One Ring package</strong>): When checked and a Quest requires <em>The One Ring</em> (<em>Cracks of Doom</em>, <em>Gollum's Fate</em>) that is not yet in the deck, checks for a <code>GoldRing = yes</code> site in Sites and automatically bundles <em>The One Ring</em>, an optimal Gold Ring (if missing), and an unrestricted <code>Gold Ring: Allow Test</code> card (excluding <code>Gold Ring: Exclude One Ring</code>, and accounting for prior Special Rings consuming single-use <code>Short-event</code> testers).</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 checks Quest Items and any site-tapping <code>Prerequisite</code> cards (such as factions or an auto-drafted Gold Ring) against remaining <strong>Decks Before Council</strong> non-Haven site capacity in Resources; if capacity is exhausted, Pass 2 falls back and logs a &#9888; warning.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -538,18 +538,18 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Resource (Events &amp; Twilight)</span>
     </div>
     <p>
-        Drafts requested environment cards (<em>Gates of Morning</em> and <em>Twilight</em>), then auto-fills all remaining Play Deck capacity up to <strong>Play Deck Size</strong> (plus requested <strong>Sideboard</strong> events) across checked <strong>Role Focus</strong> tags.
+        Drafts requested environment cards (<em>Gates of Morning</em> and <em>Twilight</em>), then auto-fills all remaining Play Deck capacity up to <strong>Play Deck Size</strong> (plus requested <strong>Additional Events in Sideboard</strong>) across checked <strong>Role Focus</strong> tags.
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Resource"</code>, <code>Secondary</code> (contains <code>"event"</code>), <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code> (<em>Gates of Morning</em>, <em>Twilight</em>).</li>
-        <li><strong>Custom Categories:</strong> <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Resource"</code>, <code>Secondary</code> (contains <code>"event"</code>), <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code> (<em>Gates of Morning</em>, <em>Twilight</em>).</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Site Requirement</code>, <code>Region Requirement</code>, <code>Prerequisite</code>, <code>Target Species</code>.</li>
     </ul>
     <h4>Exclusions &amp; Coded Rules</h4>
     <ul>
-        <li><strong>Reserved Exclusions:</strong> Excludes <em>Gates of Morning</em>, <em>Twilight</em>, <code>Role = Quest</code> events, <code>Gold Ring: Allow Test</code> events, and <code>Palant&iacute;r: Allow Use</code> events from the general auto-fill pool so earlier tabs and the environment spinners remain authoritative.</li>
-        <li><strong>Environment Cards First:</strong> Drafts requested <em>Gates of Morning</em> (&le; <code>3</code>) and <em>Twilight</em> (preferring <code>Neutral</code> printing; &le; <code>3</code> combined across the entire deck) before auto-fill runs.</li>
-        <li><strong>Proportionate Role Allocation:</strong> Computes eligible events passing all guards (<strong>Role Focus</strong>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code> in <strong>Pool</strong> + <strong>Resources</strong> + <strong>Sideboard</strong>, <code>Skill</code>/<code>Race</code>, and <code>Target Species</code>). Allocates slots proportionately to the number of eligible cards in each checked <code>Role</code> (guaranteeing at least <code>1</code> per eligible role when enough slots exist), drafting narrowest roles first with variety-first copy selection.</li>
+        <li><span class="lead-in">Reserved Exclusions:</span> Excludes <em>Gates of Morning</em>, <em>Twilight</em>, <code>Role = Quest</code> events, <code>Gold Ring: Allow Test</code> events, and <code>Palant&iacute;r: Allow Use</code> events from the general auto-fill pool so earlier tabs and the environment spinners remain authoritative.</li>
+        <li><span class="lead-in">Environment Cards First:</span> Drafts requested <em>Gates of Morning</em> (&le; 3) and <em>Twilight</em> (preferring <code>Neutral</code> printing; &le; 3 combined across the entire deck) before auto-fill runs.</li>
+        <li><span class="lead-in">Proportionate Role Allocation:</span> Computes eligible events passing all guards (<strong>Role Focus</strong>, <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code> in Pool + Resources + Sideboard, <code>Skill</code>/<code>Race</code>, and <code>Target Species</code>). Allocates slots proportionately to the number of eligible cards in each checked <code>Role</code> (guaranteeing at least 1 per eligible role when enough slots exist), drafting narrowest roles first with variety-first copy selection.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -570,18 +570,18 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Hazard"</code>, <code>Secondary</code> (<code>Creature</code>, <code>Creature/*event*</code>), <code>Alignment</code>, <code>Race</code> (<code>Nazg&ucirc;l</code> and checked items in <strong>Species / Race Focus</strong>), <code>Unique</code>, <code>Name</code>.</li>
-        <li><strong>Custom Categories:</strong> <code>Target Species</code> (<code>Nazg&ucirc;l</code> for <strong>Nazg&ucirc;l Support</strong>), <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Region Type</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Hazard"</code>, <code>Secondary</code> (<code>Creature</code>, <code>Creature/*event*</code>), <code>Alignment</code>, <code>Race</code> (<code>Nazg&ucirc;l</code> and checked items in <strong>Species / Race Focus</strong>), <code>Unique</code>, <code>Name</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Target Species</code> (<code>Nazg&ucirc;l</code> for <strong>Nazg&ucirc;l Support</strong>), <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Region Type</code>.</li>
     </ul>
     <h4>Draft Order &amp; Proportionate Species Bucketing</h4>
     <ul>
         <li>
-            <strong>Execution Order (<strong>Hazards</strong> before <strong>Sideboard</strong>):</strong>
+            <span class="lead-in">Execution Order</span> (Hazards before Sideboard):
             <ol>
-                <li><strong>Nazg&ucirc;l (<code>0.5</code> equiv):</strong> <code>Race = Nazg&ucirc;l</code> (&le; <code>9</code> combined). In <em>Target Current Deck</em> mode, prioritizes creature-keyable Nazg&ucirc;l over permanent-event-only Nazg&ucirc;l.</li>
-                <li><strong>Nazg&ucirc;l Support:</strong> Non-Nazg&ucirc;l Hazard events carrying <code>Target Species: Nazg&ucirc;l</code>.</li>
-                <li><strong>Standard Creatures (<code>1.0</code> equiv):</strong> <code>Secondary == "Creature"</code>, distributed proportionately across checked <strong>Species / Race Focus</strong> buckets with variety-first sampling.</li>
-                <li><strong>Dual-Mode Half-Creatures (<code>0.5</code> equiv):</strong> Non-Nazg&ucirc;l cards whose <code>Secondary</code> contains both <code>Creature</code> and <code>event</code> (such as <em>Shelob</em> or <em>Mouth of Sauron</em>), also bucketed proportionately by checked species.</li>
+                <li><strong>Nazg&ucirc;l</strong> (0.5 equiv): <code>Race = Nazg&ucirc;l</code> (&le; 9 combined). In <em>Target Current Deck</em> mode, prioritizes creature-keyable Nazg&ucirc;l over permanent-event-only Nazg&ucirc;l.</li>
+                <li><strong>Nazg&ucirc;l Support</strong>: Non-Nazg&ucirc;l Hazard events carrying <code>Target Species: Nazg&ucirc;l</code>.</li>
+                <li><strong>Standard Creatures</strong> (1.0 equiv): <code>Secondary == "Creature"</code>, distributed proportionately across checked <strong>Species / Race Focus</strong> buckets with variety-first sampling.</li>
+                <li><strong>Dual-Mode Half</strong> (0.5 equiv): Non-Nazg&ucirc;l cards whose <code>Secondary</code> contains both <code>Creature</code> and <code>event</code> (such as <em>Shelob</em> or <em>Mouth of Sauron</em>), also bucketed proportionately by checked species.</li>
             </ol>
         </li>
     </ul>
@@ -593,19 +593,19 @@
             <th style="width: 39%;"><em>Target Current Deck</em> Mode (Checked)</th>
         </tr>
         <tr>
-            <td><strong>Keying Filters UI</strong></td>
-            <td><strong>Enabled:</strong> Uses checked <strong>Region Terrains</strong> and <strong>Site Holds</strong> on the <strong>Creatures</strong> tab.</td>
-            <td><strong>Disabled:</strong> Manual <strong>Keying Filters</strong> are ignored; reads your drafted <strong>Sites</strong> deck directly.</td>
+            <td><strong>Keying Filters</strong> UI</td>
+            <td><span class="lead-in">Enabled:</span> Uses checked <strong>Region Terrains</strong> and <strong>Site Holds</strong> on the <strong>Creatures</strong> tab.</td>
+            <td><span class="lead-in">Disabled:</span> Manual <strong>Keying Filters</strong> are ignored; reads your drafted Sites deck directly.</td>
         </tr>
         <tr>
-            <td><strong>Region &amp; Site Keying</strong></td>
+            <td><span class="lead-in">Region &amp; Site Keying</span></td>
             <td>Creature passes if it is unkeyed, or if <em>any</em> <code>Region Requirement</code> matches a checked terrain (directly or via its Region card's <code>Region Type</code>), or <em>any</em> <code>Site Requirement</code> matches a checked hold (directly or via its Site card's <code>Site</code> hold).</td>
-            <td>Creature passes only if <em>at least one</em> <code>Region Requirement</code> or <code>Site Requirement</code> tag matches a drafted Region, <code>Region Type</code>, or Site/Haven in <strong>Sites</strong>.</td>
+            <td>Creature passes only if <em>at least one</em> <code>Region Requirement</code> or <code>Site Requirement</code> tag matches a drafted Region, <code>Region Type</code>, or Site/Haven in Sites.</td>
         </tr>
     </table>
     <h4>Warnings</h4>
     <ul>
-        <li><code>&#9888;</code> Warns if <strong>Nazg&ucirc;l Support</strong> is drafted with <code>0</code> Nazg&ucirc;l in <strong>Hazards</strong> + <strong>Sideboard</strong>, or if <strong>Hazards</strong> creature equivalents fall below <code>12</code>.</li>
+        <li>&#9888; Warns if <strong>Nazg&ucirc;l Support</strong> is drafted with 0 Nazg&ucirc;l in Hazards + Sideboard, or if Hazards creature equivalents fall below 12.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -622,18 +622,18 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Hazard (Events &amp; Twilight)</span>
     </div>
     <p>
-        Drafts requested Hazard environment cards (<em>Doors of Night</em> and <em>Twilight</em>), then auto-fills remaining Play Deck capacity up to <strong>Play Deck Size</strong> (plus requested <strong>Sideboard</strong> events) across checked <strong>Role Focus</strong> tags.
+        Drafts requested Hazard environment cards (<em>Doors of Night</em> and <em>Twilight</em>), then auto-fills remaining Play Deck capacity up to <strong>Play Deck Size</strong> (plus requested <strong>Additional Events in Sideboard</strong>) across checked <strong>Role Focus</strong> tags.
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><strong>Official Attributes:</strong> <code>Primary == "Hazard"</code>, <code>Secondary</code> (contains <code>"event"</code>; checks <code>Long-event</code> for <code>Duration</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code> (<em>Doors of Night</em>, <em>Twilight</em>).</li>
-        <li><strong>Custom Categories:</strong> <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Item</code>, <code>Target Species</code>, <code>Prerequisite</code>, <code>Automatic Attack</code>, <code>Region Type</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Hazard"</code>, <code>Secondary</code> (contains <code>"event"</code>; checks <code>Long-event</code> for <code>Duration</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code> (<em>Doors of Night</em>, <em>Twilight</em>).</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Role</code> (filtered by <strong>Role Focus</strong>), <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Target Item</code>, <code>Target Species</code>, <code>Prerequisite</code>, <code>Automatic Attack</code>, <code>Region Type</code>.</li>
     </ul>
     <h4>Exclusions &amp; Coded Rules</h4>
     <ul>
-        <li><strong>Reserved Exclusions:</strong> Excludes <em>Doors of Night</em>, <em>Twilight</em>, and all cards belonging to Step 11 (<strong>Creatures</strong>: Nazg&ucirc;l, Nazg&ucirc;l Support, Standard Creatures, and Dual-Mode Creatures).</li>
-        <li><strong>Shared <em>Twilight</em> Cap:</strong> Drafts <em>Doors of Night</em> (&le; <code>3</code>) and <em>Twilight</em> first; <em>Twilight</em> strictly shares a single 3-copy limit across <strong>Resources</strong> + <strong>Hazards</strong> + <strong>Sideboard</strong>.</li>
-        <li><strong>Proportionate Role Auto-Fill &amp; <code>Duration</code> Gate:</strong> Distributes remaining <strong>Hazards</strong> and <strong>Sideboard</strong> event slots proportionately across checked <strong>Role Focus</strong> buckets with variety-first sampling. Events tagged <code>Role: Duration</code> (<em>The Will of Sauron</em>) are held in the last bucket and are only drafted if at least one Hazard <code>Long-event</code> is already present in <strong>Hazards</strong> + <strong>Sideboard</strong>.</li>
+        <li><span class="lead-in">Reserved Exclusions:</span> Excludes <em>Doors of Night</em>, <em>Twilight</em>, and all cards belonging to Step 11 (<strong>Creatures</strong> tab: Nazg&ucirc;l, Nazg&ucirc;l Support, Standard Creatures, and Dual-Mode Half-Creatures).</li>
+        <li><span class="lead-in">Shared <em>Twilight</em> Cap:</span> Drafts <em>Doors of Night</em> (&le; 3) and <em>Twilight</em> first; <em>Twilight</em> strictly shares a single 3-copy limit across Resources + Hazards + Sideboard.</li>
+        <li><span class="lead-in">Proportionate Role Auto-Fill &amp; <code>Duration</code> Gate:</span> Distributes remaining Hazards and Sideboard event slots proportionately across checked <strong>Role Focus</strong> buckets with variety-first sampling. Events tagged <code>Role: Duration</code> (<em>The Will of Sauron</em>) are held in the last bucket and are only drafted if at least one Hazard <code>Long-event</code> is already present in Hazards + Sideboard.</li>
     </ul>
     <h4>Targeting Mode Behavior (Controlled on General Settings)</h4>
     <table>
@@ -643,32 +643,32 @@
             <th style="width: 40%;"><em>Target Current Deck</em> Mode (Checked)</th>
         </tr>
         <tr>
-            <td><strong>Geography Keying</strong></td>
+            <td><span class="lead-in">Geography Keying</span></td>
             <td>Uses checked <strong>Region Terrains</strong> &amp; <strong>Site Holds</strong> in <strong>Keying Filters</strong> (unkeyed events pass).</td>
-            <td><strong>Keying Filters</strong> disabled; if <code>Region Requirement</code> or <code>Site Requirement</code> is tagged, at least one tag must match <strong>Sites</strong>.</td>
+            <td><strong>Keying Filters</strong> disabled; if <code>Region Requirement</code> or <code>Site Requirement</code> is tagged, at least one tag must match Sites.</td>
         </tr>
         <tr>
-            <td><strong><code>Target Item</code></strong></td>
+            <td><code>Target Item</code></td>
             <td>Unrestricted (opponents may carry Rings or Palant&iacute;ri).</td>
-            <td><code>Ring</code> requires a drafted Gold Ring or Special Ring; <code>Palant&iacute;r</code> requires a drafted Palant&iacute;r item in <strong>Resources</strong> + <strong>Sideboard</strong>.</td>
+            <td><code>Ring</code> requires a drafted Gold Ring or Special Ring; <code>Palant&iacute;r</code> requires a drafted Palant&iacute;r item in Resources + Sideboard.</td>
         </tr>
         <tr>
-            <td><strong><code>Target Species</code> (3-Way)</strong></td>
+            <td><code>Target Species</code> (3-Way)</td>
             <td>
-                <strong>1. Predicates</strong> (e.g. <code>Race!=Hobbit &amp;&amp; Race!=Wizard</code>) pass.<br />
-                <strong>2. Minion Escalations</strong> (<code>Role: Combat</code> or non-Hero species) require matching drafted creatures.<br />
-                <strong>3. Hero Race Targets</strong> (e.g. <code>Elf</code>, <code>Hobbit</code>) pass.
+                <span class="lead-in">1. Predicates</span> (e.g., <code>Race!=Hobbit &amp;&amp; Race!=Wizard</code>) pass.<br />
+                <span class="lead-in">2. Minion Escalations</span> (<code>Role: Combat</code> or non-Hero species) require matching drafted creatures.<br />
+                <span class="lead-in">3. Hero Race Targets</span> (e.g., <code>Elf</code>, <code>Hobbit</code>) pass.
             </td>
             <td>
-                <strong>1. Predicates</strong> must match a drafted character in <strong>Pool</strong> + <strong>Resources</strong> + <strong>Sideboard</strong>.<br />
-                <strong>2. Minion Escalations</strong> must match drafted creature species <strong>or</strong> a site <code>Automatic Attack</code> tag.<br />
-                <strong>3. Hero Race Targets</strong> must match a drafted character's <code>Race</code>.
+                <span class="lead-in">1. Predicates</span> must match a drafted character in Pool + Resources + Sideboard.<br />
+                <span class="lead-in">2. Minion Escalations</span> must match drafted creature species <em>or</em> a site <code>Automatic Attack</code> tag.<br />
+                <span class="lead-in">3. Hero Race Targets</span> must match a drafted character's <code>Race</code>.
             </td>
         </tr>
         <tr>
-            <td><strong><code>Specific</code> &amp; <code>Prerequisite</code></strong></td>
-            <td><code>Specific</code> ignored; existing <code>Prerequisite</code> checked in <strong>Hazards</strong> + <strong>Sideboard</strong>.</td>
-            <td><code>Specific</code> must match a drafted character; existing <code>Prerequisite</code> checked in <strong>Hazards</strong> + <strong>Sideboard</strong>.</td>
+            <td><code>Specific</code> &amp; <code>Prerequisite</code></td>
+            <td><code>Specific</code> ignored; existing <code>Prerequisite</code> checked in Hazards + Sideboard.</td>
+            <td><code>Specific</code> must match a drafted character; existing <code>Prerequisite</code> checked in Hazards + Sideboard.</td>
         </tr>
     </table>
     <div class="back-to-top">

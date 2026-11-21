@@ -290,8 +290,8 @@ namespace MECCG_Deck_Builder
             var grpGeneral = new GroupBox
             {
                 Text = "Target Deck Sizing && Workbench Profiles",
-                Location = new Point(16, 12),
-                Size = new Size(810, 224)
+                Location = new Point(16, 10),
+                Size = new Size(810, 220)
             };
 
             var lblTitle = new Label { Text = "Deck Title:", Location = new Point(16, 24), Size = new Size(135, 20) };
@@ -439,8 +439,8 @@ namespace MECCG_Deck_Builder
             var grpPipeline = new GroupBox
             {
                 Text = "Deck Assembly Pipeline && Session Snapshots",
-                Location = new Point(16, 244),
-                Size = new Size(810, 152)
+                Location = new Point(16, 236),
+                Size = new Size(810, 168)
             };
 
             var lblOrder = new Label
@@ -496,8 +496,8 @@ namespace MECCG_Deck_Builder
 
             _lblPipelineStatus = new Label
             {
-                Location = new Point(16, 96),
-                Size = new Size(778, 48),
+                Location = new Point(16, 94),
+                Size = new Size(778, 66),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
                 UseMnemonic = false
@@ -512,15 +512,15 @@ namespace MECCG_Deck_Builder
             var grpSummary = new GroupBox
             {
                 Text = "Live Deck Composition Status",
-                Location = new Point(16, 404),
-                Size = new Size(810, 244)
+                Location = new Point(16, 410),
+                Size = new Size(810, 248)
             };
 
             _lblDeckSummary = new Label
             {
-                Location = new Point(20, 22),
-                Size = new Size(770, 214),
-                Font = new Font("Segoe UI", 10.0f),
+                Location = new Point(16, 20),
+                Size = new Size(778, 222),
+                Font = new Font("Segoe UI", 9.25f),
                 ForeColor = Color.FromArgb(26, 54, 93),
                 UseMnemonic = false
             };
@@ -1173,7 +1173,7 @@ namespace MECCG_Deck_Builder
             }
 
             (_numResGoldRings, _numSideGoldRings) = AddRingRow(0, "Gold Rings:", 9, 0, 9, 0, "Auto-selected from Gold Ring roll tables to match requested Special Rings.");
-            (_numResAllowRingTest, _numSideAllowRingTest) = AddRingRow(1, "Allow Ring Test:", 9, 0, 6, 0, "Total desired (counts Gandalf once if already drafted in Resources/Sideboard).");
+            (_numResAllowRingTest, _numSideAllowRingTest) = AddRingRow(1, "Allow Ring Test:", 9, 0, 6, 0, "Total desired (counts Gandalf once if already in Res/Sideboard).");
             (_numResAidRingTest, _numSideAidRingTest) = AddRingRow(2, "Aid Ring Test:", 6, 0, 6, 0, "Total desired (includes Scroll of Isildur if already drafted in Items).");
             (_numResOneRing, _numSideOneRing) = AddRingRow(3, "The One Ring:", 1, 0, 1, 0, "Unique (combined Resources + Sideboard <= 1).");
             (_numResDwarvenRings, _numSideDwarvenRings) = AddRingRow(4, "Dwarven Rings:", 7, 0, 7, 0, "Unique; playable by any character (extra perks for Dwarves).");
@@ -5510,6 +5510,7 @@ namespace MECCG_Deck_Builder
             private readonly List<Card> _allSitesInDeck;
             private readonly List<Card> _nonHavenSites;
             private readonly List<Card> _occupyingCards = [];
+            private readonly List<Card> _matchedCards = [];
             private int _matchedCount;
 
             public DeckCycleSiteTracker(
@@ -5527,13 +5528,20 @@ namespace MECCG_Deck_Builder
 
                 foreach (var card in existingResourceCards)
                 {
-                    if (_owner.NeedsDistinctNonHavenSite(card, _allSitesInDeck))
+                    if (!_owner.NeedsDistinctNonHavenSite(card, _allSitesInDeck)) continue;
+
+                    _occupyingCards.Add(card);
+                    var testMatched = new List<Card>(_matchedCards.Count + 1);
+                    testMatched.AddRange(_matchedCards);
+                    testMatched.Add(card);
+
+                    int newMatched = _owner.MaxNonHavenSiteAssignments(testMatched, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
+                    if (newMatched > _matchedCount)
                     {
-                        _occupyingCards.Add(card);
+                        _matchedCards.Add(card);
+                        _matchedCount = newMatched;
                     }
                 }
-
-                _matchedCount = _owner.MaxNonHavenSiteAssignments(_occupyingCards, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
             }
 
             public bool CanAddWithinCapacity(IEnumerable<Card> newCards)
@@ -5541,8 +5549,8 @@ namespace MECCG_Deck_Builder
                 var tappers = newCards.Where(c => _owner.NeedsDistinctNonHavenSite(c, _allSitesInDeck)).ToList();
                 if (tappers.Count == 0) return true;
 
-                var testList = new List<Card>(_occupyingCards.Count + tappers.Count);
-                testList.AddRange(_occupyingCards);
+                var testList = new List<Card>(_matchedCards.Count + tappers.Count);
+                testList.AddRange(_matchedCards);
                 testList.AddRange(tappers);
 
                 int newMatched = _owner.MaxNonHavenSiteAssignments(testList, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
@@ -5554,22 +5562,25 @@ namespace MECCG_Deck_Builder
                 var tappers = addedCards.Where(c => _owner.NeedsDistinctNonHavenSite(c, _allSitesInDeck)).ToList();
                 if (tappers.Count == 0) return;
 
-                var testList = new List<Card>(_occupyingCards.Count + tappers.Count);
-                testList.AddRange(_occupyingCards);
-                testList.AddRange(tappers);
-
-                int newMatched = _owner.MaxNonHavenSiteAssignments(testList, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
-
-                if (newMatched < _matchedCount + tappers.Count && overlapsOut != null)
+                foreach (var tapper in tappers)
                 {
-                    foreach (var tapper in tappers)
-                    {
-                        overlapsOut.Add(BuildOverlapMessage(tapper));
-                    }
-                }
+                    var testMatched = new List<Card>(_matchedCards.Count + 1);
+                    testMatched.AddRange(_matchedCards);
+                    testMatched.Add(tapper);
 
-                _occupyingCards.AddRange(tappers);
-                _matchedCount = newMatched;
+                    int newMatched = _owner.MaxNonHavenSiteAssignments(testMatched, _allSitesInDeck, _nonHavenSites, _capacityPerSite);
+                    if (newMatched > _matchedCount)
+                    {
+                        _matchedCards.Add(tapper);
+                        _matchedCount = newMatched;
+                    }
+                    else
+                    {
+                        overlapsOut?.Add(BuildOverlapMessage(tapper));
+                    }
+
+                    _occupyingCards.Add(tapper);
+                }
             }
 
             private string BuildOverlapMessage(Card tapper)
@@ -5586,12 +5597,33 @@ namespace MECCG_Deck_Builder
                     ? string.Join(", ", tapSiteNames)
                     : $"{string.Join(", ", tapSiteNames.Take(3))}, ... ({tapSiteNames.Count} sites)";
 
-                var conflictingCards = _occupyingCards
-                    .Where(other => _owner.GetNonHavenTapSiteIndices(other, _allSitesInDeck, _nonHavenSites).Any(idx => tapIndexSet.Contains(idx)))
-                    .ToList();
+                var bottleneckCards = new List<Card>();
+                for (int i = 0; i < _matchedCards.Count; i++)
+                {
+                    var withoutI = new List<Card>(_matchedCards.Count);
+                    for (int j = 0; j < _matchedCards.Count; j++)
+                    {
+                        if (j != i) withoutI.Add(_matchedCards[j]);
+                    }
+                    withoutI.Add(tapper);
 
-                string conflictNote = conflictingCards.Count > 0
-                    ? $" (shared with {FormatCardCountList(conflictingCards)})"
+                    if (_owner.MaxNonHavenSiteAssignments(withoutI, _allSitesInDeck, _nonHavenSites, _capacityPerSite) >= _matchedCount)
+                    {
+                        bottleneckCards.Add(_matchedCards[i]);
+                    }
+                }
+
+                bool usedExactBottleneck = bottleneckCards.Count > 0;
+                if (!usedExactBottleneck)
+                {
+                    bottleneckCards = [.. _occupyingCards
+                        .Where(other => _owner.GetNonHavenTapSiteIndices(other, _allSitesInDeck, _nonHavenSites).Any(idx => tapIndexSet.Contains(idx)))];
+                }
+
+                string conflictNote = bottleneckCards.Count > 0
+                    ? (usedExactBottleneck
+                        ? $" ({bottleneckCards.Count}-slot capacity filled by {FormatCardCountList(bottleneckCards)})"
+                        : $" (capacity filled by {FormatCardCountList(bottleneckCards)})")
                     : string.Empty;
 
                 return $"Site capacity exceeded in Resources: {tapper.Name} ({siteSummary}) exceeds the {_capacityPerSite}-deck capacity of its playable site(s){conflictNote}.";
@@ -6549,6 +6581,7 @@ namespace MECCG_Deck_Builder
             bool hasWizard = allDraftedChars.Any(c => string.Equals(c.Race, "Wizard", StringComparison.OrdinalIgnoreCase));
             CheckShortfall("Resources Wizard's Ring", draftedResWizard.Count, reqResWizard, !hasWizard ? "requires a Wizard in the deck" : null);
             CheckShortfall("Sideboard Wizard's Ring", draftedSideWizard.Count, reqSideWizard, !hasWizard ? "requires a Wizard in the deck" : null);
+            warnings.AddRange(ringOverlaps);
 
             if (warnings.Count > 0)
             {

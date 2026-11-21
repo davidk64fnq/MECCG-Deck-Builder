@@ -225,12 +225,18 @@ h4.entry-heading-sub {
     text-align: right;
 }
 
-    .back-to-top a {
-        color: #2B6CB0;
-        text-decoration: none;
-        font-weight: 600;
+.back-to-top a {
+    color: #2B6CB0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .back-to-top a:hover {
+        text-decoration: underline;
     }
 
-        .back-to-top a:hover {
-            text-decoration: underline;
-        }
+/* Semantic Bullet Lead-In (distinct from bold UI controls) */
+.lead-in {
+    color: #1A365D;
+    font-weight: bold;
+}

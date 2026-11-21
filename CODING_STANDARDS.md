@@ -105,6 +105,12 @@
   - **Card Scopes / Structural Metadata:** Use `<span class="scope-pill">` (clean blue Segoe UI pill) inside `<div class="scope-badge">`.
   - **Literal Game Tags / Card Attributes / Code:** Use `<code>...</code>` (Consolas monospace grey box).
   - *Rule of Thumb:* If it is a string a player types into a query or tag box, it belongs in `<code>`. If it is category scope or UI instruction, use a span/badge.
+- **5-Rule Inline Style Contract:** *(Adopted first in `workbench_reference.html`; remaining help topics to be aligned in a later documentation pass.)*
+  1. **Card data, schema, queries & filenames (`<code>`):** Official attribute names (`Primary`, `MPs`), custom category names (`Role`, `Site Requirement`), literal tag/attribute values (`yes`, `(2)`, `4(6)`), query expressions (`Mind >= 1`), formulas (`Standard + (Nazgûl + Dual) / 2 >= 12`), and filenames/extensions (`.workbench.json`). Never wrap plain prose numbers, spinner bounds (`20–60`), or warning symbols (`⚠`) in `<code>`.
+  2. **UI controls & tab names (`<strong>`):** Buttons (**Run Pipeline**), field/spinner labels (**Play Deck Size**, **Decks Before Council**), checkboxes (**Tailor Hazards to current deck**), checklists (**Role Focus**), and tab names (**Regions & Sites** tab, main window **Res** tab).
+  3. **Bullet lead-ins (`<span class="lead-in">`):** Conceptual lead-ins and tier headings (such as `Hard Pre-Run Validation:`, `Official Attributes:`, `Tier 1 (Local Region Group):`) use `.lead-in` (navy bold `#1A365D`) so they never visually collide with bold UI controls.
+  4. **Deck sections in prose (plain capitalized nouns):** Write Pool, Resources, Hazards, Sideboard, and Sites as plain capitalized text in running prose. Reserve `<span class="scope-pill">` strictly for chapter `scope-badge` headers and directory index tables.
+  5. **Card titles, modes, prose numbers & emphasis (`<em>` or plain text):** Italicize card/site titles per §9.4 (*Gandalf*, *The One Ring*, *Rivendell*), mode names (*Unknown Opponent*, *Target Current Deck*), format placeholders (*Base(Conditional)*), and genuine prose emphasis (*fewest warning tabs*). Keep prose quantities, limits, and `⚠` as plain text.
 
 ---
 
