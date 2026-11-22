@@ -99,8 +99,15 @@ namespace MECCG_Deck_Builder
 
         private DeckSnapshot _savedDeckSnapshot;
 
-        // Tab & Pipeline infrastructure
-        private readonly TabControl _tabControl;
+        // Navigation & Pipeline infrastructure
+        private readonly Panel _pnlSidebar;
+        private readonly Panel _pnlNavIndicator;
+        private readonly Panel _pnlPageHost;
+        private readonly Dictionary<string, Panel> _pages = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Button> _navButtons = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Font _navRegularFont = new("Segoe UI", 9.0f, FontStyle.Regular);
+        private readonly Font _navBoldFont = new("Segoe UI", 9.0f, FontStyle.Bold);
+        private string _activePageKey = "General Settings";
         private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
         private readonly string[] _pipelineOrder =
@@ -269,24 +276,46 @@ namespace MECCG_Deck_Builder
             _notifyDeckCallback = notifyDeckChanged ?? (_ => { });
 
             Text = "Modular Deck Assembly Workbench";
-            ClientSize = new Size(860, 714);
+            ClientSize = new Size(1056, 676);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
             StartPosition = FormStartPosition.CenterScreen;
             Font = new Font("Segoe UI", 9.0f);
 
-            _tabControl = new TabControl
+            _pnlSidebar = new Panel
+            {
+                Dock = DockStyle.Left,
+                Width = 208,
+                BackColor = Color.FromArgb(242, 245, 249)
+            };
+
+            var pnlSidebarBorder = new Panel
+            {
+                Dock = DockStyle.Right,
+                Width = 1,
+                BackColor = Color.FromArgb(203, 213, 224)
+            };
+            _pnlSidebar.Controls.Add(pnlSidebarBorder);
+
+            _pnlNavIndicator = new Panel
+            {
+                Size = new Size(4, 32),
+                Location = new Point(0, 12),
+                BackColor = Color.FromArgb(43, 108, 176)
+            };
+            _pnlSidebar.Controls.Add(_pnlNavIndicator);
+
+            _pnlPageHost = new Panel
             {
                 Dock = DockStyle.Fill,
-                Multiline = true,
-                Padding = new Point(8, 5)
+                BackColor = SystemColors.Control
             };
 
             // ==========================================
             // TAB 1: GENERAL SETTINGS
             // ==========================================
-            var tabGeneral = new TabPage("General Settings");
+            var tabGeneral = new Panel { Dock = DockStyle.Fill, Visible = false };
             var grpGeneral = new GroupBox
             {
                 Text = "Target Deck Sizing && Workbench Profiles",
@@ -531,7 +560,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 2: REGIONS & SITES
             // ==========================================
-            var tabTheater = new TabPage("Regions & Sites");
+            var tabTheater = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpDraftOpts = new GroupBox
             {
@@ -668,7 +697,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 3: STARTING COMPANY (5 ROWS)
             // ==========================================
-            var tabStarter = new TabPage("Starting Company");
+            var tabStarter = new Panel { Dock = DockStyle.Fill, Visible = false };
             BuildCharacterGrid(tabStarter, _starterRows, 5, 42, 28, null);
 
             foreach (var row in _starterRows)
@@ -691,7 +720,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 4: WIZARDS & RECRUITS
             // ==========================================
-            var tabRecruits = new TabPage("Wizards & Recruits");
+            var tabRecruits = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpWizards = new GroupBox
             {
@@ -806,7 +835,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 5: FACTIONS
             // ==========================================
-            var tabFactions = new TabPage("Factions");
+            var tabFactions = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpFactions = new GroupBox
             {
@@ -908,7 +937,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 6: ALLIES
             // ==========================================
-            var tabAllies = new TabPage("Allies");
+            var tabAllies = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpAllies = new GroupBox
             {
@@ -1009,13 +1038,13 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 7: ITEMS
             // ==========================================
-            var tabItems = new TabPage("Items");
+            var tabItems = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpItemCounts = new GroupBox
             {
                 Text = "Item Drafting Counts",
                 Location = new Point(16, 16),
-                Size = new Size(495, 220)
+                Size = new Size(495, 226)
             };
 
             var lblHdrItemType = new Label { Text = "Item Tier", Location = new Point(16, 24), Size = new Size(130, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
@@ -1060,12 +1089,12 @@ namespace MECCG_Deck_Builder
 
             var lblItemScopeNote = new Label
             {
-                Location = new Point(16, 188),
-                Size = new Size(465, 24),
+                Location = new Point(16, 183),
+                Size = new Size(465, 34),
                 ForeColor = Color.DimGray,
                 Font = new Font("Segoe UI", 8.5f),
                 UseMnemonic = false,
-                Text = "Excludes Gold Rings, Ring Special Items, Palantíri, and Quest Items (reserved for dedicated tabs)."
+                Text = "Excludes Gold Rings, Ring Special Items, Palantíri, and Quest Items (handled on dedicated steps)."
             };
 
             grpItemCounts.Controls.AddRange([
@@ -1081,7 +1110,7 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Role Focus (Uncheck to exclude)",
                 Location = new Point(525, 16),
-                Size = new Size(300, 220)
+                Size = new Size(300, 226)
             };
 
             _clbItemRoles = new CheckedListBox
@@ -1117,7 +1146,7 @@ namespace MECCG_Deck_Builder
 
             _lblItemStatus = new Label
             {
-                Location = new Point(16, 250),
+                Location = new Point(16, 256),
                 Size = new Size(805, 220),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
@@ -1130,7 +1159,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 8: RINGS
             // ==========================================
-            var tabRings = new TabPage("Rings");
+            var tabRings = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpRings = new GroupBox
             {
@@ -1234,7 +1263,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 9: PALANTIRI
             // ==========================================
-            var tabPalantiri = new TabPage("Palantíri");
+            var tabPalantiri = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpPalantiri = new GroupBox
             {
@@ -1331,7 +1360,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 10: QUESTS
             // ==========================================
-            var tabQuests = new TabPage("Quests");
+            var tabQuests = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpQuests = new GroupBox
             {
@@ -1437,7 +1466,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 11: RESOURCE EVENTS
             // ==========================================
-            var tabResourceEvents = new TabPage("Resource Events");
+            var tabResourceEvents = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpEnv = new GroupBox
             {
@@ -1573,7 +1602,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 12: CREATURES
             // ==========================================
-            var tabCreatures = new TabPage("Creatures");
+            var tabCreatures = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpNazgul = new GroupBox
             {
@@ -1780,7 +1809,7 @@ namespace MECCG_Deck_Builder
             // ==========================================
             // TAB 13: HAZARD EVENTS
             // ==========================================
-            var tabHazardEvents = new TabPage("Hazard Events");
+            var tabHazardEvents = new Panel { Dock = DockStyle.Fill, Visible = false };
 
             var grpHazEnv = new GroupBox
             {
@@ -1989,12 +2018,73 @@ namespace MECCG_Deck_Builder
                 _lblHazardEventsStatus
             ]);
 
-            // Tabs ordered to match pipeline execution order
-            _tabControl.TabPages.AddRange([
-                tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions,
-                tabAllies, tabRings, tabPalantiri, tabItems, tabQuests, tabResourceEvents,
-                tabCreatures, tabHazardEvents
-            ]);
+            // Pages ordered to match pipeline execution order
+            var navEntries = new (string Key, string Label, Panel Page)[]
+            {
+                ("General Settings", "General Settings", tabGeneral),
+                ("Regions & Sites", "1. Regions & Sites", tabTheater),
+                ("Starting Company", "2. Starting Company", tabStarter),
+                ("Wizards & Recruits", "3. Wizards & Recruits", tabRecruits),
+                ("Factions", "4. Factions", tabFactions),
+                ("Allies", "5. Allies", tabAllies),
+                ("Rings", "6. Rings", tabRings),
+                ("Palantíri", "7. Palantíri", tabPalantiri),
+                ("Items", "8. Items", tabItems),
+                ("Quests", "9. Quests", tabQuests),
+                ("Resource Events", "10. Resource Events", tabResourceEvents),
+                ("Creatures", "11. Creatures", tabCreatures),
+                ("Hazard Events", "12. Hazard Events", tabHazardEvents)
+            };
+
+            int navY = 12;
+            for (int i = 0; i < navEntries.Length; i++)
+            {
+                var (key, label, page) = navEntries[i];
+                _pages[key] = page;
+                _pnlPageHost.Controls.Add(page);
+
+                if (i == 1)
+                {
+                    var divider = new Panel
+                    {
+                        Location = new Point(12, 51),
+                        Size = new Size(183, 1),
+                        BackColor = Color.FromArgb(203, 213, 224)
+                    };
+                    var lblSteps = new Label
+                    {
+                        Text = "PIPELINE STEPS",
+                        Location = new Point(12, 58),
+                        Size = new Size(183, 16),
+                        Font = new Font("Segoe UI", 7.5f, FontStyle.Bold),
+                        ForeColor = Color.FromArgb(113, 128, 150)
+                    };
+                    _pnlSidebar.Controls.AddRange([divider, lblSteps]);
+                    navY = 78;
+                }
+
+                var btn = new Button
+                {
+                    Text = label,
+                    Tag = key,
+                    Location = new Point(0, navY),
+                    Size = new Size(207, 32),
+                    FlatStyle = FlatStyle.Flat,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Padding = new Padding(14, 0, 6, 0),
+                    Cursor = Cursors.Hand,
+                    UseMnemonic = false
+                };
+                btn.FlatAppearance.BorderSize = 0;
+                btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(226, 234, 244);
+                btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(214, 226, 240);
+                btn.Click += (s, e) => SelectPage(key);
+
+                _navButtons[key] = btn;
+                _pnlSidebar.Controls.Add(btn);
+                navY += 32;
+            }
+
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
             _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
             _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
@@ -2008,7 +2098,9 @@ namespace MECCG_Deck_Builder
             _tabInfo["Creatures"] = new(RunCreaturesDraft, _lblCreaturesStatus);
             _tabInfo["Hazard Events"] = new(RunHazardEventsDraft, _lblHazardEventsStatus);
 
-            Controls.Add(_tabControl);
+            Controls.Add(_pnlPageHost);
+            Controls.Add(_pnlSidebar);
+            SelectPage("General Settings");
 
             VisibleChanged += (s, e) =>
             {
@@ -2060,8 +2152,79 @@ namespace MECCG_Deck_Builder
             if (disposing)
             {
                 _toolTip?.Dispose();
+                _navRegularFont?.Dispose();
+                _navBoldFont?.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private void SelectPage(string pageKey)
+        {
+            if (string.IsNullOrWhiteSpace(pageKey) || !_pages.ContainsKey(pageKey))
+            {
+                return;
+            }
+
+            _activePageKey = pageKey;
+
+            _pnlPageHost.SuspendLayout();
+            foreach (var (key, page) in _pages)
+            {
+                page.Visible = string.Equals(key, pageKey, StringComparison.OrdinalIgnoreCase);
+            }
+            _pnlPageHost.ResumeLayout();
+
+            UpdateSidebarVisuals();
+        }
+
+        private void UpdateSidebarVisuals()
+        {
+            if (_pnlSidebar == null || _navButtons.Count == 0) return;
+
+            for (int i = 0; i < _pipelineOrder.Length; i++)
+            {
+                string key = _pipelineOrder[i];
+                if (!_navButtons.TryGetValue(key, out var btn) || !_tabInfo.TryGetValue(key, out var info))
+                {
+                    continue;
+                }
+
+                bool hasAlert = info.StatusLabel.Text.Contains('⚠');
+                btn.Text = hasAlert ? $"{i + 1}. {key}  ⚠" : $"{i + 1}. {key}";
+            }
+
+            foreach (var (key, btn) in _navButtons)
+            {
+                bool isActive = string.Equals(key, _activePageKey, StringComparison.OrdinalIgnoreCase);
+                bool hasError = _tabInfo.TryGetValue(key, out var info) && info.StatusLabel.ForeColor == Color.Firebrick;
+                bool hasWarning = info != null && info.StatusLabel.Text.Contains('⚠');
+
+                btn.BackColor = isActive ? Color.White : Color.FromArgb(242, 245, 249);
+                btn.Font = isActive ? _navBoldFont : _navRegularFont;
+
+                if (hasError)
+                {
+                    btn.ForeColor = Color.Firebrick;
+                }
+                else if (hasWarning)
+                {
+                    btn.ForeColor = Color.FromArgb(180, 83, 9);
+                }
+                else
+                {
+                    btn.ForeColor = isActive
+                        ? Color.FromArgb(26, 54, 93)
+                        : Color.FromArgb(45, 55, 72);
+                }
+
+                if (isActive && _pnlNavIndicator != null)
+                {
+                    _pnlNavIndicator.Top = btn.Top;
+                    _pnlNavIndicator.Height = btn.Height;
+                    _pnlNavIndicator.Visible = true;
+                    _pnlNavIndicator.BringToFront();
+                }
+            }
         }
 
         private void NotifyDeckChanged(DeckSectionType? section = null)
@@ -3940,6 +4103,8 @@ namespace MECCG_Deck_Builder
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
                 _lblPipelineStatus.Text = "Ready to run pipeline.";
             }
+
+            UpdateSidebarVisuals();
         }
 
         #endregion
@@ -3947,7 +4112,7 @@ namespace MECCG_Deck_Builder
         #region GRID_BUILDER
 
         private static void BuildCharacterGrid(
-            TabPage page,
+            Control page,
             List<CharacterRowControls> rowList,
             int count,
             int startY,
@@ -9477,6 +9642,7 @@ namespace MECCG_Deck_Builder
                         _lblPipelineStatus.ForeColor = Color.FromArgb(26, 86, 54);
                         _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
                         _lblPipelineStatus.Text = $"Pipeline complete{attemptNote}: {string.Join(" -> ", completedSteps)}";
+                        UpdateSidebarVisuals();
                         return;
                     }
 
@@ -9524,6 +9690,7 @@ namespace MECCG_Deck_Builder
                 _lblPipelineStatus.Text =
                     $"Pipeline complete with warnings (best from attempt {bestAttempt}/{maxPipelineAttempts}): {string.Join(" -> ", bestCompletedSteps)}\n" +
                     $"⚠ See notice(s) on: {string.Join(", ", bestWarningTabs)}";
+                UpdateSidebarVisuals();
                 return;
             }
 
@@ -9547,6 +9714,7 @@ namespace MECCG_Deck_Builder
                     _lblPipelineStatus.Text = $"⚠ Pipeline stopped at Step {stepNumber} ({tabName}) due to a hard lock.{priorNote}";
                     NotifyDeckChanged(null);
                     UpdateDeckSummary();
+                    UpdateSidebarVisuals();
                     return;
                 }
 
@@ -9559,6 +9727,7 @@ namespace MECCG_Deck_Builder
             _lblPipelineStatus.ForeColor = Color.FromArgb(26, 86, 54);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
             _lblPipelineStatus.Text = $"Pipeline complete: {string.Join(" -> ", finalCompleted)}";
+            UpdateSidebarVisuals();
         }
 
         #endregion

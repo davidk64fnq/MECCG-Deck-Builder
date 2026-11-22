@@ -16,46 +16,46 @@
 
     <h1>Modular Workbench Tab &amp; Rules Reference</h1>
     <p>
-        The <strong>Modular Deck Assembly Workbench</strong> (<strong>Deck &gt; Assemble from Components...</strong> [<kbd>Ctrl+M</kbd>]) builds cohesive, tournament-legal Hero decks using a fixed 12-step pipeline across 13 tabs. Rather than drafting cards in isolation, each tab inspects what earlier steps placed into the five deck sections&mdash;Pool (main window <strong>Pool</strong> tab), Resources (<strong>Res</strong> tab), Hazards (<strong>Haz</strong> tab), Sideboard (<strong>Side</strong> tab), and Sites (<strong>Site</strong> tab)&mdash;ensuring legal site paths, satisfied prerequisites, and zero dead cards.
+        The <strong>Modular Deck Assembly Workbench</strong> (<strong>Deck &gt; Assemble from Components...</strong> [<kbd>Ctrl+M</kbd>]) builds cohesive, tournament-legal Hero decks using a fixed 12-step pipeline navigated from a left-hand sidebar (<strong>General Settings</strong> plus Steps 1&ndash;12). Rather than drafting cards in isolation, each step inspects what earlier steps placed into the five deck sections&mdash;Pool (main window <strong>Pool</strong> tab), Resources (<strong>Res</strong> tab), Hazards (<strong>Haz</strong> tab), Sideboard (<strong>Side</strong> tab), and Sites (<strong>Site</strong> tab)&mdash;ensuring legal site paths, satisfied prerequisites, and zero dead cards.
     </p>
     <p>
-        Use this reference to see exactly which official database attributes, custom taxonomy categories, eligibility guards, and priority tiers each tab uses&mdash;and to understand why specific cards were (or were not) drafted.
+        Use this reference to see exactly which official database attributes, custom taxonomy categories, eligibility guards, and priority tiers each step uses&mdash;and to understand why specific cards were (or were not) drafted.
     </p>
 
     <!-- QUICK JUMP BAR -->
     <div class="chapter-nav">
-        <strong>Jump to Tab:</strong>
-        <a href="#tab-general">1. General Settings</a> &bull;
-        <a href="#tab-regions-sites">2. Regions &amp; Sites</a> &bull;
-        <a href="#tab-starting-company">3. Starting Company</a> &bull;
-        <a href="#tab-wizards-recruits">4. Wizards &amp; Recruits</a> &bull;
-        <a href="#tab-factions">5. Factions</a> &bull;
-        <a href="#tab-allies">6. Allies</a> &bull;
-        <a href="#tab-rings">7. Rings</a> &bull;
-        <a href="#tab-palantiri">8. Palant&iacute;ri</a> &bull;
-        <a href="#tab-items">9. Items</a> &bull;
-        <a href="#tab-quests">10. Quests</a> &bull;
-        <a href="#tab-resource-events">11. Resource Events</a> &bull;
-        <a href="#tab-creatures">12. Creatures</a> &bull;
-        <a href="#tab-hazard-events">13. Hazard Events</a>
+        <strong>Jump to Page:</strong>
+        <a href="#tab-general">General Settings</a> &bull;
+        <a href="#tab-regions-sites">1. Regions &amp; Sites</a> &bull;
+        <a href="#tab-starting-company">2. Starting Company</a> &bull;
+        <a href="#tab-wizards-recruits">3. Wizards &amp; Recruits</a> &bull;
+        <a href="#tab-factions">4. Factions</a> &bull;
+        <a href="#tab-allies">5. Allies</a> &bull;
+        <a href="#tab-rings">6. Rings</a> &bull;
+        <a href="#tab-palantiri">7. Palant&iacute;ri</a> &bull;
+        <a href="#tab-items">8. Items</a> &bull;
+        <a href="#tab-quests">9. Quests</a> &bull;
+        <a href="#tab-resource-events">10. Resource Events</a> &bull;
+        <a href="#tab-creatures">11. Creatures</a> &bull;
+        <a href="#tab-hazard-events">12. Hazard Events</a>
     </div>
 
     <!-- ================================================================== -->
     <!-- TAB DIRECTORY MATRIX                                               -->
     <!-- ================================================================== -->
-    <h2 id="tab-directory">Workbench Tab Directory</h2>
+    <h2 id="tab-directory">Workbench Step Directory</h2>
     <p>
-        Tabs appear in pipeline execution order. Click any tab name below to inspect its exact attributes, custom categories, rules, and warning conditions:
+        Steps appear in pipeline execution order in the left sidebar. Click any page below to inspect its exact attributes, custom categories, rules, and warning conditions:
     </p>
 
     <table>
         <tr>
-            <th style="width: 22%;">Tab (Pipeline Step)</th>
+            <th style="width: 22%;">Sidebar Page</th>
             <th style="width: 24%;">Target Section(s)</th>
             <th style="width: 54%;">Official Attributes &amp; Custom Categories Read</th>
         </tr>
         <tr>
-            <td><a href="#tab-general">1. General Settings</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Orchestrator)</em></span></td>
+            <td><a href="#tab-general">General Settings</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Orchestrator)</em></span></td>
             <td>
                 <span class="scope-pill">Pool</span> &bull;
                 <span class="scope-pill">Resources</span> &bull;
@@ -69,7 +69,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-regions-sites">2. Regions &amp; Sites</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 1)</em></span></td>
+            <td><a href="#tab-regions-sites">1. Regions &amp; Sites</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 1)</em></span></td>
             <td><span class="scope-pill">Sites</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code>, <code>Region</code>, <code>Alignment</code>, <code>Name</code><br />
@@ -77,7 +77,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-starting-company">3. Starting Company</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 2)</em></span></td>
+            <td><a href="#tab-starting-company">2. Starting Company</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 2)</em></span></td>
             <td><span class="scope-pill">Pool</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Character</code>), <code>Secondary</code>/<code>Race</code> (non-Avatar), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Name</code><br />
@@ -85,7 +85,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-wizards-recruits">4. Wizards &amp; Recruits</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 3)</em></span></td>
+            <td><a href="#tab-wizards-recruits">3. Wizards &amp; Recruits</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 3)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Character</code>), <code>Secondary</code> (<code>Avatar</code>), <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Unique</code>, <code>Name</code><br />
@@ -93,7 +93,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-factions">5. Factions</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 4)</em></span></td>
+            <td><a href="#tab-factions">4. Factions</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 4)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>Faction</code>), <code>Alignment</code>, <code>Race</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
@@ -101,7 +101,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-allies">6. Allies</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 5)</em></span></td>
+            <td><a href="#tab-allies">5. Allies</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 5)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>Ally</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
@@ -109,7 +109,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-rings">7. Rings</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 6)</em></span></td>
+            <td><a href="#tab-rings">6. Rings</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 6)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code>, <code>Alignment</code>, <code>Text</code> (2d6 table), <code>Race</code>, <code>Skill</code>, <code>GoldRing</code>, <code>Specific</code>, <code>Unique</code><br />
@@ -117,7 +117,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-palantiri">8. Palant&iacute;ri</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 7)</em></span></td>
+            <td><a href="#tab-palantiri">7. Palant&iacute;ri</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 7)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Race</code> (<code>Palant&iacute;r</code>), <code>Alignment</code>, <code>Skill</code> (<code>Sage</code>), <code>GreaterItem</code>, <code>Palantiri</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code><br />
@@ -125,7 +125,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-items">9. Items</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 9)</em></span></td>
+            <td><a href="#tab-items">8. Items</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 8)</em></span></td>
             <td><span class="scope-pill">Pool</span> (Minor) &bull; <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>*Item</code>), <code>Alignment</code>, <code>Race</code> (<code>Scroll</code>), <code>MinorItem</code>, <code>MajorItem</code>, <code>GreaterItem</code>, <code>Scroll</code>, <code>Hoard</code>, <code>Specific</code>, <code>Unique</code><br />
@@ -133,7 +133,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-quests">10. Quests</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 9)</em></span></td>
+            <td><a href="#tab-quests">9. Quests</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 9)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code>, <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>GoldRing</code>, item flags<br />
@@ -141,7 +141,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-resource-events">11. Resource Events</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 10)</em></span></td>
+            <td><a href="#tab-resource-events">10. Resource Events</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 10)</em></span></td>
             <td><span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Resource</code>), <code>Secondary</code> (<code>*event*</code>), <code>Alignment</code>, <code>Skill</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
@@ -149,7 +149,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-creatures">12. Creatures</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 11)</em></span></td>
+            <td><a href="#tab-creatures">11. Creatures</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 11)</em></span></td>
             <td><span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Hazard</code>), <code>Secondary</code> (<code>Creature</code>, <code>Creature/*event*</code>), <code>Alignment</code>, <code>Race</code>, <code>Unique</code><br />
@@ -157,7 +157,7 @@
             </td>
         </tr>
         <tr>
-            <td><a href="#tab-hazard-events">13. Hazard Events</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 12)</em></span></td>
+            <td><a href="#tab-hazard-events">12. Hazard Events</a><br /><span style="font-size: 8.5pt; color: #4A5568;"><em>(Step 12)</em></span></td>
             <td><span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span></td>
             <td>
                 <span class="lead-in">Attributes:</span> <code>Primary</code> (<code>Hazard</code>), <code>Secondary</code> (<code>*event*</code>, <code>Long-event</code>), <code>Alignment</code>, <code>Specific</code>, <code>Unique</code>, <code>Name</code><br />
@@ -169,7 +169,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 1: GENERAL SETTINGS                                        -->
     <!-- ================================================================== -->
-    <h3 id="tab-general" class="entry-heading">1. General Settings</h3>
+    <h3 id="tab-general" class="entry-heading">General Settings</h3>
     <div class="scope-badge">
         <strong>Pipeline Role:</strong> <span class="scope-pill">Orchestrator &amp; Validation</span> &bull;
         <strong>Scope:</strong> <span class="scope-pill">Pool</span> &bull; <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span> &bull; <span class="scope-pill">Sites</span>
@@ -213,7 +213,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 2: REGIONS & SITES                                         -->
     <!-- ================================================================== -->
-    <h3 id="tab-regions-sites" class="entry-heading">2. Regions &amp; Sites</h3>
+    <h3 id="tab-regions-sites" class="entry-heading">1. Regions &amp; Sites</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 1</span> &bull;
         <strong>Target Section:</strong> <span class="scope-pill">Sites</span> &bull;
@@ -247,7 +247,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 3: STARTING COMPANY                                        -->
     <!-- ================================================================== -->
-    <h3 id="tab-starting-company" class="entry-heading">3. Starting Company</h3>
+    <h3 id="tab-starting-company" class="entry-heading">2. Starting Company</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 2</span> &bull;
         <strong>Target Section:</strong> <span class="scope-pill">Pool</span> &bull;
@@ -283,7 +283,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 4: WIZARDS & RECRUITS                                      -->
     <!-- ================================================================== -->
-    <h3 id="tab-wizards-recruits" class="entry-heading">4. Wizards &amp; Recruits</h3>
+    <h3 id="tab-wizards-recruits" class="entry-heading">3. Wizards &amp; Recruits</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 3</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -323,7 +323,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 5: FACTIONS                                                -->
     <!-- ================================================================== -->
-    <h3 id="tab-factions" class="entry-heading">5. Factions</h3>
+    <h3 id="tab-factions" class="entry-heading">4. Factions</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 4</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -360,7 +360,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 6: ALLIES                                                  -->
     <!-- ================================================================== -->
-    <h3 id="tab-allies" class="entry-heading">6. Allies</h3>
+    <h3 id="tab-allies" class="entry-heading">5. Allies</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 5</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -396,7 +396,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 7: RINGS                                                   -->
     <!-- ================================================================== -->
-    <h3 id="tab-rings" class="entry-heading">8. Rings</h3>
+    <h3 id="tab-rings" class="entry-heading">6. Rings</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 6</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -426,7 +426,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 8: PALANTIRI                                               -->
     <!-- ================================================================== -->
-    <h3 id="tab-palantiri" class="entry-heading">9. Palant&iacute;ri</h3>
+    <h3 id="tab-palantiri" class="entry-heading">7. Palant&iacute;ri</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 7</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -455,7 +455,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 9: ITEMS                                                   -->
     <!-- ================================================================== -->
-    <h3 id="tab-items" class="entry-heading">9. Items</h3>
+    <h3 id="tab-items" class="entry-heading">8. Items</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 8</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Pool</span> (Minor) &bull; <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -497,7 +497,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 10: QUESTS                                                 -->
     <!-- ================================================================== -->
-    <h3 id="tab-quests" class="entry-heading">10. Quests</h3>
+    <h3 id="tab-quests" class="entry-heading">9. Quests</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 9</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -533,7 +533,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 11: RESOURCE EVENTS                                        -->
     <!-- ================================================================== -->
-    <h3 id="tab-resource-events" class="entry-heading">11. Resource Events</h3>
+    <h3 id="tab-resource-events" class="entry-heading">10. Resource Events</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 10</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Resources</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -561,7 +561,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 12: CREATURES                                              -->
     <!-- ================================================================== -->
-    <h3 id="tab-creatures" class="entry-heading">12. Creatures</h3>
+    <h3 id="tab-creatures" class="entry-heading">11. Creatures</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 11</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
@@ -617,7 +617,7 @@
     <!-- ================================================================== -->
     <!-- CHAPTER 13: HAZARD EVENTS                                          -->
     <!-- ================================================================== -->
-    <h3 id="tab-hazard-events" class="entry-heading">13. Hazard Events</h3>
+    <h3 id="tab-hazard-events" class="entry-heading">12. Hazard Events</h3>
     <div class="scope-badge">
         <strong>Pipeline Step:</strong> <span class="scope-pill">Step 12</span> &bull;
         <strong>Target Sections:</strong> <span class="scope-pill">Hazards</span> &bull; <span class="scope-pill">Sideboard</span> &bull;
