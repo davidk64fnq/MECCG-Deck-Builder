@@ -39,7 +39,7 @@ namespace MECCG_Deck_Builder
 
         private const string RingsIdleStatusText =
             "Gold Rings require at least one GoldRing-playable site in the drafted Site deck.\n" +
-            "Allow Ring Test and Aid Ring Test counts are totals (including Gandalf / Scroll of Isildur if already drafted).";
+            "Allow Ring Test and Aid Ring Test counts are totals (counting Gandalf once if already in Res/Sideboard).";
 
         private const string PalantirIdleStatusText =
             "Palantíri require a GreaterItem- or Palantiri-playable site (or their printed Site Requirement) in the drafted Site deck.\n" +
@@ -106,7 +106,7 @@ namespace MECCG_Deck_Builder
         private readonly string[] _pipelineOrder =
         [
             "Regions & Sites", "Starting Company", "Wizards & Recruits", "Factions",
-            "Allies", "Items", "Rings", "Palantíri", "Quests", "Resource Events",
+            "Allies", "Rings", "Palantíri", "Items", "Quests", "Resource Events",
             "Creatures", "Hazard Events"
         ];
 
@@ -445,7 +445,7 @@ namespace MECCG_Deck_Builder
 
             var lblOrder = new Label
             {
-                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Items -> 7. Rings -> 8. Palantíri -> 9. Quests -> 10. Resource Events -> 11. Creatures -> 12. Hazard Events",
+                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Rings -> 7. Palantíri -> 8. Items -> 9. Quests -> 10. Resource Events -> 11. Creatures -> 12. Hazard Events",
                 Location = new Point(16, 20),
                 Size = new Size(778, 36),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
@@ -463,7 +463,7 @@ namespace MECCG_Deck_Builder
             _btnRunPipeline.Click += (s, e) => RunPipelineDraft();
             _toolTip.SetToolTip(
                 _btnRunPipeline,
-                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Items -> Rings -> Palantíri -> Quests -> Resource Events -> Creatures -> Hazard Events).\n" +
+                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Rings -> Palantíri -> Items -> Quests -> Resource Events -> Creatures -> Hazard Events).\n" +
                 "Automatically retries up to 25 times if random region rolls fail downstream constraints.");
 
             _btnClearDeck = new Button
@@ -1174,7 +1174,7 @@ namespace MECCG_Deck_Builder
 
             (_numResGoldRings, _numSideGoldRings) = AddRingRow(0, "Gold Rings:", 9, 0, 9, 0, "Auto-selected from Gold Ring roll tables to match requested Special Rings.");
             (_numResAllowRingTest, _numSideAllowRingTest) = AddRingRow(1, "Allow Ring Test:", 9, 0, 6, 0, "Total desired (counts Gandalf once if already in Res/Sideboard).");
-            (_numResAidRingTest, _numSideAidRingTest) = AddRingRow(2, "Aid Ring Test:", 6, 0, 6, 0, "Total desired (includes Scroll of Isildur if already drafted in Items).");
+            (_numResAidRingTest, _numSideAidRingTest) = AddRingRow(2, "Aid Ring Test:", 6, 0, 6, 0, "Total desired (drafts Scroll of Isildur before Items runs).");
             (_numResOneRing, _numSideOneRing) = AddRingRow(3, "The One Ring:", 1, 0, 1, 0, "Unique (combined Resources + Sideboard <= 1).");
             (_numResDwarvenRings, _numSideDwarvenRings) = AddRingRow(4, "Dwarven Rings:", 7, 0, 7, 0, "Unique; playable by any character (extra perks for Dwarves).");
             (_numResMagicRings, _numSideMagicRings) = AddRingRow(5, "Magic Rings:", 10, 0, 10, 0, "Unique; playable with a Gold Ring when test indicates Magic Ring.");
@@ -1992,7 +1992,7 @@ namespace MECCG_Deck_Builder
             // Tabs ordered to match pipeline execution order
             _tabControl.TabPages.AddRange([
                 tabGeneral, tabTheater, tabStarter, tabRecruits, tabFactions,
-                tabAllies, tabItems, tabRings, tabPalantiri, tabQuests, tabResourceEvents,
+                tabAllies, tabRings, tabPalantiri, tabItems, tabQuests, tabResourceEvents,
                 tabCreatures, tabHazardEvents
             ]);
             _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
@@ -5106,7 +5106,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Faction Shortfall: Drafted only {draftedSideFactions.Count} of {reqSide} playable faction(s).");
             }
-            warnings.AddRange(factionOverlaps);
+            warnings.AddRange(siteTracker.BuildOverlapMessages());
 
             if (warnings.Count > 0)
             {
@@ -5407,7 +5407,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Ally Shortfall: Drafted only {draftedSideAllies.Count} of {reqSide} playable ally/allies.");
             }
-            warnings.AddRange(allyOverlaps);
+            warnings.AddRange(siteTracker.BuildOverlapMessages());
 
             if (warnings.Count > 0)
             {
@@ -5505,12 +5505,20 @@ namespace MECCG_Deck_Builder
 
         private sealed class DeckCycleSiteTracker
         {
+            private sealed record OverlapRecord(
+                Card Tapper,
+                List<int> TapIndices,
+                List<Card> BottleneckCards,
+                List<int> BottleneckSiteIndices,
+                bool UsedExactBottleneck);
+
             private readonly DeckAssemblyMatrixDialog _owner;
             private readonly int _capacityPerSite;
             private readonly List<Card> _allSitesInDeck;
             private readonly List<Card> _nonHavenSites;
             private readonly List<Card> _occupyingCards = [];
             private readonly List<Card> _matchedCards = [];
+            private readonly List<OverlapRecord> _overlaps = [];
             private int _matchedCount;
 
             public DeckCycleSiteTracker(
@@ -5559,6 +5567,7 @@ namespace MECCG_Deck_Builder
 
             public void Commit(IEnumerable<Card> addedCards, List<string> overlapsOut = null)
             {
+                _ = overlapsOut;
                 var tappers = addedCards.Where(c => _owner.NeedsDistinctNonHavenSite(c, _allSitesInDeck)).ToList();
                 if (tappers.Count == 0) return;
 
@@ -5576,26 +5585,86 @@ namespace MECCG_Deck_Builder
                     }
                     else
                     {
-                        overlapsOut?.Add(BuildOverlapMessage(tapper));
+                        _overlaps.Add(CaptureOverlap(tapper));
                     }
 
                     _occupyingCards.Add(tapper);
                 }
             }
 
-            private string BuildOverlapMessage(Card tapper)
+            public List<string> BuildOverlapMessages()
+            {
+                var messages = new List<string>();
+                if (_overlaps.Count == 0) return messages;
+
+                var groups = _overlaps.GroupBy(o => (
+                    BottleneckSiteKey: string.Join("|", o.BottleneckSiteIndices),
+                    BottleneckCardsText: o.BottleneckCards.Count > 0 ? FormatCardCountList(o.BottleneckCards) : string.Empty,
+                    o.UsedExactBottleneck));
+
+                foreach (var group in groups)
+                {
+                    var first = group.First();
+                    string cardsSummary = FormatCardCountList(group.Select(g => g.Tapper));
+
+                    if (first.TapIndices.Count == 0)
+                    {
+                        string verb = group.Count() > 1 ? "have" : "has";
+                        messages.Add($"Site capacity exceeded in Resources: {cardsSummary} {verb} no matching non-Haven site in Sites.");
+                        continue;
+                    }
+
+                    var distinctTapKeys = group
+                        .Select(g => string.Join("|", g.TapIndices))
+                        .Distinct(StringComparer.Ordinal)
+                        .ToList();
+
+                    string tapSitesSummary = distinctTapKeys.Count == 1
+                        ? FormatSiteIndices(first.TapIndices, 3)
+                        : null;
+
+                    string bottleneckSitesSummary = FormatSiteIndices(first.BottleneckSiteIndices, 4);
+                    int slotCount = first.UsedExactBottleneck
+                        ? first.BottleneckCards.Count
+                        : first.BottleneckSiteIndices.Count * _capacityPerSite;
+                    string slotWord = slotCount == 1 ? "slot" : "slots";
+                    string filledBy = !string.IsNullOrEmpty(group.Key.BottleneckCardsText)
+                        ? $" already filled by {group.Key.BottleneckCardsText}"
+                        : string.Empty;
+
+                    if (distinctTapKeys.Count == 1 &&
+                        string.Equals(distinctTapKeys[0], group.Key.BottleneckSiteKey, StringComparison.Ordinal))
+                    {
+                        messages.Add(
+                            $"Site capacity exceeded in Resources ({_capacityPerSite} tap/site per deck): " +
+                            $"{cardsSummary} ({tapSitesSummary}) — {slotCount}-slot capacity{filledBy}.");
+                    }
+                    else if (tapSitesSummary != null)
+                    {
+                        messages.Add(
+                            $"Site capacity exceeded in Resources ({_capacityPerSite} tap/site per deck): " +
+                            $"{cardsSummary} (playable at {tapSitesSummary})\n" +
+                            $"   Shared site pool ({bottleneckSitesSummary} — {slotCount} {slotWord}){filledBy}.");
+                    }
+                    else
+                    {
+                        messages.Add(
+                            $"Site capacity exceeded in Resources ({_capacityPerSite} tap/site per deck): " +
+                            $"{cardsSummary}\n" +
+                            $"   Shared site pool ({bottleneckSitesSummary} — {slotCount} {slotWord}){filledBy}.");
+                    }
+                }
+
+                return messages;
+            }
+
+            private OverlapRecord CaptureOverlap(Card tapper)
             {
                 var tapIndices = _owner.GetNonHavenTapSiteIndices(tapper, _allSitesInDeck, _nonHavenSites);
                 if (tapIndices.Count == 0)
                 {
-                    return $"Site capacity exceeded in Resources: {tapper.Name} has no matching non-Haven site in Sites.";
+                    return new OverlapRecord(tapper, tapIndices, [], [], false);
                 }
-
-                var tapIndexSet = tapIndices.ToHashSet();
-                var tapSiteNames = tapIndices.Select(i => _nonHavenSites[i].Name).ToList();
-                string siteSummary = tapSiteNames.Count <= 3
-                    ? string.Join(", ", tapSiteNames)
-                    : $"{string.Join(", ", tapSiteNames.Take(3))}, ... ({tapSiteNames.Count} sites)";
 
                 var bottleneckCards = new List<Card>();
                 for (int i = 0; i < _matchedCards.Count; i++)
@@ -5616,17 +5685,34 @@ namespace MECCG_Deck_Builder
                 bool usedExactBottleneck = bottleneckCards.Count > 0;
                 if (!usedExactBottleneck)
                 {
+                    var tapIndexSet = tapIndices.ToHashSet();
                     bottleneckCards = [.. _occupyingCards
                         .Where(other => _owner.GetNonHavenTapSiteIndices(other, _allSitesInDeck, _nonHavenSites).Any(idx => tapIndexSet.Contains(idx)))];
                 }
 
-                string conflictNote = bottleneckCards.Count > 0
-                    ? (usedExactBottleneck
-                        ? $" ({bottleneckCards.Count}-slot capacity filled by {FormatCardCountList(bottleneckCards)})"
-                        : $" (capacity filled by {FormatCardCountList(bottleneckCards)})")
-                    : string.Empty;
+                var siteSet = new HashSet<int>(tapIndices);
+                foreach (var bc in bottleneckCards)
+                {
+                    foreach (int idx in _owner.GetNonHavenTapSiteIndices(bc, _allSitesInDeck, _nonHavenSites))
+                    {
+                        siteSet.Add(idx);
+                    }
+                }
 
-                return $"Site capacity exceeded in Resources: {tapper.Name} ({siteSummary}) exceeds the {_capacityPerSite}-deck capacity of its playable site(s){conflictNote}.";
+                return new OverlapRecord(
+                    tapper,
+                    tapIndices,
+                    bottleneckCards,
+                    [.. siteSet.OrderBy(i => i)],
+                    usedExactBottleneck);
+            }
+
+            private string FormatSiteIndices(IReadOnlyList<int> indices, int maxDisplay)
+            {
+                var names = indices.Select(i => _nonHavenSites[i].Name).ToList();
+                return names.Count <= maxDisplay
+                    ? string.Join(", ", names)
+                    : $"{string.Join(", ", names.Take(maxDisplay))}, ... ({names.Count} sites)";
             }
         }
 
@@ -6075,7 +6161,7 @@ namespace MECCG_Deck_Builder
             CheckShortfall("Sideboard Greater Item", draftedSideGreater.Count, reqSideGreater);
             CheckShortfall("Resources Special Item", draftedResSpecial.Count, reqResSpecial);
             CheckShortfall("Sideboard Special Item", draftedSideSpecial.Count, reqSideSpecial);
-            warnings.AddRange(itemOverlaps);
+            warnings.AddRange(siteTracker.BuildOverlapMessages());
 
             if (warnings.Count > 0)
             {
@@ -6470,8 +6556,14 @@ namespace MECCG_Deck_Builder
                     .OrderBy(_ => Random.Shared.Next())
                     .ToList();
 
-                draftedResAid = DraftItemsIntoSection(aidCandidates, _deck.Resources, neededResAid, resCapacity, usedCountsByName);
+                draftedResAid = DraftItemsIntoSection(aidCandidates, _deck.Resources, neededResAid, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: true);
                 resCapacity -= draftedResAid.Count;
+                if (draftedResAid.Count < neededResAid && resCapacity > 0)
+                {
+                    var extraAid = DraftItemsIntoSection(aidCandidates, _deck.Resources, neededResAid - draftedResAid.Count, resCapacity, usedCountsByName, siteTracker, requireAvailableCapacity: false);
+                    draftedResAid.AddRange(extraAid);
+                    resCapacity -= extraAid.Count;
+                }
                 draftedSideAid = DraftItemsIntoSection(aidCandidates, _deck.Sideboard, neededSideAid, sideCapacity, usedCountsByName);
                 sideCapacity -= draftedSideAid.Count;
 
@@ -6581,7 +6673,7 @@ namespace MECCG_Deck_Builder
             bool hasWizard = allDraftedChars.Any(c => string.Equals(c.Race, "Wizard", StringComparison.OrdinalIgnoreCase));
             CheckShortfall("Resources Wizard's Ring", draftedResWizard.Count, reqResWizard, !hasWizard ? "requires a Wizard in the deck" : null);
             CheckShortfall("Sideboard Wizard's Ring", draftedSideWizard.Count, reqSideWizard, !hasWizard ? "requires a Wizard in the deck" : null);
-            warnings.AddRange(ringOverlaps);
+            warnings.AddRange(siteTracker.BuildOverlapMessages());
 
             if (warnings.Count > 0)
             {
@@ -6852,7 +6944,7 @@ namespace MECCG_Deck_Builder
                 string extra = !hasSage ? " (requires a Sage or Saruman)" : string.Empty;
                 warnings.Add($"Sideboard Allow Palantír Use Shortfall: Only {sideAllowEffective + draftedSideAllow.Count} of {reqSideAllow} met{extra}.");
             }
-            warnings.AddRange(palantirOverlaps);
+            warnings.AddRange(siteTracker.BuildOverlapMessages());
 
             if (warnings.Count > 0)
             {
@@ -7408,7 +7500,7 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Quest Shortfall: Drafted only {draftedSideQuests.Count} of {reqSide} eligible quest(s).");
             }
-            warnings.AddRange(questOverlaps);
+            warnings.AddRange(siteTracker.BuildOverlapMessages());
 
             if (warnings.Count > 0)
             {
