@@ -36,7 +36,7 @@ namespace MECCG_Deck_Builder
         private readonly Font _navRegularFont = new("Segoe UI", 9.0f, FontStyle.Regular);
         private readonly Font _navBoldFont = new("Segoe UI", 9.0f, FontStyle.Bold);
         private string _activePageKey = "General Settings";
-        private sealed record RunnableTabInfo(Func<bool, bool> Runner, Label StatusLabel);
+        private sealed record RunnableTabInfo(Func<bool, bool> Runner, Control StatusControl);
         private readonly Dictionary<string, RunnableTabInfo> _tabInfo = new(StringComparer.OrdinalIgnoreCase);
         private readonly string[] _pipelineOrder =
         [
@@ -54,7 +54,7 @@ namespace MECCG_Deck_Builder
         private Button _btnSaveSnapshot;
         private Button _btnRecallSnapshot;
         private Label _lblPipelineStatus;
-        private Label _lblDeckSummary;
+        private RichTextBox _rtbDeckSummary;
         private NumericUpDown _numDecksBeforeCouncil;
         private CheckBox _chkTailorHazardsToCurrentDeck;
 
@@ -64,11 +64,11 @@ namespace MECCG_Deck_Builder
         private NumericUpDown _numMaxSiteCount;
         private CheckedListBox _clbRegionTypes;
         private CheckedListBox _clbSiteTypes;
-        private Label _lblTheaterStatus;
+        private RichTextBox _rtbTheaterStatus;
 
         // --- TAB 3: STARTING COMPANY ---
         private readonly List<CharacterRowControls> _starterRows = [];
-        private Label _lblStarterStatus;
+        private RichTextBox _rtbStarterStatus;
 
         // --- TAB 4: WIZARDS & RECRUITS ---
         private ComboBox _cmbWizard1;
@@ -80,17 +80,17 @@ namespace MECCG_Deck_Builder
 
         private readonly List<CharacterRowControls> _recruitRows = [];
         private readonly List<CharacterRowControls> _reserveRows = [];
-        private Label _lblRecruitStatus;
+        private RichTextBox _rtbRecruitStatus;
 
         // --- TAB 5: FACTIONS ---
         private NumericUpDown _numResourceFactions;
         private NumericUpDown _numSideboardFactions;
-        private Label _lblFactionStatus;
+        private RichTextBox _rtbFactionStatus;
 
         // --- TAB 6: ALLIES ---
         private NumericUpDown _numResourceAllies;
         private NumericUpDown _numSideboardAllies;
-        private Label _lblAllyStatus;
+        private RichTextBox _rtbAllyStatus;
 
         // --- TAB 7: ITEMS ---
         private NumericUpDown _numPoolMinorItems;
@@ -103,7 +103,7 @@ namespace MECCG_Deck_Builder
         private NumericUpDown _numResourceSpecialItems;
         private NumericUpDown _numSideboardSpecialItems;
         private CheckedListBox _clbItemRoles;
-        private Label _lblItemStatus;
+        private RichTextBox _rtbItemStatus;
 
         // --- TAB 8: RINGS ---
         private NumericUpDown _numResGoldRings;
@@ -122,7 +122,7 @@ namespace MECCG_Deck_Builder
         private NumericUpDown _numSideLesserRings;
         private NumericUpDown _numResWizardsRing;
         private NumericUpDown _numSideWizardsRing;
-        private Label _lblRingsStatus;
+        private RichTextBox _rtbRingsStatus;
         private CheckedListBox _clbRingRoles;
 
         // --- TAB 9: PALANTIRI ---
@@ -131,14 +131,14 @@ namespace MECCG_Deck_Builder
         private NumericUpDown _numResAllowPalantirUse;
         private NumericUpDown _numSideAllowPalantirUse;
         private CheckedListBox _clbPalantirRoles;
-        private Label _lblPalantiriStatus;
+        private RichTextBox _rtbPalantiriStatus;
 
         // --- TAB 10: QUESTS ---
         private NumericUpDown _numResourceQuests;
         private NumericUpDown _numSideboardQuests;
         private CheckBox _chkAutoDraftOneRingPackage;
         private CheckedListBox _clbQuestRoles;
-        private Label _lblQuestsStatus;
+        private RichTextBox _rtbQuestsStatus;
 
         // --- TAB 11: RESOURCE EVENTS ---
         private NumericUpDown _numResGatesOfMorning;
@@ -147,7 +147,7 @@ namespace MECCG_Deck_Builder
         private NumericUpDown _numSideTwilight;
         private NumericUpDown _numSideboardResourceEvents;
         private CheckedListBox _clbResourceEventRoles;
-        private Label _lblResourceEventsStatus;
+        private RichTextBox _rtbResourceEventsStatus;
 
         // --- TAB 12: CREATURES ---
         private NumericUpDown _numHazNazgul;
@@ -165,7 +165,7 @@ namespace MECCG_Deck_Builder
         private Button _btnAllCreatureKeying;
         private Button _btnClearCreatureKeying;
         private Label _lblCreatureKeyingNote;
-        private Label _lblCreaturesStatus;
+        private RichTextBox _rtbCreaturesStatus;
 
         // --- TAB 13: HAZARD EVENTS ---
         private NumericUpDown _numHazDoorsOfNight;
@@ -179,7 +179,7 @@ namespace MECCG_Deck_Builder
         private Button _btnAllHazardEventKeying;
         private Button _btnClearHazardEventKeying;
         private Label _lblHazardEventKeyingNote;
-        private Label _lblHazardEventsStatus;
+        private RichTextBox _rtbHazardEventsStatus;
 
         private readonly ToolTip _toolTip = new()
         {
@@ -319,18 +319,18 @@ namespace MECCG_Deck_Builder
                 navY += 32;
             }
 
-            _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _lblTheaterStatus);
-            _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _lblStarterStatus);
-            _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _lblRecruitStatus);
-            _tabInfo["Factions"] = new(RunFactionsDraft, _lblFactionStatus);
-            _tabInfo["Allies"] = new(RunAlliesDraft, _lblAllyStatus);
-            _tabInfo["Items"] = new(RunItemsDraft, _lblItemStatus);
-            _tabInfo["Rings"] = new(RunRingsDraft, _lblRingsStatus);
-            _tabInfo["Palantíri"] = new(RunPalantiriDraft, _lblPalantiriStatus);
-            _tabInfo["Quests"] = new(RunQuestsDraft, _lblQuestsStatus);
-            _tabInfo["Resource Events"] = new(RunResourceEventsDraft, _lblResourceEventsStatus);
-            _tabInfo["Creatures"] = new(RunCreaturesDraft, _lblCreaturesStatus);
-            _tabInfo["Hazard Events"] = new(RunHazardEventsDraft, _lblHazardEventsStatus);
+            _tabInfo["Regions & Sites"] = new(RunRegionsAndSitesDraft, _rtbTheaterStatus);
+            _tabInfo["Starting Company"] = new(RunStartingCompanyDraft, _rtbStarterStatus);
+            _tabInfo["Wizards & Recruits"] = new(RunNonStartingCharactersDraft, _rtbRecruitStatus);
+            _tabInfo["Factions"] = new(RunFactionsDraft, _rtbFactionStatus);
+            _tabInfo["Allies"] = new(RunAlliesDraft, _rtbAllyStatus);
+            _tabInfo["Items"] = new(RunItemsDraft, _rtbItemStatus);
+            _tabInfo["Rings"] = new(RunRingsDraft, _rtbRingsStatus);
+            _tabInfo["Palantíri"] = new(RunPalantiriDraft, _rtbPalantiriStatus);
+            _tabInfo["Quests"] = new(RunQuestsDraft, _rtbQuestsStatus);
+            _tabInfo["Resource Events"] = new(RunResourceEventsDraft, _rtbResourceEventsStatus);
+            _tabInfo["Creatures"] = new(RunCreaturesDraft, _rtbCreaturesStatus);
+            _tabInfo["Hazard Events"] = new(RunHazardEventsDraft, _rtbHazardEventsStatus);
 
             Controls.Add(_pnlPageHost);
             Controls.Add(_pnlSidebar);
@@ -526,23 +526,13 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Deck Assembly Pipeline && Session Snapshots",
                 Location = new Point(16, 236),
-                Size = new Size(810, 168)
-            };
-
-            var lblOrder = new Label
-            {
-                Text = "Execution Order:   1. Regions & Sites -> 2. Starting Company -> 3. Wizards & Recruits -> 4. Factions -> 5. Allies -> 6. Rings -> 7. Palantíri -> 8. Items -> 9. Quests -> 10. Resource Events -> 11. Creatures -> 12. Hazard Events",
-                Location = new Point(16, 20),
-                Size = new Size(778, 36),
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-                ForeColor = Color.FromArgb(26, 54, 93),
-                UseMnemonic = false
+                Size = new Size(810, 138)
             };
 
             _btnRunPipeline = new Button
             {
                 Text = "Run Pipeline",
-                Location = new Point(16, 58),
+                Location = new Point(16, 26),
                 Size = new Size(125, 30),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
@@ -555,7 +545,7 @@ namespace MECCG_Deck_Builder
             _btnClearDeck = new Button
             {
                 Text = "Clear Deck",
-                Location = new Point(149, 58),
+                Location = new Point(149, 26),
                 Size = new Size(110, 30)
             };
             _btnClearDeck.Click += BtnClearDeck_Click;
@@ -564,7 +554,7 @@ namespace MECCG_Deck_Builder
             _btnSaveSnapshot = new Button
             {
                 Text = "Save Snapshot",
-                Location = new Point(280, 58),
+                Location = new Point(280, 26),
                 Size = new Size(125, 30)
             };
             _btnSaveSnapshot.Click += BtnSaveSnapshot_Click;
@@ -573,7 +563,7 @@ namespace MECCG_Deck_Builder
             _btnRecallSnapshot = new Button
             {
                 Text = "Recall Snapshot",
-                Location = new Point(413, 58),
+                Location = new Point(413, 26),
                 Size = new Size(125, 30),
                 Enabled = false
             };
@@ -582,7 +572,7 @@ namespace MECCG_Deck_Builder
 
             _lblPipelineStatus = new Label
             {
-                Location = new Point(16, 94),
+                Location = new Point(16, 64),
                 Size = new Size(778, 66),
                 ForeColor = Color.FromArgb(74, 85, 104),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
@@ -590,7 +580,6 @@ namespace MECCG_Deck_Builder
             };
 
             grpPipeline.Controls.AddRange([
-                lblOrder,
                 _btnRunPipeline, _btnClearDeck, _btnSaveSnapshot, _btnRecallSnapshot,
                 _lblPipelineStatus
             ]);
@@ -598,19 +587,12 @@ namespace MECCG_Deck_Builder
             var grpSummary = new GroupBox
             {
                 Text = "Live Deck Composition Status",
-                Location = new Point(16, 410),
-                Size = new Size(810, 248)
+                Location = new Point(16, 380),
+                Size = new Size(810, 278)
             };
 
-            _lblDeckSummary = new Label
-            {
-                Location = new Point(16, 20),
-                Size = new Size(778, 222),
-                Font = new Font("Segoe UI", 9.25f),
-                ForeColor = Color.FromArgb(26, 54, 93),
-                UseMnemonic = false
-            };
-            grpSummary.Controls.Add(_lblDeckSummary);
+            _rtbDeckSummary = CreateStatusRichTextBox(16, 22, 778, 248);
+            grpSummary.Controls.Add(_rtbDeckSummary);
 
             tabGeneral.Controls.AddRange([grpGeneral, grpPipeline, grpSummary]);
             return tabGeneral;
@@ -669,15 +651,15 @@ namespace MECCG_Deck_Builder
                     continue;
                 }
 
-                bool hasAlert = info.StatusLabel.Text.Contains('⚠');
+                bool hasAlert = info.StatusControl.Text.Contains('⚠');
                 btn.Text = hasAlert ? $"{i + 1}. {key}  ⚠" : $"{i + 1}. {key}";
             }
 
             foreach (var (key, btn) in _navButtons)
             {
                 bool isActive = string.Equals(key, _activePageKey, StringComparison.OrdinalIgnoreCase);
-                bool hasError = _tabInfo.TryGetValue(key, out var info) && info.StatusLabel.ForeColor == Color.Firebrick;
-                bool hasWarning = info != null && info.StatusLabel.Text.Contains('⚠');
+                bool hasError = _tabInfo.TryGetValue(key, out var info) && info.StatusControl.ForeColor == Color.Firebrick;
+                bool hasWarning = info != null && info.StatusControl.Text.Contains('⚠');
 
                 btn.BackColor = isActive ? Color.White : Color.FromArgb(242, 245, 249);
                 btn.Font = isActive ? _navBoldFont : _navRegularFont;
@@ -716,11 +698,9 @@ namespace MECCG_Deck_Builder
         {
             if (IsDisposed) return;
 
-            if (_deck.Pool.Count == 0 && !string.Equals(_lblStarterStatus.Text, StarterIdleStatusText, StringComparison.Ordinal))
+            if (_deck.Pool.Count == 0 && !string.Equals(_rtbStarterStatus.Text, StarterIdleStatusText, StringComparison.Ordinal))
             {
-                _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblStarterStatus.Text = StarterIdleStatusText;
+                SetRichPlainStatus(_rtbStarterStatus, StarterIdleStatusText, Color.FromArgb(74, 85, 104), FontStyle.Italic);
             }
 
             int totalResChars = _deck.Resources.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
@@ -839,16 +819,28 @@ namespace MECCG_Deck_Builder
             string sideMpText = sideCond != sideBase ? $"{sideBase}({sideCond})" : $"{sideBase}";
             string siteMpText = siteCond != siteBase ? $"{siteBase}({siteCond})" : $"{siteBase}";
 
-            _lblDeckSummary.Text =
-                $"Deck Title:       \"{_deck.Title}\"\n\n" +
-                $"Pool:             {_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]\n" +
-                $"Resources:        {_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote}{resEventNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]\n" +
-                $"Hazards:          {_deck.Hazards.Count} cards{hazDetailNote}\n" +
-                $"Sideboard:        {_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]\n" +
-                $"Sites:            {_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)\n\n" +
-                $"Play Deck Status: {_deck.Resources.Count} Resources / {_deck.Hazards.Count} Hazards (Target: {_numPlayDeckSize.Value}/{_numPlayDeckSize.Value})\n" +
-                $"Sideboard Status: {_deck.Sideboard.Count} / {_numSideboardSize.Value}\n" +
-                $"MP Total:         {totalMpText} MPs (Pool: {poolMpText}, Resources: {resMpText}, Sideboard: {sideMpText}{(siteBase != 0 || siteCond != 0 ? $", Sites: {siteMpText}" : "")})";
+            var titleBullets = new List<(string Label, string Value)>
+            {
+                ("Deck Title:", $"\"{_deck.Title}\"")
+            };
+
+            var sectionBullets = new List<(string Label, string Value)>
+            {
+                ("Pool:", $"{_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]"),
+                ("Resources:", $"{_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote}{resEventNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]"),
+                ("Hazards:", $"{_deck.Hazards.Count} cards{hazDetailNote}"),
+                ("Sideboard:", $"{_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]"),
+                ("Sites:", $"{_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)")
+            };
+
+            var totalsBullets = new List<(string Label, string Value)>
+            {
+                ("Play Deck Status:", $"{_deck.Resources.Count} Resources / {_deck.Hazards.Count} Hazards (Target: {_numPlayDeckSize.Value}/{_numPlayDeckSize.Value})"),
+                ("Sideboard Status:", $"{_deck.Sideboard.Count} / {_numSideboardSize.Value}"),
+                ("MP Total:", $"{totalMpText} MPs (Pool: {poolMpText}, Resources: {resMpText}, Sideboard: {sideMpText}{(siteBase != 0 || siteCond != 0 ? $", Sites: {siteMpText}" : "")})")
+            };
+
+            SetRichBulletedStatus(_rtbDeckSummary, null, [titleBullets, sectionBullets, totalsBullets]);
         }
 
         #region TAB1_SESSION_ACTIONS
@@ -880,50 +872,19 @@ namespace MECCG_Deck_Builder
             _deck.Sideboard.Clear();
             _deck.Sites.Clear();
 
-            _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblTheaterStatus.Text = TheaterIdleStatusText;
-
-            _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblStarterStatus.Text = StarterIdleStatusText;
-            _lblRecruitStatus.Text = string.Empty;
-
-            _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblFactionStatus.Text = FactionIdleStatusText;
-
-            _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblAllyStatus.Text = AllyIdleStatusText;
-
-            _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblItemStatus.Text = ItemIdleStatusText;
-
-            _lblRingsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblRingsStatus.Text = RingsIdleStatusText;
-
-            _lblPalantiriStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblPalantiriStatus.Text = PalantirIdleStatusText;
-
-            _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblQuestsStatus.Text = QuestIdleStatusText;
-
-            _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblResourceEventsStatus.Text = ResourceEventsIdleStatusText;
-
-            _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblCreaturesStatus.Text = CreaturesIdleStatusText;
-
-            _lblHazardEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblHazardEventsStatus.Text = HazardEventsIdleStatusText;
+            Color idleColor = Color.FromArgb(74, 85, 104);
+            SetRichPlainStatus(_rtbTheaterStatus, TheaterIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbStarterStatus, StarterIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbRecruitStatus, string.Empty, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbFactionStatus, FactionIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbAllyStatus, AllyIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbItemStatus, ItemIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbRingsStatus, RingsIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbPalantiriStatus, PalantirIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbQuestsStatus, QuestIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbResourceEventsStatus, ResourceEventsIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbCreaturesStatus, CreaturesIdleStatusText, idleColor, FontStyle.Italic);
+            SetRichPlainStatus(_rtbHazardEventsStatus, HazardEventsIdleStatusText, idleColor, FontStyle.Italic);
 
             _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
             _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
@@ -1433,10 +1394,10 @@ namespace MECCG_Deck_Builder
 
         private void ValidateWorkbenchReadiness()
         {
-            if (_btnRunPipeline == null || _lblRecruitStatus == null || _lblTheaterStatus == null ||
-                _lblFactionStatus == null || _lblAllyStatus == null || _lblItemStatus == null ||
-                _lblRingsStatus == null || _lblPalantiriStatus == null || _lblQuestsStatus == null ||
-                _lblResourceEventsStatus == null || _lblCreaturesStatus == null || _lblHazardEventsStatus == null)
+            if (_btnRunPipeline == null || _rtbRecruitStatus == null || _rtbTheaterStatus == null ||
+                _rtbFactionStatus == null || _rtbAllyStatus == null || _rtbItemStatus == null ||
+                _rtbRingsStatus == null || _rtbPalantiriStatus == null || _rtbQuestsStatus == null ||
+                _rtbResourceEventsStatus == null || _rtbCreaturesStatus == null || _rtbHazardEventsStatus == null)
             {
                 return;
             }
@@ -1504,57 +1465,60 @@ namespace MECCG_Deck_Builder
             int playDeckLimit = (int)_numPlayDeckSize.Value;
             int sideboardLimit = (int)_numSideboardSize.Value;
 
+            Color idleColor = Color.FromArgb(74, 85, 104);
+
             // --- Tab 2 Validation ---
             if (_clbRegionTypes.CheckedItems.Count == 0 || _clbSiteTypes.CheckedItems.Count == 0)
             {
                 hasTheaterError = true;
-                _lblTheaterStatus.ForeColor = Color.Firebrick;
-                _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblTheaterStatus.Text =
-                    "⚠ At least one Region Terrain and one Site Hold must be checked under Terrain & Hold Classifications.";
+                SetRichPlainStatus(
+                    _rtbTheaterStatus,
+                    "⚠ At least one Region Terrain and one Site Hold must be checked under Terrain & Hold Classifications.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
-            else if (_lblTheaterStatus.ForeColor == Color.Firebrick &&
-                     _lblTheaterStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal))
+            else if (_rtbTheaterStatus.ForeColor == Color.Firebrick &&
+                     _rtbTheaterStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal))
             {
-                _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblTheaterStatus.Text = TheaterIdleStatusText;
+                SetRichPlainStatus(_rtbTheaterStatus, TheaterIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 4 Validation ---
             if (companionCount > 10)
             {
                 hasRecruitError = true;
-                _lblRecruitStatus.ForeColor = Color.Firebrick;
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblRecruitStatus.Text =
+                SetRichPlainStatus(
+                    _rtbRecruitStatus,
                     $"⚠ Selection exceeds the 10-character limit for Play Deck Characters (Resources): {companionCount}/10 configured.\n" +
-                    $"Clear {companionCount - 10} row(s) to proceed.";
+                    $"Clear {companionCount - 10} row(s) to proceed.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
             else if (totalSideboardChars > sideboardLimit)
             {
                 hasRecruitError = true;
-                _lblRecruitStatus.ForeColor = Color.Firebrick;
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblRecruitStatus.Text =
+                SetRichPlainStatus(
+                    _rtbRecruitStatus,
                     $"⚠ Sideboard characters ({totalSideboardChars}: {reserveCount} Sideboard row(s){(wizInSide > 0 ? $" + {wizInSide} Wizard" : "")}) exceed the Sideboard Size limit ({sideboardLimit}) set in General Settings.\n" +
-                    "Increase Sideboard Size, change Secondary Wizard destination, or clear a Sideboard row.";
+                    "Increase Sideboard Size, change Secondary Wizard destination, or clear a Sideboard row.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
-            else if (_lblRecruitStatus.ForeColor == Color.Firebrick ||
-                     string.IsNullOrWhiteSpace(_lblRecruitStatus.Text) ||
-                     _lblRecruitStatus.Text.StartsWith("Configured:", StringComparison.Ordinal))
+            else if (_rtbRecruitStatus.ForeColor == Color.Firebrick ||
+                     string.IsNullOrWhiteSpace(_rtbRecruitStatus.Text) ||
+                     _rtbRecruitStatus.Text.StartsWith("Configured:", StringComparison.Ordinal))
             {
-                _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
-
                 string wizResText = wizInRes > 0 ? $", {wizInRes} Wizard(s)" : "";
                 string wizSideText = wizInSide > 0 ? $" + {wizInSide} Wizard" : "";
-                _lblRecruitStatus.Text =
+                SetRichPlainStatus(
+                    _rtbRecruitStatus,
                     $"Configured: {companionCount}/10 Resources{wizResText}  |  {reserveCount}/3 Sideboard{wizSideText}.\n" +
-                    "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.";
+                    "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.",
+                    idleColor,
+                    FontStyle.Italic);
             }
 
-            // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5-11) ---
+            // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5-13) ---
             int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies + resItems + resRingCards + resPalCards + resQuests + resEnvEvents;
             int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards + sideQuests + sideEnvEvents + sideAutoEvents + sideCreatures + hazEventsSide;
             string resOverMsg =
@@ -1569,56 +1533,44 @@ namespace MECCG_Deck_Builder
             if (totalConfiguredRes > playDeckLimit && resFactions > 0)
             {
                 hasFactionError = true;
-                _lblFactionStatus.ForeColor = Color.Firebrick;
-                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblFactionStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbFactionStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sideFactions > 0)
             {
                 hasFactionError = true;
-                _lblFactionStatus.ForeColor = Color.Firebrick;
-                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblFactionStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbFactionStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblFactionStatus.ForeColor == Color.Firebrick &&
-                      (_lblFactionStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblFactionStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbFactionStatus.ForeColor == Color.Firebrick &&
+                      (_rtbFactionStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbFactionStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Resources.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) &&
                       _deck.Sideboard.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) &&
-                      !_lblFactionStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblFactionStatus.Text.StartsWith("No factions configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbFactionStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbFactionStatus.Text.StartsWith("No factions configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblFactionStatus.Text = FactionIdleStatusText;
+                SetRichPlainStatus(_rtbFactionStatus, FactionIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 6 (Allies) ---
             if (totalConfiguredRes > playDeckLimit && resAllies > 0)
             {
                 hasAllyError = true;
-                _lblAllyStatus.ForeColor = Color.Firebrick;
-                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblAllyStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbAllyStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sideAllies > 0)
             {
                 hasAllyError = true;
-                _lblAllyStatus.ForeColor = Color.Firebrick;
-                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblAllyStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbAllyStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblAllyStatus.ForeColor == Color.Firebrick &&
-                      (_lblAllyStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblAllyStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbAllyStatus.ForeColor == Color.Firebrick &&
+                      (_rtbAllyStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbAllyStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Resources.All(c => !string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase)) &&
                       _deck.Sideboard.All(c => !string.Equals(c.Secondary, "Ally", StringComparison.OrdinalIgnoreCase)) &&
-                      !_lblAllyStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblAllyStatus.Text.StartsWith("No allies configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbAllyStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbAllyStatus.Text.StartsWith("No allies configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblAllyStatus.Text = AllyIdleStatusText;
+                SetRichPlainStatus(_rtbAllyStatus, AllyIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 7 (Items) ---
@@ -1626,37 +1578,29 @@ namespace MECCG_Deck_Builder
             if (totalRequestedItems > 0 && _clbItemRoles.Items.Count > 0 && _clbItemRoles.CheckedItems.Count == 0)
             {
                 hasItemError = true;
-                _lblItemStatus.ForeColor = Color.Firebrick;
-                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblItemStatus.Text = "⚠ At least one Role must be checked under Role Focus when drafting items.";
+                SetRichPlainStatus(_rtbItemStatus, "⚠ At least one Role must be checked under Role when drafting items.", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredRes > playDeckLimit && resItems > 0)
             {
                 hasItemError = true;
-                _lblItemStatus.ForeColor = Color.Firebrick;
-                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblItemStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbItemStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sideItems > 0)
             {
                 hasItemError = true;
-                _lblItemStatus.ForeColor = Color.Firebrick;
-                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblItemStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbItemStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblItemStatus.ForeColor == Color.Firebrick &&
-                      (_lblItemStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
-                       _lblItemStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblItemStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbItemStatus.ForeColor == Color.Firebrick &&
+                      (_rtbItemStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _rtbItemStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbItemStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Pool.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c) || IsQuestPackageCard(c)) &&
                       _deck.Resources.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c) || IsQuestPackageCard(c)) &&
                       _deck.Sideboard.All(c => !IsItemCard(c) || IsRingPackageCard(c) || IsPalantirPackageCard(c) || IsQuestPackageCard(c)) &&
-                      !_lblItemStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblItemStatus.Text.StartsWith("No items configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbItemStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbItemStatus.Text.StartsWith("No items configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblItemStatus.Text = ItemIdleStatusText;
+                SetRichPlainStatus(_rtbItemStatus, ItemIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 8 (Rings) ---
@@ -1669,44 +1613,34 @@ namespace MECCG_Deck_Builder
             if ((int)_numResOneRing.Value + (int)_numSideOneRing.Value > 1)
             {
                 hasRingsError = true;
-                _lblRingsStatus.ForeColor = Color.Firebrick;
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblRingsStatus.Text = "⚠ The One Ring is Unique: combined Resources + Sideboard count cannot exceed 1.";
+                SetRichPlainStatus(_rtbRingsStatus, "⚠ The One Ring is Unique: combined Resources + Sideboard count cannot exceed 1.", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalRequestedSpecialRings > 0 && _clbRingRoles.Items.Count > 0 && _clbRingRoles.CheckedItems.Count == 0)
             {
                 hasRingsError = true;
-                _lblRingsStatus.ForeColor = Color.Firebrick;
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblRingsStatus.Text = "⚠ At least one Role must be checked under Special Ring Role Focus when drafting Special Rings.";
+                SetRichPlainStatus(_rtbRingsStatus, "⚠ At least one Role must be checked under Special Ring Role when drafting Special Rings.", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredRes > playDeckLimit && resRingCards > 0)
             {
                 hasRingsError = true;
-                _lblRingsStatus.ForeColor = Color.Firebrick;
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblRingsStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbRingsStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sideRingCards > 0)
             {
                 hasRingsError = true;
-                _lblRingsStatus.ForeColor = Color.Firebrick;
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblRingsStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbRingsStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblRingsStatus.ForeColor == Color.Firebrick &&
-                      (_lblRingsStatus.Text.StartsWith("⚠ The One Ring", StringComparison.Ordinal) ||
-                       _lblRingsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
-                       _lblRingsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblRingsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbRingsStatus.ForeColor == Color.Firebrick &&
+                      (_rtbRingsStatus.Text.StartsWith("⚠ The One Ring", StringComparison.Ordinal) ||
+                       _rtbRingsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _rtbRingsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbRingsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Resources.All(c => !IsRingPackageCard(c)) &&
                       _deck.Sideboard.All(c => !IsRingPackageCard(c)) &&
-                      !_lblRingsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblRingsStatus.Text.StartsWith("No ring cards configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbRingsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbRingsStatus.Text.StartsWith("No ring cards configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblRingsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblRingsStatus.Text = RingsIdleStatusText;
+                SetRichPlainStatus(_rtbRingsStatus, RingsIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 9 (Palantiri) ---
@@ -1714,36 +1648,28 @@ namespace MECCG_Deck_Builder
             if (totalRequestedPalantiri > 0 && _clbPalantirRoles.Items.Count > 0 && _clbPalantirRoles.CheckedItems.Count == 0)
             {
                 hasPalantirError = true;
-                _lblPalantiriStatus.ForeColor = Color.Firebrick;
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblPalantiriStatus.Text = "⚠ At least one Role must be checked under Role Focus when drafting Palantíri.";
+                SetRichPlainStatus(_rtbPalantiriStatus, "⚠ At least one Role must be checked under Role when drafting Palantíri.", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredRes > playDeckLimit && resPalCards > 0)
             {
                 hasPalantirError = true;
-                _lblPalantiriStatus.ForeColor = Color.Firebrick;
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblPalantiriStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbPalantiriStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sidePalCards > 0)
             {
                 hasPalantirError = true;
-                _lblPalantiriStatus.ForeColor = Color.Firebrick;
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblPalantiriStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbPalantiriStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblPalantiriStatus.ForeColor == Color.Firebrick &&
-                      (_lblPalantiriStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
-                       _lblPalantiriStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblPalantiriStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbPalantiriStatus.ForeColor == Color.Firebrick &&
+                      (_rtbPalantiriStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _rtbPalantiriStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbPalantiriStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Resources.All(c => !IsPalantirPackageCard(c)) &&
                       _deck.Sideboard.All(c => !IsPalantirPackageCard(c)) &&
-                      !_lblPalantiriStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblPalantiriStatus.Text.StartsWith("No Palantír cards configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbPalantiriStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbPalantiriStatus.Text.StartsWith("No Palantír cards configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblPalantiriStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblPalantiriStatus.Text = PalantirIdleStatusText;
+                SetRichPlainStatus(_rtbPalantiriStatus, PalantirIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 10 (Quests) ---
@@ -1751,36 +1677,28 @@ namespace MECCG_Deck_Builder
             if (totalRequestedQuests > 0 && _clbQuestRoles.Items.Count > 0 && _clbQuestRoles.CheckedItems.Count == 0)
             {
                 hasQuestsError = true;
-                _lblQuestsStatus.ForeColor = Color.Firebrick;
-                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblQuestsStatus.Text = "⚠ At least one Role must be checked under Role Focus when drafting quests.";
+                SetRichPlainStatus(_rtbQuestsStatus, "⚠ At least one Role must be checked under Role when drafting quests.", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredRes > playDeckLimit && resQuests > 0)
             {
                 hasQuestsError = true;
-                _lblQuestsStatus.ForeColor = Color.Firebrick;
-                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblQuestsStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbQuestsStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sideQuests > 0)
             {
                 hasQuestsError = true;
-                _lblQuestsStatus.ForeColor = Color.Firebrick;
-                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblQuestsStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbQuestsStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblQuestsStatus.ForeColor == Color.Firebrick &&
-                      (_lblQuestsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
-                       _lblQuestsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblQuestsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbQuestsStatus.ForeColor == Color.Firebrick &&
+                      (_rtbQuestsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _rtbQuestsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbQuestsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Resources.All(c => !IsQuestPackageCard(c)) &&
                       _deck.Sideboard.All(c => !IsQuestPackageCard(c)) &&
-                      !_lblQuestsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblQuestsStatus.Text.StartsWith("No quests configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbQuestsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbQuestsStatus.Text.StartsWith("No quests configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblQuestsStatus.Text = QuestIdleStatusText;
+                SetRichPlainStatus(_rtbQuestsStatus, QuestIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 11 (Resource Events) ---
@@ -1792,51 +1710,39 @@ namespace MECCG_Deck_Builder
             if (gomTotal > 3)
             {
                 hasResourceEventsError = true;
-                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblResourceEventsStatus.Text = "⚠ Gates of Morning is non-unique: combined Resources + Sideboard count cannot exceed 3.";
+                SetRichPlainStatus(_rtbResourceEventsStatus, "⚠ Gates of Morning is non-unique: combined Resources + Sideboard count cannot exceed 3.", Color.Firebrick, FontStyle.Bold);
             }
             else if (twiTotal > 3)
             {
                 hasResourceEventsError = true;
-                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblResourceEventsStatus.Text = "⚠ Twilight is non-unique: combined Resources + Sideboard count cannot exceed 3.";
+                SetRichPlainStatus(_rtbResourceEventsStatus, "⚠ Twilight is non-unique: combined Resources + Sideboard count cannot exceed 3.", Color.Firebrick, FontStyle.Bold);
             }
             else if (needsAutoEvents && _clbResourceEventRoles.Items.Count > 0 && _clbResourceEventRoles.CheckedItems.Count == 0)
             {
                 hasResourceEventsError = true;
-                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblResourceEventsStatus.Text = "⚠ At least one Role must be checked under Role Focus to auto-fill Resource Events.";
+                SetRichPlainStatus(_rtbResourceEventsStatus, "⚠ At least one Role must be checked under Role to auto-fill Resource Events.", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredRes > playDeckLimit && resEnvEvents > 0)
             {
                 hasResourceEventsError = true;
-                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblResourceEventsStatus.Text = resOverMsg;
+                SetRichPlainStatus(_rtbResourceEventsStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && (sideEnvEvents + sideAutoEvents) > 0)
             {
                 hasResourceEventsError = true;
-                _lblResourceEventsStatus.ForeColor = Color.Firebrick;
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblResourceEventsStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbResourceEventsStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblResourceEventsStatus.ForeColor == Color.Firebrick &&
-                      (_lblResourceEventsStatus.Text.StartsWith("⚠ Gates of Morning", StringComparison.Ordinal) ||
-                       _lblResourceEventsStatus.Text.StartsWith("⚠ Twilight", StringComparison.Ordinal) ||
-                       _lblResourceEventsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
-                       _lblResourceEventsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
-                       _lblResourceEventsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbResourceEventsStatus.ForeColor == Color.Firebrick &&
+                      (_rtbResourceEventsStatus.Text.StartsWith("⚠ Gates of Morning", StringComparison.Ordinal) ||
+                       _rtbResourceEventsStatus.Text.StartsWith("⚠ Twilight", StringComparison.Ordinal) ||
+                       _rtbResourceEventsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _rtbResourceEventsStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
+                       _rtbResourceEventsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Resources.All(c => !IsGeneralResourceEvent(c)) &&
                       _deck.Sideboard.All(c => !IsGeneralResourceEvent(c)) &&
-                      !_lblResourceEventsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbResourceEventsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblResourceEventsStatus.Text = ResourceEventsIdleStatusText;
+                SetRichPlainStatus(_rtbResourceEventsStatus, ResourceEventsIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 12 (Creatures) ---
@@ -1846,119 +1752,111 @@ namespace MECCG_Deck_Builder
             if (hazNazgul + sideNazgul > 9)
             {
                 hasCreaturesError = true;
-                _lblCreaturesStatus.ForeColor = Color.Firebrick;
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblCreaturesStatus.Text = "⚠ Nazgûl are Unique: combined Hazards + Sideboard count cannot exceed 9.";
+                SetRichPlainStatus(
+                    _rtbCreaturesStatus,
+                    "⚠ Nazgûl are Unique: combined Hazards + Sideboard count cannot exceed 9.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
             else if (totalNonNazgulRequested > 0 && _clbCreatureSpecies.Items.Count > 0 && _clbCreatureSpecies.CheckedItems.Count == 0)
             {
                 hasCreaturesError = true;
-                _lblCreaturesStatus.ForeColor = Color.Firebrick;
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblCreaturesStatus.Text = "⚠ At least one Species / Race must be checked when drafting Standard or Dual-Mode creatures.";
+                SetRichPlainStatus(
+                    _rtbCreaturesStatus,
+                    "⚠ At least one Creature Race must be checked when drafting Standard or Dual-Mode creatures.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
             else if (!tailorToDeck && totalNonNazgulRequested > 0 &&
                      _clbCreatureRegionTypes.CheckedItems.Count == 0 &&
                      _clbCreatureSiteTypes.CheckedItems.Count == 0)
             {
                 hasCreaturesError = true;
-                _lblCreaturesStatus.ForeColor = Color.Firebrick;
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblCreaturesStatus.Text = "⚠ At least one Region Terrain or Site Hold must be checked under Keying Filters (or enable Tailor Hazards to current deck).";
+                SetRichPlainStatus(
+                    _rtbCreaturesStatus,
+                    "⚠ At least one Region Terrain or Site Hold must be checked under Keying Filters (or enable Tailor Hazards to current deck).",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
             else if (hazCreaturesTotal > playDeckLimit)
             {
                 hasCreaturesError = true;
-                _lblCreaturesStatus.ForeColor = Color.Firebrick;
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblCreaturesStatus.Text =
+                SetRichPlainStatus(
+                    _rtbCreaturesStatus,
                     $"⚠ Configured Hazards cards ({hazCreaturesTotal}: {hazStdCr} Standard + {hazDualCr} Dual + {hazNazgul} Nazgûl + {hazNazSup} Support) exceed Play Deck Size ({playDeckLimit}).\n" +
-                    "Reduce creature/Nazgûl counts or increase Play Deck Size on General Settings.";
+                    "Reduce creature/Nazgûl counts or increase Play Deck Size on General Settings.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && sideCreatures > 0)
             {
                 hasCreaturesError = true;
-                _lblCreaturesStatus.ForeColor = Color.Firebrick;
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblCreaturesStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbCreaturesStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblCreaturesStatus.ForeColor == Color.Firebrick &&
-                      (_lblCreaturesStatus.Text.StartsWith("⚠ Nazgûl are Unique", StringComparison.Ordinal) ||
-                       _lblCreaturesStatus.Text.StartsWith("⚠ At least one Species", StringComparison.Ordinal) ||
-                       _lblCreaturesStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal) ||
-                       _lblCreaturesStatus.Text.StartsWith("⚠ Configured Hazards", StringComparison.Ordinal) ||
-                       _lblCreaturesStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbCreaturesStatus.ForeColor == Color.Firebrick &&
+                      (_rtbCreaturesStatus.Text.StartsWith("⚠ Nazgûl are Unique", StringComparison.Ordinal) ||
+                       _rtbCreaturesStatus.Text.StartsWith("⚠ At least one Creature Race", StringComparison.Ordinal) ||
+                       _rtbCreaturesStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal) ||
+                       _rtbCreaturesStatus.Text.StartsWith("⚠ Configured Hazards", StringComparison.Ordinal) ||
+                       _rtbCreaturesStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Hazards.All(c => !IsCreaturesTabCard(c)) &&
                       _deck.Sideboard.All(c => !IsCreaturesTabCard(c)) &&
-                      !_lblCreaturesStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
-                      !_lblCreaturesStatus.Text.StartsWith("No creatures or Nazgûl configured", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbCreaturesStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
+                      !_rtbCreaturesStatus.Text.StartsWith("No creatures or Nazgûl configured", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblCreaturesStatus.Text = CreaturesIdleStatusText;
+                SetRichPlainStatus(_rtbCreaturesStatus, CreaturesIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Tab 13 (Hazard Events) ---
             if (hazDonTotal > 3)
             {
                 hasHazardEventsError = true;
-                _lblHazardEventsStatus.ForeColor = Color.Firebrick;
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblHazardEventsStatus.Text = "⚠ Doors of Night is non-unique: combined Hazards + Sideboard count cannot exceed 3.";
+                SetRichPlainStatus(_rtbHazardEventsStatus, "⚠ Doors of Night is non-unique: combined Hazards + Sideboard count cannot exceed 3.", Color.Firebrick, FontStyle.Bold);
             }
             else if (combinedTwiTotal > 3)
             {
                 hasHazardEventsError = true;
-                _lblHazardEventsStatus.ForeColor = Color.Firebrick;
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblHazardEventsStatus.Text = $"⚠ Twilight is non-unique: combined Resources + Hazards + Sideboard count ({combinedTwiTotal}) cannot exceed 3.";
+                SetRichPlainStatus(_rtbHazardEventsStatus, $"⚠ Twilight is non-unique: combined Resources + Hazards + Sideboard count ({combinedTwiTotal}) cannot exceed 3.", Color.Firebrick, FontStyle.Bold);
             }
             else if ((hazAutoTarget > 0 || sideHazAuto > 0) && _clbHazardEventRoles.Items.Count > 0 && _clbHazardEventRoles.CheckedItems.Count == 0)
             {
                 hasHazardEventsError = true;
-                _lblHazardEventsStatus.ForeColor = Color.Firebrick;
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblHazardEventsStatus.Text = "⚠ At least one Role must be checked under Role Focus to auto-fill Hazard Events.";
+                SetRichPlainStatus(_rtbHazardEventsStatus, "⚠ At least one Role must be checked under Role to auto-fill Hazard Events.", Color.Firebrick, FontStyle.Bold);
             }
             else if (!tailorToDeck && (hazAutoTarget > 0 || sideHazAuto > 0) &&
                      _clbHazardEventRegionTypes.CheckedItems.Count == 0 &&
                      _clbHazardEventSiteTypes.CheckedItems.Count == 0)
             {
                 hasHazardEventsError = true;
-                _lblHazardEventsStatus.ForeColor = Color.Firebrick;
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblHazardEventsStatus.Text = "⚠ At least one Region Terrain or Site Hold must be checked under Keying Filters (or enable Tailor Hazards to current deck).";
+                SetRichPlainStatus(_rtbHazardEventsStatus, "⚠ At least one Region Terrain or Site Hold must be checked under Keying Filters (or enable Tailor Hazards to current deck).", Color.Firebrick, FontStyle.Bold);
             }
             else if (totalConfiguredHaz > playDeckLimit && hazEventsEnv > 0)
             {
                 hasHazardEventsError = true;
-                _lblHazardEventsStatus.ForeColor = Color.Firebrick;
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblHazardEventsStatus.Text =
+                SetRichPlainStatus(
+                    _rtbHazardEventsStatus,
                     $"⚠ Configured Hazards cards ({totalConfiguredHaz}: {hazCreaturesTotal} creatures/Nazgûl + {hazEventsEnv} env) exceed Play Deck Size ({playDeckLimit}).\n" +
-                    "Reduce Hazard counts or increase Play Deck Size on General Settings.";
+                    "Reduce Hazard counts or increase Play Deck Size on General Settings.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
             }
             else if (totalConfiguredSide > sideboardLimit && hazEventsSide > 0)
             {
                 hasHazardEventsError = true;
-                _lblHazardEventsStatus.ForeColor = Color.Firebrick;
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Bold);
-                _lblHazardEventsStatus.Text = sideOverMsg;
+                SetRichPlainStatus(_rtbHazardEventsStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if ((_lblHazardEventsStatus.ForeColor == Color.Firebrick &&
-                      (_lblHazardEventsStatus.Text.StartsWith("⚠ Doors of Night", StringComparison.Ordinal) ||
-                       _lblHazardEventsStatus.Text.StartsWith("⚠ Twilight", StringComparison.Ordinal) ||
-                       _lblHazardEventsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
-                       _lblHazardEventsStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal) ||
-                       _lblHazardEventsStatus.Text.StartsWith("⚠ Configured Hazards", StringComparison.Ordinal) ||
-                       _lblHazardEventsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
+            else if ((_rtbHazardEventsStatus.ForeColor == Color.Firebrick &&
+                      (_rtbHazardEventsStatus.Text.StartsWith("⚠ Doors of Night", StringComparison.Ordinal) ||
+                       _rtbHazardEventsStatus.Text.StartsWith("⚠ Twilight", StringComparison.Ordinal) ||
+                       _rtbHazardEventsStatus.Text.StartsWith("⚠ At least one Role", StringComparison.Ordinal) ||
+                       _rtbHazardEventsStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal) ||
+                       _rtbHazardEventsStatus.Text.StartsWith("⚠ Configured Hazards", StringComparison.Ordinal) ||
+                       _rtbHazardEventsStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
                      (_deck.Hazards.All(c => !IsGeneralHazardEvent(c)) &&
                       _deck.Sideboard.All(c => !IsGeneralHazardEvent(c)) &&
-                      !_lblHazardEventsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase)))
+                      !_rtbHazardEventsStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase)))
             {
-                _lblHazardEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblHazardEventsStatus.Text = HazardEventsIdleStatusText;
+                SetRichPlainStatus(_rtbHazardEventsStatus, HazardEventsIdleStatusText, idleColor, FontStyle.Italic);
             }
 
             // --- Unified Pipeline Readiness ---
@@ -2023,7 +1921,7 @@ namespace MECCG_Deck_Builder
 
                 foreach (var (_, _, info) in stepsToRun)
                 {
-                    info.StatusLabel.Text = string.Empty;
+                    info.StatusControl.Text = string.Empty;
                 }
             }
 
@@ -2036,7 +1934,7 @@ namespace MECCG_Deck_Builder
             List<Card> bestHazards = null;
             List<Card> bestSideboard = null;
             List<Card> bestSites = null;
-            List<(Label Label, string Text, Color ForeColor, Font Font)> bestStatusLabels = null;
+            List<(Control Control, string Text, string Rtf, Color ForeColor, Font Font)> bestStatusControls = null;
             List<string> bestCompletedSteps = null;
             List<string> bestWarningTabs = null;
 
@@ -2060,7 +1958,7 @@ namespace MECCG_Deck_Builder
                 if (failedIndex < 0)
                 {
                     var warningTabs = stepsToRun
-                        .Where(step => step.Info.StatusLabel.Text.Contains('⚠'))
+                        .Where(step => step.Info.StatusControl.Text.Contains('⚠'))
                         .Select(step => step.TabName)
                         .ToList();
 
@@ -2086,7 +1984,12 @@ namespace MECCG_Deck_Builder
                         bestHazards = [.. _deck.Hazards];
                         bestSideboard = [.. _deck.Sideboard];
                         bestSites = [.. _deck.Sites];
-                        bestStatusLabels = [.. stepsToRun.Select(step => (step.Info.StatusLabel, step.Info.StatusLabel.Text, step.Info.StatusLabel.ForeColor, step.Info.StatusLabel.Font))];
+                        bestStatusControls = [.. stepsToRun.Select(step => (
+                            step.Info.StatusControl,
+                            step.Info.StatusControl.Text,
+                            step.Info.StatusControl is RichTextBox rtb ? rtb.Rtf : null,
+                            step.Info.StatusControl.ForeColor,
+                            step.Info.StatusControl.Font))];
                         bestCompletedSteps = completedSteps;
                         bestWarningTabs = warningTabs;
                     }
@@ -2106,11 +2009,18 @@ namespace MECCG_Deck_Builder
                 _deck.Sideboard.AddRange(bestSideboard);
                 _deck.Sites.AddRange(bestSites);
 
-                foreach (var (label, text, foreColor, font) in bestStatusLabels)
+                foreach (var (ctrl, text, rtf, foreColor, font) in bestStatusControls)
                 {
-                    label.Text = text;
-                    label.ForeColor = foreColor;
-                    label.Font = font;
+                    ctrl.ForeColor = foreColor;
+                    ctrl.Font = font;
+                    if (ctrl is RichTextBox rtb && rtf != null)
+                    {
+                        rtb.Rtf = rtf;
+                    }
+                    else
+                    {
+                        ctrl.Text = text;
+                    }
                 }
 
                 NotifyDeckChanged(null);

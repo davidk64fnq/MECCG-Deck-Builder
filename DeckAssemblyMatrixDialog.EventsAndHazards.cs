@@ -10,15 +10,15 @@ namespace MECCG_Deck_Builder
     {
         private const string ResourceEventsIdleStatusText =
             "Fills remaining Play Deck (Resources) capacity up to Play Deck Size, plus requested Sideboard events.\n" +
-            "Drafts Environment cards (Gates of Morning, Twilight) first, then distributes remaining slots proportionately across checked Role Focus tags.";
+            "Drafts Environment cards (Gates of Morning, Twilight) first, then distributes remaining slots proportionately across checked Role tags.";
 
         private const string CreaturesIdleStatusText =
             "Drafts Nazgûl, Nazgûl Support events, Standard Creatures (1.0), and non-Nazgûl Dual-Mode Half-Creatures (0.5).\n" +
-            "Uses proportionate Species / Race buckets with variety-first sampling; all Unique creatures remain eligible.";
+            "Uses proportionate Creature Race buckets with variety-first sampling; all Unique creatures remain eligible.";
 
         private const string HazardEventsIdleStatusText =
             "Fills remaining Play Deck (Hazards) capacity up to Play Deck Size, plus requested Sideboard events.\n" +
-            "Drafts Environment cards (Doors of Night, Twilight) first, then distributes remaining slots proportionately across checked Role Focus tags.";
+            "Drafts Environment cards (Doors of Night, Twilight) first, then distributes remaining slots proportionately across checked Role tags.";
 
         private Panel BuildResourceEventsPage()
         {
@@ -107,7 +107,7 @@ namespace MECCG_Deck_Builder
 
             var grpResEventRoles = new GroupBox
             {
-                Text = "Role Focus (Uncheck to exclude)",
+                Text = "Role (Uncheck to exclude)",
                 Location = new Point(525, 16),
                 Size = new Size(300, 292)
             };
@@ -143,17 +143,9 @@ namespace MECCG_Deck_Builder
 
             grpResEventRoles.Controls.AddRange([_clbResourceEventRoles, btnAllEventRoles, btnClearEventRoles]);
 
-            _lblResourceEventsStatus = new Label
-            {
-                Location = new Point(16, 320),
-                Size = new Size(805, 290),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = ResourceEventsIdleStatusText
-            };
+            _rtbResourceEventsStatus = CreateStatusRichTextBox(16, 320, 805, 336, ResourceEventsIdleStatusText);
 
-            tabResourceEvents.Controls.AddRange([grpEnv, grpAutoFill, grpResEventRoles, _lblResourceEventsStatus]);
+            tabResourceEvents.Controls.AddRange([grpEnv, grpAutoFill, grpResEventRoles, _rtbResourceEventsStatus]);
             return tabResourceEvents;
         }
 
@@ -168,9 +160,9 @@ namespace MECCG_Deck_Builder
                 Size = new Size(475, 116)
             };
 
-            var lblNazHdrCat = new Label { Text = "Card Group", Location = new Point(16, 22), Size = new Size(165, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblNazHdrHaz = new Label { Text = "Hazards", Location = new Point(190, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblNazHdrSide = new Label { Text = "Sideboard", Location = new Point(282, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblNazHdrCat = new Label { Text = "Card Group", Location = new Point(16, 22), Size = new Size(160, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblNazHdrHaz = new Label { Text = "Hazards", Location = new Point(180, 22), Size = new Size(72, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblNazHdrSide = new Label { Text = "Sideboard", Location = new Point(258, 22), Size = new Size(74, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
 
             NumericUpDown CreateCreatureSpinner(int x, int y, int min, int max, int defVal)
             {
@@ -179,17 +171,17 @@ namespace MECCG_Deck_Builder
                 return nud;
             }
 
-            var lblNazgul = new Label { Text = "Nazgûl (0.5 equiv):", Location = new Point(16, 49), Size = new Size(165, 20) };
-            _numHazNazgul = CreateCreatureSpinner(190, 46, 0, 9, 0);
-            _numSideNazgul = CreateCreatureSpinner(282, 46, 0, 9, 0);
-            var lblNazNote = new Label { Text = "Unique (<= 9 total)", Location = new Point(358, 49), Size = new Size(110, 20), ForeColor = Color.DimGray };
+            var lblNazgul = new Label { Text = "Nazgûl (0.5 equiv):", Location = new Point(16, 49), Size = new Size(160, 20) };
+            _numHazNazgul = CreateCreatureSpinner(180, 46, 0, 9, 0);
+            _numSideNazgul = CreateCreatureSpinner(258, 46, 0, 9, 0);
+            var lblNazNote = new Label { Text = "Unique (<= 9 total)", Location = new Point(334, 49), Size = new Size(135, 20), ForeColor = Color.DimGray };
             _toolTip.SetToolTip(_numHazNazgul, "Unique Nazgûl (Race = Nazgûl; 0.5 creature equivalent each). Combined Hazards + Sideboard <= 9.");
             _toolTip.SetToolTip(_numSideNazgul, "Unique Nazgûl in Sideboard (combined Hazards + Sideboard <= 9).");
 
-            var lblNazSup = new Label { Text = "Nazgûl Support:", Location = new Point(16, 81), Size = new Size(165, 20) };
-            _numHazNazgulSupport = CreateCreatureSpinner(190, 78, 0, 15, 0);
-            _numSideNazgulSupport = CreateCreatureSpinner(282, 78, 0, 10, 0);
-            var lblNazSupNote = new Label { Text = "Target: Nazgûl", Location = new Point(358, 81), Size = new Size(110, 20), ForeColor = Color.DimGray };
+            var lblNazSup = new Label { Text = "Nazgûl Support:", Location = new Point(16, 81), Size = new Size(160, 20) };
+            _numHazNazgulSupport = CreateCreatureSpinner(180, 78, 0, 15, 0);
+            _numSideNazgulSupport = CreateCreatureSpinner(258, 78, 0, 10, 0);
+            var lblNazSupNote = new Label { Text = "Target: Nazgûl", Location = new Point(334, 81), Size = new Size(135, 20), ForeColor = Color.DimGray };
             _toolTip.SetToolTip(_numHazNazgulSupport, "Hazard support events tagged Target Species = Nazgûl.");
             _toolTip.SetToolTip(_numSideNazgulSupport, "Sideboard Nazgûl support events tagged Target Species = Nazgûl.");
 
@@ -206,19 +198,19 @@ namespace MECCG_Deck_Builder
                 Size = new Size(475, 168)
             };
 
-            var lblCrHdrCat = new Label { Text = "Creature Tier", Location = new Point(16, 22), Size = new Size(165, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblCrHdrHaz = new Label { Text = "Hazards", Location = new Point(190, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblCrHdrSide = new Label { Text = "Sideboard", Location = new Point(282, 22), Size = new Size(80, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblCrHdrCat = new Label { Text = "Creature Tier", Location = new Point(16, 22), Size = new Size(160, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblCrHdrHaz = new Label { Text = "Hazards", Location = new Point(180, 22), Size = new Size(72, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblCrHdrSide = new Label { Text = "Sideboard", Location = new Point(258, 22), Size = new Size(74, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
 
-            var lblStdCr = new Label { Text = "Standard Creatures (1.0):", Location = new Point(16, 49), Size = new Size(165, 20) };
-            _numHazStandardCreatures = CreateCreatureSpinner(190, 46, 0, 30, 12);
-            _numSideStandardCreatures = CreateCreatureSpinner(282, 46, 0, 15, 2);
-            var lblStdNote = new Label { Text = "Secondary = Creature", Location = new Point(358, 49), Size = new Size(112, 20), ForeColor = Color.DimGray };
+            var lblStdCr = new Label { Text = "Standard Creatures (1.0):", Location = new Point(16, 49), Size = new Size(160, 20) };
+            _numHazStandardCreatures = CreateCreatureSpinner(180, 46, 0, 30, 12);
+            _numSideStandardCreatures = CreateCreatureSpinner(258, 46, 0, 15, 2);
+            var lblStdNote = new Label { Text = "Secondary = Creature", Location = new Point(334, 49), Size = new Size(135, 20), ForeColor = Color.DimGray };
 
-            var lblDualCr = new Label { Text = "Dual-Mode Half (0.5):", Location = new Point(16, 81), Size = new Size(165, 20) };
-            _numHazDualCreatures = CreateCreatureSpinner(190, 78, 0, 12, 0);
-            _numSideDualCreatures = CreateCreatureSpinner(282, 78, 0, 10, 0);
-            var lblDualNote = new Label { Text = "Non-Nazgûl duals", Location = new Point(358, 81), Size = new Size(112, 20), ForeColor = Color.DimGray };
+            var lblDualCr = new Label { Text = "Dual-Mode Half (0.5):", Location = new Point(16, 81), Size = new Size(160, 20) };
+            _numHazDualCreatures = CreateCreatureSpinner(180, 78, 0, 12, 0);
+            _numSideDualCreatures = CreateCreatureSpinner(258, 78, 0, 10, 0);
+            var lblDualNote = new Label { Text = "Non-Nazgûl duals", Location = new Point(334, 81), Size = new Size(135, 20), ForeColor = Color.DimGray };
             _toolTip.SetToolTip(_numHazDualCreatures, "Non-Nazgûl dual-mode creatures (e.g. Shelob, Mouth of Sauron; 0.5 creature equivalent each).");
 
             _lblCreatureEquivReadout = new Label
@@ -239,7 +231,7 @@ namespace MECCG_Deck_Builder
 
             var grpCreatureSpecies = new GroupBox
             {
-                Text = "Species / Race Focus (Uncheck to exclude)",
+                Text = "Creature Race (Uncheck to exclude)",
                 Location = new Point(505, 14),
                 Size = new Size(321, 200)
             };
@@ -347,20 +339,12 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false
             };
 
-            _lblCreaturesStatus = new Label
-            {
-                Location = new Point(16, 318),
-                Size = new Size(475, 290),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = CreaturesIdleStatusText
-            };
+            _rtbCreaturesStatus = CreateStatusRichTextBox(16, 318, 475, 342, CreaturesIdleStatusText);
 
             tabCreatures.Controls.AddRange([
                 grpNazgul, grpCreatures,
                 grpCreatureSpecies, grpCreatureKeying, _lblCreatureKeyingNote,
-                _lblCreaturesStatus
+                _rtbCreaturesStatus
             ]);
 
             return tabCreatures;
@@ -453,7 +437,7 @@ namespace MECCG_Deck_Builder
 
             var grpHazEventRoles = new GroupBox
             {
-                Text = "Role Focus (Uncheck to exclude)",
+                Text = "Role (Uncheck to exclude)",
                 Location = new Point(505, 14),
                 Size = new Size(321, 200)
             };
@@ -561,20 +545,12 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false
             };
 
-            _lblHazardEventsStatus = new Label
-            {
-                Location = new Point(16, 322),
-                Size = new Size(475, 290),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = HazardEventsIdleStatusText
-            };
+            _rtbHazardEventsStatus = CreateStatusRichTextBox(16, 322, 475, 338, HazardEventsIdleStatusText);
 
             tabHazardEvents.Controls.AddRange([
                 grpHazEnv, grpHazAutoFill,
                 grpHazEventRoles, grpHazEventKeying, _lblHazardEventKeyingNote,
-                _lblHazardEventsStatus
+                _rtbHazardEventsStatus
             ]);
 
             return tabHazardEvents;
@@ -837,7 +813,7 @@ namespace MECCG_Deck_Builder
             {
                 if (!silent)
                 {
-                    MessageBox.Show(this, "Please select at least one Role under Role Focus on the Resource Events tab.", "Resource Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select at least one Role under Role on the Resource Events tab.", "Resource Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 return false;
             }
@@ -991,14 +967,15 @@ namespace MECCG_Deck_Builder
             string resText = resAll.Count > 0 ? FormatCardCountList(resAll) : "(None)";
             string sideText = sideAll.Count > 0 ? FormatCardCountList(sideAll) : "(None)";
 
-            string statusMsg =
-                $"Drafted {resAll.Count} event(s) into Resources and {sideAll.Count} into Sideboard:\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Resources:", resText),
+                ("Sideboard:", sideText)
+            };
 
             if (!string.IsNullOrWhiteSpace(resRoleSummary))
             {
-                statusMsg += $"\n• Resources Role Allocation: {resRoleSummary}";
+                bullets.Add(("Resources Role Allocation:", resRoleSummary));
             }
 
             var warnings = new List<string>();
@@ -1015,22 +992,11 @@ namespace MECCG_Deck_Builder
                 warnings.Add($"Sideboard Events Shortfall: Drafted {draftedSideAuto.Count} of {reqSideAuto} requested.");
             }
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblResourceEventsStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblResourceEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblResourceEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblResourceEventsStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbResourceEventsStatus,
+                $"Drafted {resAll.Count} event(s) into Resources and {sideAll.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -1209,9 +1175,7 @@ namespace MECCG_Deck_Builder
 
             if (totalRequested == 0)
             {
-                _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblCreaturesStatus.Text = "No creatures or Nazgûl configured (0 drafted).";
+                SetRichPlainStatus(_rtbCreaturesStatus, "No creatures or Nazgûl configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -1232,7 +1196,7 @@ namespace MECCG_Deck_Builder
             {
                 if (!silent)
                 {
-                    MessageBox.Show(this, "Please select at least one Species / Race under Species / Race Focus on the Creatures tab.", "Creatures", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select at least one Creature Race under Creature Race on the Creatures tab.", "Creatures", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 return false;
             }
@@ -1377,7 +1341,7 @@ namespace MECCG_Deck_Builder
                 .Where(c => IsDualModeNonNazgulCreature(c) && PassesCreatureFilters(c))
                 .ToList();
 
-            var (draftedHazStd, hazStdSummary) = DraftCreaturesProportionately(
+            var (draftedHazStd, _) = DraftCreaturesProportionately(
                 standardPool, checkedSpecies, _deck.Hazards, Math.Min(reqHazStd, hazCapacity), usedCountsByName);
             hazCapacity -= draftedHazStd.Count;
 
@@ -1385,7 +1349,7 @@ namespace MECCG_Deck_Builder
                 standardPool, checkedSpecies, _deck.Sideboard, Math.Min(reqSideStd, sideCapacity), usedCountsByName);
             sideCapacity -= draftedSideStd.Count;
 
-            var (draftedHazDual, hazDualSummary) = DraftCreaturesProportionately(
+            var (draftedHazDual, _) = DraftCreaturesProportionately(
                 dualPool, checkedSpecies, _deck.Hazards, Math.Min(reqHazDual, hazCapacity), usedCountsByName);
 
             var (draftedSideDual, _) = DraftCreaturesProportionately(
@@ -1403,22 +1367,26 @@ namespace MECCG_Deck_Builder
 
             int hazEquiv = draftedHazStd.Count + ((draftedHazNazgul.Count + draftedHazDual.Count) / 2);
 
-            string hazText = hazAll.Count > 0 ? FormatCardCountList(hazAll) : "(None)";
-            string sideText = sideAll.Count > 0 ? FormatCardCountList(sideAll) : "(None)";
+            var hazBullets = new List<(string Label, string Value)>();
+            var sideBullets = new List<(string Label, string Value)>();
 
-            string statusMsg =
-                $"Drafted {hazAll.Count} card(s) into Hazards (Creature Equiv: {hazEquiv}/12 min) and {sideAll.Count} into Sideboard:\n" +
-                $"• Hazards: {hazText}\n" +
-                $"• Sideboard: {sideText}";
+            void AddBulletIfRelevant(List<(string Label, string Value)> target, string label, int requested, List<Card> drafted)
+            {
+                if (requested > 0 || drafted.Count > 0)
+                {
+                    target.Add((label, drafted.Count > 0 ? FormatCardCountList(drafted) : "(None)"));
+                }
+            }
 
-            if (!string.IsNullOrWhiteSpace(hazStdSummary))
-            {
-                statusMsg += $"\n• Standard Species Mix: {hazStdSummary}";
-            }
-            if (!string.IsNullOrWhiteSpace(hazDualSummary))
-            {
-                statusMsg += $"\n• Dual-Mode Species Mix: {hazDualSummary}";
-            }
+            AddBulletIfRelevant(hazBullets, "Hazards — Nazgûl:", reqHazNazgul, draftedHazNazgul);
+            AddBulletIfRelevant(hazBullets, "Hazards — Nazgûl Support:", reqHazNazSup, draftedHazNazSup);
+            AddBulletIfRelevant(hazBullets, "Hazards — Standard:", reqHazStd, draftedHazStd);
+            AddBulletIfRelevant(hazBullets, "Hazards — Dual-Mode:", reqHazDual, draftedHazDual);
+
+            AddBulletIfRelevant(sideBullets, "Sideboard — Nazgûl:", reqSideNazgul, draftedSideNazgul);
+            AddBulletIfRelevant(sideBullets, "Sideboard — Nazgûl Support:", reqSideNazSup, draftedSideNazSup);
+            AddBulletIfRelevant(sideBullets, "Sideboard — Standard:", reqSideStd, draftedSideStd);
+            AddBulletIfRelevant(sideBullets, "Sideboard — Dual-Mode:", reqSideDual, draftedSideDual);
 
             var warnings = new List<string>();
             if (draftedHazNazgul.Count < reqHazNazgul) warnings.Add($"Hazards Nazgûl Shortfall: Drafted {draftedHazNazgul.Count} of {reqHazNazgul}.");
@@ -1441,22 +1409,12 @@ namespace MECCG_Deck_Builder
                 warnings.Add($"Hazards has {hazEquiv} creature equivalents (tournament minimum is 12).");
             }
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblCreaturesStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblCreaturesStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblCreaturesStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
+            SetRichBulletedStatus(
+                _rtbCreaturesStatus,
+                $"Drafted {hazAll.Count} card(s) into Hazards (Creature Equiv: {hazEquiv}/12 min) and {sideAll.Count} into Sideboard:",
+                [hazBullets, sideBullets],
+                warnings);
 
-            _lblCreaturesStatus.Text = statusMsg;
             return true;
         }
 
@@ -1749,7 +1707,7 @@ namespace MECCG_Deck_Builder
             {
                 if (!silent)
                 {
-                    MessageBox.Show(this, "Please select at least one Role under Role Focus on the Hazard Events tab.", "Hazard Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select at least one Role under Role on the Hazard Events tab.", "Hazard Events", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 return false;
             }
@@ -2002,14 +1960,15 @@ namespace MECCG_Deck_Builder
             string hazText = hazAll.Count > 0 ? FormatCardCountList(hazAll) : "(None)";
             string sideText = sideAll.Count > 0 ? FormatCardCountList(sideAll) : "(None)";
 
-            string statusMsg =
-                $"Drafted {hazAll.Count} event(s) into Hazards and {sideAll.Count} into Sideboard:\n" +
-                $"• Hazards: {hazText}\n" +
-                $"• Sideboard: {sideText}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Hazards:", hazText),
+                ("Sideboard:", sideText)
+            };
 
             if (!string.IsNullOrWhiteSpace(hazRoleSummary))
             {
-                statusMsg += $"\n• Hazards Role Allocation: {hazRoleSummary}";
+                bullets.Add(("Hazards Role Allocation:", hazRoleSummary));
             }
 
             var warnings = new List<string>();
@@ -2026,22 +1985,11 @@ namespace MECCG_Deck_Builder
                 warnings.Add($"Sideboard Hazard Events Shortfall: Drafted {draftedSideAuto.Count} of {reqSideAuto} requested.");
             }
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblHazardEventsStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblHazardEventsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblHazardEventsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblHazardEventsStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbHazardEventsStatus,
+                $"Drafted {hazAll.Count} event(s) into Hazards and {sideAll.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
     }

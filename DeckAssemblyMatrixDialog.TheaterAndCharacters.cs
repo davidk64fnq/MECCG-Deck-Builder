@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using NaturalSort.Extension;
 
 namespace MECCG_Deck_Builder
 {
@@ -143,17 +144,9 @@ namespace MECCG_Deck_Builder
 
             grpFilters.Controls.AddRange([lblRegTypes, _clbRegionTypes, lblSiteTypes, _clbSiteTypes]);
 
-            _lblTheaterStatus = new Label
-            {
-                Location = new Point(16, 268),
-                Size = new Size(805, 120),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = TheaterIdleStatusText
-            };
+            _rtbTheaterStatus = CreateStatusRichTextBox(16, 268, 805, 220, TheaterIdleStatusText);
 
-            tabTheater.Controls.AddRange([grpDraftOpts, grpFilters, _lblTheaterStatus]);
+            tabTheater.Controls.AddRange([grpDraftOpts, grpFilters, _rtbTheaterStatus]);
             return tabTheater;
         }
 
@@ -167,16 +160,8 @@ namespace MECCG_Deck_Builder
                 row.TxtMind.Text = ">=1";
             }
 
-            _lblStarterStatus = new Label
-            {
-                Location = new Point(16, 198),
-                Size = new Size(790, 90),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = StarterIdleStatusText
-            };
-            tabStarter.Controls.Add(_lblStarterStatus);
+            _rtbStarterStatus = CreateStatusRichTextBox(16, 198, 790, 180, StarterIdleStatusText);
+            tabStarter.Controls.Add(_rtbStarterStatus);
 
             return tabStarter;
         }
@@ -285,15 +270,8 @@ namespace MECCG_Deck_Builder
 
             BuildCharacterGrid(tabRecruits, _reserveRows, 3, 430, 24, ValidateWorkbenchReadiness);
 
-            _lblRecruitStatus = new Label
-            {
-                Location = new Point(16, 514),
-                Size = new Size(810, 80),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
-                UseMnemonic = false
-            };
-            tabRecruits.Controls.Add(_lblRecruitStatus);
+            _rtbRecruitStatus = CreateStatusRichTextBox(16, 514, 810, 140);
+            tabRecruits.Controls.Add(_rtbRecruitStatus);
 
             return tabRecruits;
         }
@@ -684,11 +662,17 @@ namespace MECCG_Deck_Builder
             int finalAdvSites = draftedSitesAndRegions.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase));
 
             string capNote = wasCappedByMax ? $" (capped from {totalAvailableAdvSites} available)" : string.Empty;
-            string regionListStr = string.Join(", ", bestCluster);
+            string regionListStr = string.Join(", ", bestCluster.OrderBy(r => r, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort()));
+            var draftedAdvSiteCards = draftedSitesAndRegions
+                .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            string advSitesStr = draftedAdvSiteCards.Count > 0 ? FormatCardCountList(draftedAdvSiteCards) : "(None)";
 
-            string statusMsg =
-                $"Drafted {draftedSitesAndRegions.Count} cards ({finalHavens} Havens, {finalRegions} Regions, {finalAdvSites} Adventure Sites{capNote}). Seed: {bestSeed}\n" +
-                $"Regions: {regionListStr}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Regions:", regionListStr),
+                ("Adventure Sites:", advSitesStr)
+            };
 
             var warnings = new List<string>();
             if (!string.IsNullOrEmpty(terrainAdjustedNote))
@@ -704,22 +688,11 @@ namespace MECCG_Deck_Builder
                 warnings.Add("Site Shortfall: 0 adventure sites matched the checked Site Holds inside these regions.");
             }
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblTheaterStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblTheaterStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblTheaterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblTheaterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblTheaterStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbTheaterStatus,
+                $"Drafted {draftedSitesAndRegions.Count} cards ({finalHavens} Havens, {finalRegions} Regions, {finalAdvSites} Adventure Sites{capNote}). Seed: {bestSeed}",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -728,9 +701,7 @@ namespace MECCG_Deck_Builder
             var activeRows = _starterRows.Where(r => r.IsActive).ToList();
             if (activeRows.Count == 0)
             {
-                _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblStarterStatus.Text = "No starting company rows configured (0 characters drafted into Pool).";
+                SetRichPlainStatus(_rtbStarterStatus, "No starting company rows configured (0 characters drafted into Pool).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -956,7 +927,9 @@ namespace MECCG_Deck_Builder
             }
 
             int finalMind = bestCompany.Sum(c => ParseCardMind(c.Mind));
-            string companyNames = string.Join(", ", bestCompany.Select(c => $"{c.Name} ({c.Mind} Mind)"));
+            string companyNames = string.Join(", ", bestCompany
+                .OrderBy(c => c.Name, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort())
+                .Select(c => $"{c.Name} ({c.Mind} Mind)"));
 
             var tierParts = new List<string>();
             if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local region(s)");
@@ -966,9 +939,15 @@ namespace MECCG_Deck_Builder
                 ? " [All from drafted regions]"
                 : $" [{string.Join(", ", tierParts)}]";
 
-            _lblStarterStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblStarterStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            _lblStarterStatus.Text = $"Drafted {bestCompany.Count} starting characters (Total Mind: {finalMind}/20){tierNote}:\n{companyNames}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Starting Pool:", companyNames)
+            };
+
+            SetRichBulletedStatus(
+                _rtbStarterStatus,
+                $"Drafted {bestCompany.Count} starting characters (Total Mind: {finalMind}/20){tierNote}:",
+                [bullets]);
             return true;
         }
 
@@ -981,9 +960,7 @@ namespace MECCG_Deck_Builder
 
             if (wiz1Count == 0 && wiz2Count == 0 && activeRecruitRows.Count == 0 && activeReserveRows.Count == 0)
             {
-                _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
-                _lblRecruitStatus.Text = "No Wizards or additional characters configured (0 characters drafted).";
+                SetRichPlainStatus(_rtbRecruitStatus, "No Wizards or additional characters configured (0 characters drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -1287,8 +1264,8 @@ namespace MECCG_Deck_Builder
                 NotifyDeckChanged(finalRecruits.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
             }
 
-            string recruitNames = finalRecruits.Count > 0 ? string.Join(", ", finalRecruits.Select(c => c.Name)) : "(None)";
-            string reserveNames = finalReserves.Count > 0 ? string.Join(", ", finalReserves.Select(c => c.Name)) : "(None)";
+            string recruitNames = finalRecruits.Count > 0 ? FormatCardCountList(finalRecruits) : "(None)";
+            string reserveNames = finalReserves.Count > 0 ? FormatCardCountList(finalReserves) : "(None)";
 
             var tierParts = new List<string>();
             if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local site(s)");
@@ -1321,24 +1298,17 @@ namespace MECCG_Deck_Builder
                 }
             }
 
-            if (wizardNotes.Count > 0)
+            var bullets = new List<(string Label, string Value)>
             {
-                _lblRecruitStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblRecruitStatus.Text =
-                    $"Drafted {finalRecruits.Count} into Resources and {finalReserves.Count} into Sideboard{tierNote}:\n" +
-                    $"• Resources: {recruitNames}  |  Sideboard: {reserveNames}\n" +
-                    $"⚠ {string.Join(" ", wizardNotes)}";
-            }
-            else
-            {
-                _lblRecruitStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRecruitStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
-                _lblRecruitStatus.Text =
-                    $"Drafted {finalRecruits.Count} into Resources and {finalReserves.Count} into Sideboard{tierNote}:\n" +
-                    $"• Resources: {recruitNames}\n" +
-                    $"• Sideboard: {reserveNames}";
-            }
+                ("Resources:", recruitNames),
+                ("Sideboard:", reserveNames)
+            };
+
+            SetRichBulletedStatus(
+                _rtbRecruitStatus,
+                $"Drafted {finalRecruits.Count} into Resources and {finalReserves.Count} into Sideboard{tierNote}:",
+                [bullets],
+                wizardNotes);
 
             return true;
         }

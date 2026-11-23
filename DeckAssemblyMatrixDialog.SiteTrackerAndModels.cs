@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using NaturalSort.Extension;
 
 namespace MECCG_Deck_Builder
 {
@@ -634,9 +635,157 @@ namespace MECCG_Deck_Builder
              _filterService.GetCardTagsForCategory(c.Id, "Target Species")
                  .Any(t => CardFilterService.EqualsWithDiacriticFallback(t, "Wizard")));
 
+        private static RichTextBox CreateStatusRichTextBox(int x, int y, int width, int height, string initialText = null)
+        {
+            var rtb = new RichTextBox
+            {
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                BorderStyle = BorderStyle.None,
+                BackColor = SystemColors.Control,
+                ForeColor = Color.FromArgb(74, 85, 104),
+                Font = new Font("Segoe UI", 9.0f),
+                ReadOnly = true,
+                TabStop = false,
+                DetectUrls = false,
+                ScrollBars = RichTextBoxScrollBars.Vertical,
+                WordWrap = true
+            };
+
+            if (!string.IsNullOrEmpty(initialText))
+            {
+                SetRichPlainStatus(rtb, initialText, Color.FromArgb(74, 85, 104), FontStyle.Italic);
+            }
+
+            return rtb;
+        }
+
+        private static void SetRichPlainStatus(RichTextBox rtb, string text, Color color, FontStyle style)
+        {
+            if (rtb == null) return;
+
+            rtb.SuspendLayout();
+            rtb.Clear();
+            rtb.ForeColor = color;
+            using var font = new Font("Segoe UI", 9.0f, style);
+            rtb.SelectionStart = 0;
+            rtb.SelectionLength = 0;
+            rtb.SelectionIndent = 0;
+            rtb.SelectionHangingIndent = 0;
+            rtb.SelectionColor = color;
+            rtb.SelectionFont = font;
+            rtb.AppendText(text ?? string.Empty);
+            rtb.SelectionStart = 0;
+            rtb.ScrollToCaret();
+            rtb.ResumeLayout();
+        }
+
+        private static void SetRichBulletedStatus(
+            RichTextBox rtb,
+            string headerLine,
+            IReadOnlyList<IReadOnlyList<(string Label, string Value)>> bulletGroups,
+            IReadOnlyList<string> warnings = null)
+        {
+            if (rtb == null) return;
+
+            Color headerColor = Color.FromArgb(74, 85, 104);
+            Color labelColor = Color.FromArgb(26, 54, 93);
+            Color valueColor = Color.FromArgb(45, 55, 72);
+            Color noneColor = Color.FromArgb(113, 128, 150);
+            Color warnColor = Color.FromArgb(180, 83, 9);
+
+            using var headerFont = new Font("Segoe UI", 9.0f, FontStyle.Italic);
+            using var labelFont = new Font("Segoe UI", 8.75f, FontStyle.Bold);
+            using var valueFont = new Font("Segoe UI", 8.75f, FontStyle.Regular);
+            using var noneFont = new Font("Segoe UI", 8.75f, FontStyle.Italic);
+            using var warnFont = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+            using var bulletGapFont = new Font("Segoe UI", 3.0f, FontStyle.Regular);
+            using var groupGapFont = new Font("Segoe UI", 5.5f, FontStyle.Regular);
+
+            void AppendSegment(string text, Color color, Font font)
+            {
+                rtb.SelectionStart = rtb.TextLength;
+                rtb.SelectionLength = 0;
+                rtb.SelectionColor = color;
+                rtb.SelectionFont = font;
+                rtb.AppendText(text);
+            }
+
+            void StartParagraph(int hangingIndent)
+            {
+                rtb.SelectionStart = rtb.TextLength;
+                rtb.SelectionLength = 0;
+                rtb.SelectionIndent = 0;
+                rtb.SelectionHangingIndent = hangingIndent;
+            }
+
+            void EndParagraphAndAddGap(Font closingFont, Font gapFont)
+            {
+                AppendSegment("\n", headerColor, closingFont);
+                StartParagraph(0);
+                AppendSegment("\n", headerColor, gapFont);
+            }
+
+            rtb.SuspendLayout();
+            rtb.Clear();
+            rtb.ForeColor = headerColor;
+
+            Font lastClosingFont = null;
+
+            if (!string.IsNullOrWhiteSpace(headerLine))
+            {
+                StartParagraph(0);
+                AppendSegment(headerLine, headerColor, headerFont);
+                lastClosingFont = headerFont;
+            }
+
+            if (bulletGroups != null)
+            {
+                foreach (var group in bulletGroups)
+                {
+                    if (group == null || group.Count == 0) continue;
+
+                    for (int i = 0; i < group.Count; i++)
+                    {
+                        var (label, value) = group[i];
+                        if (lastClosingFont != null)
+                        {
+                            EndParagraphAndAddGap(lastClosingFont, i == 0 ? groupGapFont : bulletGapFont);
+                        }
+
+                        StartParagraph(10);
+                        AppendSegment($"• {label} ", labelColor, labelFont);
+                        bool isNone = string.Equals(value, "(None)", StringComparison.Ordinal);
+                        Font curValFont = isNone ? noneFont : valueFont;
+                        AppendSegment(value ?? string.Empty, isNone ? noneColor : valueColor, curValFont);
+                        lastClosingFont = curValFont;
+                    }
+                }
+            }
+
+            if (warnings != null)
+            {
+                for (int i = 0; i < warnings.Count; i++)
+                {
+                    if (lastClosingFont != null)
+                    {
+                        EndParagraphAndAddGap(lastClosingFont, i == 0 ? groupGapFont : bulletGapFont);
+                    }
+                    StartParagraph(0);
+                    AppendSegment($"⚠ {warnings[i]}", warnColor, warnFont);
+                    lastClosingFont = warnFont;
+                }
+            }
+
+            rtb.SelectionStart = 0;
+            rtb.ScrollToCaret();
+            rtb.ResumeLayout();
+        }
+
         private static string FormatCardCountList(IEnumerable<Card> cards) =>
             string.Join(", ", cards
                 .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(g => g.First().Name, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort())
                 .Select(g => g.Count() > 1 ? $"{g.Count()}x {g.First().Name}" : g.First().Name));
 
         private bool MatchesItemSitePlayability(Card item, List<Card> allSitesInDeck)

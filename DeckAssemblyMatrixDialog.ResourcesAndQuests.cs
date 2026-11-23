@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using NaturalSort.Extension;
 
 namespace MECCG_Deck_Builder
 {
@@ -19,7 +20,7 @@ namespace MECCG_Deck_Builder
 
         private const string ItemIdleStatusText =
             "Minor, Major, Greater, and non-Ring/non-Palantír Special Items are drafted if playable at drafted Sites/Havens.\n" +
-            "Pool Minor Items (0-2) are drafted first; all items obey Role Focus, Region/Site Requirements, Specific, Prerequisite, and Hero Target Species.";
+            "Pool Minor Items (0-2) are drafted first; all items obey Role, Region/Site Requirements, Specific, Prerequisite, and Hero Target Species.";
 
         private const string RingsIdleStatusText =
             "Gold Rings require at least one GoldRing-playable site in the drafted Site deck.\n" +
@@ -138,17 +139,9 @@ namespace MECCG_Deck_Builder
                 lblFactionRulesNote
             ]);
 
-            _lblFactionStatus = new Label
-            {
-                Location = new Point(16, 216),
-                Size = new Size(805, 160),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = FactionIdleStatusText
-            };
+            _rtbFactionStatus = CreateStatusRichTextBox(16, 216, 805, 240, FactionIdleStatusText);
 
-            tabFactions.Controls.AddRange([grpFactions, _lblFactionStatus]);
+            tabFactions.Controls.AddRange([grpFactions, _rtbFactionStatus]);
             return tabFactions;
         }
 
@@ -240,17 +233,9 @@ namespace MECCG_Deck_Builder
                 lblAllyRulesNote
             ]);
 
-            _lblAllyStatus = new Label
-            {
-                Location = new Point(16, 202),
-                Size = new Size(805, 160),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = AllyIdleStatusText
-            };
+            _rtbAllyStatus = CreateStatusRichTextBox(16, 202, 805, 240, AllyIdleStatusText);
 
-            tabAllies.Controls.AddRange([grpAllies, _lblAllyStatus]);
+            tabAllies.Controls.AddRange([grpAllies, _rtbAllyStatus]);
             return tabAllies;
         }
 
@@ -309,7 +294,7 @@ namespace MECCG_Deck_Builder
 
             var grpRingRoles = new GroupBox
             {
-                Text = "Special Ring Role Focus (Uncheck to exclude)",
+                Text = "Special Ring Role (Uncheck to exclude)",
                 Location = new Point(526, 326),
                 Size = new Size(300, 224)
             };
@@ -345,17 +330,9 @@ namespace MECCG_Deck_Builder
 
             grpRingRoles.Controls.AddRange([_clbRingRoles, btnAllRingRoles, btnClearRingRoles]);
 
-            _lblRingsStatus = new Label
-            {
-                Location = new Point(16, 326),
-                Size = new Size(495, 260),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = RingsIdleStatusText
-            };
+            _rtbRingsStatus = CreateStatusRichTextBox(16, 326, 495, 330, RingsIdleStatusText);
 
-            tabRings.Controls.AddRange([grpRings, grpRingRoles, _lblRingsStatus]);
+            tabRings.Controls.AddRange([grpRings, grpRingRoles, _rtbRingsStatus]);
             return tabRings;
         }
 
@@ -407,7 +384,7 @@ namespace MECCG_Deck_Builder
 
             var grpPalantirRoles = new GroupBox
             {
-                Text = "Role Focus (Uncheck to exclude)",
+                Text = "Role (Uncheck to exclude)",
                 Location = new Point(525, 16),
                 Size = new Size(300, 220)
             };
@@ -443,17 +420,9 @@ namespace MECCG_Deck_Builder
 
             grpPalantirRoles.Controls.AddRange([_clbPalantirRoles, btnAllPalRoles, btnClearPalRoles]);
 
-            _lblPalantiriStatus = new Label
-            {
-                Location = new Point(16, 250),
-                Size = new Size(805, 240),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = PalantirIdleStatusText
-            };
+            _rtbPalantiriStatus = CreateStatusRichTextBox(16, 250, 805, 300, PalantirIdleStatusText);
 
-            tabPalantiri.Controls.AddRange([grpPalantiri, grpPalantirRoles, _lblPalantiriStatus]);
+            tabPalantiri.Controls.AddRange([grpPalantiri, grpPalantirRoles, _rtbPalantiriStatus]);
             return tabPalantiri;
         }
 
@@ -515,7 +484,7 @@ namespace MECCG_Deck_Builder
 
             var grpItemRoles = new GroupBox
             {
-                Text = "Role Focus (Uncheck to exclude)",
+                Text = "Role (Uncheck to exclude)",
                 Location = new Point(525, 16),
                 Size = new Size(300, 226)
             };
@@ -551,17 +520,9 @@ namespace MECCG_Deck_Builder
 
             grpItemRoles.Controls.AddRange([_clbItemRoles, btnAllItemRoles, btnClearItemRoles]);
 
-            _lblItemStatus = new Label
-            {
-                Location = new Point(16, 256),
-                Size = new Size(805, 220),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = ItemIdleStatusText
-            };
+            _rtbItemStatus = CreateStatusRichTextBox(16, 256, 805, 300, ItemIdleStatusText);
 
-            tabItems.Controls.AddRange([grpItemCounts, grpItemRoles, _lblItemStatus]);
+            tabItems.Controls.AddRange([grpItemCounts, grpItemRoles, _rtbItemStatus]);
             return tabItems;
         }
 
@@ -622,7 +583,7 @@ namespace MECCG_Deck_Builder
 
             var grpQuestRoles = new GroupBox
             {
-                Text = "Role Focus (Uncheck to exclude)",
+                Text = "Role (Uncheck to exclude)",
                 Location = new Point(525, 16),
                 Size = new Size(300, 220)
             };
@@ -658,17 +619,9 @@ namespace MECCG_Deck_Builder
 
             grpQuestRoles.Controls.AddRange([_clbQuestRoles, btnAllQuestRoles, btnClearQuestRoles]);
 
-            _lblQuestsStatus = new Label
-            {
-                Location = new Point(16, 250),
-                Size = new Size(805, 250),
-                ForeColor = Color.FromArgb(74, 85, 104),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Italic),
-                UseMnemonic = false,
-                Text = QuestIdleStatusText
-            };
+            _rtbQuestsStatus = CreateStatusRichTextBox(16, 250, 805, 300, QuestIdleStatusText);
 
-            tabQuests.Controls.AddRange([grpQuests, grpQuestRoles, _lblQuestsStatus]);
+            tabQuests.Controls.AddRange([grpQuests, grpQuestRoles, _rtbQuestsStatus]);
             return tabQuests;
         }
 
@@ -871,9 +824,7 @@ namespace MECCG_Deck_Builder
 
             if (reqRes == 0 && reqSide == 0)
             {
-                _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblFactionStatus.Text = "No factions configured (0 drafted).";
+                SetRichPlainStatus(_rtbFactionStatus, "No factions configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -1076,19 +1027,20 @@ namespace MECCG_Deck_Builder
             }
 
             string resText = draftedResFactions.Count > 0
-                ? string.Join(", ", draftedResFactions.Select(f => f.Name)) +
-                  (draftedResPrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedResPrereqs.Select(p => p.Name))})" : "")
+                ? FormatCardCountList(draftedResFactions) +
+                  (draftedResPrereqs.Count > 0 ? $" (+ prereq: {FormatCardCountList(draftedResPrereqs)})" : "")
                 : "(None)";
 
             string sideText = draftedSideFactions.Count > 0
-                ? string.Join(", ", draftedSideFactions.Select(f => f.Name)) +
-                  (draftedSidePrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedSidePrereqs.Select(p => p.Name))})" : "")
+                ? FormatCardCountList(draftedSideFactions) +
+                  (draftedSidePrereqs.Count > 0 ? $" (+ prereq: {FormatCardCountList(draftedSidePrereqs)})" : "")
                 : "(None)";
 
-            string statusMsg =
-                $"Drafted {draftedResFactions.Count} faction(s) into Resources and {draftedSideFactions.Count} into Sideboard:\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Resources:", resText),
+                ("Sideboard:", sideText)
+            };
 
             var warnings = new List<string>();
             if (draftedResFactions.Count < reqRes)
@@ -1101,22 +1053,11 @@ namespace MECCG_Deck_Builder
             }
             warnings.AddRange(siteTracker.BuildOverlapMessages());
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblFactionStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblFactionStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblFactionStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblFactionStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblFactionStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbFactionStatus,
+                $"Drafted {draftedResFactions.Count} faction(s) into Resources and {draftedSideFactions.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -1206,9 +1147,7 @@ namespace MECCG_Deck_Builder
 
             if (reqRes == 0 && reqSide == 0)
             {
-                _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblAllyStatus.Text = "No allies configured (0 drafted).";
+                SetRichPlainStatus(_rtbAllyStatus, "No allies configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -1377,19 +1316,20 @@ namespace MECCG_Deck_Builder
             }
 
             string resText = draftedResAllies.Count > 0
-                ? string.Join(", ", draftedResAllies.Select(a => a.Name)) +
-                  (draftedResPrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedResPrereqs.Select(p => p.Name))})" : "")
+                ? FormatCardCountList(draftedResAllies) +
+                  (draftedResPrereqs.Count > 0 ? $" (+ prereq: {FormatCardCountList(draftedResPrereqs)})" : "")
                 : "(None)";
 
             string sideText = draftedSideAllies.Count > 0
-                ? string.Join(", ", draftedSideAllies.Select(a => a.Name)) +
-                  (draftedSidePrereqs.Count > 0 ? $" (+ prereq: {string.Join(", ", draftedSidePrereqs.Select(p => p.Name))})" : "")
+                ? FormatCardCountList(draftedSideAllies) +
+                  (draftedSidePrereqs.Count > 0 ? $" (+ prereq: {FormatCardCountList(draftedSidePrereqs)})" : "")
                 : "(None)";
 
-            string statusMsg =
-                $"Drafted {draftedResAllies.Count} ally/allies into Resources and {draftedSideAllies.Count} into Sideboard:\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Resources:", resText),
+                ("Sideboard:", sideText)
+            };
 
             var warnings = new List<string>();
             if (draftedResAllies.Count < reqRes)
@@ -1402,22 +1342,11 @@ namespace MECCG_Deck_Builder
             }
             warnings.AddRange(siteTracker.BuildOverlapMessages());
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblAllyStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblAllyStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblAllyStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblAllyStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblAllyStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbAllyStatus,
+                $"Drafted {draftedResAllies.Count} ally/allies into Resources and {draftedSideAllies.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -1527,9 +1456,7 @@ namespace MECCG_Deck_Builder
 
             if (totalRequested == 0)
             {
-                _lblRingsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblRingsStatus.Text = "No ring cards configured (0 drafted).";
+                SetRichPlainStatus(_rtbRingsStatus, "No ring cards configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -1548,7 +1475,7 @@ namespace MECCG_Deck_Builder
             {
                 if (!silent)
                 {
-                    MessageBox.Show(this, "Please select at least one Role under Special Ring Role Focus on the Rings tab.", "Rings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select at least one Role under Special Ring Role on the Rings tab.", "Rings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 return false;
             }
@@ -1847,18 +1774,19 @@ namespace MECCG_Deck_Builder
             if (innateSideAid.Count > 0) innateNotes.Add($"Sideboard Aid Test: {FormatInnateAbilitySummary(innateSideAid, sideAidEffective)}");
 
             string goldSiteNames = goldRingSites.Count > 0
-                ? string.Join(", ", goldRingSites.Select(s => s.Name))
+                ? string.Join(", ", goldRingSites.Select(s => s.Name).OrderBy(n => n, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort()))
                 : "(None)";
 
-            string statusMsg =
-                $"Drafted {resAll.Count} ring card(s) into Resources and {sideAll.Count} into Sideboard:\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}\n" +
-                $"• GoldRing-playable sites ({goldRingSites.Count}): {goldSiteNames}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Resources:", resText),
+                ("Sideboard:", sideText),
+                ($"GoldRing-playable sites ({goldRingSites.Count}):", goldSiteNames)
+            };
 
             if (innateNotes.Count > 0)
             {
-                statusMsg += $"\n• Already in deck from earlier tabs: {string.Join(" | ", innateNotes)}";
+                bullets.Add(("Already in deck from earlier tabs:", string.Join(" | ", innateNotes)));
             }
 
             var warnings = new List<string>();
@@ -1898,22 +1826,11 @@ namespace MECCG_Deck_Builder
             CheckShortfall("Sideboard Wizard's Ring", draftedSideWizard.Count, reqSideWizard, !hasWizard ? "requires a Wizard in the deck" : null);
             warnings.AddRange(siteTracker.BuildOverlapMessages());
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblRingsStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblRingsStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblRingsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblRingsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblRingsStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbRingsStatus,
+                $"Drafted {resAll.Count} ring card(s) into Resources and {sideAll.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -1927,9 +1844,7 @@ namespace MECCG_Deck_Builder
             int totalRequested = reqResPal + reqSidePal + reqResAllow + reqSideAllow;
             if (totalRequested == 0)
             {
-                _lblPalantiriStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblPalantiriStatus.Text = "No Palantír cards configured (0 drafted).";
+                SetRichPlainStatus(_rtbPalantiriStatus, "No Palantír cards configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -1938,7 +1853,7 @@ namespace MECCG_Deck_Builder
             {
                 if (!silent)
                 {
-                    MessageBox.Show(this, "Please select at least one Role under Role Focus on the Palantíri tab.", "Palantíri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select at least one Role under Role on the Palantíri tab.", "Palantíri", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 return false;
             }
@@ -2132,21 +2047,24 @@ namespace MECCG_Deck_Builder
 
             string resText = resAll.Count > 0 ? FormatCardCountList(resAll) : "(None)";
             string sideText = sideAll.Count > 0 ? FormatCardCountList(sideAll) : "(None)";
-            string palSiteNames = palantirSites.Count > 0 ? string.Join(", ", palantirSites.Select(s => s.Name)) : "(None)";
+            string palSiteNames = palantirSites.Count > 0
+                ? string.Join(", ", palantirSites.Select(s => s.Name).OrderBy(n => n, StringComparer.CurrentCultureIgnoreCase.WithNaturalSort()))
+                : "(None)";
 
             var innateNotes = new List<string>();
             if (innateResAllow.Count > 0) innateNotes.Add($"Resources Allow Use: {FormatInnateAbilitySummary(innateResAllow, resAllowEffective)}");
             if (innateSideAllow.Count > 0) innateNotes.Add($"Sideboard Allow Use: {FormatInnateAbilitySummary(innateSideAllow, sideAllowEffective)}");
 
-            string statusMsg =
-                $"Drafted {resAll.Count} Palantír card(s) into Resources and {sideAll.Count} into Sideboard:\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}\n" +
-                $"• Palantír-playable sites ({palantirSites.Count}): {palSiteNames}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Resources:", resText),
+                ("Sideboard:", sideText),
+                ($"Palantír-playable sites ({palantirSites.Count}):", palSiteNames)
+            };
 
             if (innateNotes.Count > 0)
             {
-                statusMsg += $"\n• Already in deck from earlier tabs: {string.Join(" | ", innateNotes)}";
+                bullets.Add(("Already in deck from earlier tabs:", string.Join(" | ", innateNotes)));
             }
 
             bool hasSage = allDraftedChars.Any(c => CardFilterService.MatchesCardnumCriterion(c, "Skill", "Sage"));
@@ -2172,22 +2090,11 @@ namespace MECCG_Deck_Builder
             }
             warnings.AddRange(siteTracker.BuildOverlapMessages());
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblPalantiriStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblPalantiriStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblPalantiriStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblPalantiriStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbPalantiriStatus,
+                $"Drafted {resAll.Count} Palantír card(s) into Resources and {sideAll.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -2210,9 +2117,7 @@ namespace MECCG_Deck_Builder
 
             if (totalRequested == 0)
             {
-                _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblItemStatus.Text = "No items configured (0 drafted).";
+                SetRichPlainStatus(_rtbItemStatus, "No items configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -2223,7 +2128,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Please select at least one Role under Role Focus on the Items tab.",
+                        "Please select at least one Role under Role on the Items tab.",
                         "Items",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -2395,15 +2300,16 @@ namespace MECCG_Deck_Builder
             var draftedResAll = draftedResMinor.Concat(draftedResMajor).Concat(draftedResGreater).Concat(draftedResSpecial).ToList();
             var draftedSideAll = draftedSideMinor.Concat(draftedSideMajor).Concat(draftedSideGreater).Concat(draftedSideSpecial).ToList();
 
-            string poolText = draftedPoolMinor.Count > 0 ? string.Join(", ", draftedPoolMinor.Select(c => c.Name)) : "(None)";
-            string resText = draftedResAll.Count > 0 ? string.Join(", ", draftedResAll.Select(c => c.Name)) : "(None)";
-            string sideText = draftedSideAll.Count > 0 ? string.Join(", ", draftedSideAll.Select(c => c.Name)) : "(None)";
+            string poolText = draftedPoolMinor.Count > 0 ? FormatCardCountList(draftedPoolMinor) : "(None)";
+            string resText = draftedResAll.Count > 0 ? FormatCardCountList(draftedResAll) : "(None)";
+            string sideText = draftedSideAll.Count > 0 ? FormatCardCountList(draftedSideAll) : "(None)";
 
-            string statusMsg =
-                $"Drafted {draftedPoolMinor.Count} Pool, {draftedResAll.Count} Resources, and {draftedSideAll.Count} Sideboard item(s):\n" +
-                $"• Pool: {poolText}\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Pool:", poolText),
+                ("Resources:", resText),
+                ("Sideboard:", sideText)
+            };
 
             var warnings = new List<string>();
             if (reqPoolMinor > poolChars.Count)
@@ -2433,22 +2339,11 @@ namespace MECCG_Deck_Builder
             CheckShortfall("Sideboard Special Item", draftedSideSpecial.Count, reqSideSpecial);
             warnings.AddRange(siteTracker.BuildOverlapMessages());
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblItemStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblItemStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblItemStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblItemStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblItemStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbItemStatus,
+                $"Drafted {draftedPoolMinor.Count} Pool, {draftedResAll.Count} Resources, and {draftedSideAll.Count} Sideboard item(s):",
+                [bullets],
+                warnings);
             return true;
         }
 
@@ -2459,9 +2354,7 @@ namespace MECCG_Deck_Builder
 
             if (reqRes == 0 && reqSide == 0)
             {
-                _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-                _lblQuestsStatus.Text = "No quests configured (0 drafted).";
+                SetRichPlainStatus(_rtbQuestsStatus, "No quests configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
             }
 
@@ -2470,7 +2363,7 @@ namespace MECCG_Deck_Builder
             {
                 if (!silent)
                 {
-                    MessageBox.Show(this, "Please select at least one Role under Role Focus on the Quests tab.", "Quests", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(this, "Please select at least one Role under Role on the Quests tab.", "Quests", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 return false;
             }
@@ -2967,15 +2860,16 @@ namespace MECCG_Deck_Builder
                   (draftedSideExtras.Count > 0 ? $" (+ prereq/ring: {FormatCardCountList(draftedSideExtras)})" : "")
                 : "(None)";
 
-            string statusMsg =
-                $"Drafted {draftedResQuests.Count} quest(s) into Resources and {draftedSideQuests.Count} into Sideboard:\n" +
-                $"• Resources: {resText}\n" +
-                $"• Sideboard: {sideText}";
+            var bullets = new List<(string Label, string Value)>
+            {
+                ("Resources:", resText),
+                ("Sideboard:", sideText)
+            };
 
             if (!string.IsNullOrEmpty(oneRingDiag) &&
                 !draftedResQuests.Any(q => CardFilterService.EqualsWithDiacriticFallback(q.Name, "Cracks of Doom")))
             {
-                statusMsg += $"\n• Diagnostic: {oneRingDiag}";
+                bullets.Add(("Diagnostic:", oneRingDiag));
             }
 
             var warnings = new List<string>();
@@ -2989,22 +2883,11 @@ namespace MECCG_Deck_Builder
             }
             warnings.AddRange(siteTracker.BuildOverlapMessages());
 
-            if (warnings.Count > 0)
-            {
-                foreach (var w in warnings)
-                {
-                    statusMsg += $"\n⚠ {w}";
-                }
-                _lblQuestsStatus.ForeColor = Color.FromArgb(180, 83, 9);
-                _lblQuestsStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            }
-            else
-            {
-                _lblQuestsStatus.ForeColor = Color.FromArgb(74, 85, 104);
-                _lblQuestsStatus.Font = new Font("Segoe UI", 9.0f, FontStyle.Italic);
-            }
-
-            _lblQuestsStatus.Text = statusMsg;
+            SetRichBulletedStatus(
+                _rtbQuestsStatus,
+                $"Drafted {draftedResQuests.Count} quest(s) into Resources and {draftedSideQuests.Count} into Sideboard:",
+                [bullets],
+                warnings);
             return true;
         }
 
