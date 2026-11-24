@@ -62,7 +62,7 @@
         <tr>
             <td><a href="#tab-regions-sites">1. Regions &amp; Sites</a></td>
             <td>Sites</td>
-            <td>4 Hero Havens, connected region cluster, &amp; adventure sites</td>
+            <td>4 Hero havens, connected region group, &amp; sites</td>
         </tr>
         <tr>
             <td><a href="#tab-starting-company">2. Starting Company</a></td>
@@ -148,7 +148,7 @@
                 <li><span class="lead-in">Checklist Guards:</span> Required checklists (such as <strong>Region Terrains</strong> and <strong>Site Holds</strong> on the <strong>Regions &amp; Sites</strong> tab, or <strong>Role</strong>, <strong>Special Ring Role</strong>, <strong>Creature Race</strong>, and <strong>Keying Filters</strong> on active drafting tabs) cannot be left completely unchecked when cards governed by them are requested.</li>
             </ul>
         </li>
-        <li><strong>Decks Before Council</strong> (1&ndash;4, default 1): Sets the per-site tap capacity across Steps 4&ndash;9 (<strong>Factions</strong>, <strong>Allies</strong>, <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, <strong>Items</strong>, and <strong>Quests</strong> tabs). Each non-Haven site in Sites supports up to <em>N</em> site-tapping cards in Resources (1 per planned deck cycle, since tapped sites untap on deck exhaust), while Havens never tap and have unlimited capacity. Any Pass 2 overflow emits one grouped &#9888; warning per contested site bottleneck (showing a <em>Shared site pool</em> line when earlier tabs share sites with the current tab).</li>
+        <li><strong>Decks Before Council</strong> (1&ndash;4, default 1): Sets the per-site tap capacity across Steps 4&ndash;9 (<strong>Factions</strong>, <strong>Allies</strong>, <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, <strong>Items</strong>, and <strong>Quests</strong> tabs). Each non-haven site in Sites supports up to <em>N</em> site-tapping cards in Resources (1 per planned deck cycle, since tapped sites untap on deck exhaust), while havens never tap and have unlimited capacity. Any Pass 2 overflow emits one grouped &#9888; warning per contested site bottleneck (showing a <em>Shared site pool</em> line when earlier tabs share sites with the current tab).</li>
         <li><strong>Tailor Hazards to current deck</strong> (default unchecked): Switches Steps 11&ndash;12 (<strong>Creatures</strong> and <strong>Hazard Events</strong> tabs) between <em>Unknown Opponent</em> mode (manual keying filters) and <em>Target Current Deck</em> mode (keying against your drafted Sites, Pool, and Resources).</li>
         <li>
             <span class="lead-in">25-Attempt Retry Loop:</span> Clicking <strong>Run Pipeline</strong> clears all five deck sections and executes Steps 1&ndash;12 in sequence up to 25 times:
@@ -175,24 +175,26 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Region</span> &bull; <span class="scope-pill">Site</span>
     </div>
     <p>
-        Establishes the playable Middle-earth geography before any character or resource step runs, drafting all four Hero Havens, a connected region cluster, and eligible adventure sites.
+        Establishes the playable Middle-earth geography before any character or resource step runs, drafting all four Hero havens, a connected region group, and eligible sites.
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><span class="lead-in">Official Attributes:</span> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code> (<code>Haven</code> vs. adventure hold types), <code>Region</code>, <code>Alignment</code>, <code>Name</code>, <code>Set</code>.</li>
-        <li><span class="lead-in">Custom Categories:</span> <code>Adjacent Regions</code> (builds Middle-earth's bidirectional border graph), <code>Region Type</code> (read from Region cards and propagated to Site cards).</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary</code> (<code>Region</code>, <code>Site</code>), <code>Site</code> (<code>Haven</code> vs. site hold types), <code>Region</code>, <code>Alignment</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Custom Categories:</span> <code>Adjacent Regions</code> (used to build a map of the regions), <code>Region Type</code>.</li>
     </ul>
     <h4>Coded Rules &amp; Selection Logic</h4>
     <ul>
-        <li><span class="lead-in">Automatic Hero Havens:</span> Always drafts <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, and <em>Edhellond</em>, preferring <code>Hero</code> &rarr; <code>Neutral</code> printings.</li>
-        <li><span class="lead-in">Terrain Filtering &amp; Seed Fallback:</span> Only regions whose <code>Region Type</code> matches a checked item in <strong>Region Terrains</strong> are eligible. If a named <strong>Seed Region</strong> is excluded by checked terrains, BFS finds the shortest border path to the nearest allowed region and starts there with a &#9888; notice.</li>
-        <li><span class="lead-in">Cluster Search</span> (50 trials for <strong>Random</strong> / 25 for a named seed): Expands a contiguous border-to-border region cluster up to <strong>Region Count</strong> (4&ndash;12, default 5). Scores clusters highest when they hit <strong>Region Count</strong> and contain at least 1 and at most <strong>Max Adventure Sites</strong> (1&ndash;50, default 12) matching adventure sites.</li>
-        <li><span class="lead-in">Adventure Site Filtering &amp; Cap:</span> Drafts non-Haven sites inside the chosen cluster whose <code>Site</code> hold is checked in <strong>Site Holds</strong> and whose <code>Region Type</code> is checked in <strong>Region Terrains</strong>. If more than <strong>Max Adventure Sites</strong> match, a random subset up to the cap is kept. Duplicate titles in Sites are never added.</li>
+        <li><span class="lead-in">Automatic Hero havens:</span> Always drafts <em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, and <em>Edhellond</em>.</li>
+        <li><span class="lead-in">Terrain &amp; Seed Filtering:</span> Only regions whose <code>Region Type</code> matches a checked item in <strong>Region Terrains</strong> are listed in the <strong>Seed Region</strong> dropdown and eligible for drafting. If an already-selected or profile-loaded <strong>Seed Region</strong> becomes excluded by unchecking its terrain, it remains selected with a &#9888; validation error and disables <strong>Run Pipeline</strong> until its terrain is re-checked or another seed is chosen.</li>
+        <li><span class="lead-in">Region group must contain a haven</span> (unchecked by default): When checked, requires the drafted region group to include at least one Hero haven's region (<em>Rivendell</em>, <em>L&oacute;rien</em>, <em>Grey Havens</em>, or <em>Edhellond</em>) reachable through checked <strong>Region Terrains</strong> within <strong>Region Count</strong> regions (counting both the seed and the haven region). If no haven region matches checked terrains, or if a named <strong>Seed Region</strong> needs more than <strong>Region Count</strong> regions to reach one, <strong>Run Pipeline</strong> is disabled with a &#9888; validation error.</li>
+        <li><span class="lead-in">Region Group Search</span> (50 trials): Builds a region group&mdash;where every region shares a border with at least one other region in the group&mdash;up to <strong>Region Count</strong> (4&ndash;12, default 5). Stops on the first group that hits <strong>Region Count</strong> with 1 to <strong>Max Sites</strong> (1&ndash;50, default 12) matching sites&mdash;or, if every roll exceeds the cap, keeps a random group and trims its sites randomly to <strong>Max Sites</strong>.</li>
+        <li><span class="lead-in">Site Filtering &amp; Cap:</span> Drafts sites inside the chosen region group whose <code>Site</code> hold is checked in <strong>Site Holds</strong> and whose <code>Region Type</code> is checked in <strong>Region Terrains</strong>. If more than <strong>Max Sites</strong> match, a random subset up to the cap is kept. Duplicate titles in Sites are never added.</li>
     </ul>
     <h4>Warnings &amp; Edge Cases</h4>
     <ul>
-        <li>&#9888; <span class="lead-in">Seed adjusted:</span> Triggered if the named seed was excluded by <strong>Region Terrains</strong>.</li>
-        <li>&#9888; <span class="lead-in">Region / Site Shortfall:</span> Triggered if fewer than <strong>Region Count</strong> connected regions match checked terrains, or 0 adventure sites match checked holds inside the cluster.</li>
+        <li>&#9888; <span class="lead-in">Seed terrain mismatch:</span> Triggered when a selected or profile-loaded <strong>Seed Region</strong>'s <code>Region Type</code> is unchecked in <strong>Region Terrains</strong> (disables <strong>Run Pipeline</strong> until resolved).</li>
+        <li>&#9888; <span class="lead-in">Haven unreachable:</span> Triggered when <strong>Region group must contain a haven</strong> is checked and either no Hero haven's region matches <strong>Region Terrains</strong>, or a named <strong>Seed Region</strong> cannot reach an allowed haven region within <strong>Region Count</strong> (disables <strong>Run Pipeline</strong> until resolved).</li>
+        <li>&#9888; <span class="lead-in">Region / Site Shortfall:</span> Triggered if fewer than <strong>Region Count</strong> connected regions match checked terrains, or 0 sites match checked holds inside the region group.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -223,8 +225,8 @@
         <li>
             <span class="lead-in">3-Tier Geographic Priority:</span>
             <ol>
-                <li><span class="lead-in">Tier 1 (Local Region Group):</span> Characters whose <code>Home Region</code>, home site's <code>Region</code>, or <code>Home</code> site/predicate matches the drafted regions in Sites or a Haven located inside those drafted regions.</li>
-                <li><span class="lead-in">Tier 2 (Outside Havens):</span> Characters homed at Havens outside the drafted region cluster.</li>
+                <li><span class="lead-in">Tier 1 (Local Region Group):</span> Characters whose <code>Home Region</code>, home site's <code>Region</code>, or <code>Home</code> site/predicate matches the drafted regions in Sites or a haven located inside those drafted regions.</li>
+                <li><span class="lead-in">Tier 2 (Outside Havens):</span> Characters homed at havens outside the drafted region group.</li>
                 <li><span class="lead-in">Tier 3 (Out-of-Region):</span> Any remaining matching non-Avatar character.</li>
             </ol>
         </li>
@@ -259,16 +261,16 @@
         <li>
             <span class="lead-in">3-Tier Geographic Priority</span> (25 attempts, tightest-row-first on attempt 0):
             <ol>
-                <li><span class="lead-in">Tier 1:</span> Characters homed at drafted local adventure sites or Havens inside the drafted region group.</li>
-                <li><span class="lead-in">Tier 2:</span> Characters homed at Havens outside the drafted region group.</li>
-                <li><span class="lead-in">Tier 3:</span> Remaining Haven-playable characters (or those whose <code>Site Requirement</code> is met in Sites).</li>
+                <li><span class="lead-in">Tier 1:</span> Characters homed at drafted local sites or havens inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 2:</span> Characters homed at havens outside the drafted region group.</li>
+                <li><span class="lead-in">Tier 3:</span> Remaining haven-playable characters (or those whose <code>Site Requirement</code> is met in Sites).</li>
             </ol>
         </li>
         <li><span class="lead-in">Uniqueness &amp; Exclusion:</span> Never drafts a character title already in Pool, and enforces <code>Unique</code> = 1 across non-Avatar recruits.</li>
     </ul>
     <h4>Warnings</h4>
     <ul>
-        <li>&#9888; Emits a non-blocking notice if <em>Saruman</em> is drafted without <em>Isengard</em> in Sites, or <em>Radagast</em> without <em>Rhosgobel</em> (both still deploy normally at any Haven).</li>
+        <li>&#9888; Emits a non-blocking notice if <em>Saruman</em> is drafted without <em>Isengard</em> in Sites, or <em>Radagast</em> without <em>Rhosgobel</em> (both still deploy normally at any haven).</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -300,12 +302,12 @@
             <ol>
                 <li><span class="lead-in">Tier 1:</span> Matches a drafted character's <code>Faction Bonus</code> tag (ignoring wildcards <code>*</code> and <code>All</code>) <em>or</em> matches a drafted character via <code>Specific</code> (such as <em>Army of the Dead</em> with <em>Aragorn II</em>), tie-broken by Pool &gt; Resources &gt; Sideboard.</li>
                 <li><span class="lead-in">Tier 2:</span> Matches a drafted character's <code>Race</code> (Pool &gt; Resources &gt; Sideboard).</li>
-                <li><span class="lead-in">Tier 3:</span> Playable at a local adventure site or local Haven inside the drafted region group.</li>
-                <li><span class="lead-in">Tier 4:</span> Remaining eligible factions (such as those at outside Havens).</li>
+                <li><span class="lead-in">Tier 3:</span> Playable at a local site or local haven inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 4:</span> Remaining eligible factions (such as those at outside havens).</li>
             </ol>
         </li>
         <li><span class="lead-in">Auto-Drafting &amp; Copy Limits:</span> Drafts Resources before Sideboard (variety-first, enforcing <code>Unique</code> = 1 / non-unique = 3 combined). Missing <code>Prerequisite</code> cards (e.g., <em>Paths of the Dead</em>) are automatically added to the same section if capacity allows.</li>
-        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 enforces <strong>Decks Before Council</strong> tap capacity across non-Haven sites in Sites (1 Resources play per cycle; Havens unlimited), factoring in any site-tapping <code>Prerequisite</code> cards. If no within-capacity faction exists, Pass 2 falls back and logs a &#9888; warning.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 enforces <strong>Decks Before Council</strong> tap capacity across non-haven sites in Sites (1 Resources play per cycle; havens unlimited), factoring in any site-tapping <code>Prerequisite</code> cards. If no within-capacity faction exists, Pass 2 falls back and logs a &#9888; warning.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -322,7 +324,7 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Resource (Ally)</span>
     </div>
     <p>
-        Drafts Hero-playable allies playable at drafted Sites or Havens, prioritizing local territory and preventing 1-deck site bottlenecks with Resources Factions.
+        Drafts Hero-playable allies playable at drafted sites or havens, prioritizing local territory and preventing 1-deck site bottlenecks with Resources Factions.
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
@@ -335,11 +337,11 @@
         <li>
             <span class="lead-in">2-Tier Geographic Priority:</span>
             <ol>
-                <li><span class="lead-in">Tier 1:</span> Playable at local adventure sites or local Havens inside the drafted region group.</li>
-                <li><span class="lead-in">Tier 2:</span> Playable at Havens outside the drafted region group.</li>
+                <li><span class="lead-in">Tier 1:</span> Playable at local sites or local havens inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 2:</span> Playable at havens outside the drafted region group.</li>
             </ol>
         </li>
-        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 uses capacitated bipartite matching across all site-tapping cards already in Resources (allowing up to <strong>Decks Before Council</strong> cards per non-Haven site in Sites, and unlimited plays at Havens). If no within-capacity ally exists, Pass 2 falls back to an over-capacity ally and logs a grouped &#9888; warning naming the contested site(s) and blocking card(s).</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 uses capacitated bipartite matching across all site-tapping cards already in Resources (allowing up to <strong>Decks Before Council</strong> cards per non-haven site in Sites, and unlimited plays at havens). If no within-capacity ally exists, Pass 2 falls back to an over-capacity ally and logs a grouped &#9888; warning naming the contested site(s) and blocking card(s).</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -367,11 +369,11 @@
     </ul>
     <h4>Coded Rules &amp; Cross-Tab Interactions</h4>
     <ul>
-        <li><span class="lead-in"><code>GoldRing = yes</code> Site Gate:</span> Gold Rings, Ring Tests, <em>The One Ring</em>, Dwarven Rings, Magic Rings, and Lesser Rings require at least one <code>GoldRing = yes</code> site in Sites. If none exists, those slots are skipped with a &#9888; warning. (<em>Wizard's Ring</em> only requires a Haven via <code>Site Requirement</code> plus a <code>Wizard</code> in the deck.)</li>
+        <li><span class="lead-in"><code>GoldRing = yes</code> Site Gate:</span> Gold Rings, Ring Tests, <em>The One Ring</em>, Dwarven Rings, Magic Rings, and Lesser Rings require at least one <code>GoldRing = yes</code> site in Sites. If none exists, those slots are skipped with a &#9888; warning. (<em>Wizard's Ring</em> only requires a haven via <code>Site Requirement</code> plus a <code>Wizard</code> in the deck.)</li>
         <li><span class="lead-in">2d6 Roll-Table Scoring:</span> When any Special Ring (One, Dwarven, or Magic) is requested, Gold Rings are scored by parsing their printed 2d6 outcomes in <code>Text</code> (<code>5 &times; One Ring ways + 2 &times; Dwarven Ring ways + 1 &times; Magic/Spirit Ring ways</code>) and drafted playset-first. Otherwise, Gold Rings draft variety-first.</li>
         <li><span class="lead-in">Total Test Counting &amp; <em>Ringlore</em> Exclusion:</span> The <strong>Allow Ring Test</strong> and <strong>Aid Ring Test</strong> spinners represent <em>totals</em>. Cards already drafted in earlier tabs (such as <em>Gandalf</em> for <code>Gold Ring: Allow Test</code>, counted at most once per unique title per section) are counted first before drafting additional test cards, and <strong>Aid Ring Test</strong> drafts <em>Scroll of Isildur</em> directly here ahead of the <strong>Items</strong> tab. If <em>The One Ring</em> is requested without other tested Special Rings in that section, testers tagged <code>Gold Ring: Exclude One Ring</code> (<em>Ringlore</em>) are excluded; otherwise they are ranked behind unrestricted testers.</li>
         <li><span class="lead-in">Special Ring Guards:</span> <em>The One Ring</em> is capped at &le; 1 combined (Resources + Sideboard). Dwarven Rings do <em>not</em> enforce <code>Target Species: Dwarf</code> (any character can bear them). Non-One Special Rings must pass checked tags in <strong>Special Ring Role</strong>. All cards check <code>Region Requirement</code>, <code>Site Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code>, and <code>Skill</code>/<code>Race</code> locks.</li>
-        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Resources Gold Rings and site-tapping <strong>Aid Ring Test</strong> items (<em>Scroll of Isildur</em>) run Pass 1 within remaining <strong>Decks Before Council</strong> non-Haven site capacity before Pass 2 fills any shortfall with a grouped &#9888; warning (including a <em>Shared site pool</em> breakdown if earlier steps share sites). Special Rings (which replace Gold Rings on test, or play at a Haven for <em>Wizard's Ring</em>) and Ring Test events do not consume site tap slots.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Resources Gold Rings and site-tapping <strong>Aid Ring Test</strong> items (<em>Scroll of Isildur</em>) run Pass 1 within remaining <strong>Decks Before Council</strong> non-haven site capacity before Pass 2 fills any shortfall with a grouped &#9888; warning (including a <em>Shared site pool</em> breakdown if earlier steps share sites). Special Rings (which replace Gold Rings on test, or play at a haven for <em>Wizard's Ring</em>) and Ring Test events do not consume site tap slots.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -400,7 +402,7 @@
         <li><span class="lead-in">Palant&iacute;r Item Playability:</span> A Palant&iacute;r is eligible if its <code>Site Requirement</code> (e.g., <em>Isengard</em>, <em>Minas Tirith</em>, <em>The White Towers</em>) matches Sites, or&mdash;when no <code>Site Requirement</code> is tagged&mdash;if Sites contains a location with <code>GreaterItem = yes</code> or <code>Palantiri = yes</code> (such as <em>Lossadan Cairn</em>, respecting <code>Hoard</code>).</li>
         <li><span class="lead-in">Item Guards:</span> Enforces checked <strong>Role</strong> tags, <code>Region Requirement</code>, <code>Specific</code>, existing <code>Prerequisite</code>, <code>Skill</code>, and <code>Target Species</code> (<em>Palant&iacute;r of Elostirion</em> requires an <code>Elf</code> or <code>Wizard</code> in the deck).</li>
         <li><span class="lead-in">Total Allow Palant&iacute;r Use Counting:</span> Counts existing <code>Special Ability: Palant&iacute;r: Allow Use</code> cards in Resources / Sideboard (such as <em>Saruman</em>, counted once per unique title) before drafting <em>Align Palant&iacute;r</em> or <em>Use Palant&iacute;r</em> (which require a <code>Sage</code>).</li>
-        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Running ahead of <strong>Items</strong> gives Palant&iacute;ri priority on scarce <code>GreaterItem</code> / <code>Palantiri</code> site slots. Resources Palant&iacute;r items run Pass 1 within remaining <strong>Decks Before Council</strong> non-Haven site capacity (avoiding collisions with earlier Factions, Allies, or Rings) before Pass 2 falls back with a grouped &#9888; warning.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Running ahead of <strong>Items</strong> gives Palant&iacute;ri priority on scarce <code>GreaterItem</code> / <code>Palantiri</code> site slots. Resources Palant&iacute;r items run Pass 1 within remaining <strong>Decks Before Council</strong> non-haven site capacity (avoiding collisions with earlier Factions, Allies, or Rings) before Pass 2 falls back with a grouped &#9888; warning.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -442,7 +444,7 @@
                 <li><code>Target Species</code> is enforced only for Hero character races (<code>D&uacute;nadan</code>, <code>Dwarf</code>, <code>Elf</code>, <code>Hobbit</code>, <code>Man</code>, <code>Wizard</code>). Creature-targeted tags (such as <code>Orc</code> on <em>Glamdring</em> or <code>Animal; Spider; Undead; Wolf</code> on <em>Star-glass</em>) are ignored here.</li>
             </ul>
         </li>
-        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> For Resources items, Pass 1 runs across all four tiers (<code>Special Item</code> &rarr; <code>Greater Item</code> &rarr; <code>Major Item</code> &rarr; <code>Minor Item</code>) within remaining <strong>Decks Before Council</strong> non-Haven site capacity—automatically preferring items playable at remaining open sites before Pass 2 fills any shortfall with a grouped &#9888; warning. Pool starting Minor Items (deployed at <em>Rivendell</em> before Turn 1) and Sideboard items are unrestricted.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> For Resources items, Pass 1 runs across all four tiers (<code>Special Item</code> &rarr; <code>Greater Item</code> &rarr; <code>Major Item</code> &rarr; <code>Minor Item</code>) within remaining <strong>Decks Before Council</strong> non-haven site capacity&mdash;automatically preferring items playable at remaining open sites before Pass 2 fills any shortfall with a grouped &#9888; warning. Pool starting Minor Items (deployed at <em>Rivendell</em> before Turn 1) and Sideboard items are unrestricted.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -478,7 +480,7 @@
             </ol>
         </li>
         <li><span class="lead-in">Optional One Ring Package</span> (<strong>Auto-draft One Ring package</strong>): When checked and a Quest requires <em>The One Ring</em> (<em>Cracks of Doom</em>, <em>Gollum's Fate</em>) that is not yet in the deck, checks for a <code>GoldRing = yes</code> site in Sites and automatically bundles <em>The One Ring</em>, an optimal Gold Ring (if missing), and an unrestricted <code>Gold Ring: Allow Test</code> card (excluding <code>Gold Ring: Exclude One Ring</code>, and accounting for prior Special Rings consuming single-use <code>Short-event</code> testers).</li>
-        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 checks Quest Items and any site-tapping <code>Prerequisite</code> cards (such as factions or an auto-drafted Gold Ring) against remaining <strong>Decks Before Council</strong> non-Haven site capacity in Resources; if capacity is exhausted, Pass 2 falls back and logs a &#9888; warning.</li>
+        <li><span class="lead-in">Per-Cycle Site-Capacity Matching:</span> Pass 1 checks Quest Items and any site-tapping <code>Prerequisite</code> cards (such as factions or an auto-drafted Gold Ring) against remaining <strong>Decks Before Council</strong> non-haven site capacity in Resources; if capacity is exhausted, Pass 2 falls back and logs a &#9888; warning.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -557,7 +559,7 @@
         <tr>
             <td><span class="lead-in">Region &amp; Site Keying</span></td>
             <td>Creature passes if it is unkeyed, or if <em>any</em> <code>Region Requirement</code> matches a checked terrain (directly or via its Region card's <code>Region Type</code>), or <em>any</em> <code>Site Requirement</code> matches a checked hold (directly or via its Site card's <code>Site</code> hold).</td>
-            <td>Creature passes only if <em>at least one</em> <code>Region Requirement</code> or <code>Site Requirement</code> tag matches a drafted Region, <code>Region Type</code>, or Site/Haven in Sites.</td>
+            <td>Creature passes only if <em>at least one</em> <code>Region Requirement</code> or <code>Site Requirement</code> tag matches a drafted region, <code>Region Type</code>, or site/haven in Sites.</td>
         </tr>
     </table>
     <h4>Warnings</h4>

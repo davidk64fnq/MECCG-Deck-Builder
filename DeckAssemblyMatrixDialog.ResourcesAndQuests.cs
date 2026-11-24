@@ -11,15 +11,15 @@ namespace MECCG_Deck_Builder
     public sealed partial class DeckAssemblyMatrixDialog
     {
         private const string FactionIdleStatusText =
-            "Factions are strictly limited to those playable at Sites/Havens in the drafted Site deck.\n" +
+            "Factions are strictly limited to those playable at sites or havens in the drafted Site deck.\n" +
             "Auto-drafted prerequisite cards (e.g. Paths of the Dead) are added alongside their faction if their own site requirements are met.";
 
         private const string AllyIdleStatusText =
-            "Allies are strictly limited to those playable at Sites/Havens in the drafted Site deck.\n" +
-            "Prioritizes allies playable in the drafted region group before outside Havens.";
+            "Allies are strictly limited to those playable at sites or havens in the drafted Site deck.\n" +
+            "Prioritizes allies playable in the drafted region group before outside havens.";
 
         private const string ItemIdleStatusText =
-            "Minor, Major, Greater, and non-Ring/non-Palantír Special Items are drafted if playable at drafted Sites/Havens.\n" +
+            "Minor, Major, Greater, and non-Ring/non-Palantír Special Items are drafted if playable at drafted sites or havens.\n" +
             "Pool Minor Items (0-2) are drafted first; all items obey Role, Region/Site Requirements, Specific, Prerequisite, and Hero Target Species.";
 
         private const string RingsIdleStatusText =
@@ -31,7 +31,7 @@ namespace MECCG_Deck_Builder
             "Allow Palantír Use counts are totals (including Saruman counted once if already drafted in Resources/Sideboard).";
 
         private const string QuestIdleStatusText =
-            "Drafts Role = Quest cards (events and Quest Special Items) playable at drafted Sites/Havens.\n" +
+            "Drafts Role = Quest cards (events and Quest Special Items) playable at drafted sites or havens.\n" +
             "Drafts missing Prerequisite cards (e.g. Men of Lamedon, Narsil && Reforging) into the same section if capacity permits.";
 
         private const string PureQuestRoleLabel = "Quest (Only)";
@@ -128,7 +128,7 @@ namespace MECCG_Deck_Builder
                 ForeColor = Color.DimGray,
                 UseMnemonic = false,
                 Text =
-                    "Priority Order (among factions playable at drafted Sites/Havens with Specific & Prerequisite requirements met):\n" +
+                    "Priority Order (among factions playable at drafted sites or havens with Specific & Prerequisite requirements met):\n" +
                     "  1. Faction Bonus / Specific Character (Pool -> Resources -> Sideboard)   2. Character Race Match (Pool -> Resources -> Sideboard)\n" +
                     "  3. Local Region Group Sites before Outside Havens                       4. Remaining Eligible Factions"
             };
@@ -139,9 +139,10 @@ namespace MECCG_Deck_Builder
                 lblFactionRulesNote
             ]);
 
-            _rtbFactionStatus = CreateStatusRichTextBox(16, 216, 805, 240, FactionIdleStatusText);
+            GroupBox grpFactionStatus;
+            (grpFactionStatus, _rtbFactionStatus) = CreateStatusGroupBox(16, 212, 810, 250, FactionIdleStatusText);
 
-            tabFactions.Controls.AddRange([grpFactions, _rtbFactionStatus]);
+            tabFactions.Controls.AddRange([grpFactions, grpFactionStatus]);
             return tabFactions;
         }
 
@@ -223,8 +224,8 @@ namespace MECCG_Deck_Builder
                 ForeColor = Color.DimGray,
                 UseMnemonic = false,
                 Text =
-                    "Priority Order (among allies playable at drafted Sites/Havens with Specific & Prerequisite requirements met):\n" +
-                    "  1. Local Region Group Sites (and local Havens)      2. Outside Havens"
+                    "Priority Order (among allies playable at drafted sites or havens with Specific & Prerequisite requirements met):\n" +
+                    "  1. Local Region Group Sites (and local havens)      2. Outside Havens"
             };
 
             grpAllies.Controls.AddRange([
@@ -233,9 +234,10 @@ namespace MECCG_Deck_Builder
                 lblAllyRulesNote
             ]);
 
-            _rtbAllyStatus = CreateStatusRichTextBox(16, 202, 805, 240, AllyIdleStatusText);
+            GroupBox grpAllyStatus;
+            (grpAllyStatus, _rtbAllyStatus) = CreateStatusGroupBox(16, 198, 810, 250, AllyIdleStatusText);
 
-            tabAllies.Controls.AddRange([grpAllies, _rtbAllyStatus]);
+            tabAllies.Controls.AddRange([grpAllies, grpAllyStatus]);
             return tabAllies;
         }
 
@@ -290,7 +292,7 @@ namespace MECCG_Deck_Builder
             (_numResDwarvenRings, _numSideDwarvenRings) = AddRingRow(4, "Dwarven Rings:", 7, 0, 7, 0, "Unique; playable by any character (extra perks for Dwarves).");
             (_numResMagicRings, _numSideMagicRings) = AddRingRow(5, "Magic Rings:", 10, 0, 10, 0, "Unique; playable with a Gold Ring when test indicates Magic Ring.");
             (_numResLesserRings, _numSideLesserRings) = AddRingRow(6, "Lesser Rings:", 6, 0, 6, 0, "Non-unique (up to 3 copies); playable with any Gold Ring test result.");
-            (_numResWizardsRing, _numSideWizardsRing) = AddRingRow(7, "Wizard's Ring:", 3, 0, 3, 0, "Wizard only, playable at a Haven (requires a Wizard in the deck).");
+            (_numResWizardsRing, _numSideWizardsRing) = AddRingRow(7, "Wizard's Ring:", 3, 0, 3, 0, "Wizard only, playable at a haven (requires a Wizard in the deck).");
 
             var grpRingRoles = new GroupBox
             {
@@ -330,9 +332,10 @@ namespace MECCG_Deck_Builder
 
             grpRingRoles.Controls.AddRange([_clbRingRoles, btnAllRingRoles, btnClearRingRoles]);
 
-            _rtbRingsStatus = CreateStatusRichTextBox(16, 326, 495, 330, RingsIdleStatusText);
+            GroupBox grpRingsStatus;
+            (grpRingsStatus, _rtbRingsStatus) = CreateStatusGroupBox(16, 326, 495, 336, RingsIdleStatusText);
 
-            tabRings.Controls.AddRange([grpRings, grpRingRoles, _rtbRingsStatus]);
+            tabRings.Controls.AddRange([grpRings, grpRingRoles, grpRingsStatus]);
             return tabRings;
         }
 
@@ -420,9 +423,10 @@ namespace MECCG_Deck_Builder
 
             grpPalantirRoles.Controls.AddRange([_clbPalantirRoles, btnAllPalRoles, btnClearPalRoles]);
 
-            _rtbPalantiriStatus = CreateStatusRichTextBox(16, 250, 805, 300, PalantirIdleStatusText);
+            GroupBox grpPalantiriStatus;
+            (grpPalantiriStatus, _rtbPalantiriStatus) = CreateStatusGroupBox(16, 246, 809, 310, PalantirIdleStatusText);
 
-            tabPalantiri.Controls.AddRange([grpPalantiri, grpPalantirRoles, _rtbPalantiriStatus]);
+            tabPalantiri.Controls.AddRange([grpPalantiri, grpPalantirRoles, grpPalantiriStatus]);
             return tabPalantiri;
         }
 
@@ -520,9 +524,10 @@ namespace MECCG_Deck_Builder
 
             grpItemRoles.Controls.AddRange([_clbItemRoles, btnAllItemRoles, btnClearItemRoles]);
 
-            _rtbItemStatus = CreateStatusRichTextBox(16, 256, 805, 300, ItemIdleStatusText);
+            GroupBox grpItemStatus;
+            (grpItemStatus, _rtbItemStatus) = CreateStatusGroupBox(16, 252, 809, 310, ItemIdleStatusText);
 
-            tabItems.Controls.AddRange([grpItemCounts, grpItemRoles, _rtbItemStatus]);
+            tabItems.Controls.AddRange([grpItemCounts, grpItemRoles, grpItemStatus]);
             return tabItems;
         }
 
@@ -619,9 +624,10 @@ namespace MECCG_Deck_Builder
 
             grpQuestRoles.Controls.AddRange([_clbQuestRoles, btnAllQuestRoles, btnClearQuestRoles]);
 
-            _rtbQuestsStatus = CreateStatusRichTextBox(16, 250, 805, 300, QuestIdleStatusText);
+            GroupBox grpQuestsStatus;
+            (grpQuestsStatus, _rtbQuestsStatus) = CreateStatusGroupBox(16, 246, 809, 310, QuestIdleStatusText);
 
-            tabQuests.Controls.AddRange([grpQuests, grpQuestRoles, _rtbQuestsStatus]);
+            tabQuests.Controls.AddRange([grpQuests, grpQuestRoles, grpQuestsStatus]);
             return tabQuests;
         }
 
@@ -844,7 +850,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Factions requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Factions requires sites/havens in the Site deck (run Regions & Sites first).",
                         "Factions",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -1167,7 +1173,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Allies requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Allies requires sites/havens in the Site deck (run Regions & Sites first).",
                         "Allies",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -2381,7 +2387,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Quests requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Quests requires sites/havens in the Site deck (run Regions & Sites first).",
                         "Quests",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -2792,7 +2798,7 @@ namespace MECCG_Deck_Builder
                             {
                                 if (CardFilterService.EqualsWithDiacriticFallback(candidate.Name, "Cracks of Doom"))
                                 {
-                                    oneRingDiag ??= "Cracks of Doom skipped in Pass 1: Gold Ring exceeds non-Haven site capacity for the planned deck cycle(s).";
+                                    oneRingDiag ??= "Cracks of Doom skipped in Pass 1: Gold Ring exceeds non-haven site capacity for the planned deck cycle(s).";
                                 }
                                 continue;
                             }

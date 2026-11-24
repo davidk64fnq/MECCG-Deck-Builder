@@ -62,9 +62,11 @@ namespace MECCG_Deck_Builder
         private ComboBox _cmbSeedRegion;
         private NumericUpDown _numRegionCount;
         private NumericUpDown _numMaxSiteCount;
+        private CheckBox _chkRequireHavenInRegionGroup;
         private CheckedListBox _clbRegionTypes;
         private CheckedListBox _clbSiteTypes;
         private RichTextBox _rtbTheaterStatus;
+        private bool _isUpdatingSeedDropdown;
 
         // --- TAB 3: STARTING COMPANY ---
         private readonly List<CharacterRowControls> _starterRows = [];
@@ -206,7 +208,7 @@ namespace MECCG_Deck_Builder
             ClientSize = new Size(1056, 676);
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
-            MinimizeBox = false;
+            MinimizeBox = true;
             StartPosition = FormStartPosition.CenterScreen;
             Font = new Font("Segoe UI", 9.0f);
 
@@ -332,8 +334,16 @@ namespace MECCG_Deck_Builder
             _tabInfo["Creatures"] = new(RunCreaturesDraft, _rtbCreaturesStatus);
             _tabInfo["Hazard Events"] = new(RunHazardEventsDraft, _rtbHazardEventsStatus);
 
+            var pnlTopBorder = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 1,
+                BackColor = Color.FromArgb(203, 213, 224)
+            };
+
             Controls.Add(_pnlPageHost);
             Controls.Add(_pnlSidebar);
+            Controls.Add(pnlTopBorder);
             SelectPage("General Settings");
 
             VisibleChanged += (s, e) =>
@@ -376,7 +386,7 @@ namespace MECCG_Deck_Builder
             var grpGeneral = new GroupBox
             {
                 Text = "Target Deck Sizing && Workbench Profiles",
-                Location = new Point(16, 10),
+                Location = new Point(16, 16),
                 Size = new Size(810, 220)
             };
 
@@ -452,12 +462,12 @@ namespace MECCG_Deck_Builder
             _toolTip.SetToolTip(
                 _numDecksBeforeCouncil,
                 "Planned deck cycles before calling the Free Council.\n" +
-                "Each non-Haven site can be tapped once per deck cycle (1-4) across Resources Factions, Allies, Items, Gold Rings, Palantíri, and Quest Items.\n" +
+                "Each non-haven site can be tapped once per deck cycle (1-4) across Resources Factions, Allies, Items, Gold Rings, Palantíri, and Quest Items.\n" +
                 "Havens never tap and have unlimited capacity.");
 
             var lblDecksHint = new Label
             {
-                Text = "deck cycle(s) planned (non-Haven sites allow 1 Resources tap per cycle; Havens never tap).",
+                Text = "deck cycle(s) planned (non-haven sites allow 1 Resources tap per cycle; havens never tap).",
                 Location = new Point(225, 120),
                 Size = new Size(575, 20),
                 ForeColor = Color.DimGray
@@ -525,7 +535,7 @@ namespace MECCG_Deck_Builder
             var grpPipeline = new GroupBox
             {
                 Text = "Deck Assembly Pipeline && Session Snapshots",
-                Location = new Point(16, 236),
+                Location = new Point(16, 242),
                 Size = new Size(810, 138)
             };
 
@@ -587,11 +597,11 @@ namespace MECCG_Deck_Builder
             var grpSummary = new GroupBox
             {
                 Text = "Live Deck Composition Status",
-                Location = new Point(16, 380),
-                Size = new Size(810, 278)
+                Location = new Point(16, 386),
+                Size = new Size(810, 186)
             };
 
-            _rtbDeckSummary = CreateStatusRichTextBox(16, 22, 778, 248);
+            _rtbDeckSummary = CreateStatusRichTextBox(16, 30, 778, 146);
             grpSummary.Controls.Add(_rtbDeckSummary);
 
             tabGeneral.Controls.AddRange([grpGeneral, grpPipeline, grpSummary]);
@@ -729,7 +739,6 @@ namespace MECCG_Deck_Builder
             int sideStandardCreatures = _deck.Sideboard.Count(IsStandardCreatureCard);
             int hazDualCreatures = _deck.Hazards.Count(IsDualModeNonNazgulCreature);
             int sideDualCreatures = _deck.Sideboard.Count(IsDualModeNonNazgulCreature);
-            int hazCreatureEquiv = hazStandardCreatures + ((hazNazgul + hazDualCreatures) / 2);
 
             if (totalResChars == 0 && totalSideChars == 0 &&
                 resFactions == 0 && sideFactions == 0 &&
@@ -747,6 +756,9 @@ namespace MECCG_Deck_Builder
                 ValidateWorkbenchReadiness();
             }
 
+            static string Plural(int count, string singular, string plural = null) =>
+                count == 1 ? singular : (plural ?? $"{singular}s");
+
             int poolChars = _deck.Pool.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase));
             int poolMind = _deck.Pool.Sum(c => ParseCardMind(c.Mind));
             int nonAvatarCharsInRes = _deck.Resources.Count(c => string.Equals(c.Primary, "Character", StringComparison.OrdinalIgnoreCase) && !IsAvatar(c));
@@ -757,36 +769,36 @@ namespace MECCG_Deck_Builder
             int havensInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase));
             int advSitesInSites = _deck.Sites.Count(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase) && !string.Equals(c.Site, "Haven", StringComparison.OrdinalIgnoreCase));
 
-            string poolItemNote = poolItems > 0 ? $" + {poolItems} item(s)" : "";
-            string avatarResNote = avatarsInRes > 0 ? $" + {avatarsInRes} Avatar(s)" : "";
-            string resFactionNote = resFactions > 0 ? $", {resFactions} faction(s)" : "";
-            string resAllyNote = resAllies > 0 ? (resAllies == 1 ? ", 1 ally" : $", {resAllies} allies") : "";
-            string resItemNote = resItems > 0 ? $", {resItems} item(s)" : "";
-            string resRingNote = resRingCards > 0 ? $", {resRingCards} ring card(s)" : "";
-            string resPalantirNote = resPalantirCards > 0 ? $", {resPalantirCards} palantír card(s)" : "";
-            string resQuestNote = resQuests > 0 ? $", {resQuests} quest(s)" : "";
-            string resEventNote = resEvents > 0 ? $", {resEvents} event(s)" : "";
+            string poolItemNote = poolItems > 0 ? $" + {poolItems} {Plural(poolItems, "item")}" : "";
+            string avatarResNote = avatarsInRes > 0 ? $" + {avatarsInRes} {Plural(avatarsInRes, "Avatar")}" : "";
+            string resFactionNote = resFactions > 0 ? $", {resFactions} {Plural(resFactions, "faction")}" : "";
+            string resAllyNote = resAllies > 0 ? $", {resAllies} {Plural(resAllies, "ally", "allies")}" : "";
+            string resItemNote = resItems > 0 ? $", {resItems} {Plural(resItems, "item")}" : "";
+            string resRingNote = resRingCards > 0 ? $", {resRingCards} {Plural(resRingCards, "ring card")}" : "";
+            string resPalantirNote = resPalantirCards > 0 ? $", {resPalantirCards} {Plural(resPalantirCards, "palantír card")}" : "";
+            string resQuestNote = resQuests > 0 ? $", {resQuests} {Plural(resQuests, "quest")}" : "";
+            string resEventNote = resEvents > 0 ? $", {resEvents} {Plural(resEvents, "event")}" : "";
 
             var hazParts = new List<string>();
-            if (hazStandardCreatures > 0) hazParts.Add($"{hazStandardCreatures} creature(s)");
-            if (hazDualCreatures > 0) hazParts.Add($"{hazDualCreatures} dual(s)");
+            if (hazStandardCreatures > 0) hazParts.Add($"{hazStandardCreatures} {Plural(hazStandardCreatures, "creature")}");
+            if (hazDualCreatures > 0) hazParts.Add($"{hazDualCreatures} {Plural(hazDualCreatures, "dual")}");
             if (hazNazgul > 0) hazParts.Add($"{hazNazgul} Nazgûl");
             if (hazNazgulSupport > 0) hazParts.Add($"{hazNazgulSupport} Nazgûl support");
-            if (hazEvents > 0) hazParts.Add($"{hazEvents} event(s)");
-            string hazDetailNote = hazParts.Count > 0 ? $" ({string.Join(", ", hazParts)}; Equiv: {hazCreatureEquiv}/12 min)" : "";
+            if (hazEvents > 0) hazParts.Add($"{hazEvents} {Plural(hazEvents, "event")}");
+            string hazDetailNote = hazParts.Count > 0 ? $" ({string.Join(", ", hazParts)})" : "";
 
             var sideParts = new List<string>();
-            if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} character(s)");
-            if (avatarsInSideboard > 0) sideParts.Add($"{avatarsInSideboard} Avatar");
-            if (sideFactions > 0) sideParts.Add($"{sideFactions} faction(s)");
-            if (sideAllies > 0) sideParts.Add(sideAllies == 1 ? "1 ally" : $"{sideAllies} allies");
-            if (sideItems > 0) sideParts.Add($"{sideItems} item(s)");
-            if (sideRingCards > 0) sideParts.Add($"{sideRingCards} ring card(s)");
-            if (sidePalantirCards > 0) sideParts.Add($"{sidePalantirCards} palantír card(s)");
-            if (sideQuests > 0) sideParts.Add($"{sideQuests} quest(s)");
-            if (sideAllEvents > 0) sideParts.Add($"{sideAllEvents} event(s)");
-            if (sideStandardCreatures > 0) sideParts.Add($"{sideStandardCreatures} creature(s)");
-            if (sideDualCreatures > 0) sideParts.Add($"{sideDualCreatures} dual(s)");
+            if (nonAvatarCharsInSideboard > 0) sideParts.Add($"{nonAvatarCharsInSideboard} {Plural(nonAvatarCharsInSideboard, "character")}");
+            if (avatarsInSideboard > 0) sideParts.Add($"{avatarsInSideboard} {Plural(avatarsInSideboard, "Avatar")}");
+            if (sideFactions > 0) sideParts.Add($"{sideFactions} {Plural(sideFactions, "faction")}");
+            if (sideAllies > 0) sideParts.Add($"{sideAllies} {Plural(sideAllies, "ally", "allies")}");
+            if (sideItems > 0) sideParts.Add($"{sideItems} {Plural(sideItems, "item")}");
+            if (sideRingCards > 0) sideParts.Add($"{sideRingCards} {Plural(sideRingCards, "ring card")}");
+            if (sidePalantirCards > 0) sideParts.Add($"{sidePalantirCards} {Plural(sidePalantirCards, "palantír card")}");
+            if (sideQuests > 0) sideParts.Add($"{sideQuests} {Plural(sideQuests, "quest")}");
+            if (sideAllEvents > 0) sideParts.Add($"{sideAllEvents} {Plural(sideAllEvents, "event")}");
+            if (sideStandardCreatures > 0) sideParts.Add($"{sideStandardCreatures} {Plural(sideStandardCreatures, "creature")}");
+            if (sideDualCreatures > 0) sideParts.Add($"{sideDualCreatures} {Plural(sideDualCreatures, "dual")}");
             if (sideNazgul > 0) sideParts.Add($"{sideNazgul} Nazgûl");
             if (sideNazgulSupport > 0) sideParts.Add($"{sideNazgulSupport} Nazgûl support");
             string sideDetailNote = sideParts.Count > 0 ? $" ({string.Join(", ", sideParts)})" : "";
@@ -814,33 +826,27 @@ namespace MECCG_Deck_Builder
             int totalCond = poolCond + resCond + sideCond + siteCond;
 
             string totalMpText = totalCond != totalBase ? $"{totalBase}({totalCond})" : $"{totalBase}";
+            string totalMpUnit = (totalBase == 1 && totalCond == 1) ? "MP" : "MPs";
             string poolMpText = poolCond != poolBase ? $"{poolBase}({poolCond})" : $"{poolBase}";
             string resMpText = $"{resBase}({resCond})";
             string sideMpText = sideCond != sideBase ? $"{sideBase}({sideCond})" : $"{sideBase}";
             string siteMpText = siteCond != siteBase ? $"{siteBase}({siteCond})" : $"{siteBase}";
 
-            var titleBullets = new List<(string Label, string Value)>
+            var sectionRows = new List<(string Label, string Value)>
             {
-                ("Deck Title:", $"\"{_deck.Title}\"")
+                ("Pool:", $"{_deck.Pool.Count} {Plural(_deck.Pool.Count, "card")} ({poolChars} {Plural(poolChars, "character")}, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]"),
+                ("Resources:", $"{_deck.Resources.Count} {Plural(_deck.Resources.Count, "card")} ({nonAvatarCharsInRes} {Plural(nonAvatarCharsInRes, "character")}{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote}{resEventNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]"),
+                ("Hazards:", $"{_deck.Hazards.Count} {Plural(_deck.Hazards.Count, "card")}{hazDetailNote}  [Creature equivalent >= 12]"),
+                ("Sideboard:", $"{_deck.Sideboard.Count} {Plural(_deck.Sideboard.Count, "card")}{sideDetailNote}"),
+                ("Sites:", $"{_deck.Sites.Count} {Plural(_deck.Sites.Count, "card")} ({havensInSites} {Plural(havensInSites, "Haven")}, {regionsInSites} {Plural(regionsInSites, "Region")}, {advSitesInSites} {Plural(advSitesInSites, "Site")})")
             };
 
-            var sectionBullets = new List<(string Label, string Value)>
+            var mpRows = new List<(string Label, string Value)>
             {
-                ("Pool:", $"{_deck.Pool.Count} cards ({poolChars} characters, {poolMind} Mind{poolItemNote})  [Limits: <= 20 Mind, <= 2 Minor Items]"),
-                ("Resources:", $"{_deck.Resources.Count} cards ({nonAvatarCharsInRes} characters{avatarResNote}{resFactionNote}{resAllyNote}{resItemNote}{resRingNote}{resPalantirNote}{resQuestNote}{resEventNote})  [Limits: <= 10 non-Avatar, <= 3 Avatars]"),
-                ("Hazards:", $"{_deck.Hazards.Count} cards{hazDetailNote}"),
-                ("Sideboard:", $"{_deck.Sideboard.Count} cards{sideDetailNote}  [Target: {_numSideboardSize.Value}]"),
-                ("Sites:", $"{_deck.Sites.Count} cards ({havensInSites} Havens, {regionsInSites} Regions, {advSitesInSites} Adventure Sites)")
+                ("MP Total:", $"{totalMpText} {totalMpUnit} (Pool: {poolMpText}, Resources: {resMpText}, Sideboard: {sideMpText}{(siteBase != 0 || siteCond != 0 ? $", Sites: {siteMpText}" : "")})")
             };
 
-            var totalsBullets = new List<(string Label, string Value)>
-            {
-                ("Play Deck Status:", $"{_deck.Resources.Count} Resources / {_deck.Hazards.Count} Hazards (Target: {_numPlayDeckSize.Value}/{_numPlayDeckSize.Value})"),
-                ("Sideboard Status:", $"{_deck.Sideboard.Count} / {_numSideboardSize.Value}"),
-                ("MP Total:", $"{totalMpText} MPs (Pool: {poolMpText}, Resources: {resMpText}, Sideboard: {sideMpText}{(siteBase != 0 || siteCond != 0 ? $", Sites: {siteMpText}" : "")})")
-            };
-
-            SetRichBulletedStatus(_rtbDeckSummary, null, [titleBullets, sectionBullets, totalsBullets]);
+            SetRichBulletedStatus(_rtbDeckSummary, null, [sectionRows, mpRows]);
         }
 
         #region TAB1_SESSION_ACTIONS
@@ -1036,6 +1042,7 @@ namespace MECCG_Deck_Builder
                 SeedRegion = _cmbSeedRegion.SelectedItem?.ToString() ?? "Random",
                 RegionCount = (int)_numRegionCount.Value,
                 MaxSiteCount = (int)_numMaxSiteCount.Value,
+                RequireHavenInRegionGroup = _chkRequireHavenInRegionGroup.Checked,
                 SelectedRegionTypes = [.. _clbRegionTypes.CheckedItems.Cast<string>()],
                 SelectedSiteTypes = [.. _clbSiteTypes.CheckedItems.Cast<string>()],
 
@@ -1184,13 +1191,14 @@ namespace MECCG_Deck_Builder
                 _numSideboardSize.Value = config.SideboardSize;
             }
 
-            SetComboSelection(_cmbSeedRegion, config.SeedRegion);
             _numRegionCount.Value = Math.Clamp(config.RegionCount, (int)_numRegionCount.Minimum, (int)_numRegionCount.Maximum);
 
             _numMaxSiteCount.Value = Math.Clamp(config.MaxSiteCount, (int)_numMaxSiteCount.Minimum, (int)_numMaxSiteCount.Maximum);
+            _chkRequireHavenInRegionGroup.Checked = config.RequireHavenInRegionGroup;
 
             SetCheckedItems(_clbRegionTypes, config.SelectedRegionTypes);
             SetCheckedItems(_clbSiteTypes, config.SelectedSiteTypes);
+            PopulateSeedRegionDropdown(config.SeedRegion);
 
             if (config.StarterRows != null)
             {
@@ -1477,8 +1485,34 @@ namespace MECCG_Deck_Builder
                     Color.Firebrick,
                     FontStyle.Bold);
             }
+            else if (IsSeedRegionExcludedByTerrains(out string badSeed, out string seedTerrains))
+            {
+                hasTheaterError = true;
+                string terrainNote = !string.IsNullOrEmpty(seedTerrains)
+                    ? $" ({seedTerrains})"
+                    : " (no Region Type tag)";
+                string fixHint = !string.IsNullOrEmpty(seedTerrains)
+                    ? $"Check {seedTerrains} in Region Terrains or select another Seed Region."
+                    : "Select another Seed Region.";
+                SetRichPlainStatus(
+                    _rtbTheaterStatus,
+                    $"⚠ Seed Region '{badSeed}'{terrainNote} is excluded by Region Terrains.\n{fixHint}",
+                    Color.Firebrick,
+                    FontStyle.Bold);
+            }
+            else if (_chkRequireHavenInRegionGroup.Checked && IsHavenReachabilityError(out string havenErrorMsg))
+            {
+                hasTheaterError = true;
+                SetRichPlainStatus(
+                    _rtbTheaterStatus,
+                    havenErrorMsg,
+                    Color.Firebrick,
+                    FontStyle.Bold);
+            }
             else if (_rtbTheaterStatus.ForeColor == Color.Firebrick &&
-                     _rtbTheaterStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal))
+                     (_rtbTheaterStatus.Text.StartsWith("⚠ At least one Region Terrain", StringComparison.Ordinal) ||
+                      _rtbTheaterStatus.Text.StartsWith("⚠ Seed Region '", StringComparison.Ordinal) ||
+                      _rtbTheaterStatus.Text.StartsWith("⚠ 'Region group must contain a haven'", StringComparison.Ordinal)))
             {
                 SetRichPlainStatus(_rtbTheaterStatus, TheaterIdleStatusText, idleColor, FontStyle.Italic);
             }
@@ -1513,7 +1547,7 @@ namespace MECCG_Deck_Builder
                 SetRichPlainStatus(
                     _rtbRecruitStatus,
                     $"Configured: {companionCount}/10 Resources{wizResText}  |  {reserveCount}/3 Sideboard{wizSideText}.\n" +
-                    "Recruits prioritize: 1) local sites (including local Havens), 2) outside Havens, 3) any Haven-playable character.",
+                    "Recruits prioritize: 1) local sites (including local havens), 2) outside havens, 3) any haven-playable character.",
                     idleColor,
                     FontStyle.Italic);
             }

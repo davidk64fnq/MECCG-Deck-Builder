@@ -13,7 +13,7 @@ namespace MECCG_Deck_Builder
 
         private const string StarterIdleStatusText =
             "Total Mind limit: <= 20.\n" +
-            "Starting characters prioritize: 1) drafted region group (including local Havens), 2) outside Havens, 3) any matching character.";
+            "Starting characters prioritize: 1) drafted region group (including local havens), 2) outside havens, 3) any matching character.";
 
         private const string TheaterIdleStatusText =
             "Configure seed region, region/site counts, and terrain/hold filters, then click Run Pipeline on General Settings.";
@@ -41,7 +41,13 @@ namespace MECCG_Deck_Builder
                 Size = new Size(252, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            _cmbSeedRegion.SelectedIndexChanged += (s, e) => UpdateSeedTooltip();
+            _cmbSeedRegion.SelectedIndexChanged += (s, e) =>
+            {
+                if (_isUpdatingSeedDropdown) return;
+                UpdateSeedTooltip();
+                PopulateSeedRegionDropdown();
+                ValidateWorkbenchReadiness();
+            };
 
             var lblRegCount = new Label { Text = "Region Count:", Location = new Point(12, 59), Size = new Size(134, 20) };
             _numRegionCount = new NumericUpDown
@@ -52,13 +58,14 @@ namespace MECCG_Deck_Builder
                 Maximum = 12,
                 Value = 5
             };
+            _numRegionCount.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
             string regCountTip =
                 "Target number of connected (border-to-border) regions to draft.\n" +
                 "Minimum is 4, allowing most local site-to-site moves within a single turn.";
             _toolTip.SetToolTip(lblRegCount, regCountTip);
             _toolTip.SetToolTip(_numRegionCount, regCountTip);
 
-            var lblMaxSites = new Label { Text = "Max Adventure Sites:", Location = new Point(12, 91), Size = new Size(134, 20) };
+            var lblMaxSites = new Label { Text = "Max Sites:", Location = new Point(12, 91), Size = new Size(134, 20) };
             _numMaxSiteCount = new NumericUpDown
             {
                 Location = new Point(150, 88),
@@ -68,27 +75,42 @@ namespace MECCG_Deck_Builder
                 Value = 12
             };
             string maxSitesTip =
-                "Maximum number of matching adventure sites (non-Haven sites) to draft.\n" +
+                "Maximum number of matching sites (excluding the 4 havens) to draft.\n" +
                 "Prefers a connected region group within Max; if all attempts exceed Max, keeps a random subset up to Max.";
             _toolTip.SetToolTip(lblMaxSites, maxSitesTip);
             _toolTip.SetToolTip(_numMaxSiteCount, maxSitesTip);
 
+            _chkRequireHavenInRegionGroup = new CheckBox
+            {
+                Text = "Region group must contain a haven",
+                Location = new Point(12, 120),
+                Size = new Size(390, 22),
+                Checked = false
+            };
+            _chkRequireHavenInRegionGroup.CheckedChanged += (s, e) => ValidateWorkbenchReadiness();
+            _toolTip.SetToolTip(
+                _chkRequireHavenInRegionGroup,
+                "When checked, the drafted region group must include at least one Hero haven's region\n" +
+                "(Rivendell, Lórien, Grey Havens, or Edhellond) reachable through checked Region Terrains within Region Count.\n" +
+                "Useful if you prefer Region Movement over Starter Movement to reach havens.");
+
             var lblTheaterRulesNote = new Label
             {
-                Location = new Point(12, 126),
-                Size = new Size(390, 86),
+                Location = new Point(12, 148),
+                Size = new Size(390, 74),
                 ForeColor = Color.DimGray,
                 UseMnemonic = false,
                 Text =
                     "Automatic Site Deck Rules:\n" +
-                    "• Always drafts all 4 Havens (Rivendell, Lórien, Grey Havens, Edhellond).\n" +
-                    "• Starting Company & Recruits prioritize these regions, sites, & Havens."
+                    "• Always drafts all 4 havens (Rivendell, Lórien, Grey Havens, Edhellond).\n" +
+                    "• Starting Company & Recruits prioritize these regions, sites, & havens."
             };
 
             grpDraftOpts.Controls.AddRange([
                 lblSeed, _cmbSeedRegion,
                 lblRegCount, _numRegionCount,
                 lblMaxSites, _numMaxSiteCount,
+                _chkRequireHavenInRegionGroup,
                 lblTheaterRulesNote
             ]);
 
@@ -114,10 +136,20 @@ namespace MECCG_Deck_Builder
             };
             _clbRegionTypes.Items.AddRange(["Wilderness", "Border-land", "Free-domain", "Shadow-land", "Dark-domain", "Coastal Sea"]);
             SetAllChecked(_clbRegionTypes, true);
-            _clbRegionTypes.ItemCheck += (s, e) => BeginInvoke(ValidateWorkbenchReadiness);
+            _clbRegionTypes.ItemCheck += (s, e) =>
+            {
+                if (IsHandleCreated)
+                {
+                    BeginInvoke(() =>
+                    {
+                        PopulateSeedRegionDropdown();
+                        ValidateWorkbenchReadiness();
+                    });
+                }
+            };
             _toolTip.SetToolTip(
                 _clbRegionTypes,
-                "Only regions with a checked terrain type will be drafted.\n" +
+                "Only regions with a checked terrain type are listed in Seed Region and eligible for drafting.\n" +
                 "All terrains are checked by default; uncheck any terrain you wish to avoid.");
 
             var lblSiteTypes = new Label
@@ -138,15 +170,16 @@ namespace MECCG_Deck_Builder
             _clbSiteTypes.ItemCheck += (s, e) => BeginInvoke(ValidateWorkbenchReadiness);
             _toolTip.SetToolTip(
                 _clbSiteTypes,
-                "Only adventure sites with a checked hold type will be drafted\n" +
-                "(all 4 Havens are always included automatically).\n" +
+                "Only sites with a checked hold type will be drafted\n" +
+                "(all 4 havens are always included automatically).\n" +
                 "Unchecking Free-hold/Border-hold will limit available recruit Home sites.");
 
             grpFilters.Controls.AddRange([lblRegTypes, _clbRegionTypes, lblSiteTypes, _clbSiteTypes]);
 
-            _rtbTheaterStatus = CreateStatusRichTextBox(16, 268, 805, 220, TheaterIdleStatusText);
+            GroupBox grpTheaterStatus;
+            (grpTheaterStatus, _rtbTheaterStatus) = CreateStatusGroupBox(16, 260, 809, 230, TheaterIdleStatusText);
 
-            tabTheater.Controls.AddRange([grpDraftOpts, grpFilters, _rtbTheaterStatus]);
+            tabTheater.Controls.AddRange([grpDraftOpts, grpFilters, grpTheaterStatus]);
             return tabTheater;
         }
 
@@ -160,8 +193,9 @@ namespace MECCG_Deck_Builder
                 row.TxtMind.Text = ">=1";
             }
 
-            _rtbStarterStatus = CreateStatusRichTextBox(16, 198, 790, 180, StarterIdleStatusText);
-            tabStarter.Controls.Add(_rtbStarterStatus);
+            GroupBox grpStarterStatus;
+            (grpStarterStatus, _rtbStarterStatus) = CreateStatusGroupBox(16, 192, 810, 196, StarterIdleStatusText);
+            tabStarter.Controls.Add(grpStarterStatus);
 
             return tabStarter;
         }
@@ -270,8 +304,9 @@ namespace MECCG_Deck_Builder
 
             BuildCharacterGrid(tabRecruits, _reserveRows, 3, 430, 24, ValidateWorkbenchReadiness);
 
-            _rtbRecruitStatus = CreateStatusRichTextBox(16, 514, 810, 140);
-            tabRecruits.Controls.Add(_rtbRecruitStatus);
+            GroupBox grpRecruitStatus;
+            (grpRecruitStatus, _rtbRecruitStatus) = CreateStatusGroupBox(16, 510, 810, 152);
+            tabRecruits.Controls.Add(grpRecruitStatus);
 
             return tabRecruits;
         }
@@ -343,29 +378,247 @@ namespace MECCG_Deck_Builder
             _toolTip.SetToolTip(_cmbSeedRegion, tip);
         }
 
-        private void PopulateSeedRegionDropdown()
+        private void PopulateSeedRegionDropdown(string preferredSelection = null)
         {
-            string prev = _cmbSeedRegion.SelectedItem?.ToString() ?? "Random";
-            _cmbSeedRegion.BeginUpdate();
-            _cmbSeedRegion.Items.Clear();
-            _cmbSeedRegion.Items.Add("Random");
-
-            var activeSets = _getActiveSets();
-            var allRegions = _catalog.Cards
-                .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
-                            (activeSets.Count == 0 || activeSets.Contains(c.Set)))
-                .Select(c => c.Name.Trim())
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .OrderBy(r => r, StringComparer.OrdinalIgnoreCase);
-
-            foreach (var reg in allRegions)
+            if (_isUpdatingSeedDropdown) return;
+            _isUpdatingSeedDropdown = true;
+            try
             {
-                _cmbSeedRegion.Items.Add(reg);
+                string prev = preferredSelection ?? _cmbSeedRegion.SelectedItem?.ToString() ?? "Random";
+                var activeSets = _getActiveSets();
+                var checkedTerrains = _clbRegionTypes.CheckedItems.Cast<string>().ToList();
+
+                var allActiveRegions = _catalog.Cards
+                    .Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
+                                (activeSets.Count == 0 || activeSets.Contains(c.Set)))
+                    .GroupBy(c => c.Name.Trim(), StringComparer.OrdinalIgnoreCase)
+                    .Select(g => g.First())
+                    .ToList();
+
+                var listedRegions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var regCard in allActiveRegions)
+                {
+                    var rTypes = DeckGenerationService.GetRegionTypesForCard(regCard, _catalog.Cards, _filterService);
+                    if (rTypes.Any(rt => checkedTerrains.Any(ct => CardFilterService.EqualsWithDiacriticFallback(rt, ct))))
+                    {
+                        listedRegions.Add(regCard.Name.Trim());
+                    }
+                }
+
+                // Hybrid safety net: keep an already-selected/loaded active region selectable so validation can warn about it
+                if (!string.IsNullOrWhiteSpace(prev) &&
+                    !string.Equals(prev, "Random", StringComparison.OrdinalIgnoreCase) &&
+                    allActiveRegions.Any(r => CardFilterService.EqualsWithDiacriticFallback(r.Name.Trim(), prev)))
+                {
+                    listedRegions.Add(prev);
+                }
+
+                _cmbSeedRegion.BeginUpdate();
+                _cmbSeedRegion.Items.Clear();
+                _cmbSeedRegion.Items.Add("Random");
+
+                foreach (var reg in listedRegions.OrderBy(r => r, StringComparer.OrdinalIgnoreCase))
+                {
+                    _cmbSeedRegion.Items.Add(reg);
+                }
+
+                int idx = _cmbSeedRegion.FindStringExact(prev);
+                _cmbSeedRegion.SelectedIndex = idx >= 0 ? idx : 0;
+                _cmbSeedRegion.EndUpdate();
+            }
+            finally
+            {
+                _isUpdatingSeedDropdown = false;
+            }
+        }
+
+        private bool IsSeedRegionExcludedByTerrains(out string seedName, out string seedTerrainsText)
+        {
+            seedName = _cmbSeedRegion?.SelectedItem?.ToString() ?? "Random";
+            seedTerrainsText = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(seedName) ||
+                string.Equals(seedName, "Random", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
             }
 
-            int idx = _cmbSeedRegion.FindStringExact(prev);
-            _cmbSeedRegion.SelectedIndex = idx >= 0 ? idx : 0;
-            _cmbSeedRegion.EndUpdate();
+            string targetSeed = seedName;
+            var checkedTerrains = _clbRegionTypes.CheckedItems.Cast<string>().ToList();
+            if (checkedTerrains.Count == 0) return false;
+
+            var activeSets = _getActiveSets();
+            var regCard = _catalog.Cards.FirstOrDefault(c =>
+                string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase) &&
+                (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                CardFilterService.EqualsWithDiacriticFallback(c.Name, targetSeed));
+
+            if (regCard == null) return false;
+
+            var rTypes = DeckGenerationService.GetRegionTypesForCard(regCard, _catalog.Cards, _filterService);
+            if (rTypes.Count > 0)
+            {
+                seedTerrainsText = string.Join(", ", rTypes);
+            }
+
+            bool isAllowed = rTypes.Any(rt =>
+                checkedTerrains.Any(ct => CardFilterService.EqualsWithDiacriticFallback(rt, ct)));
+
+            return !isAllowed;
+        }
+
+        private Dictionary<string, string> GetHeroHavenRegions(IReadOnlyList<Card> allCards, ISet<string> activeSets)
+        {
+            var havenRegionByHavenName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var havenName in HeroHavens)
+            {
+                var havenCard = FindHeroPreferredCard(allCards, activeSets, "Site", havenName);
+                if (havenCard != null && !string.IsNullOrWhiteSpace(havenCard.Region))
+                {
+                    havenRegionByHavenName[havenCard.Name] = havenCard.Region.Trim();
+                }
+            }
+            return havenRegionByHavenName;
+        }
+
+        private static List<string> FindShortestAllowedRegionPath(
+            Dictionary<string, HashSet<string>> graph,
+            string startRegion,
+            IEnumerable<string> targetRegions,
+            HashSet<string> allowedRegions)
+        {
+            var targetSet = new HashSet<string>(targetRegions ?? [], StringComparer.OrdinalIgnoreCase);
+            if (string.IsNullOrWhiteSpace(startRegion) || targetSet.Count == 0 ||
+                allowedRegions == null || !allowedRegions.Contains(startRegion))
+            {
+                return [];
+            }
+
+            if (targetSet.Contains(startRegion))
+            {
+                return [startRegion];
+            }
+
+            var queue = new Queue<string>();
+            var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var parent = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            queue.Enqueue(startRegion);
+            visited.Add(startRegion);
+
+            string destination = null;
+            while (queue.Count > 0)
+            {
+                string current = queue.Dequeue();
+                if (targetSet.Contains(current))
+                {
+                    destination = current;
+                    break;
+                }
+
+                if (graph.TryGetValue(current, out var neighbors))
+                {
+                    foreach (var neighbor in neighbors)
+                    {
+                        if (allowedRegions.Contains(neighbor) && visited.Add(neighbor))
+                        {
+                            parent[neighbor] = current;
+                            queue.Enqueue(neighbor);
+                        }
+                    }
+                }
+            }
+
+            if (destination == null) return [];
+
+            var path = new List<string> { destination };
+            string curr = destination;
+            while (parent.TryGetValue(curr, out var p))
+            {
+                path.Add(p);
+                curr = p;
+                if (string.Equals(curr, startRegion, StringComparison.OrdinalIgnoreCase)) break;
+            }
+            path.Reverse();
+            return path;
+        }
+
+        private bool IsHavenReachabilityError(out string errorMessage)
+        {
+            errorMessage = string.Empty;
+            var checkedTerrains = _clbRegionTypes.CheckedItems.Cast<string>().ToList();
+            if (checkedTerrains.Count == 0) return false;
+
+            var allCards = _catalog.Cards;
+            var activeSets = _getActiveSets();
+            string terrainFilter = string.Join("; ", checkedTerrains);
+
+            var allowedRegions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in allCards.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+            {
+                var rTypes = DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService);
+                if (DeckGenerationService.MatchesRegionTypeFilter(rTypes, terrainFilter))
+                {
+                    allowedRegions.Add(regCard.Name.Trim());
+                }
+            }
+
+            var havenRegionsByHaven = GetHeroHavenRegions(allCards, activeSets);
+            var allowedHavenPairs = havenRegionsByHaven
+                .Where(kvp => allowedRegions.Contains(kvp.Value))
+                .ToList();
+
+            if (allowedHavenPairs.Count == 0)
+            {
+                errorMessage =
+                    "⚠ 'Region group must contain a haven' is checked, but no Hero haven's region matches the checked Region Terrains.\n" +
+                    "Enable a haven's Region Terrain or uncheck the option.";
+                return true;
+            }
+
+            string seedChoice = _cmbSeedRegion?.SelectedItem?.ToString() ?? "Random";
+            if (string.IsNullOrWhiteSpace(seedChoice) ||
+                string.Equals(seedChoice, "Random", StringComparison.OrdinalIgnoreCase) ||
+                !allowedRegions.Contains(seedChoice))
+            {
+                return false;
+            }
+
+            var graph = _filterService.BuildRegionAdjacencyGraph(allCards);
+            int targetRegions = (int)_numRegionCount.Value;
+
+            int bestMinRegions = int.MaxValue;
+            string bestHavenName = null;
+            string bestHavenRegion = null;
+
+            foreach (var (havenName, havenRegion) in allowedHavenPairs)
+            {
+                var path = FindShortestAllowedRegionPath(graph, seedChoice, [havenRegion], allowedRegions);
+                if (path.Count > 0 && path.Count < bestMinRegions)
+                {
+                    bestMinRegions = path.Count;
+                    bestHavenName = havenName;
+                    bestHavenRegion = havenRegion;
+                }
+            }
+
+            if (bestMinRegions == int.MaxValue)
+            {
+                errorMessage =
+                    $"⚠ 'Region group must contain a haven': Seed Region '{seedChoice}' cannot reach any allowed haven region through the checked Region Terrains.\n" +
+                    "Enable connecting Region Terrains, choose another Seed Region, or uncheck the option.";
+                return true;
+            }
+
+            if (bestMinRegions > targetRegions)
+            {
+                errorMessage =
+                    $"⚠ 'Region group must contain a haven': Seed Region '{seedChoice}' needs at least {bestMinRegions} regions to reach {bestHavenName} ({bestHavenRegion}), exceeding Region Count ({targetRegions}).\n" +
+                    $"Increase Region Count to {bestMinRegions}+, choose another Seed Region, or uncheck the option.";
+                return true;
+            }
+
+            return false;
         }
 
         private void WizardSelection_Changed(object sender, EventArgs e)
@@ -525,29 +778,84 @@ namespace MECCG_Deck_Builder
                 return false;
             }
 
-            string terrainAdjustedNote = null;
             if (!isRandomSeed && !allowedRegions.Contains(seedChoice))
             {
-                var pathToAllowed = DeckGenerationService.FindShortestRegionPath(graph, seedChoice, allowedRegions);
-                if (pathToAllowed.Count == 0)
+                if (!silent)
+                {
+                    MessageBox.Show(
+                        this,
+                        $"Selected Seed Region '{seedChoice}' is excluded by the checked Region Terrains.",
+                        "Regions & Sites",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+                }
+                return false;
+            }
+
+            bool requireHaven = _chkRequireHavenInRegionGroup.Checked;
+            HashSet<string> allowedHavenRegions = null;
+            if (requireHaven)
+            {
+                allowedHavenRegions = GetHeroHavenRegions(allCards, activeSets).Values
+                    .Where(r => allowedRegions.Contains(r))
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                if (allowedHavenRegions.Count == 0)
                 {
                     if (!silent)
                     {
                         MessageBox.Show(
                             this,
-                            $"Selected Seed Region '{seedChoice}' and all connected neighbors are excluded by the checked Region Terrains.",
+                            "'Region group must contain a haven' is checked, but no Hero haven's region matches the checked Region Terrains.",
                             "Regions & Sites",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Warning);
                     }
                     return false;
                 }
-                string nearestAllowed = pathToAllowed[^1];
-                terrainAdjustedNote = $"Seed '{seedChoice}' excluded by terrain filter; started from nearest allowed region '{nearestAllowed}'.";
-                seedChoice = nearestAllowed;
+
+                if (isRandomSeed)
+                {
+                    candidateSeeds = [.. candidateSeeds.Where(seed =>
+                    {
+                        var path = FindShortestAllowedRegionPath(graph, seed, allowedHavenRegions, allowedRegions);
+                        return path.Count > 0 && path.Count <= targetRegions;
+                    })];
+
+                    if (candidateSeeds.Count == 0)
+                    {
+                        if (!silent)
+                        {
+                            MessageBox.Show(
+                                this,
+                                $"No active region can reach an allowed haven region within Region Count ({targetRegions}).",
+                                "Regions & Sites",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                        }
+                        return false;
+                    }
+                }
+                else
+                {
+                    var checkPath = FindShortestAllowedRegionPath(graph, seedChoice, allowedHavenRegions, allowedRegions);
+                    if (checkPath.Count == 0 || checkPath.Count > targetRegions)
+                    {
+                        if (!silent)
+                        {
+                            MessageBox.Show(
+                                this,
+                                $"Seed Region '{seedChoice}' cannot reach an allowed haven region within Region Count ({targetRegions}).",
+                                "Regions & Sites",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning);
+                        }
+                        return false;
+                    }
+                }
             }
 
-            int maxAttempts = isRandomSeed ? 50 : 25;
+            const int maxAttempts = 50;
             string bestSeed = seedChoice;
             List<string> bestCluster = [];
             int bestScore = -1;
@@ -560,6 +868,21 @@ namespace MECCG_Deck_Builder
 
                 var trialCluster = new List<string> { trialSeed };
                 ExpandClusterToTarget(graph, trialCluster, targetRegions, allowedRegions);
+
+                if (requireHaven && !trialCluster.Any(r => allowedHavenRegions.Contains(r)))
+                {
+                    var reachablePaths = allowedHavenRegions
+                        .Select(hr => FindShortestAllowedRegionPath(graph, trialSeed, [hr], allowedRegions))
+                        .Where(p => p.Count > 0 && p.Count <= targetRegions)
+                        .ToList();
+
+                    if (reachablePaths.Count > 0)
+                    {
+                        var chosenPath = reachablePaths[Random.Shared.Next(reachablePaths.Count)];
+                        trialCluster = [.. chosenPath];
+                        ExpandClusterToTarget(graph, trialCluster, targetRegions, allowedRegions);
+                    }
+                }
 
                 int matchingSiteCount = allCards
                     .Where(c =>
@@ -579,13 +902,9 @@ namespace MECCG_Deck_Builder
 
                 int regionScore = meetsRegions ? 100000 : trialCluster.Count * 1000;
                 int sitePresenceScore = hasSites ? 10000 : 0;
-                int maxFitScore = withinMaxSites
-                    ? 5000
-                    : (hasSites ? Math.Max(1, 5000 - (matchingSiteCount - maxSites)) : 0);
+                int score = regionScore + sitePresenceScore;
 
-                int score = regionScore + sitePresenceScore + maxFitScore;
-
-                if (score > bestScore)
+                if (score >= bestScore)
                 {
                     bestScore = score;
                     bestSeed = trialSeed;
@@ -671,14 +990,10 @@ namespace MECCG_Deck_Builder
             var bullets = new List<(string Label, string Value)>
             {
                 ("Regions:", regionListStr),
-                ("Adventure Sites:", advSitesStr)
+                ("Sites:", advSitesStr)
             };
 
             var warnings = new List<string>();
-            if (!string.IsNullOrEmpty(terrainAdjustedNote))
-            {
-                warnings.Add(terrainAdjustedNote);
-            }
             if (bestCluster.Count < targetRegions)
             {
                 warnings.Add($"Region Shortfall: Found only {bestCluster.Count} of {targetRegions} connected regions matching checked terrains.");
@@ -690,7 +1005,7 @@ namespace MECCG_Deck_Builder
 
             SetRichBulletedStatus(
                 _rtbTheaterStatus,
-                $"Drafted {draftedSitesAndRegions.Count} cards ({finalHavens} Havens, {finalRegions} Regions, {finalAdvSites} Adventure Sites{capNote}). Seed: {bestSeed}",
+                $"Drafted {draftedSitesAndRegions.Count} cards ({finalHavens} Havens, {finalRegions} Regions, {finalAdvSites} {(finalAdvSites == 1 ? "Site" : "Sites")}{capNote}). Seed: {bestSeed}",
                 [bullets],
                 warnings);
             return true;
@@ -725,7 +1040,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Starting Company requires regions/Havens in the Site deck (run Regions & Sites first).",
+                        "Starting Company requires regions/havens in the Site deck (run Regions & Sites first).",
                         "Starting Company",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -933,7 +1248,7 @@ namespace MECCG_Deck_Builder
 
             var tierParts = new List<string>();
             if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local region(s)");
-            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside Haven(s)");
+            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside haven(s)");
             if (bestT3Count > 0) tierParts.Add($"{bestT3Count} out-of-region");
             string tierNote = (bestT2Count == 0 && bestT3Count == 0)
                 ? " [All from drafted regions]"
@@ -1045,7 +1360,7 @@ namespace MECCG_Deck_Builder
                 {
                     MessageBox.Show(
                         this,
-                        "Wizards & Recruits requires Sites/Havens in the Site deck (run Regions & Sites first).",
+                        "Wizards & Recruits requires sites/havens in the Site deck (run Regions & Sites first).",
                         "Wizards & Recruits",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -1269,7 +1584,7 @@ namespace MECCG_Deck_Builder
 
             var tierParts = new List<string>();
             if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local site(s)");
-            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside Haven(s)");
+            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside haven(s)");
             if (bestT3Count > 0) tierParts.Add($"{bestT3Count} out-of-region");
             string tierNote = rowSpecs.Count > 0
                 ? (bestT2Count == 0 && bestT3Count == 0
@@ -1293,7 +1608,7 @@ namespace MECCG_Deck_Builder
 
                     if (landSite != null && !allSitesInDeck.Any(s => CardFilterService.EqualsWithDiacriticFallback(s.Name, landSite)))
                     {
-                        wizardNotes.Add($"{wizName}'s home site ({landSite}) is not in the Site deck (deploys at a Haven).");
+                        wizardNotes.Add($"{wizName}'s home site ({landSite}) is not in the Site deck (deploys at a haven).");
                     }
                 }
             }

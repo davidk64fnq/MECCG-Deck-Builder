@@ -2300,8 +2300,13 @@ namespace MECCG_Deck_Builder
     section => RefreshMainDeckUI(section));
             }
 
-            _assemblyWorkbench.Show(this);
+            if (_assemblyWorkbench.WindowState == FormWindowState.Minimized)
+            {
+                _assemblyWorkbench.WindowState = FormWindowState.Normal;
+            }
+            _assemblyWorkbench.Show();
             _assemblyWorkbench.BringToFront();
+            _assemblyWorkbench.Activate();
         }
 
         internal void RefreshMainDeckUI(DeckSectionType? targetSection = null)

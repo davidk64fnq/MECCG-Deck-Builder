@@ -143,9 +143,10 @@ namespace MECCG_Deck_Builder
 
             grpResEventRoles.Controls.AddRange([_clbResourceEventRoles, btnAllEventRoles, btnClearEventRoles]);
 
-            _rtbResourceEventsStatus = CreateStatusRichTextBox(16, 320, 805, 336, ResourceEventsIdleStatusText);
+            GroupBox grpResourceEventsStatus;
+            (grpResourceEventsStatus, _rtbResourceEventsStatus) = CreateStatusGroupBox(16, 318, 809, 344, ResourceEventsIdleStatusText);
 
-            tabResourceEvents.Controls.AddRange([grpEnv, grpAutoFill, grpResEventRoles, _rtbResourceEventsStatus]);
+            tabResourceEvents.Controls.AddRange([grpEnv, grpAutoFill, grpResEventRoles, grpResourceEventsStatus]);
             return tabResourceEvents;
         }
 
@@ -339,12 +340,13 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false
             };
 
-            _rtbCreaturesStatus = CreateStatusRichTextBox(16, 318, 475, 342, CreaturesIdleStatusText);
+            GroupBox grpCreaturesStatus;
+            (grpCreaturesStatus, _rtbCreaturesStatus) = CreateStatusGroupBox(16, 316, 475, 346, CreaturesIdleStatusText);
 
             tabCreatures.Controls.AddRange([
                 grpNazgul, grpCreatures,
                 grpCreatureSpecies, grpCreatureKeying, _lblCreatureKeyingNote,
-                _rtbCreaturesStatus
+                grpCreaturesStatus
             ]);
 
             return tabCreatures;
@@ -545,12 +547,13 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false
             };
 
-            _rtbHazardEventsStatus = CreateStatusRichTextBox(16, 322, 475, 338, HazardEventsIdleStatusText);
+            GroupBox grpHazardEventsStatus;
+            (grpHazardEventsStatus, _rtbHazardEventsStatus) = CreateStatusGroupBox(16, 320, 475, 342, HazardEventsIdleStatusText);
 
             tabHazardEvents.Controls.AddRange([
                 grpHazEnv, grpHazAutoFill,
                 grpHazEventRoles, grpHazEventKeying, _lblHazardEventKeyingNote,
-                _rtbHazardEventsStatus
+                grpHazardEventsStatus
             ]);
 
             return tabHazardEvents;

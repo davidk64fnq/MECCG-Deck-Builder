@@ -126,7 +126,7 @@ namespace MECCG_Deck_Builder
                     if (first.TapIndices.Count == 0)
                     {
                         string verb = group.Count() > 1 ? "have" : "has";
-                        messages.Add($"Site capacity exceeded in Resources: {cardsSummary} {verb} no matching non-Haven site in Sites.");
+                        messages.Add($"Site capacity exceeded in Resources: {cardsSummary} {verb} no matching non-haven site in Sites.");
                         continue;
                     }
 
@@ -635,6 +635,26 @@ namespace MECCG_Deck_Builder
              _filterService.GetCardTagsForCategory(c.Id, "Target Species")
                  .Any(t => CardFilterService.EqualsWithDiacriticFallback(t, "Wizard")));
 
+        private static (GroupBox Box, RichTextBox Status) CreateStatusGroupBox(
+            int x,
+            int y,
+            int width,
+            int height,
+            string initialText = null,
+            string title = "Drafting Status && Results")
+        {
+            var grp = new GroupBox
+            {
+                Text = title,
+                Location = new Point(x, y),
+                Size = new Size(width, height)
+            };
+
+            var rtb = CreateStatusRichTextBox(16, 26, width - 32, height - 36, initialText);
+            grp.Controls.Add(rtb);
+            return (grp, rtb);
+        }
+
         private static RichTextBox CreateStatusRichTextBox(int x, int y, int width, int height, string initialText = null)
         {
             var rtb = new RichTextBox
@@ -753,8 +773,8 @@ namespace MECCG_Deck_Builder
                             EndParagraphAndAddGap(lastClosingFont, i == 0 ? groupGapFont : bulletGapFont);
                         }
 
-                        StartParagraph(10);
-                        AppendSegment($"• {label} ", labelColor, labelFont);
+                        StartParagraph(0);
+                        AppendSegment($"{label} ", labelColor, labelFont);
                         bool isNone = string.Equals(value, "(None)", StringComparison.Ordinal);
                         Font curValFont = isNone ? noneFont : valueFont;
                         AppendSegment(value ?? string.Empty, isNone ? noneColor : valueColor, curValFont);
@@ -1189,6 +1209,7 @@ namespace MECCG_Deck_Builder
         public string SeedRegion { get; set; } = "Random";
         public int RegionCount { get; set; } = 5;
         public int MaxSiteCount { get; set; } = 12;
+        public bool RequireHavenInRegionGroup { get; set; }
         public List<string> SelectedRegionTypes { get; set; } = [];
         public List<string> SelectedSiteTypes { get; set; } = [];
 
