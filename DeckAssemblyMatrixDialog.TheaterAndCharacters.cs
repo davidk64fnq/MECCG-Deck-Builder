@@ -13,7 +13,7 @@ namespace MECCG_Deck_Builder
 
         private const string StarterIdleStatusText =
             "Total Mind limit: <= 20.\n" +
-            "Starting characters prioritize: 1) drafted region group (including local havens), 2) outside havens, 3) any matching character.";
+            "Starting characters prioritize: 1) drafted region group (including local havens), 2) any matching character.";
 
         private const string TheaterIdleStatusText =
             "Configure seed region, region/site counts, and terrain/hold filters, then click Run Pipeline on General Settings.";
@@ -187,15 +187,37 @@ namespace MECCG_Deck_Builder
         {
             var tabStarter = new Panel { Dock = DockStyle.Fill, Visible = false };
 
-            BuildCharacterGrid(tabStarter, _starterRows, 5, 42, 28, null);
+            var grpStarterGrid = new GroupBox
+            {
+                Text = "Starting Characters (Pool - Up to 5, Total Mind <= 20)",
+                Location = new Point(16, 16),
+                Size = new Size(810, 234)
+            };
+
+            BuildCharacterGrid(
+                grpStarterGrid,
+                _starterRows,
+                5,
+                46,
+                36,
+                ValidateWorkbenchReadiness,
+                ValidateWorkbenchReadiness,
+                startX: 16,
+                col1Width: 165,
+                col2Width: 165,
+                col3Width: 165,
+                col4Width: 165,
+                colGap: 20);
+
             foreach (var row in _starterRows)
             {
                 row.TxtMind.Text = ">=1";
+                row.TxtDI.Text = "<=4";
             }
 
             GroupBox grpStarterStatus;
-            (grpStarterStatus, _rtbStarterStatus) = CreateStatusGroupBox(16, 192, 810, 196, StarterIdleStatusText);
-            tabStarter.Controls.Add(grpStarterStatus);
+            (grpStarterStatus, _rtbStarterStatus) = CreateStatusGroupBox(16, 260, 810, 230, StarterIdleStatusText);
+            tabStarter.Controls.AddRange([grpStarterGrid, grpStarterStatus]);
 
             return tabStarter;
         }
@@ -208,23 +230,23 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Avatar / Wizard Selection (Primary: Resources | Secondary: Sideboard or Resources)",
                 Location = new Point(16, 8),
-                Size = new Size(810, 82)
+                Size = new Size(810, 80)
             };
 
-            var lblWiz1 = new Label { Text = "Primary Wizard:", Location = new Point(12, 25), Size = new Size(105, 18) };
+            var lblWiz1 = new Label { Text = "Primary Wizard:", Location = new Point(16, 23), Size = new Size(110, 18) };
             _cmbWizard1 = new ComboBox
             {
-                Location = new Point(120, 22),
+                Location = new Point(130, 20),
                 Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             _cmbWizard1.Items.AddRange(["(None)", "Random", "Alatar", "Gandalf", "Pallando", "Radagast", "Saruman"]);
             _cmbWizard1.SelectedIndex = 1; // Random
 
-            var lblWiz1Cop = new Label { Text = "Copies:", Location = new Point(275, 25), Size = new Size(50, 18) };
+            var lblWiz1Cop = new Label { Text = "Copies:", Location = new Point(285, 23), Size = new Size(50, 18) };
             _cmbWizard1Copies = new ComboBox
             {
-                Location = new Point(325, 22),
+                Location = new Point(335, 20),
                 Size = new Size(50, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
@@ -232,10 +254,10 @@ namespace MECCG_Deck_Builder
             _cmbWizard1Copies.Items.AddRange(["1", "2", "3"]);
             _cmbWizard1Copies.SelectedIndex = 1; // 2 copies
 
-            var lblWiz2 = new Label { Text = "Secondary Wizard:", Location = new Point(12, 53), Size = new Size(105, 18) };
+            var lblWiz2 = new Label { Text = "Secondary Wizard:", Location = new Point(16, 51), Size = new Size(110, 18) };
             _cmbWizard2 = new ComboBox
             {
-                Location = new Point(120, 50),
+                Location = new Point(130, 48),
                 Size = new Size(140, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
@@ -243,10 +265,10 @@ namespace MECCG_Deck_Builder
             _cmbWizard2.Items.AddRange(["(None)", "Random", "Alatar", "Gandalf", "Pallando", "Radagast", "Saruman"]);
             _cmbWizard2.SelectedIndex = 1; // Random
 
-            var lblWiz2Cop = new Label { Text = "Copies:", Location = new Point(275, 53), Size = new Size(50, 18) };
+            var lblWiz2Cop = new Label { Text = "Copies:", Location = new Point(285, 51), Size = new Size(50, 18) };
             _cmbWizard2Copies = new ComboBox
             {
-                Location = new Point(325, 50),
+                Location = new Point(335, 48),
                 Size = new Size(50, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
@@ -254,10 +276,10 @@ namespace MECCG_Deck_Builder
             _cmbWizard2Copies.Items.AddRange(["1", "2"]);
             _cmbWizard2Copies.SelectedIndex = 0; // 1 copy
 
-            var lblWiz2Dest = new Label { Text = "Destination:", Location = new Point(395, 53), Size = new Size(75, 18) };
+            var lblWiz2Dest = new Label { Text = "Destination:", Location = new Point(405, 51), Size = new Size(75, 18) };
             _cmbWizard2Dest = new ComboBox
             {
-                Location = new Point(475, 50),
+                Location = new Point(485, 48),
                 Size = new Size(110, 23),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Enabled = false
@@ -278,35 +300,54 @@ namespace MECCG_Deck_Builder
                 lblWiz2Dest, _cmbWizard2Dest
             ]);
 
-            tabRecruits.Controls.Add(grpWizards);
-
-            var lblRecruitsHdr = new Label
+            var grpRecruits = new GroupBox
             {
                 Text = "Play Deck Characters (Resources - Up to 10)",
-                Location = new Point(16, 98),
-                Size = new Size(400, 18),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
-                ForeColor = Color.FromArgb(26, 54, 93)
+                Location = new Point(16, 94),
+                Size = new Size(810, 288)
             };
-            tabRecruits.Controls.Add(lblRecruitsHdr);
 
-            BuildCharacterGrid(tabRecruits, _recruitRows, 10, 138, 24, ValidateWorkbenchReadiness);
+            BuildCharacterGrid(
+                grpRecruits,
+                _recruitRows,
+                10,
+                40,
+                24,
+                ValidateWorkbenchReadiness,
+                ValidateWorkbenchReadiness,
+                startX: 16,
+                col1Width: 165,
+                col2Width: 165,
+                col3Width: 165,
+                col4Width: 165,
+                colGap: 20);
 
-            var lblReservesHdr = new Label
+            var grpReserves = new GroupBox
             {
                 Text = "Sideboard Characters (Sideboard - Up to 3)",
-                Location = new Point(16, 390),
-                Size = new Size(450, 18),
-                Font = new Font("Segoe UI", 9.0f, FontStyle.Bold),
-                ForeColor = Color.FromArgb(26, 54, 93)
+                Location = new Point(16, 388),
+                Size = new Size(810, 120)
             };
-            tabRecruits.Controls.Add(lblReservesHdr);
 
-            BuildCharacterGrid(tabRecruits, _reserveRows, 3, 430, 24, ValidateWorkbenchReadiness);
+            BuildCharacterGrid(
+                grpReserves,
+                _reserveRows,
+                3,
+                40,
+                24,
+                ValidateWorkbenchReadiness,
+                ValidateWorkbenchReadiness,
+                startX: 16,
+                col1Width: 165,
+                col2Width: 165,
+                col3Width: 165,
+                col4Width: 165,
+                colGap: 20);
 
             GroupBox grpRecruitStatus;
-            (grpRecruitStatus, _rtbRecruitStatus) = CreateStatusGroupBox(16, 510, 810, 152);
-            tabRecruits.Controls.Add(grpRecruitStatus);
+            (grpRecruitStatus, _rtbRecruitStatus) = CreateStatusGroupBox(16, 514, 810, 150);
+
+            tabRecruits.Controls.AddRange([grpWizards, grpRecruits, grpReserves, grpRecruitStatus]);
 
             return tabRecruits;
         }
@@ -317,12 +358,25 @@ namespace MECCG_Deck_Builder
             int count,
             int startY,
             int rowSpacing,
-            Action onRowChanged)
+            Action onRowChanged,
+            Action onTextFieldExit = null,
+            int startX = 16,
+            int col1Width = 145,
+            int col2Width = 145,
+            int col3Width = 145,
+            int col4Width = 135,
+            int colGap = 12)
         {
-            var lblHdrSkill = new Label { Text = "Skill Focus", Location = new Point(16, startY - 20), Size = new Size(135, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrRace = new Label { Text = "Species / Race", Location = new Point(157, startY - 20), Size = new Size(135, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrMind = new Label { Text = "Mind (e.g. <=3, 2-4)", Location = new Point(298, startY - 20), Size = new Size(115, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
-            var lblHdrDI = new Label { Text = "DI (e.g. >=2)", Location = new Point(419, startY - 20), Size = new Size(115, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            int x1 = startX;
+            int x2 = x1 + col1Width + colGap;
+            int x3 = x2 + col2Width + colGap;
+            int x4 = x3 + col3Width + colGap;
+            int xClear = x4 + col4Width + Math.Min(colGap, 16);
+
+            var lblHdrSkill = new Label { Text = "Skill Focus", Location = new Point(x1, startY - 20), Size = new Size(col1Width, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrRace = new Label { Text = "Species / Race", Location = new Point(x2, startY - 20), Size = new Size(col2Width, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrMind = new Label { Text = "Mind (e.g. <=3, 2-4)", Location = new Point(x3, startY - 20), Size = new Size(col3Width, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
+            var lblHdrDI = new Label { Text = "DI (e.g. <=4)", Location = new Point(x4, startY - 20), Size = new Size(col4Width, 18), Font = new Font("Segoe UI", 8.5f, FontStyle.Bold) };
 
             page.Controls.AddRange([lblHdrSkill, lblHdrRace, lblHdrMind, lblHdrDI]);
 
@@ -331,11 +385,11 @@ namespace MECCG_Deck_Builder
                 int y = startY + (i * rowSpacing);
                 var row = new CharacterRowControls
                 {
-                    CmbSkill = new ComboBox { Location = new Point(16, y), Size = new Size(135, 23), DropDownStyle = ComboBoxStyle.DropDownList },
-                    CmbSpecies = new ComboBox { Location = new Point(157, y), Size = new Size(135, 23), DropDownStyle = ComboBoxStyle.DropDownList },
-                    TxtMind = new TextBox { Location = new Point(298, y), Size = new Size(115, 23) },
-                    TxtDI = new TextBox { Location = new Point(419, y), Size = new Size(115, 23) },
-                    BtnClear = new Button { Text = "✕", Location = new Point(540, y - 1), Size = new Size(28, 25), ForeColor = Color.DimGray }
+                    CmbSkill = new ComboBox { Location = new Point(x1, y), Size = new Size(col1Width, 23), DropDownStyle = ComboBoxStyle.DropDownList },
+                    CmbSpecies = new ComboBox { Location = new Point(x2, y), Size = new Size(col2Width, 23), DropDownStyle = ComboBoxStyle.DropDownList },
+                    TxtMind = new TextBox { Location = new Point(x3, y), Size = new Size(col3Width, 23) },
+                    TxtDI = new TextBox { Location = new Point(x4, y), Size = new Size(col4Width, 23) },
+                    BtnClear = new Button { Text = "✕", Location = new Point(xClear, y - 1), Size = new Size(28, 25), ForeColor = Color.DimGray }
                 };
 
                 row.CmbSkill.Items.AddRange(["Any", "Diplomat", "Ranger", "Sage", "Scout", "Warrior"]);
@@ -348,8 +402,22 @@ namespace MECCG_Deck_Builder
                 {
                     row.CmbSkill.SelectedIndexChanged += (s, e) => onRowChanged();
                     row.CmbSpecies.SelectedIndexChanged += (s, e) => onRowChanged();
-                    row.TxtMind.TextChanged += (s, e) => onRowChanged();
-                    row.TxtDI.TextChanged += (s, e) => onRowChanged();
+
+                    if (onTextFieldExit != null)
+                    {
+                        row.TxtMind.Leave += (s, e) => onTextFieldExit();
+                        row.TxtDI.Leave += (s, e) => onTextFieldExit();
+                    }
+                    else
+                    {
+                        row.TxtMind.TextChanged += (s, e) => onRowChanged();
+                        row.TxtDI.TextChanged += (s, e) => onRowChanged();
+                    }
+                }
+                else if (onTextFieldExit != null)
+                {
+                    row.TxtMind.Leave += (s, e) => onTextFieldExit();
+                    row.TxtDI.Leave += (s, e) => onTextFieldExit();
                 }
 
                 row.BtnClear.Click += (s, e) =>
@@ -1052,13 +1120,8 @@ namespace MECCG_Deck_Builder
                 .Where(h => !string.IsNullOrWhiteSpace(h.Region) && draftedRegions.Contains(h.Region.Trim()))
                 .ToList();
 
-            var outsideHavens = havenSites
-                .Where(h => string.IsNullOrWhiteSpace(h.Region) || !draftedRegions.Contains(h.Region.Trim()))
-                .ToList();
-
             var tier1PerRow = new List<List<Card>>(activeRows.Count);
             var tier2PerRow = new List<List<Card>>(activeRows.Count);
-            var tier3PerRow = new List<List<Card>>(activeRows.Count);
             var allPerRow = new List<List<Card>>(activeRows.Count);
 
             for (int i = 0; i < activeRows.Count; i++)
@@ -1066,22 +1129,13 @@ namespace MECCG_Deck_Builder
                 var t1 = GetCandidatesForCharacterRow(activeRows[i], allCards, activeSets, draftedRegions, localHavens);
                 var t1Ids = new HashSet<string>(t1.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
 
-                var t2 = outsideHavens.Count > 0
-                    ? GetCandidatesForCharacterRow(activeRows[i], allCards, activeSets, null, outsideHavens)
-                        .Where(c => !t1Ids.Contains(c.Id))
-                        .ToList()
-                    : [];
-
-                var t12Ids = new HashSet<string>(t1Ids.Concat(t2.Select(c => c.Id)), StringComparer.OrdinalIgnoreCase);
-
-                var t3 = GetCandidatesForCharacterRow(activeRows[i], allCards, activeSets, null, null)
-                    .Where(c => !t12Ids.Contains(c.Id))
+                var t2 = GetCandidatesForCharacterRow(activeRows[i], allCards, activeSets, null, null)
+                    .Where(c => !t1Ids.Contains(c.Id))
                     .ToList();
 
-                var combined = new List<Card>(t1.Count + t2.Count + t3.Count);
+                var combined = new List<Card>(t1.Count + t2.Count);
                 combined.AddRange(t1);
                 combined.AddRange(t2);
-                combined.AddRange(t3);
 
                 if (combined.Count == 0)
                 {
@@ -1099,7 +1153,6 @@ namespace MECCG_Deck_Builder
 
                 tier1PerRow.Add(t1);
                 tier2PerRow.Add(t2);
-                tier3PerRow.Add(t3);
                 allPerRow.Add(combined);
             }
 
@@ -1128,17 +1181,15 @@ namespace MECCG_Deck_Builder
 
             List<Card> bestCompany = null;
             int bestScore = -1;
+            int tiedBestCount = 0;
             int bestT1Count = 0;
             int bestT2Count = 0;
-            int bestT3Count = 0;
 
             for (int attempt = 0; attempt < 100; attempt++)
             {
-                var rowIndices = Enumerable.Range(0, activeRows.Count).ToList();
-                if (attempt > 0)
-                {
-                    rowIndices = [.. rowIndices.OrderBy(_ => Random.Shared.Next())];
-                }
+                var rowIndices = Enumerable.Range(0, activeRows.Count)
+                    .OrderBy(_ => Random.Shared.Next())
+                    .ToList();
 
                 var picked = new List<Card>(activeRows.Count);
                 var usedTitles = new HashSet<string>(baseUsedTitles, StringComparer.OrdinalIgnoreCase);
@@ -1147,7 +1198,6 @@ namespace MECCG_Deck_Builder
 
                 int t1Count = 0;
                 int t2Count = 0;
-                int t3Count = 0;
                 bool validPermutation = true;
 
                 foreach (int rowIdx in rowIndices)
@@ -1176,18 +1226,6 @@ namespace MECCG_Deck_Builder
                             chosen = eligibleT2[Random.Shared.Next(eligibleT2.Count)];
                             t2Count++;
                         }
-                        else
-                        {
-                            var eligibleT3 = tier3PerRow[rowIdx]
-                                .Where(c => !usedTitles.Contains(c.Name) && ParseCardMind(c.Mind) <= maxAllowedMind)
-                                .ToList();
-
-                            if (eligibleT3.Count > 0)
-                            {
-                                chosen = eligibleT3[Random.Shared.Next(eligibleT3.Count)];
-                                t3Count++;
-                            }
-                        }
                     }
 
                     if (chosen == null)
@@ -1201,18 +1239,22 @@ namespace MECCG_Deck_Builder
                     currentMind += ParseCardMind(chosen.Mind);
                 }
 
-                int score = (t1Count * 10000) + (t2Count * 100);
-                if (validPermutation && currentMind <= 20 && score > bestScore)
+                int score = t1Count;
+                if (validPermutation && currentMind <= 20)
                 {
-                    bestCompany = picked;
-                    bestScore = score;
-                    bestT1Count = t1Count;
-                    bestT2Count = t2Count;
-                    bestT3Count = t3Count;
-
-                    if (bestT1Count == activeRows.Count)
+                    if (score > bestScore)
                     {
-                        break;
+                        bestCompany = picked;
+                        bestScore = score;
+                        tiedBestCount = 1;
+                        bestT1Count = t1Count;
+                        bestT2Count = t2Count;
+                    }
+                    else if (score == bestScore && Random.Shared.Next(++tiedBestCount) == 0)
+                    {
+                        bestCompany = picked;
+                        bestT1Count = t1Count;
+                        bestT2Count = t2Count;
                     }
                 }
             }
@@ -1248,9 +1290,8 @@ namespace MECCG_Deck_Builder
 
             var tierParts = new List<string>();
             if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local region(s)");
-            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside haven(s)");
-            if (bestT3Count > 0) tierParts.Add($"{bestT3Count} out-of-region");
-            string tierNote = (bestT2Count == 0 && bestT3Count == 0)
+            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} other");
+            string tierNote = bestT2Count == 0
                 ? " [All from drafted regions]"
                 : $" [{string.Join(", ", tierParts)}]";
 
@@ -1261,7 +1302,7 @@ namespace MECCG_Deck_Builder
 
             SetRichBulletedStatus(
                 _rtbStarterStatus,
-                $"Drafted {bestCompany.Count} starting characters (Total Mind: {finalMind}/20){tierNote}:",
+                $"Drafted {bestCompany.Count} starting {(bestCompany.Count == 1 ? "character" : "characters")} (Total Mind: {finalMind}/20){tierNote}:",
                 [bullets]);
             return true;
         }
@@ -1374,13 +1415,7 @@ namespace MECCG_Deck_Builder
                     (!string.IsNullOrWhiteSpace(s.Region) && draftedRegions.Contains(s.Region.Trim())))
                 .ToList();
 
-            var tier2Sites = allSitesInDeck
-                .Where(s =>
-                    string.Equals(s.Site, "Haven", StringComparison.OrdinalIgnoreCase) &&
-                    (string.IsNullOrWhiteSpace(s.Region) || !draftedRegions.Contains(s.Region.Trim())))
-                .ToList();
-
-            var rowSpecs = new List<(bool IsReserve, int RowNum, List<Card> Tier1, List<Card> Tier2, List<Card> Tier3)>();
+            var rowSpecs = new List<(bool IsReserve, int RowNum, List<Card> Tier1, List<Card> Tier2)>();
 
             void AddRowSpec(CharacterRowControls row, bool isReserve, int rowNum)
             {
@@ -1391,18 +1426,11 @@ namespace MECCG_Deck_Builder
                     : [];
                 var t1Ids = new HashSet<string>(t1.Select(c => c.Id), StringComparer.OrdinalIgnoreCase);
 
-                var t2 = tier2Sites.Count > 0
-                    ? GetCandidatesForCharacterRow(row, allCards, activeSets, null, tier2Sites)
-                        .Where(c => !t1Ids.Contains(c.Id) && SatisfiesRecruitSiteRequirement(c, allSitesInDeck))
-                        .ToList()
-                    : [];
-                var t12Ids = new HashSet<string>(t1Ids.Concat(t2.Select(c => c.Id)), StringComparer.OrdinalIgnoreCase);
-
-                var t3 = GetCandidatesForCharacterRow(row, allCards, activeSets, null, null)
-                    .Where(c => !t12Ids.Contains(c.Id) && SatisfiesRecruitSiteRequirement(c, allSitesInDeck))
+                var t2 = GetCandidatesForCharacterRow(row, allCards, activeSets, null, null)
+                    .Where(c => !t1Ids.Contains(c.Id) && SatisfiesRecruitSiteRequirement(c, allSitesInDeck))
                     .ToList();
 
-                rowSpecs.Add((isReserve, rowNum, t1, t2, t3));
+                rowSpecs.Add((isReserve, rowNum, t1, t2));
             }
 
             for (int i = 0; i < activeRecruitRows.Count; i++)
@@ -1414,7 +1442,7 @@ namespace MECCG_Deck_Builder
                 AddRowSpec(activeReserveRows[i], true, i + 1);
             }
 
-            var emptyRow = rowSpecs.FirstOrDefault(r => r.Tier1.Count == 0 && r.Tier2.Count == 0 && r.Tier3.Count == 0);
+            var emptyRow = rowSpecs.FirstOrDefault(r => r.Tier1.Count == 0 && r.Tier2.Count == 0);
             if (emptyRow.Tier1 != null)
             {
                 if (!silent)
@@ -1435,12 +1463,12 @@ namespace MECCG_Deck_Builder
             List<Card> finalRecruits = null;
             List<Card> finalReserves = null;
             int bestScore = -1;
+            int tiedBestCount = 0;
             int bestT1Count = 0;
             int bestT2Count = 0;
-            int bestT3Count = 0;
             string lastFailureReason = null;
 
-            for (int attempt = 0; attempt < 25; attempt++)
+            for (int attempt = 0; attempt < 100; attempt++)
             {
                 var attemptRecruits = new List<Card>();
                 var attemptReserves = new List<Card>();
@@ -1483,18 +1511,13 @@ namespace MECCG_Deck_Builder
                     usedTitles.Add(wiz2Card.Name);
                 }
 
-                var orderedSpecs = attempt == 0
-                    ? [.. rowSpecs
-                        .OrderBy(r => r.Tier1.Count > 0 ? 0 : (r.Tier2.Count > 0 ? 1 : 2))
-                        .ThenBy(r => r.Tier1.Count > 0 ? r.Tier1.Count : (r.Tier2.Count > 0 ? r.Tier2.Count : r.Tier3.Count))]
-                    : rowSpecs.OrderBy(_ => Random.Shared.Next()).ToList();
+                var orderedSpecs = rowSpecs.OrderBy(_ => Random.Shared.Next()).ToList();
 
                 int t1Count = 0;
                 int t2Count = 0;
-                int t3Count = 0;
                 bool failed = false;
 
-                foreach (var (IsReserve, RowNum, Tier1, Tier2, Tier3) in orderedSpecs)
+                foreach (var (IsReserve, RowNum, Tier1, Tier2) in orderedSpecs)
                 {
                     var availT1 = Tier1.Where(c => !usedTitles.Contains(c.Name)).ToList();
                     Card chosen = null;
@@ -1510,15 +1533,6 @@ namespace MECCG_Deck_Builder
                         {
                             chosen = availT2[Random.Shared.Next(availT2.Count)];
                             t2Count++;
-                        }
-                        else
-                        {
-                            var availT3 = Tier3.Where(c => !usedTitles.Contains(c.Name)).ToList();
-                            if (availT3.Count > 0)
-                            {
-                                chosen = availT3[Random.Shared.Next(availT3.Count)];
-                                t3Count++;
-                            }
                         }
                     }
 
@@ -1539,19 +1553,24 @@ namespace MECCG_Deck_Builder
                     }
                 }
 
-                int score = (t1Count * 10000) + (t2Count * 100);
-                if (!failed && score > bestScore)
+                int score = t1Count;
+                if (!failed)
                 {
-                    finalRecruits = attemptRecruits;
-                    finalReserves = attemptReserves;
-                    bestScore = score;
-                    bestT1Count = t1Count;
-                    bestT2Count = t2Count;
-                    bestT3Count = t3Count;
-
-                    if (bestT1Count == rowSpecs.Count)
+                    if (score > bestScore)
                     {
-                        break;
+                        finalRecruits = attemptRecruits;
+                        finalReserves = attemptReserves;
+                        bestScore = score;
+                        tiedBestCount = 1;
+                        bestT1Count = t1Count;
+                        bestT2Count = t2Count;
+                    }
+                    else if (score == bestScore && Random.Shared.Next(++tiedBestCount) == 0)
+                    {
+                        finalRecruits = attemptRecruits;
+                        finalReserves = attemptReserves;
+                        bestT1Count = t1Count;
+                        bestT2Count = t2Count;
                     }
                 }
             }
@@ -1582,14 +1601,28 @@ namespace MECCG_Deck_Builder
             string recruitNames = finalRecruits.Count > 0 ? FormatCardCountList(finalRecruits) : "(None)";
             string reserveNames = finalReserves.Count > 0 ? FormatCardCountList(finalReserves) : "(None)";
 
-            var tierParts = new List<string>();
-            if (bestT1Count > 0) tierParts.Add($"{bestT1Count} local site(s)");
-            if (bestT2Count > 0) tierParts.Add($"{bestT2Count} outside haven(s)");
-            if (bestT3Count > 0) tierParts.Add($"{bestT3Count} out-of-region");
-            string tierNote = rowSpecs.Count > 0
-                ? (bestT2Count == 0 && bestT3Count == 0
+            int draftedWizCount = finalRecruits.Concat(finalReserves).Count(IsAvatar);
+            var bracketParts = new List<string>();
+            if (draftedWizCount > 0)
+            {
+                bracketParts.Add($"{draftedWizCount} {(draftedWizCount == 1 ? "Wizard" : "Wizards")}");
+            }
+            if (rowSpecs.Count > 0)
+            {
+                if (bestT1Count > 0)
+                {
+                    bracketParts.Add($"{bestT1Count} {(bestT1Count == 1 ? "local site" : "local sites")}");
+                }
+                if (bestT2Count > 0)
+                {
+                    bracketParts.Add($"{bestT2Count} other");
+                }
+            }
+
+            string tierNote = bracketParts.Count > 0
+                ? (draftedWizCount == 0 && bestT2Count == 0
                     ? " [All from local sites]"
-                    : $" [{string.Join(", ", tierParts)}]")
+                    : $" [{string.Join(", ", bracketParts)}]")
                 : string.Empty;
 
             var wizardNotes = new List<string>();
@@ -1619,11 +1652,15 @@ namespace MECCG_Deck_Builder
                 ("Sideboard:", reserveNames)
             };
 
+            if (wizardNotes.Count > 0)
+            {
+                bullets.Add(("Note:", string.Join(" ", wizardNotes)));
+            }
+
             SetRichBulletedStatus(
                 _rtbRecruitStatus,
                 $"Drafted {finalRecruits.Count} into Resources and {finalReserves.Count} into Sideboard{tierNote}:",
-                [bullets],
-                wizardNotes);
+                [bullets]);
 
             return true;
         }
@@ -1711,7 +1748,7 @@ namespace MECCG_Deck_Builder
 
                 if (!string.IsNullOrWhiteSpace(row.TxtDI.Text))
                 {
-                    if (!DeckGenerationService.EvaluateNumericAttributeComparison(c, "Direct", row.TxtDI.Text.Trim())) return false;
+                    if (!DeckGenerationService.EvaluateNumericAttributeComparison(c, "Direct", row.TxtDI.Text.Trim(), "0")) return false;
                 }
 
                 if (checkRegions || checkSites)

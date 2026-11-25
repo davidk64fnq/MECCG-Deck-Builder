@@ -541,21 +541,21 @@ namespace MECCG_Deck_Builder
 
             _btnRunPipeline = new Button
             {
-                Text = "Run Pipeline",
+                Text = "Run Pipeline (F5)",
                 Location = new Point(16, 26),
-                Size = new Size(125, 30),
+                Size = new Size(145, 30),
                 Font = new Font("Segoe UI", 9.0f, FontStyle.Bold)
             };
             _btnRunPipeline.Click += (s, e) => RunPipelineDraft();
             _toolTip.SetToolTip(
                 _btnRunPipeline,
-                "Drafts the full deck in sequence (Regions & Sites -> Starting Company -> Wizards & Recruits -> Factions -> Allies -> Rings -> Palantíri -> Items -> Quests -> Resource Events -> Creatures -> Hazard Events).\n" +
+                "Drafts the full deck in sequence (Shortcut: F5 from any workbench tab).\n" +
                 "Automatically retries up to 25 times if random region rolls fail downstream constraints.");
 
             _btnClearDeck = new Button
             {
                 Text = "Clear Deck",
-                Location = new Point(149, 26),
+                Location = new Point(169, 26),
                 Size = new Size(110, 30)
             };
             _btnClearDeck.Click += BtnClearDeck_Click;
@@ -564,7 +564,7 @@ namespace MECCG_Deck_Builder
             _btnSaveSnapshot = new Button
             {
                 Text = "Save Snapshot",
-                Location = new Point(280, 26),
+                Location = new Point(300, 26),
                 Size = new Size(125, 30)
             };
             _btnSaveSnapshot.Click += BtnSaveSnapshot_Click;
@@ -573,7 +573,7 @@ namespace MECCG_Deck_Builder
             _btnRecallSnapshot = new Button
             {
                 Text = "Recall Snapshot",
-                Location = new Point(413, 26),
+                Location = new Point(433, 26),
                 Size = new Size(125, 30),
                 Enabled = false
             };
@@ -606,6 +606,24 @@ namespace MECCG_Deck_Builder
 
             tabGeneral.Controls.AddRange([grpGeneral, grpPipeline, grpSummary]);
             return tabGeneral;
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.F5)
+            {
+                ValidateWorkbenchReadiness();
+                if (_btnRunPipeline != null && _btnRunPipeline.Enabled)
+                {
+                    RunPipelineDraft();
+                }
+                else
+                {
+                    System.Media.SystemSounds.Beep.Play();
+                }
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -1402,7 +1420,7 @@ namespace MECCG_Deck_Builder
 
         private void ValidateWorkbenchReadiness()
         {
-            if (_btnRunPipeline == null || _rtbRecruitStatus == null || _rtbTheaterStatus == null ||
+            if (_btnRunPipeline == null || _rtbStarterStatus == null || _rtbRecruitStatus == null || _rtbTheaterStatus == null ||
                 _rtbFactionStatus == null || _rtbAllyStatus == null || _rtbItemStatus == null ||
                 _rtbRingsStatus == null || _rtbPalantiriStatus == null || _rtbQuestsStatus == null ||
                 _rtbResourceEventsStatus == null || _rtbCreaturesStatus == null || _rtbHazardEventsStatus == null)
@@ -1411,6 +1429,7 @@ namespace MECCG_Deck_Builder
             }
 
             bool hasTheaterError = false;
+            bool hasStarterError = false;
             bool hasRecruitError = false;
             bool hasFactionError = false;
             bool hasAllyError = false;
@@ -1517,7 +1536,81 @@ namespace MECCG_Deck_Builder
                 SetRichPlainStatus(_rtbTheaterStatus, TheaterIdleStatusText, idleColor, FontStyle.Italic);
             }
 
+            // --- Tab 3 (Starting Company) Validation ---
+            var activeSetsForStarter = _getActiveSets();
+            var activeStarterRows = _starterRows
+                .Select((Row, Index) => (Row, RowNumber: Index + 1))
+                .Where(x => x.Row.IsActive)
+                .ToList();
+
+            if (activeStarterRows.Count > 0)
+            {
+                var zeroMatchRows = new List<int>();
+                int minMindSum = 0;
+
+                foreach (var (row, rowNum) in activeStarterRows)
+                {
+                    var candidates = GetCandidatesForCharacterRow(row, _catalog.Cards, activeSetsForStarter, null, null);
+                    if (candidates.Count == 0)
+                    {
+                        zeroMatchRows.Add(rowNum);
+                    }
+                    else
+                    {
+                        minMindSum += candidates.Min(c => ParseCardMind(c.Mind));
+                    }
+                }
+
+                if (zeroMatchRows.Count > 0)
+                {
+                    hasStarterError = true;
+                    string rowLabel = zeroMatchRows.Count == 1
+                        ? $"Row {zeroMatchRows[0]} matches"
+                        : $"Row(s) {string.Join(", ", zeroMatchRows)} match";
+                    SetRichPlainStatus(
+                        _rtbStarterStatus,
+                        $"⚠ {rowLabel} 0 non-Avatar characters in your active sets (note: Mind must be >= 1; leave a box blank for Any).\n" +
+                        "Adjust the row filter(s) or clear the row.",
+                        Color.Firebrick,
+                        FontStyle.Bold);
+                }
+                else if (minMindSum > 20)
+                {
+                    hasStarterError = true;
+                    SetRichPlainStatus(
+                        _rtbStarterStatus,
+                        $"⚠ Minimum possible Mind sum ({minMindSum}) exceeds the 20-Mind starting pool limit.\n" +
+                        "Lower your Mind thresholds or clear one of the rows.",
+                        Color.Firebrick,
+                        FontStyle.Bold);
+                }
+                else if (_rtbStarterStatus.ForeColor == Color.Firebrick &&
+                         (_rtbStarterStatus.Text.StartsWith("⚠ Row", StringComparison.Ordinal) ||
+                          _rtbStarterStatus.Text.StartsWith("⚠ Minimum possible Mind", StringComparison.Ordinal)))
+                {
+                    SetRichPlainStatus(_rtbStarterStatus, StarterIdleStatusText, idleColor, FontStyle.Italic);
+                }
+            }
+            else if (_rtbStarterStatus.ForeColor == Color.Firebrick &&
+                     (_rtbStarterStatus.Text.StartsWith("⚠ Row", StringComparison.Ordinal) ||
+                      _rtbStarterStatus.Text.StartsWith("⚠ Minimum possible Mind", StringComparison.Ordinal)))
+            {
+                SetRichPlainStatus(_rtbStarterStatus, StarterIdleStatusText, idleColor, FontStyle.Italic);
+            }
+
             // --- Tab 4 Validation ---
+            var zeroMatchRecruitRows = _recruitRows
+                .Select((Row, Index) => (Row, RowNumber: Index + 1))
+                .Where(x => x.Row.IsActive && GetCandidatesForCharacterRow(x.Row, _catalog.Cards, activeSetsForStarter, null, null).Count == 0)
+                .Select(x => x.RowNumber)
+                .ToList();
+
+            var zeroMatchReserveRows = _reserveRows
+                .Select((Row, Index) => (Row, RowNumber: Index + 1))
+                .Where(x => x.Row.IsActive && GetCandidatesForCharacterRow(x.Row, _catalog.Cards, activeSetsForStarter, null, null).Count == 0)
+                .Select(x => x.RowNumber)
+                .ToList();
+
             if (companionCount > 10)
             {
                 hasRecruitError = true;
@@ -1538,6 +1631,31 @@ namespace MECCG_Deck_Builder
                     Color.Firebrick,
                     FontStyle.Bold);
             }
+            else if (zeroMatchRecruitRows.Count > 0 || zeroMatchReserveRows.Count > 0)
+            {
+                hasRecruitError = true;
+                var badParts = new List<string>();
+                if (zeroMatchRecruitRows.Count > 0)
+                {
+                    badParts.Add(zeroMatchRecruitRows.Count == 1
+                        ? $"Play Deck Row {zeroMatchRecruitRows[0]}"
+                        : $"Play Deck Row(s) {string.Join(", ", zeroMatchRecruitRows)}");
+                }
+                if (zeroMatchReserveRows.Count > 0)
+                {
+                    badParts.Add(zeroMatchReserveRows.Count == 1
+                        ? $"Sideboard Row {zeroMatchReserveRows[0]}"
+                        : $"Sideboard Row(s) {string.Join(", ", zeroMatchReserveRows)}");
+                }
+
+                string verb = (zeroMatchRecruitRows.Count + zeroMatchReserveRows.Count) == 1 ? "matches" : "match";
+                SetRichPlainStatus(
+                    _rtbRecruitStatus,
+                    $"⚠ {string.Join(" and ", badParts)} {verb} 0 non-Avatar characters in your active sets (note: Mind must be >= 1; leave a box blank for Any).\n" +
+                    "Adjust the row filter(s) or clear the row.",
+                    Color.Firebrick,
+                    FontStyle.Bold);
+            }
             else if (_rtbRecruitStatus.ForeColor == Color.Firebrick ||
                      string.IsNullOrWhiteSpace(_rtbRecruitStatus.Text) ||
                      _rtbRecruitStatus.Text.StartsWith("Configured:", StringComparison.Ordinal))
@@ -1547,7 +1665,7 @@ namespace MECCG_Deck_Builder
                 SetRichPlainStatus(
                     _rtbRecruitStatus,
                     $"Configured: {companionCount}/10 Resources{wizResText}  |  {reserveCount}/3 Sideboard{wizSideText}.\n" +
-                    "Recruits prioritize: 1) local sites (including local havens), 2) outside havens, 3) any haven-playable character.",
+                    "Recruits prioritize: 1) local sites (including local havens), 2) any eligible character.",
                     idleColor,
                     FontStyle.Italic);
             }
@@ -1895,7 +2013,7 @@ namespace MECCG_Deck_Builder
 
             // --- Unified Pipeline Readiness ---
             bool anyError =
-                hasTheaterError || hasRecruitError || hasFactionError || hasAllyError ||
+                hasTheaterError || hasStarterError || hasRecruitError || hasFactionError || hasAllyError ||
                 hasItemError || hasRingsError || hasPalantirError || hasQuestsError ||
                 hasResourceEventsError || hasCreaturesError || hasHazardEventsError;
 
@@ -1905,6 +2023,7 @@ namespace MECCG_Deck_Builder
             {
                 var blockedTabs = new List<string>();
                 if (hasTheaterError) blockedTabs.Add("Regions & Sites");
+                if (hasStarterError) blockedTabs.Add("Starting Company");
                 if (hasRecruitError) blockedTabs.Add("Wizards & Recruits");
                 if (hasFactionError) blockedTabs.Add("Factions");
                 if (hasAllyError) blockedTabs.Add("Allies");
@@ -1960,149 +2079,182 @@ namespace MECCG_Deck_Builder
             }
 
             const int maxPipelineAttempts = 25;
+            const string baseTitle = "Modular Deck Assembly Workbench";
 
-            int fewestWarnings = int.MaxValue;
-            int bestAttempt = 0;
-            List<Card> bestPool = null;
-            List<Card> bestResources = null;
-            List<Card> bestHazards = null;
-            List<Card> bestSideboard = null;
-            List<Card> bestSites = null;
-            List<(Control Control, string Text, string Rtf, Color ForeColor, Font Font)> bestStatusControls = null;
-            List<string> bestCompletedSteps = null;
-            List<string> bestWarningTabs = null;
+            bool prevRecallEnabled = _btnRecallSnapshot.Enabled;
+            UseWaitCursor = true;
+            Cursor.Current = Cursors.WaitCursor;
+            _btnRunPipeline.Enabled = false;
+            _btnRunPipeline.Text = "Running...";
+            _btnClearDeck.Enabled = false;
+            _btnSaveSnapshot.Enabled = false;
+            _btnRecallSnapshot.Enabled = false;
+            _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+            _lblPipelineStatus.Text = $"Running pipeline (attempt 1/{maxPipelineAttempts})...";
+            Text = $"{baseTitle} - Running Pipeline (attempt 1/{maxPipelineAttempts})...";
+            _btnRunPipeline.Update();
+            _lblPipelineStatus.Update();
+            Update();
 
-            for (int attempt = 1; attempt <= maxPipelineAttempts; attempt++)
+            try
             {
-                ResetAttemptState();
-                var completedSteps = new List<string>();
-                int failedIndex = -1;
+                int fewestWarnings = int.MaxValue;
+                int bestAttempt = 0;
+                List<Card> bestPool = null;
+                List<Card> bestResources = null;
+                List<Card> bestHazards = null;
+                List<Card> bestSideboard = null;
+                List<Card> bestSites = null;
+                List<(Control Control, string Text, string Rtf, Color ForeColor, Font Font)> bestStatusControls = null;
+                List<string> bestCompletedSteps = null;
+                List<string> bestWarningTabs = null;
 
-                for (int s = 0; s < stepsToRun.Count; s++)
+                for (int attempt = 1; attempt <= maxPipelineAttempts; attempt++)
                 {
-                    var (stepNumber, tabName, info) = stepsToRun[s];
-                    if (!info.Runner(true))
+                    Text = $"{baseTitle} - Running Pipeline (attempt {attempt}/{maxPipelineAttempts})...";
+                    ResetAttemptState();
+                    var completedSteps = new List<string>();
+                    int failedIndex = -1;
+
+                    for (int s = 0; s < stepsToRun.Count; s++)
                     {
-                        failedIndex = s;
+                        var (stepNumber, tabName, info) = stepsToRun[s];
+                        if (!info.Runner(true))
+                        {
+                            failedIndex = s;
+                            break;
+                        }
+                        completedSteps.Add($"{stepNumber}. {tabName} ✓");
+                    }
+
+                    if (failedIndex < 0)
+                    {
+                        var warningTabs = stepsToRun
+                            .Where(step => step.Info.StatusControl.Text.Contains('⚠'))
+                            .Select(step => step.TabName)
+                            .ToList();
+
+                        if (warningTabs.Count == 0)
+                        {
+                            NotifyDeckChanged(null);
+                            UpdateDeckSummary();
+
+                            string attemptNote = attempt > 1 ? $" (attempt {attempt}/{maxPipelineAttempts})" : string.Empty;
+                            _lblPipelineStatus.ForeColor = Color.FromArgb(26, 86, 54);
+                            _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+                            _lblPipelineStatus.Text = $"Pipeline complete{attemptNote}: {string.Join(" -> ", completedSteps)}";
+                            UpdateSidebarVisuals();
+                            return;
+                        }
+
+                        if (warningTabs.Count <= fewestWarnings)
+                        {
+                            fewestWarnings = warningTabs.Count;
+                            bestAttempt = attempt;
+                            bestPool = [.. _deck.Pool];
+                            bestResources = [.. _deck.Resources];
+                            bestHazards = [.. _deck.Hazards];
+                            bestSideboard = [.. _deck.Sideboard];
+                            bestSites = [.. _deck.Sites];
+                            bestStatusControls = [.. stepsToRun.Select(step => (
+                                step.Info.StatusControl,
+                                step.Info.StatusControl.Text,
+                                step.Info.StatusControl is RichTextBox rtb ? rtb.Rtf : null,
+                                step.Info.StatusControl.ForeColor,
+                                step.Info.StatusControl.Font))];
+                            bestCompletedSteps = completedSteps;
+                            bestWarningTabs = warningTabs;
+                        }
+                    }
+                    else if (failedIndex == 0 && attempt == 1)
+                    {
                         break;
                     }
-                    completedSteps.Add($"{stepNumber}. {tabName} ✓");
                 }
 
-                if (failedIndex < 0)
+                if (bestPool != null)
                 {
-                    var warningTabs = stepsToRun
-                        .Where(step => step.Info.StatusControl.Text.Contains('⚠'))
-                        .Select(step => step.TabName)
-                        .ToList();
+                    ResetAttemptState();
+                    _deck.Pool.AddRange(bestPool);
+                    _deck.Resources.AddRange(bestResources);
+                    _deck.Hazards.AddRange(bestHazards);
+                    _deck.Sideboard.AddRange(bestSideboard);
+                    _deck.Sites.AddRange(bestSites);
 
-                    if (warningTabs.Count == 0)
+                    foreach (var (ctrl, text, rtf, foreColor, font) in bestStatusControls)
                     {
+                        ctrl.ForeColor = foreColor;
+                        ctrl.Font = font;
+                        if (ctrl is RichTextBox rtb && rtf != null)
+                        {
+                            rtb.Rtf = rtf;
+                        }
+                        else
+                        {
+                            ctrl.Text = text;
+                        }
+                    }
+
+                    NotifyDeckChanged(null);
+                    UpdateDeckSummary();
+
+                    _lblPipelineStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                    _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+                    _lblPipelineStatus.Text =
+                        $"Pipeline complete with warnings (best from attempt {bestAttempt}/{maxPipelineAttempts}): {string.Join(" -> ", bestCompletedSteps)}\n" +
+                        $"⚠ See notice(s) on: {string.Join(", ", bestWarningTabs)}";
+                    UpdateSidebarVisuals();
+                    return;
+                }
+
+                ResetAttemptState();
+                _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
+                _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+                _lblPipelineStatus.Text = "Running diagnostic pass...";
+                _lblPipelineStatus.Update();
+                NotifyDeckChanged(null);
+
+                var finalCompleted = new List<string>();
+                foreach (var (stepNumber, tabName, info) in stepsToRun)
+                {
+                    if (!info.Runner(false))
+                    {
+                        string priorNote = finalCompleted.Count > 0
+                            ? $" Completed: {string.Join(" -> ", finalCompleted)}."
+                            : " No steps completed.";
+
+                        _lblPipelineStatus.ForeColor = Color.Firebrick;
+                        _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
+                        _lblPipelineStatus.Text = $"⚠ Pipeline stopped at Step {stepNumber} ({tabName}) due to a hard lock.{priorNote}";
                         NotifyDeckChanged(null);
                         UpdateDeckSummary();
-
-                        string attemptNote = attempt > 1 ? $" (attempt {attempt}/{maxPipelineAttempts})" : string.Empty;
-                        _lblPipelineStatus.ForeColor = Color.FromArgb(26, 86, 54);
-                        _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                        _lblPipelineStatus.Text = $"Pipeline complete{attemptNote}: {string.Join(" -> ", completedSteps)}";
                         UpdateSidebarVisuals();
                         return;
                     }
 
-                    if (warningTabs.Count <= fewestWarnings)
-                    {
-                        fewestWarnings = warningTabs.Count;
-                        bestAttempt = attempt;
-                        bestPool = [.. _deck.Pool];
-                        bestResources = [.. _deck.Resources];
-                        bestHazards = [.. _deck.Hazards];
-                        bestSideboard = [.. _deck.Sideboard];
-                        bestSites = [.. _deck.Sites];
-                        bestStatusControls = [.. stepsToRun.Select(step => (
-                            step.Info.StatusControl,
-                            step.Info.StatusControl.Text,
-                            step.Info.StatusControl is RichTextBox rtb ? rtb.Rtf : null,
-                            step.Info.StatusControl.ForeColor,
-                            step.Info.StatusControl.Font))];
-                        bestCompletedSteps = completedSteps;
-                        bestWarningTabs = warningTabs;
-                    }
-                }
-                else if (failedIndex == 0 && attempt == 1)
-                {
-                    break;
-                }
-            }
-
-            if (bestPool != null)
-            {
-                ResetAttemptState();
-                _deck.Pool.AddRange(bestPool);
-                _deck.Resources.AddRange(bestResources);
-                _deck.Hazards.AddRange(bestHazards);
-                _deck.Sideboard.AddRange(bestSideboard);
-                _deck.Sites.AddRange(bestSites);
-
-                foreach (var (ctrl, text, rtf, foreColor, font) in bestStatusControls)
-                {
-                    ctrl.ForeColor = foreColor;
-                    ctrl.Font = font;
-                    if (ctrl is RichTextBox rtb && rtf != null)
-                    {
-                        rtb.Rtf = rtf;
-                    }
-                    else
-                    {
-                        ctrl.Text = text;
-                    }
+                    finalCompleted.Add($"{stepNumber}. {tabName} ✓");
                 }
 
                 NotifyDeckChanged(null);
                 UpdateDeckSummary();
 
-                _lblPipelineStatus.ForeColor = Color.FromArgb(180, 83, 9);
+                _lblPipelineStatus.ForeColor = Color.FromArgb(26, 86, 54);
                 _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                _lblPipelineStatus.Text =
-                    $"Pipeline complete with warnings (best from attempt {bestAttempt}/{maxPipelineAttempts}): {string.Join(" -> ", bestCompletedSteps)}\n" +
-                    $"⚠ See notice(s) on: {string.Join(", ", bestWarningTabs)}";
+                _lblPipelineStatus.Text = $"Pipeline complete: {string.Join(" -> ", finalCompleted)}";
                 UpdateSidebarVisuals();
-                return;
             }
-
-            ResetAttemptState();
-            _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
-            _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
-            _lblPipelineStatus.Text = "Running diagnostic pass...";
-            NotifyDeckChanged(null);
-
-            var finalCompleted = new List<string>();
-            foreach (var (stepNumber, tabName, info) in stepsToRun)
+            finally
             {
-                if (!info.Runner(false))
-                {
-                    string priorNote = finalCompleted.Count > 0
-                        ? $" Completed: {string.Join(" -> ", finalCompleted)}."
-                        : " No steps completed.";
-
-                    _lblPipelineStatus.ForeColor = Color.Firebrick;
-                    _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-                    _lblPipelineStatus.Text = $"⚠ Pipeline stopped at Step {stepNumber} ({tabName}) due to a hard lock.{priorNote}";
-                    NotifyDeckChanged(null);
-                    UpdateDeckSummary();
-                    UpdateSidebarVisuals();
-                    return;
-                }
-
-                finalCompleted.Add($"{stepNumber}. {tabName} ✓");
+                Text = baseTitle;
+                UseWaitCursor = false;
+                Cursor.Current = Cursors.Default;
+                _btnRunPipeline.Text = "Run Pipeline (F5)";
+                _btnClearDeck.Enabled = true;
+                _btnSaveSnapshot.Enabled = true;
+                _btnRecallSnapshot.Enabled = prevRecallEnabled || _savedDeckSnapshot != null;
+                ValidateWorkbenchReadiness();
             }
-
-            NotifyDeckChanged(null);
-            UpdateDeckSummary();
-
-            _lblPipelineStatus.ForeColor = Color.FromArgb(26, 86, 54);
-            _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Bold);
-            _lblPipelineStatus.Text = $"Pipeline complete: {string.Join(" -> ", finalCompleted)}";
-            UpdateSidebarVisuals();
         }
 
         #endregion

@@ -151,7 +151,7 @@
         <li><strong>Decks Before Council</strong> (1&ndash;4, default 1): Sets the per-site tap capacity across Steps 4&ndash;9 (<strong>Factions</strong>, <strong>Allies</strong>, <strong>Rings</strong>, <strong>Palant&iacute;ri</strong>, <strong>Items</strong>, and <strong>Quests</strong> tabs). Each non-haven site in Sites supports up to <em>N</em> site-tapping cards in Resources (1 per planned deck cycle, since tapped sites untap on deck exhaust), while havens never tap and have unlimited capacity. Any Pass 2 overflow emits one grouped &#9888; warning per contested site bottleneck (showing a <em>Shared site pool</em> line when earlier tabs share sites with the current tab).</li>
         <li><strong>Tailor Hazards to current deck</strong> (default unchecked): Switches Steps 11&ndash;12 (<strong>Creatures</strong> and <strong>Hazard Events</strong> tabs) between <em>Unknown Opponent</em> mode (manual keying filters) and <em>Target Current Deck</em> mode (keying against your drafted Sites, Pool, and Resources).</li>
         <li>
-            <span class="lead-in">25-Attempt Retry Loop:</span> Clicking <strong>Run Pipeline</strong> clears all five deck sections and executes Steps 1&ndash;12 in sequence up to 25 times:
+            <span class="lead-in">25-Attempt Retry Loop:</span> Clicking <strong>Run Pipeline (F5)</strong> (or pressing <kbd>F5</kbd> from any workbench tab) clears all five deck sections and executes Steps 1&ndash;12 in sequence up to 25 times:
             <ul>
                 <li>Stops immediately if Step 1 fails on attempt 1, or as soon as all 12 steps complete with zero &#9888; warnings.</li>
                 <li>If every attempt produces at least one &#9888; warning, keeps the latest run with the <em>fewest warning tabs</em> (without biasing toward larger site counts or multi-card packages).</li>
@@ -211,26 +211,25 @@
         <strong>Card Scope:</strong> <span class="scope-pill">Character (Non-Avatar)</span>
     </div>
     <p>
-        Fills up to five starting character slots (all defaulting to <code>Mind &gt;= 1</code>) while strictly respecting the official 20-Mind starting company limit.
+        Fills up to five starting character slots (defaulting to <code>Mind &gt;= 1</code> and <code>DI &lt;= 4</code>) while strictly respecting the official 20-Mind starting company limit.
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Character"</code>, <code>Secondary</code> / <code>Race</code> (excludes Avatars: <code>Avatar</code>, <code>Wizard</code>, <code>Ringwraith</code>), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary</code> (<code>Character</code>), <code>Secondary</code> (<code>Character</code> &mdash; non-Avatar), <code>Skill</code>, <code>Race</code>, <code>Mind</code>, <code>Direct</code> (blank treated as <code>0</code> for non-Avatar characters), <code>Home</code>, <code>Name</code>, <code>Set</code>.</li>
         <li><span class="lead-in">Custom Categories:</span> <code>Home Region</code>.</li>
         <li><span class="lead-in">Intentionally Ignored:</span> Character <code>Site Requirement</code> tags are ignored here because starting characters deploy at <em>Rivendell</em> regardless of home-site recruitment restrictions (allowing Hobbits to start in Pool without <em>Bag End</em> in Sites).</li>
     </ul>
     <h4>Coded Rules &amp; Priority Tiers</h4>
     <ul>
-        <li><span class="lead-in">Minimum Mind Feasibility Check:</span> Before searching, sums the lowest <code>Mind</code> candidate for each active row; if the minimum sum exceeds 20, the step stops immediately.</li>
+        <li><span class="lead-in">Row &amp; Mind Validation:</span> On exiting a <strong>Mind</strong> or <strong>DI</strong> box (or changing <strong>Skill Focus</strong> / <strong>Species / Race</strong>), checks that every active row matches at least one character in active sets and that the lowest <code>Mind</code> sum across active rows is <code>&lt;= 20</code>; otherwise disables <strong>Run Pipeline</strong> with a warning.</li>
         <li>
-            <span class="lead-in">3-Tier Geographic Priority:</span>
-            <ol>
-                <li><span class="lead-in">Tier 1 (Local Region Group):</span> Characters whose <code>Home Region</code>, home site's <code>Region</code>, or <code>Home</code> site/predicate matches the drafted regions in Sites or a haven located inside those drafted regions.</li>
-                <li><span class="lead-in">Tier 2 (Outside Havens):</span> Characters homed at havens outside the drafted region group.</li>
-                <li><span class="lead-in">Tier 3 (Out-of-Region):</span> Any remaining matching non-Avatar character.</li>
-            </ol>
+            <span class="lead-in">Geographic Priority:</span>
+            <ul>
+                <li><span class="lead-in">Tier 1 (Local Region Group):</span> Characters whose home site is in one of the drafted regions (including any haven inside those regions).</li>
+                <li><span class="lead-in">Tier 2 (Other Eligible):</span> Any remaining matching character.</li>
+            </ul>
         </li>
-        <li><span class="lead-in">100-Attempt Permutation Search:</span> Shuffles row assignment order across up to 100 attempts to find a distinct-character combination totaling &le; 20 Mind with the highest Tier 1 / Tier 2 score, never duplicating titles across Pool, Resources, or Sideboard.</li>
+        <li><span class="lead-in">Company Assembly Search:</span> Runs 100 trials to find a company matching the requirements, selecting the combination with the most Tier 1 matches and breaking remaining ties randomly, without duplicating titles across Pool, Resources, or Sideboard.</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;
@@ -251,26 +250,23 @@
     </p>
     <h4>Attributes &amp; Categories Read</h4>
     <ul>
-        <li><span class="lead-in">Official Attributes:</span> <code>Primary == "Character"</code>, <code>Secondary == "Avatar"</code>, <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code>, <code>Home</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
+        <li><span class="lead-in">Official Attributes:</span> <code>Primary</code> (<code>Character</code>), <code>Secondary</code> (<code>Avatar</code> for Wizards; <code>Character</code> &mdash; non-Avatar for recruits), <code>Race</code>, <code>Skill</code>, <code>Mind</code>, <code>Direct</code> (blank treated as <code>0</code> for non-Avatar characters), <code>Home</code>, <code>Unique</code>, <code>Name</code>, <code>Set</code>.</li>
         <li><span class="lead-in">Custom Categories:</span> <code>Home Region</code>, <code>Site Requirement</code> (strictly enforced for non-Avatar recruits).</li>
     </ul>
     <h4>Coded Rules &amp; Priority Tiers</h4>
     <ul>
-        <li><span class="lead-in">Tournament Avatar Allowance:</span> Supports 1&ndash;3 copies of <strong>Primary Wizard</strong> in Resources. When Primary &lt; 3, a distinct <strong>Secondary Wizard</strong> (1&ndash;2 copies, capped so total Wizards &le; 3) can be routed to Sideboard (default: <strong>Random</strong> 2 + <strong>Random</strong> 1) or Resources.</li>
-        <li><span class="lead-in">Recruit <code>Site Requirement</code> Guard:</span> Unlike the <strong>Starting Company</strong> tab, every recruit and Sideboard character must have its <code>Site Requirement</code> (if any) satisfied in Sites. For example, Hobbits (<code>Site Requirement: Bag End</code>) and <em>Fram Framson</em> (<code>Site Requirement: Framsburg</code>) only draft here if those sites are in the drafted Site deck.</li>
+        <li><span class="lead-in">Tournament Avatar Allowance:</span> Supports 1&ndash;3 copies of <strong>Primary Wizard</strong> in Resources. When <strong>Primary Wizard</strong> has fewer than 3 copies, a distinct <strong>Secondary Wizard</strong> (1&ndash;2 copies, capped at 3 Wizards total) can be routed to either Sideboard or Resources. By default, 2 copies of a random <strong>Primary Wizard</strong> go to Resources and 1 copy of a distinct random <strong>Secondary Wizard</strong> goes to Sideboard.</li>
+        <li><span class="lead-in">Row Validation:</span> On exiting a <strong>Mind</strong> or <strong>DI</strong> box (or changing <strong>Skill Focus</strong> / <strong>Species / Race</strong>) on any <strong>Play Deck Characters</strong> or <strong>Sideboard Characters</strong> row, checks that the row matches at least one non-Avatar character in active sets; otherwise disables <strong>Run Pipeline</strong> with a warning.</li>
+        <li><span class="lead-in">Recruit <code>Site Requirement</code> Guard:</span> Unlike the <strong>Starting Company</strong> tab, every recruit and Sideboard character must have its <code>Site Requirement</code> (if any) satisfied in Sites. For example, Hobbits (<code>Site Requirement: Bag End</code>) and <em>Fram Framson</em> (METD; <code>Site Requirement: Framsburg</code>) only draft here if those sites are in the drafted Site deck.</li>
         <li>
-            <span class="lead-in">3-Tier Geographic Priority</span> (25 attempts, tightest-row-first on attempt 0):
-            <ol>
-                <li><span class="lead-in">Tier 1:</span> Characters homed at drafted local sites or havens inside the drafted region group.</li>
-                <li><span class="lead-in">Tier 2:</span> Characters homed at havens outside the drafted region group.</li>
-                <li><span class="lead-in">Tier 3:</span> Remaining haven-playable characters (or those whose <code>Site Requirement</code> is met in Sites).</li>
-            </ol>
+            <span class="lead-in">Geographic Priority:</span>
+            <ul>
+                <li><span class="lead-in">Tier 1 (Drafted Sites &amp; Local Havens):</span> Characters whose home site is a drafted site or a haven inside the drafted region group.</li>
+                <li><span class="lead-in">Tier 2 (Other Eligible):</span> Any remaining matching character (whose <code>Site Requirement</code>, if any, is satisfied in Sites).</li>
+            </ul>
         </li>
-        <li><span class="lead-in">Uniqueness &amp; Exclusion:</span> Never drafts a character title already in Pool, and enforces <code>Unique</code> = 1 across non-Avatar recruits.</li>
-    </ul>
-    <h4>Warnings</h4>
-    <ul>
-        <li>&#9888; Emits a non-blocking notice if <em>Saruman</em> is drafted without <em>Isengard</em> in Sites, or <em>Radagast</em> without <em>Rhosgobel</em> (both still deploy normally at any haven).</li>
+        <li><span class="lead-in">Recruit Assembly Search:</span> Runs 100 trials to fill all rows without duplicating unique characters across Pool, Resources, and Sideboard, selecting the combination with the most Tier 1 matches and breaking remaining ties randomly.</li>
+        <li><span class="lead-in">Wizard Home Site Note:</span> Displays an informational note (not a warning) if <em>Saruman</em> is drafted without <em>Isengard</em> in Sites, or <em>Radagast</em> without <em>Rhosgobel</em> (both deploy normally at any haven).</li>
     </ul>
     <div class="back-to-top">
         <a href="#tab-directory">&#9650; Back to Tab Directory</a> &bull;

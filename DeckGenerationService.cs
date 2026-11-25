@@ -1151,9 +1151,15 @@ namespace MECCG_Deck_Builder
         }
 #pragma warning restore SYSLIB1045
 
-        internal static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query)
+        internal static bool EvaluateNumericAttributeComparison(Card card, string attrKey, string query, string defaultIfBlank = null)
         {
             string rawCardVal = card.GetAttribute(attrKey);
+            if ((string.IsNullOrWhiteSpace(rawCardVal) || rawCardVal.Trim() == "-") &&
+                !string.IsNullOrWhiteSpace(defaultIfBlank) &&
+                !CardFilterService.IsBlankSentinel(query?.Trim()))
+            {
+                rawCardVal = defaultIfBlank;
+            }
             string normalizedQuery = NormalizeNumericQuery(query);
 
             if (!TryParseCardStat(rawCardVal, out int cardStat))
