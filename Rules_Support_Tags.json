@@ -3616,7 +3616,7 @@
       "id": "369",
       "name": "Roäc the Raven",
       "Region Requirement": "Northern Rhovanion",
-      "Role": "Recruitment",
+      "Role": "Influence",
       "set": "METW",
       "Site Requirement": "Region=Northern Rhovanion"
     },
@@ -4153,7 +4153,7 @@
       "fullCode": "A Chance Meeting (TW)",
       "id": "239",
       "name": "A Chance Meeting",
-      "Role": "Recruitment",
+      "Role": "Influence",
       "set": "METW",
       "Site Requirement": "Border-hold; Free-hold; Ruins & Lairs"
     },
@@ -4161,7 +4161,7 @@
       "fullCode": "A Friend or Three (TW)",
       "id": "240",
       "name": "A Friend or Three",
-      "Role": "Corruption; Influence",
+      "Role": "Corruption; Faction Support; Influence",
       "set": "METW"
     },
     {
@@ -4480,7 +4480,7 @@
       "fullCode": "Lordly Presence (TW)",
       "id": "317",
       "name": "Lordly Presence",
-      "Role": "Influence",
+      "Role": "Faction Support; Influence",
       "set": "METW"
     },
     {
@@ -5230,7 +5230,7 @@
       "fullCode": "Muster (TW)",
       "id": "338",
       "name": "Muster",
-      "Role": "Influence",
+      "Role": "Faction Support; Influence",
       "set": "METW"
     },
     {
@@ -5269,7 +5269,7 @@
       "fullCode": "Old Road (TW)",
       "id": "344",
       "name": "Old Road",
-      "Role": "Recruitment",
+      "Role": "Influence",
       "set": "METW"
     },
     {
@@ -5322,7 +5322,7 @@
       "fullCode": "Persuasive Words (TW)",
       "id": "353",
       "name": "Persuasive Words",
-      "Role": "Influence",
+      "Role": "Faction Support; Influence",
       "set": "METW"
     },
     {
@@ -5428,7 +5428,7 @@
       "fullCode": "Tempering Friendship (TW)",
       "id": "386",
       "name": "Tempering Friendship",
-      "Role": "Recruitment",
+      "Role": "Faction Support; Influence",
       "set": "METW"
     },
     {
@@ -5841,6 +5841,20 @@
       "name": "Gandalf",
       "set": "METW",
       "Special Ability": "Gold Ring: Allow Test"
+    },
+    {
+      "fullCode": "Old Friendship (TW)",
+      "id": "343",
+      "name": "Old Friendship",
+      "Role": "Corruption; Influence",
+      "set": "METW"
+    },
+    {
+      "fullCode": "New Friendship (TW)",
+      "id": "342",
+      "name": "New Friendship",
+      "Role": "Corruption; Faction Support; Influence",
+      "set": "METW"
     }
   ],
   "Filters": [
@@ -6174,13 +6188,13 @@
       "Combat",
       "Corruption",
       "Duration",
+      "Faction Support",
       "Influence",
       "Item",
       "Movement",
       "Protection",
       "Quest",
       "Readiness",
-      "Recruitment",
       "Site",
       "Terrain"
     ],

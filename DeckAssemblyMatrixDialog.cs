@@ -87,6 +87,8 @@ namespace MECCG_Deck_Builder
         // --- TAB 5: FACTIONS ---
         private NumericUpDown _numResourceFactions;
         private NumericUpDown _numSideboardFactions;
+        private NumericUpDown _numResourceFactionSupport;
+        private NumericUpDown _numSideboardFactionSupport;
         private RichTextBox _rtbFactionStatus;
 
         // --- TAB 6: ALLIES ---
@@ -503,23 +505,32 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Save Settings...",
                 Location = new Point(155, 186),
-                Size = new Size(120, 26)
+                Size = new Size(112, 26)
             };
             btnSaveSettings.Click += (s, e) => SaveSettingsToFile();
 
             var btnLoadSettings = new Button
             {
                 Text = "Load Settings...",
-                Location = new Point(283, 186),
-                Size = new Size(120, 26)
+                Location = new Point(273, 186),
+                Size = new Size(112, 26)
             };
             btnLoadSettings.Click += (s, e) => LoadSettingsFromFile();
 
+            var btnResetDefaults = new Button
+            {
+                Text = "Reset Defaults",
+                Location = new Point(391, 186),
+                Size = new Size(112, 26)
+            };
+            btnResetDefaults.Click += (s, e) => ResetSettingsToDefaults();
+            _toolTip.SetToolTip(btnResetDefaults, "Resets all workbench tabs, filters, and counts back to factory defaults.");
+
             var lblProfileHint = new Label
             {
-                Text = "Save or load workbench configurations (.workbench.json) to reuse tab criteria.",
-                Location = new Point(415, 183),
-                Size = new Size(385, 34),
+                Text = "Save, load (.workbench.json), or reset workbench settings to defaults.",
+                Location = new Point(513, 183),
+                Size = new Size(288, 34),
                 ForeColor = Color.DimGray
             };
 
@@ -529,7 +540,7 @@ namespace MECCG_Deck_Builder
                 lblSideSize, _numSideboardSize, lblSideSizeHint,
                 lblDecksBeforeCouncil, _numDecksBeforeCouncil, lblDecksHint,
                 lblHazardTargeting, _chkTailorHazardsToCurrentDeck,
-                lblProfiles, btnSaveSettings, btnLoadSettings, lblProfileHint
+                lblProfiles, btnSaveSettings, btnLoadSettings, btnResetDefaults, lblProfileHint
             ]);
 
             var grpPipeline = new GroupBox
@@ -1048,6 +1059,55 @@ namespace MECCG_Deck_Builder
             }
         }
 
+        private void ResetSettingsToDefaults()
+        {
+            var res = MessageBox.Show(
+                this,
+                "Reset all workbench tabs, filters, and counts back to factory defaults?",
+                "Reset Workbench Defaults",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (res != DialogResult.Yes) return;
+
+            ApplyLoadedSettings(CreateDefaultSettings());
+            _lblPipelineStatus.ForeColor = Color.FromArgb(74, 85, 104);
+            _lblPipelineStatus.Font = new Font("Segoe UI", 8.5f, FontStyle.Italic);
+            _lblPipelineStatus.Text = "Workbench settings reset to factory defaults.";
+        }
+
+        private static DeckAssemblySettings CreateDefaultSettings()
+        {
+            var settings = new DeckAssemblySettings
+            {
+                SelectedRegionTypes = ["Wilderness", "Border-land", "Free-domain", "Shadow-land", "Dark-domain", "Coastal Sea"],
+                SelectedSiteTypes = ["Free-hold", "Border-hold", "Ruins & Lairs", "Shadow-hold", "Dark-hold"]
+            };
+
+            for (int i = 0; i < 5; i++)
+            {
+                settings.StarterRows.Add(new CharacterRowSettings
+                {
+                    Skill = "Any",
+                    Species = "Any",
+                    Mind = ">=1",
+                    DI = "<=4"
+                });
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                settings.RecruitRows.Add(new CharacterRowSettings());
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                settings.ReserveRows.Add(new CharacterRowSettings());
+            }
+
+            return settings;
+        }
+
         private DeckAssemblySettings ExportCurrentSettings()
         {
             return new DeckAssemblySettings
@@ -1096,6 +1156,8 @@ namespace MECCG_Deck_Builder
 
                 ResourceFactionCount = (int)_numResourceFactions.Value,
                 SideboardFactionCount = (int)_numSideboardFactions.Value,
+                ResourceFactionSupportCount = (int)_numResourceFactionSupport.Value,
+                SideboardFactionSupportCount = (int)_numSideboardFactionSupport.Value,
 
                 ResourceAllyCount = (int)_numResourceAllies.Value,
                 SideboardAllyCount = (int)_numSideboardAllies.Value,
@@ -1217,7 +1279,9 @@ namespace MECCG_Deck_Builder
             SetCheckedItems(_clbRegionTypes, config.SelectedRegionTypes);
             SetCheckedItems(_clbSiteTypes, config.SelectedSiteTypes);
             PopulateSeedRegionDropdown(config.SeedRegion);
+            UpdateSeedTooltip();
 
+            foreach (var row in _starterRows) row.Clear();
             if (config.StarterRows != null)
             {
                 for (int i = 0; i < Math.Min(_starterRows.Count, config.StarterRows.Count); i++)
@@ -1233,6 +1297,7 @@ namespace MECCG_Deck_Builder
             SetComboSelection(_cmbWizard2Dest, config.SecondaryWizardDestination);
             WizardSelection_Changed(null, null);
 
+            foreach (var row in _recruitRows) row.Clear();
             if (config.RecruitRows != null)
             {
                 for (int i = 0; i < Math.Min(_recruitRows.Count, config.RecruitRows.Count); i++)
@@ -1241,6 +1306,7 @@ namespace MECCG_Deck_Builder
                 }
             }
 
+            foreach (var row in _reserveRows) row.Clear();
             if (config.ReserveRows != null)
             {
                 for (int i = 0; i < Math.Min(_reserveRows.Count, config.ReserveRows.Count); i++)
@@ -1253,6 +1319,8 @@ namespace MECCG_Deck_Builder
 
             _numResourceFactions.Value = Math.Clamp(config.ResourceFactionCount, (int)_numResourceFactions.Minimum, (int)_numResourceFactions.Maximum);
             _numSideboardFactions.Value = Math.Clamp(config.SideboardFactionCount, (int)_numSideboardFactions.Minimum, (int)_numSideboardFactions.Maximum);
+            _numResourceFactionSupport.Value = Math.Clamp(config.ResourceFactionSupportCount, (int)_numResourceFactionSupport.Minimum, (int)_numResourceFactionSupport.Maximum);
+            _numSideboardFactionSupport.Value = Math.Clamp(config.SideboardFactionSupportCount, (int)_numSideboardFactionSupport.Minimum, (int)_numSideboardFactionSupport.Maximum);
 
             _numResourceAllies.Value = Math.Clamp(config.ResourceAllyCount, (int)_numResourceAllies.Minimum, (int)_numResourceAllies.Maximum);
             _numSideboardAllies.Value = Math.Clamp(config.SideboardAllyCount, (int)_numSideboardAllies.Minimum, (int)_numSideboardAllies.Maximum);
@@ -1450,6 +1518,8 @@ namespace MECCG_Deck_Builder
 
             int resFactions = (int)_numResourceFactions.Value;
             int sideFactions = (int)_numSideboardFactions.Value;
+            int resFactionSupport = (int)_numResourceFactionSupport.Value;
+            int sideFactionSupport = (int)_numSideboardFactionSupport.Value;
             int resAllies = (int)_numResourceAllies.Value;
             int sideAllies = (int)_numSideboardAllies.Value;
             int resItems = (int)_numResourceMinorItems.Value + (int)_numResourceMajorItems.Value +
@@ -1671,23 +1741,23 @@ namespace MECCG_Deck_Builder
             }
 
             // --- Shared Play Deck & Sideboard Budget Validation (Tabs 5-13) ---
-            int totalConfiguredRes = companionCount + wizInRes + resFactions + resAllies + resItems + resRingCards + resPalCards + resQuests + resEnvEvents;
-            int totalConfiguredSide = totalSideboardChars + sideFactions + sideAllies + sideItems + sideRingCards + sidePalCards + sideQuests + sideEnvEvents + sideAutoEvents + sideCreatures + hazEventsSide;
+            int totalConfiguredRes = companionCount + wizInRes + resFactions + resFactionSupport + resAllies + resItems + resRingCards + resPalCards + resQuests + resEnvEvents;
+            int totalConfiguredSide = totalSideboardChars + sideFactions + sideFactionSupport + sideAllies + sideItems + sideRingCards + sidePalCards + sideQuests + sideEnvEvents + sideAutoEvents + sideCreatures + hazEventsSide;
             string resOverMsg =
-                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards + {resQuests} quests + {resEnvEvents} env) exceed Play Deck Size ({playDeckLimit}).\n" +
+                $"⚠ Configured Resources cards ({totalConfiguredRes}: {companionCount + wizInRes} characters + {resFactions} factions + {resFactionSupport} faction support + {resAllies} allies + {resItems} items + {resRingCards} ring cards + {resPalCards} palantír cards + {resQuests} quests + {resEnvEvents} env) exceed Play Deck Size ({playDeckLimit}).\n" +
                 "Reduce Resources card counts or increase Play Deck Size on General Settings.";
 
             string sideOverMsg =
-                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents + hazEventsSide} events + {sideCreatures} creature/Nazgûl) exceed Sideboard Size ({sideboardLimit}).\n" +
+                $"⚠ Configured Sideboard cards ({totalConfiguredSide}: {totalSideboardChars} characters + {sideFactions} factions + {sideFactionSupport} faction support + {sideAllies} allies + {sideItems} items + {sideRingCards} ring cards + {sidePalCards} palantír cards + {sideQuests} quests + {sideEnvEvents + sideAutoEvents + hazEventsSide} events + {sideCreatures} creature/Nazgûl) exceed Sideboard Size ({sideboardLimit}).\n" +
                 "Reduce Sideboard card counts or increase Sideboard Size on General Settings.";
 
             // --- Tab 5 (Factions) ---
-            if (totalConfiguredRes > playDeckLimit && resFactions > 0)
+            if (totalConfiguredRes > playDeckLimit && (resFactions + resFactionSupport) > 0)
             {
                 hasFactionError = true;
                 SetRichPlainStatus(_rtbFactionStatus, resOverMsg, Color.Firebrick, FontStyle.Bold);
             }
-            else if (totalConfiguredSide > sideboardLimit && sideFactions > 0)
+            else if (totalConfiguredSide > sideboardLimit && (sideFactions + sideFactionSupport) > 0)
             {
                 hasFactionError = true;
                 SetRichPlainStatus(_rtbFactionStatus, sideOverMsg, Color.Firebrick, FontStyle.Bold);
@@ -1695,8 +1765,8 @@ namespace MECCG_Deck_Builder
             else if ((_rtbFactionStatus.ForeColor == Color.Firebrick &&
                       (_rtbFactionStatus.Text.StartsWith("⚠ Configured Resources", StringComparison.Ordinal) ||
                        _rtbFactionStatus.Text.StartsWith("⚠ Configured Sideboard", StringComparison.Ordinal))) ||
-                     (_deck.Resources.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) &&
-                      _deck.Sideboard.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase)) &&
+                     (_deck.Resources.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase) && !IsFactionSupportEvent(c)) &&
+                      _deck.Sideboard.All(c => !string.Equals(c.Secondary, "Faction", StringComparison.OrdinalIgnoreCase) && !IsFactionSupportEvent(c)) &&
                       !_rtbFactionStatus.Text.StartsWith("Drafted ", StringComparison.OrdinalIgnoreCase) &&
                       !_rtbFactionStatus.Text.StartsWith("No factions configured", StringComparison.OrdinalIgnoreCase)))
             {

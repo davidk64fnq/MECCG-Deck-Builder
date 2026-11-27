@@ -58,7 +58,7 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Faction Drafting Counts && Priority Rules",
                 Location = new Point(16, 16),
-                Size = new Size(810, 186)
+                Size = new Size(810, 250)
             };
 
             var lblResFactions = new Label
@@ -118,29 +118,64 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false
             };
 
+            var lblFactionSupport = new Label
+            {
+                Text = "Faction Support (Events):",
+                Location = new Point(16, 102),
+                Size = new Size(210, 20)
+            };
+            _numResourceFactionSupport = CreateItemSpinner(232, 99, 0, 15, 0);
+            _numResourceFactionSupport.Size = new Size(60, 23);
+            var lblSupSide = new Label
+            {
+                Text = "Sideboard:",
+                Location = new Point(304, 102),
+                Size = new Size(70, 20)
+            };
+            _numSideboardFactionSupport = CreateItemSpinner(376, 99, 0, 10, 0);
+            _numSideboardFactionSupport.Size = new Size(60, 23);
+            var lblSupHint = new Label
+            {
+                Text = "influence-boosting events (Role = Faction Support; drafted after Factions).",
+                Location = new Point(448, 100),
+                Size = new Size(350, 34),
+                ForeColor = Color.DimGray,
+                UseMnemonic = false
+            };
+
+            string resSupTip = "Resource events tagged Role = Faction Support to draft into Play Deck (Resources).";
+            string sideSupTip = "Resource events tagged Role = Faction Support to draft into Sideboard.";
+            _toolTip.SetToolTip(lblFactionSupport, resSupTip);
+            _toolTip.SetToolTip(_numResourceFactionSupport, resSupTip);
+            _toolTip.SetToolTip(lblSupSide, sideSupTip);
+            _toolTip.SetToolTip(_numSideboardFactionSupport, sideSupTip);
+
             _numResourceFactions.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
             _numSideboardFactions.ValueChanged += (s, e) => ValidateWorkbenchReadiness();
 
             var lblFactionRulesNote = new Label
             {
-                Location = new Point(16, 102),
-                Size = new Size(778, 68),
+                Location = new Point(16, 140),
+                Size = new Size(778, 96),
                 ForeColor = Color.DimGray,
                 UseMnemonic = false,
                 Text =
                     "Priority Order (among factions playable at drafted sites or havens with Specific & Prerequisite requirements met):\n" +
-                    "  1. Faction Bonus / Specific Character (Pool -> Resources -> Sideboard)   2. Character Race Match (Pool -> Resources -> Sideboard)\n" +
-                    "  3. Local Region Group Sites before Outside Havens                       4. Remaining Eligible Factions"
+                    "  1. Faction Bonus / Specific Character (Pool -> Resources -> Sideboard)\n" +
+                    "  2. Character Race Match (Pool -> Resources -> Sideboard)\n" +
+                    "  3. Local Region Group Sites before Outside Havens\n" +
+                    "  4. Remaining Eligible Factions"
             };
 
             grpFactions.Controls.AddRange([
                 lblResFactions, _numResourceFactions, lblResFactionsHint,
                 lblSideFactions, _numSideboardFactions, lblSideFactionsHint,
+                lblFactionSupport, _numResourceFactionSupport, lblSupSide, _numSideboardFactionSupport, lblSupHint,
                 lblFactionRulesNote
             ]);
 
             GroupBox grpFactionStatus;
-            (grpFactionStatus, _rtbFactionStatus) = CreateStatusGroupBox(16, 212, 810, 250, FactionIdleStatusText);
+            (grpFactionStatus, _rtbFactionStatus) = CreateStatusGroupBox(16, 276, 810, 250, FactionIdleStatusText);
 
             tabFactions.Controls.AddRange([grpFactions, grpFactionStatus]);
             return tabFactions;
@@ -154,7 +189,7 @@ namespace MECCG_Deck_Builder
             {
                 Text = "Ally Drafting Counts && Priority Rules",
                 Location = new Point(16, 16),
-                Size = new Size(810, 172)
+                Size = new Size(810, 184)
             };
 
             var lblResAllies = new Label
@@ -220,12 +255,13 @@ namespace MECCG_Deck_Builder
             var lblAllyRulesNote = new Label
             {
                 Location = new Point(16, 102),
-                Size = new Size(778, 54),
+                Size = new Size(778, 66),
                 ForeColor = Color.DimGray,
                 UseMnemonic = false,
                 Text =
                     "Priority Order (among allies playable at drafted sites or havens with Specific & Prerequisite requirements met):\n" +
-                    "  1. Local Region Group Sites (and local havens)      2. Outside Havens"
+                    "  1. Local Region Group Sites (and local havens)\n" +
+                    "  2. Outside Havens"
             };
 
             grpAllies.Controls.AddRange([
@@ -235,7 +271,7 @@ namespace MECCG_Deck_Builder
             ]);
 
             GroupBox grpAllyStatus;
-            (grpAllyStatus, _rtbAllyStatus) = CreateStatusGroupBox(16, 198, 810, 250, AllyIdleStatusText);
+            (grpAllyStatus, _rtbAllyStatus) = CreateStatusGroupBox(16, 210, 810, 250, AllyIdleStatusText);
 
             tabAllies.Controls.AddRange([grpAllies, grpAllyStatus]);
             return tabAllies;
@@ -827,8 +863,10 @@ namespace MECCG_Deck_Builder
 
             int reqRes = (int)_numResourceFactions.Value;
             int reqSide = (int)_numSideboardFactions.Value;
+            int reqResSup = (int)_numResourceFactionSupport.Value;
+            int reqSideSup = (int)_numSideboardFactionSupport.Value;
 
-            if (reqRes == 0 && reqSide == 0)
+            if (reqRes == 0 && reqSide == 0 && reqResSup == 0 && reqSideSup == 0)
             {
                 SetRichPlainStatus(_rtbFactionStatus, "No factions configured (0 drafted).", Color.FromArgb(74, 85, 104), FontStyle.Italic);
                 return true;
@@ -844,7 +882,7 @@ namespace MECCG_Deck_Builder
                 .Where(c => string.Equals(c.Primary, "Site", StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            if (allSitesInDeck.Count == 0)
+            if (allSitesInDeck.Count == 0 && (reqRes > 0 || reqSide > 0))
             {
                 if (!silent)
                 {
@@ -1026,10 +1064,82 @@ namespace MECCG_Deck_Builder
                 draftedSidePrereqs,
                 ref sideCardsAdded);
 
+            resCapacity = Math.Max(0, resCapacity - resCardsAdded);
+            sideCapacity = Math.Max(0, sideCapacity - sideCardsAdded);
+
+            var draftedRegionTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var regCard in _deck.Sites.Where(c => string.Equals(c.Primary, "Region", StringComparison.OrdinalIgnoreCase)))
+            {
+                foreach (var rt in DeckGenerationService.GetRegionTypesForCard(regCard, allCards, _filterService))
+                {
+                    if (!string.IsNullOrWhiteSpace(rt))
+                    {
+                        draftedRegionTypes.Add(rt.Trim());
+                    }
+                }
+            }
+
+            var allDeckNonSiteCards = _deck.Pool
+                .Concat(_deck.Resources)
+                .Concat(_deck.Sideboard)
+                .ToList();
+
+            bool PassesFactionSupportGuards(Card evt)
+            {
+                if (!MatchesItemRegionRequirement(evt, draftedRegions, draftedRegionTypes))
+                {
+                    return false;
+                }
+
+                var siteReqs = _filterService.GetCardTagsForCategory(evt.Id, "Site Requirement");
+                if (siteReqs.Count > 0 && !siteReqs.Any(req => MatchesAnySiteRequirement(allSitesInDeck, req, _filterService)))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrWhiteSpace(evt.Specific) &&
+                    !allDraftedChars.Any(ch => CardFilterService.EqualsWithDiacriticFallback(ch.Name, evt.Specific)))
+                {
+                    return false;
+                }
+
+                if (!SatisfiesExistingPrerequisites(evt, allDeckNonSiteCards))
+                {
+                    return false;
+                }
+
+                if (!MatchesSkillOrRaceRequirements(evt, allDraftedChars))
+                {
+                    return false;
+                }
+
+                if (!MatchesItemTargetSpecies(evt, allDraftedChars))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            var supportCandidates = (reqResSup > 0 || reqSideSup > 0)
+                ? allCards
+                    .Where(c =>
+                        (activeSets.Count == 0 || activeSets.Contains(c.Set)) &&
+                        IsFactionSupportEvent(c))
+                    .GroupBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                    .Select(PickHeroPreferredFromGroup)
+                    .Where(c => c != null && PassesFactionSupportGuards(c))
+                    .OrderBy(_ => Random.Shared.Next())
+                    .ToList()
+                : [];
+
+            var draftedResSup = DraftItemsIntoSection(supportCandidates, _deck.Resources, reqResSup, resCapacity, usedCountsByName);
+            var draftedSideSup = DraftItemsIntoSection(supportCandidates, _deck.Sideboard, reqSideSup, sideCapacity, usedCountsByName);
+
             _deck.SortSections();
             if (!silent)
             {
-                NotifyDeckChanged(draftedResFactions.Count > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
+                NotifyDeckChanged((draftedResFactions.Count + draftedResSup.Count) > 0 ? DeckSectionType.Resources : DeckSectionType.Sideboard);
             }
 
             string resText = draftedResFactions.Count > 0
@@ -1048,6 +1158,12 @@ namespace MECCG_Deck_Builder
                 ("Sideboard:", sideText)
             };
 
+            if (reqResSup > 0 || reqSideSup > 0 || draftedResSup.Count > 0 || draftedSideSup.Count > 0)
+            {
+                bullets.Add(("Resources Support:", draftedResSup.Count > 0 ? FormatCardCountList(draftedResSup) : "(None)"));
+                bullets.Add(("Sideboard Support:", draftedSideSup.Count > 0 ? FormatCardCountList(draftedSideSup) : "(None)"));
+            }
+
             var warnings = new List<string>();
             if (draftedResFactions.Count < reqRes)
             {
@@ -1057,11 +1173,23 @@ namespace MECCG_Deck_Builder
             {
                 warnings.Add($"Sideboard Faction Shortfall: Drafted only {draftedSideFactions.Count} of {reqSide} playable faction(s).");
             }
+            if (draftedResSup.Count < reqResSup)
+            {
+                warnings.Add($"Resources Faction Support Shortfall: Drafted only {draftedResSup.Count} of {reqResSup} eligible event(s).");
+            }
+            if (draftedSideSup.Count < reqSideSup)
+            {
+                warnings.Add($"Sideboard Faction Support Shortfall: Drafted only {draftedSideSup.Count} of {reqSideSup} eligible event(s).");
+            }
             warnings.AddRange(siteTracker.BuildOverlapMessages());
+
+            string headerText = (reqResSup > 0 || reqSideSup > 0 || draftedResSup.Count > 0 || draftedSideSup.Count > 0)
+                ? $"Drafted {draftedResFactions.Count} faction(s) (+ {draftedResSup.Count} support) into Resources and {draftedSideFactions.Count} (+ {draftedSideSup.Count} support) into Sideboard:"
+                : $"Drafted {draftedResFactions.Count} faction(s) into Resources and {draftedSideFactions.Count} into Sideboard:";
 
             SetRichBulletedStatus(
                 _rtbFactionStatus,
-                $"Drafted {draftedResFactions.Count} faction(s) into Resources and {draftedSideFactions.Count} into Sideboard:",
+                headerText,
                 [bullets],
                 warnings);
             return true;

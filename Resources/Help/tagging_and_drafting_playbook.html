@@ -220,7 +220,7 @@
     <ul>
         <li><code>Movement</code> &rarr; Extra movement phases, emergency Haven relocation, or flight (<em>Bill the Pony</em>, <em>Gwaihir</em>, <em>Shadowfax</em>)</li>
         <li><code>Protection</code> &rarr; Strike immunity against automatic attacks, attack evasion, or hazard cancellation (<em>Treebeard</em>, <em>Goldberry</em>, <em>Tom Bombadil</em>)</li>
-        <li><code>Recruitment</code> &rarr; Alternative faction recruitment mechanisms bypassing influence checks (<em>Ro&auml;c the Raven</em>)</li>
+        <li><code>Influence</code> &rarr; Alternative faction recruitment mechanisms bypassing standard diplomat checks (<em>Ro&auml;c the Raven</em>)</li>
     </ul>
 
     <div class="note">
@@ -683,7 +683,7 @@
     <div class="note">
         <strong>What is Intentionally OMITTED on Factions:</strong>
         <ul>
-            <li><strong>No <code>Role</code> Tags:</strong> Factions are scored Marshalling Point assets, not utility events. Tagging them with <code>Role: Influence</code> or <code>Role: Recruitment</code> would cause generic event queries to draft high-MP factions into event slots.</li>
+            <li><strong>No <code>Role</code> Tags:</strong> Factions are scored Marshalling Point assets, not utility events. Tagging them with <code>Role: Influence</code> or <code>Role: Faction Support</code> would cause generic event queries to draft high-MP factions into event slots.</li>
             <li><strong>No <code>Target Species</code> for Standard Modifications:</strong> Standard printed dice adjustments (such as <em>Wood-elves</em> granting <code>Elves (+1), Dwarves (-2)</code>) are situational in-game roll modifiers. In deck construction, diplomat recruitment bonuses are handled proactively by <code>Faction Bonus</code> on Character cards.</li>
             <li><strong>No Redundant Racial Tags:</strong> Factions already carry their official species classification in the database (e.g. <em>Wood-elves</em> has <code>Race: Elf</code>, <em>Iron Hill Dwarves</em> has <code>Race: Dwarf</code>, <em>Riders of Rohan</em> has <code>Race: Man</code>). Procedural rules query official <code>Race</code> directly without custom tag duplication.</li>
         </ul>
@@ -1401,7 +1401,7 @@
         <li><code>Corruption</code> &rarr; Active corruption removal (<em>Palant&iacute;r of Elostirion</em>)</li>
         <li><code>Influence</code> &rarr; Mathematical bonuses to Direct Influence (DI) or recruitment check rolls (<em>Elf-stone</em>, <em>Horn of Anor</em>, <em>Lesser Ring</em>, <em>Magic Ring of Words</em>)</li>
         <li><code>Influence; Readiness</code> &rarr; Dwarf influence leadership and stamina refreshing (<em>The Arkenstone</em>)</li>
-        <li><code>Influence; Recruitment</code> &rarr; Direct faction recruitment tools and homeland character influence (<em>Red Arrow</em>)</li>
+        <li><code>Influence; Faction Support</code> &rarr; Direct faction recruitment tools and homeland character influence (<em>Red Arrow</em>)</li>
         <li><code>Item</code> &rarr; Modifying Gold Ring test rolls or searching play decks for items (<em>Scroll of Isildur</em>, <em>Dwarven Rings of Barin, B&aacute;vor, Dr&uacute;in, Dw&aacute;lin, Th&eacute;lor, Thr&aacute;r</em>)</li>
         <li><code>Site</code> &rarr; Untapping visited site cards (<em>Dwarven Ring of Durin's Tribe</em>)</li>
         <li><code>Quest</code> &rarr; Relics and storyline items delivering victory points when stored or planted at designated strongholds (<em>Earth of Galadriel's Orchard</em>, <em>Sapling of the White Tree</em>, <em>Book of Mazarbul</em>)</li>
@@ -1674,13 +1674,13 @@
         <li><code>Card Flow</code> &rarr; Searching play decks, retrieving cards from discard, hand cycling, or mass hazard permanent-event discard (<em>Gates of Morning</em>, <em>Favor of the Valar</em>, <em>Far-sight</em>, <em>Mirror of Galadriel</em>, <em>Reforging</em>, <em>The Cock Crows</em>, <em>Vilya</em>, <em>Wizard's River-horses</em>)</li>
         <li><code>Combat</code> &rarr; Active martial prowess buffs, combat dice enhancements, or strike debuffs (<em>Block</em>, <em>Dodge</em>, <em>Lucky Strike</em>, <em>Risky Blow</em>, <em>Clear Skies</em>, <em>Fellowship</em>, <em>Kindling of the Spirit</em>, <em>Lapse of Will</em>, <em>Sacrifice of Form</em>, <em>Stars</em>, <em>Sun</em>, <em>The Evenstar</em>, <em>The Old Thrush</em>, <em>True F&aacute;na</em>, <em>Wizard's Fire</em>, <em>Wizard's Flame</em>)</li>
         <li><code>Corruption</code> &rarr; Mitigating corruption burdens, providing roll bonuses, or auto-passing corruption checks (<em>A Friend or Three</em>, <em>Elf-song</em>, <em>Fellowship</em>, <em>Halfling Strength</em>, <em>Nenya</em>, <em>New Friendship</em>, <em>Old Friendship</em>)</li>
-        <li><code>Influence</code> &rarr; Numerical bonuses to influence dice rolls or direct influence capacity buffs (<em>A Friend or Three</em>, <em>Lordly Presence</em>, <em>Muster</em>, <em>Nenya</em>, <em>New Friendship</em>, <em>Old Friendship</em>, <em>Persuasive Words</em>, <em>Return of the King</em>, <em>Tempering Friendship</em>, <em>Wizard's Laughter</em>, <em>Wizard's Voice</em>)</li>
+        <li><code>Faction Support</code> &rarr; Subset of Hero Resource events directly aiding faction influence attempts (<em>A Friend or Three</em>, <em>Lordly Presence</em>, <em>Muster</em>, <em>New Friendship</em>, <em>Persuasive Words</em>, <em>Tempering Friendship</em>)</li>
+        <li><code>Influence</code> &rarr; Numerical bonuses to influence dice rolls, direct influence capacity buffs, or character/faction entry enablers (<em>A Chance Meeting</em>, <em>A Friend or Three</em>, <em>Lordly Presence</em>, <em>Muster</em>, <em>New Friendship</em>, <em>Old Friendship</em>, <em>Old Road</em>, <em>Persuasive Words</em>, <em>Return of the King</em>, <em>Tempering Friendship</em>, <em>Wizard's Laughter</em>, <em>Wizard's Voice</em>)</li>
         <li><code>Item</code> &rarr; Testing Gold Rings, retrieving stored gear, activating Palant&iacute;ri, or searching for items (<em>Align Palant&iacute;r</em>, <em>Lucky Search</em>, <em>Reforging</em>, <em>Ringlore</em>, <em>Test of Form</em>, <em>Test of Lore</em>, <em>Thorough Search</em>, <em>Use Palant&iacute;r</em>, <em>Wizard's Test</em>)</li>
         <li><code>Movement</code> &rarr; Granting additional movement phases, haven return, or regional route adjustments (<em>Anduin River</em>, <em>Ash Mountains</em>, <em>Bridge</em>, <em>Great-road</em>, <em>Misty Mountains</em>, <em>Morannon</em>, <em>Mountains of Shadow</em>, <em>White Mountains</em>)</li>
         <li><code>Protection</code> &rarr; Cancelling attacks before strikes are rolled, dodging strikes, or reducing hazard limits (<em>Concealment</em>, <em>Dark Quarrels</em>, <em>Eagle-mounts</em>, <em>Elf-song</em>, <em>Escape</em>, <em>Fair Sailing</em>, <em>Fair Travels...</em>, <em>Ford</em>, <em>Great Ship</em>, <em>Halfling Stealth</em>, <em>Hiding</em>, <em>Horses</em>, <em>Praise to Elbereth</em>, <em>Sacrifice of Form</em>, <em>Secret Entrance</em>, <em>Secret Passage</em>, <em>Stealth</em>, <em>The Cock Crows</em>, <em>Vanishment</em>, <em>Wizard's River-horses</em>)</li>
         <li><code>Quest</code> &rarr; Scoring Marshalling Points (MPs) for completing specific journeys, or destroying The One Ring (<em>And&uacute;ril, the Flame of the West</em>, <em>Cracks of Doom</em>, <em>Dreams of Lore</em>, <em>Gollum's Fate</em>, <em>Rescue Prisoners</em>, <em>Stone of Erech</em>)</li>
         <li><code>Readiness</code> &rarr; Untapping characters, stamina recovery, or healing wounds from wounded to well status (<em>And&uacute;ril, the Flame of the West</em>, <em>Halfling Strength</em>, <em>Narya</em>)</li>
-        <li><code>Recruitment</code> &rarr; Enabling or accelerating character/faction entry into play at non-standard sites or alternative havens (<em>A Chance Meeting</em>, <em>Muster</em>, <em>Old Road</em>)</li>
         <li><code>Site</code> &rarr; Transforming site status into a Haven or functioning as a dark site (<em>Morannon</em>, <em>Quiet Lands</em>, <em>The White Tree</em>)</li>
         <li><code>Terrain</code> &rarr; Converting region path symbols and territory terrain between hostile and safe (<em>Fog</em>, <em>Moon</em>, <em>Quiet Lands</em>, <em>Stars</em>, <em>The Evenstar</em>)</li>
     </ul>

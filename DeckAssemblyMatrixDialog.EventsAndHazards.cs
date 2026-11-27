@@ -99,7 +99,7 @@ namespace MECCG_Deck_Builder
                 UseMnemonic = false,
                 Text =
                     "• Distributes slots proportionately by eligible cards per checked Role (min 1 each if slots permit).\n" +
-                    "• Excludes Gates of Morning, Twilight, Quests, Ring Tests & Palantír Use events.\n" +
+                    "• Excludes Gates of Morning, Twilight, Quests, Faction Support, Ring Tests & Palantír Use events.\n" +
                     "• Enforces Skill, Target Species, Specific, Site/Region Requirements & existing Prerequisites."
             };
 
@@ -574,6 +574,7 @@ namespace MECCG_Deck_Builder
             }
 
             if (HasRoleTag(card, "Quest")) return false;
+            if (HasRoleTag(card, "Faction Support")) return false;
             if (HasSpecialAbility(card, "Gold Ring: Allow Test")) return false;
             if (HasSpecialAbility(card, "Palantír: Allow Use")) return false;
 

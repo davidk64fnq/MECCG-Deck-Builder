@@ -469,6 +469,14 @@ namespace MECCG_Deck_Builder
               card.Secondary.Contains("event", StringComparison.OrdinalIgnoreCase)) ||
              CardFilterService.EqualsWithDiacriticFallback(card.Name, "Twilight"));
 
+        private bool IsFactionSupportEvent(Card card) =>
+            card != null &&
+            string.Equals(card.Primary, "Resource", StringComparison.OrdinalIgnoreCase) &&
+            IsHeroPlayableAlignment(card.Alignment) &&
+            card.Secondary != null &&
+            card.Secondary.Contains("event", StringComparison.OrdinalIgnoreCase) &&
+            HasRoleTag(card, "Faction Support");
+
         private bool IsGeneralResourceEvent(Card card) =>
             IsResourceEventPackageCard(card) &&
             !IsRingPackageCard(card) &&
@@ -1228,6 +1236,8 @@ namespace MECCG_Deck_Builder
         // Tab 5: Factions
         public int ResourceFactionCount { get; set; } = 1;
         public int SideboardFactionCount { get; set; } = 0;
+        public int ResourceFactionSupportCount { get; set; } = 0;
+        public int SideboardFactionSupportCount { get; set; } = 0;
 
         // Tab 6: Allies
         public int ResourceAllyCount { get; set; } = 1;
